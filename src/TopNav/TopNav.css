@@ -1,0 +1,23 @@
+.nav-container {
+    position: relative;
+    height: 85px;
+    background-color: #222;
+}
+
+.nav-item {
+    position: absolute;
+    top: 10px;
+}
+
+.btn {
+    right: 10px;
+    height: 37px;
+    border-radius: 7px;
+    font-size: 150%;
+}
+
+.brand {
+    left: 10px;
+    font-size: 200%;
+    color: #ddd;
+}
