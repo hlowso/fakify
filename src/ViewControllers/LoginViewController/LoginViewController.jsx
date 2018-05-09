@@ -7,15 +7,14 @@ import {
     FormControl, 
     Col
 } from "react-bootstrap";
-import "./SignUpViewController.css";
+import "./LoginViewController.css";
 
-class SignUpViewController extends Component {
+class LoginViewController extends Component {
     constructor(props) {
         super(props);
         this.state = {
             currentEmail: "",
             currentPassword: "",
-            currentConfirmedPassword: ""
         };
     }
 
@@ -23,7 +22,7 @@ class SignUpViewController extends Component {
         return (
             <div className="form-container">
                 <div className="header-container">
-                    <span className="header">Sign Up</span>
+                    <span className="header">Login</span>
                 </div>
                 <Form horizontal> 
                     <FormGroup row controlId="email" >
@@ -47,21 +46,13 @@ class SignUpViewController extends Component {
                         </Col>
                     </FormGroup>
 
-                    <FormGroup row controlId="confirm-password" >
-                        <Col componentClass={ControlLabel} sm={2} >
-                            Confirm Password
-                        </Col>
-                        <Col sm={10} >
-                            <FormControl type="password" />
-                        </Col>
-                    </FormGroup>
                 </Form>
                 <div>
-                    <Link to="/login">Already signed up?</Link>
+                    <Link to="/signup">Don't have an account?</Link>
                 </div>
             </div>
         );
     }
 };
 
-export default SignUpViewController;
+export default LoginViewController;

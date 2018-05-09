@@ -3,7 +3,7 @@ import { Switch, Route } from "react-router";
 
 import TopNav from "../TopNav/TopNav";
 import SignUpViewController from '../ViewControllers/SignUpViewController/SignUpViewController';
-// import LoginViewController from '../ViewControllers/LoginViewController';
+import LoginViewController from '../ViewControllers/LoginViewController/LoginViewController';
 
 const AppRouter = () => (
     <div id="app-router">
@@ -11,7 +11,7 @@ const AppRouter = () => (
         <main>
             <Switch>
                 <Route exact path='/signup' component={SignUpViewController} />
-                {/* <Route exact path='/login' component={LoginViewController} /> */}
+                <Route exact path='/login' component={LoginViewController} />
             </Switch>
         </main>
     </div>
