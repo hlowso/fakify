@@ -1,12 +1,5 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { 
-    Form,
-    FormGroup, 
-    ControlLabel, 
-    FormControl, 
-    Col
-} from "react-bootstrap";
 import "./LoginViewController.css";
 
 class LoginViewController extends Component {
@@ -21,32 +14,64 @@ class LoginViewController extends Component {
     render() {
         return (
             <div className="form-container">
-                <div className="header-container">
-                    <span className="header">Login</span>
-                </div>
-                <Form horizontal> 
-                    <FormGroup row controlId="email" >
-                        <Col componentClass={ControlLabel} sm={2} >
-                            Email
-                        </Col>
-                        <Col sm={10} >
-                            <FormControl 
+                <h1>Login</h1>
+
+                <form>
+                    <table style={{width: "100%"}}>
+                        <col style={{width: "20%"}} />
+                        <col style={{width: "80%"}} />
+                        
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <label>Email</label>
+                                </td>
+                                <td>
+                                    <input 
+                                        type="email"
+                                        placeholder="example@gmail.com"
+                                    />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>Password</label>   
+                                </td>
+                                <td>
+                                    <input
+                                        type="password"
+                                        placeholder="password"
+                                    />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+
+                {/* <Form>
+                    <FormGroup row>
+                        <Label for="email" sm={3}>Email</Label>
+                        <Col sm={4}>
+                            <Input 
                                 type="email" 
-                                placeholder="example@gmail.com" 
+                                name="email"                                
+                                placeholder="Email" 
                             />
                         </Col>
                     </FormGroup>
 
-                    <FormGroup row controlId="password" >
-                        <Col componentClass={ControlLabel} sm={2} >
-                            Password
-                        </Col>
-                        <Col sm={10} >
-                            <FormControl type="password" />
+                    <FormGroup row>
+                        <Label for="password" sm={3}>Password</Label>
+                        <Col sm={4}>
+                            <Input 
+                                type="password"
+                                name="password" 
+                                placeholder="Password" 
+                            />
                         </Col>
                     </FormGroup>
 
-                </Form>
+                </Form> */}
                 <div>
                     <Link to="/signup">Don't have an account?</Link>
                 </div>
