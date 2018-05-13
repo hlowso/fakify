@@ -1,8 +1,10 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import "./SignUpViewController.css";
 
+const PASSWORD_MINIMUM_LENGTH = 8;
 const NO_MATCH_MESSAGE = "passwords don't match";
+const PASSWORD_TOO_SHORT_MESSAGE = `password must be at least ${PASSWORD_MINIMUM_LENGTH} characters`
 
 class SignUpViewController extends Component {
     constructor(props) {
@@ -11,7 +13,8 @@ class SignUpViewController extends Component {
             currentEmail: "",
             currentPassword: "",
             currentConfirmPassword: "",
-            errorMessage: ""
+            errorMessage: "",
+            signupSuccessful: false
         };
     }
 
@@ -21,90 +24,93 @@ class SignUpViewController extends Component {
             currentEmail, 
             currentPassword, 
             currentConfirmPassword,
-            errorMessage 
+            errorMessage,
+            signupSuccessful 
         } = this.state;
 
-        return (
-            <div>
-                <div className="signup-container header-container">
-                    <h1>Sign Up</h1>
-                </div>
+        return signupSuccessful
+                ? <Redirect to="/play" />
+                : (
+                    <div>
+                        <div className="signup-container header-container">
+                            <h1>Sign Up</h1>
+                        </div>
+                    
+                        <div className="signup-container form-container">
             
-                <div className="signup-container form-container">
-
-                    <form onSubmit={this.submitHandler}>
-                        <table style={{width: "100%"}}>
-                            <col style={{width: "30%"}} />
-                            <col style={{width: "70%"}} />
-                            
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <label>Email:</label>
-                                    </td>
-                                    <td>
-                                        <input 
-                                            type="email"
-                                            value={currentEmail}
-                                            name="currentEmail"
-                                            placeholder="example@gmail.com"
-                                            onChange={this.handleInputChange}
-                                        />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <label>Password:</label>   
-                                    </td>
-                                    <td>
-                                        <input
-                                            type="password"
-                                            value={currentPassword}
-                                            name="currentPassword"
-                                            placeholder="password"
-                                            onChange={this.handleInputChange}
-                                        />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <label>Confirm Password:</label>   
-                                    </td>
-                                    <td>
-                                        <input
-                                            type="password"
-                                            value={currentConfirmPassword}
-                                            name="currentConfirmPassword"
-                                            placeholder="confirm password"
-                                            onChange={this.handleInputChange}
-                                        />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td />
-                                    <td>
-                                        <input
-                                            type="submit"
-                                            value="Submit"
-                                        />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                    <div>
-                                        <Link to="/login">Already signed up?</Link>
-                                    </div>
-                                    </td>
-                                    <td>
-                                        {errorMessage && <span className="error">{errorMessage}</span>}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </form>
-                </div>
-            </div>
-        );
+                            <form onSubmit={this.submitHandler}>
+                                <table style={{width: "100%"}}>
+                                    <col style={{width: "30%"}} />
+                                    <col style={{width: "70%"}} />
+                                    
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <label>Email:</label>
+                                            </td>
+                                            <td>
+                                                <input 
+                                                    type="email"
+                                                    value={currentEmail}
+                                                    name="currentEmail"
+                                                    placeholder="example@gmail.com"
+                                                    onChange={this.handleInputChange}
+                                                />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label>Password:</label>   
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="password"
+                                                    value={currentPassword}
+                                                    name="currentPassword"
+                                                    placeholder="password"
+                                                    onChange={this.handleInputChange}
+                                                />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label>Confirm Password:</label>   
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="password"
+                                                    value={currentConfirmPassword}
+                                                    name="currentConfirmPassword"
+                                                    placeholder="confirm password"
+                                                    onChange={this.handleInputChange}
+                                                />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td />
+                                            <td>
+                                                <input
+                                                    type="submit"
+                                                    value="Create Account"
+                                                />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                            <div>
+                                                <Link to="/login">Already signed up?</Link>
+                                            </div>
+                                            </td>
+                                            <td>
+                                                {errorMessage && <span className="error">{errorMessage}</span>}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                );
     }
 
     handleInputChange = event => {
@@ -119,15 +125,18 @@ class SignUpViewController extends Component {
         event.preventDefault();
         let { 
             currentEmail,
-             currentPassword,
-             currentConfirmPassword
+            currentPassword,
+            currentConfirmPassword
          } = event.target;
 
         let email = currentEmail.value,
             password = currentPassword.value,
             confirmPassword = currentConfirmPassword.value;
 
-        if (password !== confirmPassword) {
+        if (password.length < PASSWORD_MINIMUM_LENGTH) {
+            this.setState({ errorMessage: PASSWORD_TOO_SHORT_MESSAGE});
+        }
+        else if (password !== confirmPassword) {
             this.setState({ errorMessage: NO_MATCH_MESSAGE});
         }
         else {
@@ -142,14 +151,9 @@ class SignUpViewController extends Component {
             })
             .then(response => {
                 console.log("RESPONSE", response);
-                if (response) { 
-                    console.log(response.headers);
-                    return response.json(); 
+                if (response.status === 200) {
+                    this.setState({ signupSuccessful: true });
                 }
-                return null;
-            })
-            .then(body => {
-                console.log(body);
             });
         }
     }

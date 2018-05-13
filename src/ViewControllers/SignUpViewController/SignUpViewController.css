@@ -24,6 +24,7 @@ input {
 }
 
 input[type="submit"] {
+    margin-top: 5%;
     width: 200px;
     border: 1px solid #666
 }
@@ -57,5 +58,10 @@ a, a:visited {
 
 a:hover {
     color: #222;
+}
+
+.error {
+    margin-left: 10%;    
+    color: #f66;
 }
 

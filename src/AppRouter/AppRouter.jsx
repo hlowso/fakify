@@ -19,7 +19,7 @@ class AppRouter extends Component {
             ? this.getAuthenticatingJSX()
             : accessGranted
                 ? this.getRouterJSX()
-                : this.getRedirectJSX();
+                : <Redirect to="/login" />;
     }
 
     componentWillMount() {
@@ -42,10 +42,6 @@ class AppRouter extends Component {
         <Switch id="app-router">
             <Route exact path="/play" component={PlayerViewController} />
         </Switch>
-    )
-
-    getRedirectJSX = () => (
-        <Redirect to="/login" />
     )
 };
 

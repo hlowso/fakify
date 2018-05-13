@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import "./LoginViewController.css";
 
 class LoginViewController extends Component {
@@ -8,75 +8,134 @@ class LoginViewController extends Component {
         this.state = {
             currentEmail: "",
             currentPassword: "",
+            errorMessage: "",
+            accessGranted: false
         };
     }
 
     render() {
-        return (
-            <div className="form-container">
-                <h1>Login</h1>
+        let { 
+            currentEmail, 
+            currentPassword, 
+            errorMessage, 
+            accessGranted 
+        } = this.state;
 
-                <form>
-                    <table style={{width: "100%"}}>
-                        <col style={{width: "20%"}} />
-                        <col style={{width: "80%"}} />
-                        
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <label>Email</label>
-                                </td>
-                                <td>
-                                    <input 
-                                        type="email"
-                                        placeholder="example@gmail.com"
-                                    />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <label>Password</label>   
-                                </td>
-                                <td>
-                                    <input
-                                        type="password"
-                                        placeholder="password"
-                                    />
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </form>
-
-                {/* <Form>
-                    <FormGroup row>
-                        <Label for="email" sm={3}>Email</Label>
-                        <Col sm={4}>
-                            <Input 
-                                type="email" 
-                                name="email"                                
-                                placeholder="Email" 
-                            />
-                        </Col>
-                    </FormGroup>
-
-                    <FormGroup row>
-                        <Label for="password" sm={3}>Password</Label>
-                        <Col sm={4}>
-                            <Input 
-                                type="password"
-                                name="password" 
-                                placeholder="Password" 
-                            />
-                        </Col>
-                    </FormGroup>
-
-                </Form> */}
-                <div>
-                    <Link to="/signup">Don't have an account?</Link>
-                </div>
-            </div>
+        return accessGranted 
+                ? <Redirect to="/play" /> 
+                : (
+                    <div>
+                        <div className="login-container header-container">
+                            <h1>Login</h1>                
+                        </div>
+                        <div className="login-container form-container">
+                            <form onSubmit={this.handleSubmit}>
+                                <table style={{width: "100%"}}>
+                                    <col style={{width: "30%"}} />
+                                    <col style={{width: "70%"}} />
+                                    
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <label>Email:</label>
+                                            </td>
+                                            <td>
+                                                <input 
+                                                    type="email"
+                                                    value={currentEmail}
+                                                    name="currentEmail"
+                                                    placeholder="example@gmail.com"
+                                                    onChange={this.handleInputChange}
+                                                />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label>Password:</label>   
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="password"
+                                                    value={currentPassword}
+                                                    name="currentPassword"
+                                                    placeholder="password"
+                                                    onChange={this.handleInputChange}
+                                                />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td />
+                                            <td>
+                                                <input
+                                                    type="submit"
+                                                    value="Login"
+                                                />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                            <div>
+                                                <Link to="/signup">Don't have an account?</Link>
+                                            </div>
+                                            </td>
+                                            <td>
+                                                {errorMessage && <span className="error">{errorMessage}</span>}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
         );
+    }
+
+    handleInputChange = event => {
+        let { name, value } = event.target;
+        let stateUpdate = {};
+        stateUpdate[name] = value;
+
+        this.setState(stateUpdate);
+    }
+
+    handleSubmit = event => {
+        event.preventDefault();
+
+        let { 
+            currentEmail,
+            currentPassword
+         } = event.target;
+
+        let email = currentEmail.value,
+            password = currentPassword.value;
+
+        if (password.length === 0) {
+            this.setState({ errorMessage: "password cannot be empty" });
+        }
+        else {
+            let returningUser = { email, password };
+            fetch('/api/admin/login', { 
+                body: JSON.stringify(returningUser), 
+                method: "PATCH", 
+                headers: {
+                    'content-type': 'application/json'
+                }, 
+                credentials: "same-origin" 
+            })
+            .then(response => {
+                console.log("RESPONSE", response);
+                let stateUpdate = {};
+
+                if (response.status === 200) { 
+                    stateUpdate.accessGranted = true;
+                }
+                else {
+                    stateUpdate.errorMessage = "passoword or email incorrect";
+                }
+
+                this.setState(stateUpdate);
+            });
+        }
     }
 };
 
