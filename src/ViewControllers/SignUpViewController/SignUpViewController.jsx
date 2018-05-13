@@ -139,18 +139,25 @@ class SignUpViewController extends Component {
         }
         else {
             let newUser = { email, password };
-            fetch('/api/admin/signup', { body: JSON.stringify(newUser), method: "POST", headers: {'content-type': 'application/json'}, credentials: "same-origin" })
-                .then(response => {
-                    console.log("RESPONSE", response);
-                    if (response) { 
-                        console.log(response.headers);
-                        return response.json(); 
-                    }
-                    return null;
-                })
-                .then(body => {
-                    console.log(body);
-                });
+            fetch('/api/admin/signup', { 
+                body: JSON.stringify(newUser), 
+                method: "POST", 
+                headers: {
+                    'content-type': 'application/json'
+                }, 
+                credentials: "same-origin" 
+            })
+            .then(response => {
+                console.log("RESPONSE", response);
+                if (response) { 
+                    console.log(response.headers);
+                    return response.json(); 
+                }
+                return null;
+            })
+            .then(body => {
+                console.log(body);
+            });
         }
     }
 };
