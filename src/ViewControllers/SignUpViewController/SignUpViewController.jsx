@@ -1,12 +1,5 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { 
-    Form,
-    FormGroup, 
-    ControlLabel, 
-    FormControl, 
-    Col
-} from "react-bootstrap";
 import "./SignUpViewController.css";
 
 const NO_MATCH_MESSAGE = "passwords don't match";

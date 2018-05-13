@@ -1,20 +1,52 @@
-import React from "react";
-import { Switch, Route } from "react-router";
+import React, { Component } from "react";
+import { Switch, Route, Redirect } from "react-router";
 
-import TopNav from "../TopNav/TopNav";
-import SignUpViewController from '../ViewControllers/SignUpViewController/SignUpViewController';
-import LoginViewController from '../ViewControllers/LoginViewController/LoginViewController';
+import PlayerViewController from "../ViewControllers/PlayerViewController/PlayerViewController";
 
-const AppRouter = () => (
-    <div id="app-router">
-        <TopNav />
-        <main>
-            <Switch>
-                <Route exact path='/signup' component={SignUpViewController} />
-                <Route exact path='/login' component={LoginViewController} />
-            </Switch>
-        </main>
-    </div>
-);
+class AppRouter extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            authenticating: true,
+            accessGranted: false
+        }
+    }
+
+    render() {
+        let { authenticating, accessGranted } = this.state;
+
+        return authenticating 
+            ? this.getAuthenticatingJSX()
+            : accessGranted
+                ? this.getRouterJSX()
+                : this.getRedirectJSX();
+    }
+
+    componentWillMount() {
+        fetch('/api/admin/authenticate', { 
+            method: "GET", 
+            credentials: "same-origin" 
+        })
+        .then(response => {
+            let stateUpdate = { authenticating: false };
+            stateUpdate.accessGranted = response.status === 200;
+            this.setState(stateUpdate);
+        });
+    }
+
+    getAuthenticatingJSX = () => (
+        <h1>authenticating...</h1>
+    )
+
+    getRouterJSX = () => (
+        <Switch id="app-router">
+            <Route exact path="/play" component={PlayerViewController} />
+        </Switch>
+    )
+
+    getRedirectJSX = () => (
+        <Redirect to="/login" />
+    )
+};
 
 export default AppRouter;
