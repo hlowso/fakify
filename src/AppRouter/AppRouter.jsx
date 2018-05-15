@@ -23,6 +23,8 @@ class AppRouter extends Component {
     }
 
     componentWillMount() {
+        let { setUser } = this.props;
+
         fetch('/api/admin/authenticate', { 
             method: "GET", 
             credentials: "same-origin" 
@@ -31,7 +33,9 @@ class AppRouter extends Component {
             let stateUpdate = { authenticating: false };
             stateUpdate.accessGranted = response.status === 200;
             this.setState(stateUpdate);
-        });
+            return response.json();
+        })
+        .then(user => setUser(user));
     }
 
     getAuthenticatingJSX = () => (

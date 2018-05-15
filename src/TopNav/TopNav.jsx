@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Link, Redirect } from "react-router-dom";
-import { Navbar, NavItem } from "react-bootstrap";
+import { Navbar, Nav, NavItem } from "react-bootstrap";
 import "./TopNav.css";
 
 class TopNav extends Component {
@@ -11,11 +11,6 @@ class TopNav extends Component {
     }
 
     render() {
-        // let navStyle = {
-        //     backgroundColor: "#222",
-        //     width: "%100"
-        // };
-
         let { user } = this.props;
 
         return (
@@ -24,13 +19,17 @@ class TopNav extends Component {
                     <Navbar.Brand className="nav-item brand">
                         PreComp
                     </Navbar.Brand>
-                    {user.email && <NavItem onClick={this.onClickLogout} style={{color: "white"}}>{user.email}</NavItem>}
                 </Navbar.Header>
-                {/* <Link to="/signup">
-                    <button className="nav-item btn">
-                        Sign Up                        
-                    </button>
-                </Link> */}
+                <Navbar.Collapse>
+                    <Nav pullRight>
+                        {user.email 
+                            && <NavItem 
+                                    onClick={this.onClickLogout} 
+                                    style={{color: "white"}} >
+                                        {user.email}
+                                </NavItem>}
+                    </Nav>
+                </Navbar.Collapse>
             </Navbar>
         );
     }
