@@ -33,9 +33,14 @@ class AppRouter extends Component {
             let stateUpdate = { authenticating: false };
             stateUpdate.accessGranted = response.status === 200;
             this.setState(stateUpdate);
-            return response.json();
+            if (response.status === 200) {
+                return response.json();
+            }
+            return null;
         })
-        .then(user => setUser(user));
+        .then(user => { 
+            if(user) setUser(user); 
+        });
     }
 
     getAuthenticatingJSX = () => (
