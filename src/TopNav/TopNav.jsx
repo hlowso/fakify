@@ -7,7 +7,6 @@ class TopNav extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            logoutClicked: false
         };
     }
 
@@ -18,11 +17,8 @@ class TopNav extends Component {
         // };
 
         let { user } = this.props;
-        let { logoutClicked } = this.state; 
 
-        return logoutClicked
-            ? <Redirect to="/login" />
-            : (
+        return (
             <Navbar staticTop className="nav-container">
                 <Navbar.Header>
                     <Navbar.Brand className="nav-item brand">
@@ -41,13 +37,14 @@ class TopNav extends Component {
 
     onClickLogout = event => {
         fetch("/api/admin/logout", {
-            method: "PATCH"
+            method: "PATCH",
+            credentials: "same-origin"
         })
         .then(response => {
             console.log("LOGOUT RESPONSE", response);
             
         });
-        this.setState({ logoutClicked: true });
+        window.location.reload();
     }
 }
 
