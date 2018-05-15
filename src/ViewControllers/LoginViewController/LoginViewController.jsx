@@ -128,6 +128,7 @@ class LoginViewController extends Component {
 
                 if (response.status === 200) { 
                     stateUpdate.accessGranted = true;
+                    this.props.setUser({ email: "placeholder@gmail.com" });
                 }
                 else {
                     stateUpdate.errorMessage = "passoword or email incorrect";

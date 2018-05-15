@@ -1,12 +1,14 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
-import { Navbar } from "react-bootstrap";
+import { Link, Redirect } from "react-router-dom";
+import { Navbar, NavItem } from "react-bootstrap";
 import "./TopNav.css";
 
 class TopNav extends Component {
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            logoutClicked: false
+        };
     }
 
     render() {
@@ -15,12 +17,18 @@ class TopNav extends Component {
         //     width: "%100"
         // };
 
-        return (
+        let { user } = this.props;
+        let { logoutClicked } = this.state; 
+
+        return logoutClicked
+            ? <Redirect to="/login" />
+            : (
             <Navbar staticTop className="nav-container">
                 <Navbar.Header>
                     <Navbar.Brand className="nav-item brand">
                         PreComp
                     </Navbar.Brand>
+                    {user.email && <NavItem onClick={this.onClickLogout} style={{color: "white"}}>{user.email}</NavItem>}
                 </Navbar.Header>
                 {/* <Link to="/signup">
                     <button className="nav-item btn">
@@ -29,6 +37,17 @@ class TopNav extends Component {
                 </Link> */}
             </Navbar>
         );
+    }
+
+    onClickLogout = event => {
+        fetch("/api/admin/logout", {
+            method: "PATCH"
+        })
+        .then(response => {
+            console.log("LOGOUT RESPONSE", response);
+            
+        });
+        this.setState({ logoutClicked: true });
     }
 }
 

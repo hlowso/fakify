@@ -141,6 +141,7 @@ class SignUpViewController extends Component {
         }
         else {
             let newUser = { email, password };
+
             fetch('/api/admin/signup', { 
                 body: JSON.stringify(newUser), 
                 method: "POST", 
@@ -154,6 +155,10 @@ class SignUpViewController extends Component {
                 if (response.status === 200) {
                     this.setState({ signupSuccessful: true });
                 }
+                return response.json();
+            })
+            .then(user => {
+                this.props.setUser(user);
             });
         }
     }
