@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { Link, Redirect } from "react-router-dom";
 import "./SignUpViewController.css";
 
+import * as Api from "../../shared/Api";
+
 const PASSWORD_MINIMUM_LENGTH = 8;
 const NO_MATCH_MESSAGE = "passwords don't match";
 const PASSWORD_TOO_SHORT_MESSAGE = `password must be at least ${PASSWORD_MINIMUM_LENGTH} characters`
@@ -19,7 +21,6 @@ class SignUpViewController extends Component {
     }
 
     render() {
-
         let { 
             currentEmail, 
             currentPassword, 
@@ -141,25 +142,17 @@ class SignUpViewController extends Component {
         }
         else {
             let newUser = { email, password };
-
-            fetch('/api/admin/signup', { 
-                body: JSON.stringify(newUser), 
-                method: "POST", 
-                headers: {
-                    'content-type': 'application/json'
-                }, 
-                credentials: "same-origin" 
-            })
-            .then(response => {
-                console.log("RESPONSE", response);
-                if (response.status === 200) {
-                    this.setState({ signupSuccessful: true });
-                }
-                return response.json();
-            })
-            .then(user => {
-                this.props.setUser(user);
-            });
+            let stateUpdate = {};
+            Api.signup(newUser)
+                .then(user => {
+                    if (user) {
+                        stateUpdate.signupSuccessful = true;
+                        this.props.setUser(user);
+                    } else {
+                        stateUpdate.errorMessage = "a user already exists with that email";
+                    }
+                    this.setState(stateUpdate);
+                });
         }
     }
 };

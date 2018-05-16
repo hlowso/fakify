@@ -3,11 +3,12 @@ import { Link, Redirect } from "react-router-dom";
 import { Navbar, Nav, NavItem } from "react-bootstrap";
 import "./TopNav.css";
 
+import * as Api from "../shared/Api"; 
+
 class TopNav extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-        };
+        this.state = {};
     }
 
     render() {
@@ -35,15 +36,10 @@ class TopNav extends Component {
     }
 
     onClickLogout = event => {
-        fetch("/api/admin/logout", {
-            method: "PATCH",
-            credentials: "same-origin"
-        })
-        .then(response => {
-            console.log("LOGOUT RESPONSE", response);
-            
-        });
-        window.location.reload();
+        Api.logout()
+            .then(() => { 
+                window.location.reload();
+            });
     }
 }
 

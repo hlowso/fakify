@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Switch, Route, Redirect } from "react-router";
 
+import * as Api from "../shared/Api";
 import PlayerViewController from "../ViewControllers/PlayerViewController/PlayerViewController";
 
 class AppRouter extends Component {
@@ -25,22 +26,15 @@ class AppRouter extends Component {
     componentWillMount() {
         let { setUser } = this.props;
 
-        fetch('/api/admin/authenticate', { 
-            method: "GET", 
-            credentials: "same-origin" 
-        })
-        .then(response => {
-            let stateUpdate = { authenticating: false };
-            stateUpdate.accessGranted = response.status === 200;
-            this.setState(stateUpdate);
-            if (response.status === 200) {
-                return response.json();
-            }
-            return null;
-        })
-        .then(user => { 
-            if(user) setUser(user); 
-        });
+        Api.authenticate()
+            .then(user => { 
+                let stateUpdate = { authenticating: false };
+                if(user) { 
+                    setUser(user);
+                    stateUpdate.accessGranted = true;
+                } 
+                this.setState(stateUpdate);
+            });
     }
 
     getAuthenticatingJSX = () => (

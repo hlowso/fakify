@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { Link, Redirect } from "react-router-dom";
 import "./LoginViewController.css";
 
+import * as Api from "../../shared/Api";
+
 class LoginViewController extends Component {
     constructor(props) {
         super(props);
@@ -114,28 +116,17 @@ class LoginViewController extends Component {
         }
         else {
             let returningUser = { email, password };
-            fetch('/api/admin/login', { 
-                body: JSON.stringify(returningUser), 
-                method: "PATCH", 
-                headers: {
-                    'content-type': 'application/json'
-                }, 
-                credentials: "same-origin" 
-            })
-            .then(response => {
-                console.log("RESPONSE", response);
-                let stateUpdate = {};
-
-                if (response.status === 200) { 
-                    stateUpdate.accessGranted = true;
-                    this.props.setUser({ email: "placeholder@gmail.com" });
-                }
-                else {
-                    stateUpdate.errorMessage = "passoword or email incorrect";
-                }
-
-                this.setState(stateUpdate);
-            });
+            Api.login(returningUser)
+                .then(res => {
+                    let stateUpdate = {};
+                    if (res.status === 200) {
+                        stateUpdate.accessGranted = true;
+                        this.props.setUser({ email });
+                    } else {
+                        stateUpdate.errorMessage = "email or password incorrect";
+                    }
+                    this.setState(stateUpdate);
+                });
         }
     }
 };
