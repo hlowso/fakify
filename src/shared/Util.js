@@ -47,3 +47,7 @@ export class CookieManager {
         return obj;
     }
 };
+
+export const redirect = route => {
+    window.location.replace(`http://localhost:3000/${route}`);
+};

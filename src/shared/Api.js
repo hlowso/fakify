@@ -10,8 +10,8 @@ export const authenticate = () => {
         });
 }
 
-export const login = () => {
-    return FetchHelpers.PATCH('/api/admin/login');
+export const login = returningUser => {
+    return FetchHelpers.PATCH('/api/admin/login', returningUser);
 }
 
 export const logout = () => {
