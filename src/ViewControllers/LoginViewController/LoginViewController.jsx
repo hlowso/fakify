@@ -26,7 +26,7 @@ class LoginViewController extends Component {
         return accessGranted 
                 ? <Redirect to="/play" /> 
                 : (
-                    <div>
+                    <div id="login-view">
                         <div className="login-container header-container">
                             <h1>Login</h1>                
                         </div>

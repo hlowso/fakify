@@ -32,7 +32,7 @@ class SignUpViewController extends Component {
         return signupSuccessful
                 ? <Redirect to="/play" />
                 : (
-                    <div>
+                    <div id="signup-view">
                         <div className="signup-container header-container">
                             <h1>Sign Up</h1>
                         </div>

@@ -22,11 +22,13 @@ class TopNav extends Component {
                     </Navbar.Brand>
                 </Navbar.Header>
                 <Navbar.Collapse>
-                    <Nav pullRight>
+                    <Nav>
                         {user.email 
-                            && <NavItem 
+                            &&  <NavItem 
+                                    eventKey={1}
                                     onClick={this.onClickLogout} 
-                                    style={{color: "white"}} >
+                                    style={{color: "white"}} 
+                                >
                                         {user.email}
                                 </NavItem>}
                     </Nav>
@@ -35,11 +37,9 @@ class TopNav extends Component {
         );
     }
 
-    onClickLogout = event => {
-        Api.logout()
-            .then(() => { 
-                window.location.reload();
-            });
+    onClickLogout = async event => {
+        await Api.logout();
+        window.location.reload();
     }
 }
 
