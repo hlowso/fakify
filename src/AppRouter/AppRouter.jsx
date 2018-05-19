@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import { Switch, Route, Redirect } from "react-router";
+import { Switch, Route } from "react-router";
 
 import * as Api from "../shared/Api";
 import * as Util from "../shared/Util";
 
 import PlayerViewController from "../ViewControllers/PlayerViewController/PlayerViewController";
-import SignUpViewController from "../ViewControllers/SignUpViewController/SignUpViewController";
-import LoginViewController from "../ViewControllers/LoginViewController/LoginViewController";
+// import SignUpViewController from "../ViewControllers/SignUpViewController/SignUpViewController";
+// import LoginViewController from "../ViewControllers/LoginViewController/LoginViewController";
 
 class AppRouter extends Component {
     constructor(props) {
@@ -17,8 +17,8 @@ class AppRouter extends Component {
     }
 
     render() {
-        let { authenticating, accessGranted } = this.state;
-        let { route } = this.props;
+        let { authenticating } = this.state;
+        // let { route } = this.props;
 
         return authenticating 
             ? this.renderAuthenticatingMessage()
@@ -32,7 +32,7 @@ class AppRouter extends Component {
     componentWillMount() {
         let { 
             setUser,
-            redirect 
+            // redirect 
         } = this.props;
 
         Api.authenticate()

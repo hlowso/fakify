@@ -1,12 +1,5 @@
 import React, { Component } from "react";
-import { Link, Redirect } from "react-router-dom";
-import { 
-    Navbar, 
-    NavbarBrand, 
-    Collapse, 
-    Nav, 
-    NavItem 
-} from "reactstrap";
+
 import "./TopNav.css";
 
 import * as Api from "../shared/Api"; 
@@ -18,8 +11,6 @@ class TopNav extends Component {
     }
 
     render() {
-        let { user } = this.props;
-
         return (
             <header className="nav-container">
                 <span className="nav nav-brand">PreComp</span>
