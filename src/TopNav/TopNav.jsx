@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Link, Redirect } from "react-router-dom";
-import { Navbar, Nav, NavItem } from "react-bootstrap";
+import { Navbar, NavbarBrand, Collapse, Nav, NavItem } from "reactstrap";
 import "./TopNav.css";
 
 import * as Api from "../shared/Api"; 
@@ -16,13 +16,11 @@ class TopNav extends Component {
 
         return (
             <Navbar staticTop className="nav-container">
-                <Navbar.Header>
-                    <Navbar.Brand className="nav-item brand">
+                    <NavbarBrand className="nav-item brand">
                         PreComp
-                    </Navbar.Brand>
-                </Navbar.Header>
-                <Navbar.Collapse>
-                    <Nav>
+                    </NavbarBrand>
+                <Collapse>
+                    <Nav >
                         {user.email 
                             &&  <NavItem 
                                     eventKey={1}
@@ -32,7 +30,7 @@ class TopNav extends Component {
                                         {user.email}
                                 </NavItem>}
                     </Nav>
-                </Navbar.Collapse>
+                </Collapse>
             </Navbar>
         );
     }
