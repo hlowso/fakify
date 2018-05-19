@@ -1,6 +1,12 @@
 import React, { Component } from "react";
 import { Link, Redirect } from "react-router-dom";
-import { Navbar, NavbarBrand, Collapse, Nav, NavItem } from "reactstrap";
+import { 
+    Navbar, 
+    NavbarBrand, 
+    Collapse, 
+    Nav, 
+    NavItem 
+} from "reactstrap";
 import "./TopNav.css";
 
 import * as Api from "../shared/Api"; 
@@ -15,23 +21,23 @@ class TopNav extends Component {
         let { user } = this.props;
 
         return (
-            <Navbar staticTop className="nav-container">
-                    <NavbarBrand className="nav-item brand">
-                        PreComp
-                    </NavbarBrand>
-                <Collapse>
-                    <Nav >
-                        {user.email 
-                            &&  <NavItem 
-                                    eventKey={1}
-                                    onClick={this.onClickLogout} 
-                                    style={{color: "white"}} 
-                                >
-                                        {user.email}
-                                </NavItem>}
-                    </Nav>
-                </Collapse>
-            </Navbar>
+            <header className="nav-container">
+                <span className="nav nav-brand">PreComp</span>
+                {this.renderNavList()}
+            </header>
+        );
+    }
+
+    renderNavList = () => {
+        let { user } = this.props;
+        return user.email && (
+            <div className="nav nav-list">
+                <a 
+                    className="nav-item" 
+                    id="logout-link" 
+                    onClick={this.onClickLogout} >Log Out</a>
+                <span className="nav-item">{user.email}</span>
+            </div>
         );
     }
 
