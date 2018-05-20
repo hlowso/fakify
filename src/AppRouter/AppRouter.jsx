@@ -4,7 +4,7 @@ import { Switch, Route } from "react-router";
 import * as Api from "../shared/Api";
 import * as Util from "../shared/Util";
 
-import PlayerViewController from "../ViewControllers/PlayerViewController/PlayerViewController";
+import PlayViewController from "../ViewControllers/PlayViewController/PlayViewController";
 // import SignUpViewController from "../ViewControllers/SignUpViewController/SignUpViewController";
 // import LoginViewController from "../ViewControllers/LoginViewController/LoginViewController";
 
@@ -24,7 +24,7 @@ class AppRouter extends Component {
             ? this.renderAuthenticatingMessage()
             : (
                 <Switch id="app-router">
-                    <Route exact path="/play" component={PlayerViewController} />
+                    <Route exact path="/play" component={PlayViewController} />
                 </Switch>
             );
     }

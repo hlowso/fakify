@@ -4,6 +4,7 @@
   "private": true,
   "proxy": "http://localhost:3001",
   "dependencies": {
+    "classnames": "^2.2.5",
     "midi": "git+https://github.com/hlowso/MIDI.js.git",
     "midi.js": "^0.3.0",
     "react": "^16.3.2",
