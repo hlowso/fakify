@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Soundfont from "soundfont-player";
-import MIDI from "../../MIDI";
+import MIDI from "midi.js";
+import GET_FONT from "./soundfonts/acoustic_grand_piano-ogg";
 
 class PlayerViewController extends Component {
     constructor(props) {
@@ -12,28 +13,25 @@ class PlayerViewController extends Component {
 
     componentDidMount() {
         console.log("PRECOMP - playviewcontroller did mount");
-        // if (typeof MIDI === "undefined") console.log("here");
-        // console.log(MIDI);
-        // console.log(Soundfont);
-        console.log(MIDI.loadPluggin);
-        this.playMultiple();
+        MIDI.loadPlugin(
+            () => {
+                GET_FONT(MIDI);
+                console.log(MIDI);
+
+                MIDI.setContext(new AudioContext(), () => {
+                    MIDI.noteOn(0, 60, 127, 0);
+                });
+                
+            }
+        );
     }
 
     render() {
         return (
-            <div id="play-view">
+            <div style={{display: "flex", justifyContent: "center"}} id="play-view">
                 <h1>This Will Be The App</h1>
             </div>
         )
-    }
-
-    async playMultiple() {
-        const ac = new AudioContext();
-        const piano = await Soundfont.instrument(ac, 'acoustic_grand_piano');
-        const clarinet = await Soundfont.instrument(ac, 'clarinet');
-
-        piano.play('C4', ac.currentTime, {duration: 20});
-        clarinet.play('E4', ac.currentTime, {duration: 20});
     }
 }
 
