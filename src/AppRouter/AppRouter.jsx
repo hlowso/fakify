@@ -5,8 +5,7 @@ import * as Api from "../shared/Api";
 import * as Util from "../shared/Util";
 
 import PlayViewController from "../ViewControllers/PlayViewController/PlayViewController";
-// import SignUpViewController from "../ViewControllers/SignUpViewController/SignUpViewController";
-// import LoginViewController from "../ViewControllers/LoginViewController/LoginViewController";
+
 
 class AppRouter extends Component {
     constructor(props) {
@@ -18,7 +17,6 @@ class AppRouter extends Component {
 
     render() {
         let { authenticating } = this.state;
-        // let { route } = this.props;
 
         return authenticating 
             ? this.renderAuthenticatingMessage()
@@ -32,7 +30,6 @@ class AppRouter extends Component {
     componentWillMount() {
         let { 
             setUser,
-            // redirect 
         } = this.props;
 
         Api.authenticate()

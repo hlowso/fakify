@@ -26,6 +26,7 @@
 .song-list-panel-item:hover {
     background-color: #222;
     color: white;
+    cursor: pointer;
 }
 
 .song-list-panel-item span {

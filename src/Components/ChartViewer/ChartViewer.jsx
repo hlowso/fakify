@@ -14,8 +14,10 @@ class ChartViewer extends Component {
         let { song } = this.props;
         return (
             <div id="chart-viewer">
-                <h1>{song.title}</h1>
-                <div>{this.renderProgression()}</div>
+                <header className="chart-header">
+                    <h1>{song.title}</h1>
+                </header>
+                <section className="chart-body">{this.renderProgression()}</section>
             </div>
         );
     }
@@ -28,11 +30,24 @@ class ChartViewer extends Component {
         for (let barNumber in progression) {
             let bar = progression[barNumber];
             // console.log("bar", bar);
+            let chordNames = [];
             let beats = [];
-            for (let beat in bar) {
-                beats.push(<span key={beat}>{bar[beat]}</span>);
+
+            // TODO: the following logic doesn't cover all timeSignature cases
+            for (let beat = 1; beat <= song.timeSignature[1]; beat ++) {
+                chordNames.push(<span className="chord-name" key={beat}>{bar[beat]}</span>);
+                beats.push(<span className="beat" key={beat}>{beat}</span>);
             }
-            barElements.push(<div className="bar" key={barNumber}>{beats}</div>);
+            barElements.push(
+                <div className="bar-container" key={barNumber}>
+                    <div className="bar-chord-group">
+                        {chordNames}
+                    </div>
+                    <div className="bar-beat-group">
+                        {beats}
+                    </div>
+                </div>
+            );
         };
 
         return barElements;

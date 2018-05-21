@@ -22,7 +22,7 @@ class AdminRouter extends Component {
 
         return (
             <div id="app-router">
-                <TopNav user={user}/>
+                <TopNav user={user} setUser={this.setUser} />
                 {this.renderRouter()}
             </div>
         );

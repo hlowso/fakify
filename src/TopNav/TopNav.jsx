@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 
 import "./TopNav.css";
 
@@ -23,18 +24,19 @@ class TopNav extends Component {
         let { user } = this.props;
         return user.email && (
             <div className="nav nav-list">
-                <a 
+                <Link
+                    to="/login" 
                     className="nav-item" 
                     id="logout-link" 
-                    onClick={this.onClickLogout} >Log Out</a>
+                    onClick={this.onClickLogout} >Log Out</Link>
                 <span className="nav-item">{user.email}</span>
             </div>
         );
     }
 
     onClickLogout = async event => {
+        this.props.setUser({ email: null })
         await Api.logout();
-        window.location.reload();
     }
 }
 
