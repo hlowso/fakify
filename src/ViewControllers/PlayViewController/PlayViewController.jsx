@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Button } from "react-bootstrap";
 import Modal from "react-modal";
 
+import MenuBar from "../../Components/MenuBar/MenuBar";
 import SongListPanel from "../../Components/SongListPanel/SongListPanel";
 import ChartViewer from "../../Components/ChartViewer/ChartViewer";
 import Keyboard from "../../Components/Keyboard/Keyboard";
@@ -101,7 +102,7 @@ class PlayViewController extends Component {
                     let midiAccessCallback;
 
                     if (inputId) {
-                        // TODO: refactor the one-at-a-time nature of getMIDIAccess followed by setupMIDIInput
+                        // TODO: refactor the one-at-a-time nature of getMIDIAccess followed by setupMIDIInput, I don't like the callback
                         midiAccessCallback = () => this.setupMIDIInput(inputId);
                     } else {
                         this.setState({ midiSettingsModalOpen: true, loading: false });
@@ -119,14 +120,18 @@ class PlayViewController extends Component {
         let { loading, songTitles, selectedSong } = this.state;
         return loading ? <h1>loading...</h1> : (
             <div id="play-view">
-                <div className={"top-row"}>
+                <div>
+                    <MenuBar 
+                        openMIDISettingsModal={() => this.setState({ midiSettingsModalOpen: true })} />
+                </div>
+                <div className="top-row">
                     <SongListPanel 
                         songTitles={songTitles}
                         selectedTitle={selectedSong.title} />
                     <ChartViewer
                         song={selectedSong} />
                 </div>
-                <div className={"bottom-row"}>
+                <div className="bottom-row">
                     <Keyboard />
                 </div>
 
@@ -145,7 +150,7 @@ class PlayViewController extends Component {
         let { requestingMIDIAccess, midiAccess } = this.state;
         let inputRadioButtons = [], form, inputs;
 
-        if (midiAccess) {
+        if (midiAccess && midiAccess.inputs) {
             inputs = midiAccess.inputs.values();  
 
             for( let input = inputs.next(); input && !input.done; input = inputs.next()) {
@@ -189,6 +194,9 @@ class PlayViewController extends Component {
         this.setState({ midiSettingsModalOpen: false });
     }
 
+    // TODO put all midi related functions into their own folder, they shouldn't be here in the play view controller
+    // TODO setup redux - with the above done, we're gunna need a single source of truth that exists beyond any one 
+    // view controller...
     getMIDIAccess = callback => {
         this.setState({ requestingMIDIAccess: true });
         navigator.requestMIDIAccess()
@@ -207,6 +215,8 @@ class PlayViewController extends Component {
         for( let input = inputs.next(); input && !input.done; input = inputs.next()) {
             if (inputId === input.value.id) {
                 input.value.onmidimessage = this.playMidiMessage;
+            } else {
+                input.value.onmidimessage = null;
             }
         }
     }
