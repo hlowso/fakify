@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import { Switch, Route } from "react-router";
 
 import TopNav from "../TopNav/TopNav";
-import AppRouter from "../AppRouter/AppRouter";
 import SignUpViewController from '../ViewControllers/SignUpViewController/SignUpViewController';
 import LoginViewController from '../ViewControllers/LoginViewController/LoginViewController';
+import Authenticator from "../Authenticator/Authenticator";
 
 
 class AdminRouter extends Component {
@@ -16,9 +16,7 @@ class AdminRouter extends Component {
     }
 
     render() {
-        let { 
-            user, 
-        } = this.state;
+        let { user } = this.state;
 
         return (
             <div id="app-router">
@@ -33,7 +31,7 @@ class AdminRouter extends Component {
             <Switch>
                 <Route exact path='/signup' render={() => <SignUpViewController setUser={this.setUser} />} />
                 <Route exact path='/login' render={() => <LoginViewController setUser={this.setUser} />} />
-                <Route path='/' render={() => <AppRouter setUser={this.setUser} />} />                    
+                <Route path='/' render={() => <Authenticator setUser={this.setUser} />} />                    
             </Switch>
         </main>
     )
