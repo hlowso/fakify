@@ -92,6 +92,8 @@ class PlayViewController extends Component {
         ); 
     }
 
+    // TODO refactor the midi settings modal render function
+    // TODO style the Modal
     renderMIDISettingsModal() {
         let onSubmitWrapper = event => { 
             event.preventDefault(); 
