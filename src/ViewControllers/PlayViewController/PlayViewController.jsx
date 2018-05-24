@@ -7,6 +7,9 @@ import SongListPanel from "../../Components/SongListPanel/SongListPanel";
 import ChartViewer from "../../Components/ChartViewer/ChartViewer";
 import Keyboard from "../../Components/Keyboard/Keyboard";
 
+import * as Api from "../../shared/Api";
+import * as StorageHelper from "../../shared/StorageHelper";
+
 // import Soundfont from "soundfont-player";
 import MIDI from "midi.js";
 import LoadGrand from "./soundfonts/acoustic_grand_piano-ogg";
@@ -24,100 +27,49 @@ class PlayViewController extends Component {
             midiInputSettings: {
                 inputId: ""
             },
-            // songTitles is hard-coded for now
-            // TODO: create an endpoint for songtitles
-            songTitles: [
-                "#4",
-                "'Round Midnight",
-                "Bewitched",
-                "Bye Bye Blackbird",
-                "C Blues",
-                "Giant Steps",                
-                "Michelle",
-                "My Favourite Things",
-                "Now's The Time",
-                "Someday My Prince Will Come"
-            ],
-
-            // selectedSong is hard-coded for now
-            // TODO: create an endpoint for selectedSong
-            selectedSong: {
-                title: "C Blues",
-                timeSignature: [4, 4],
-                originalKey: "C",
-                originalTempo: 120,
-                key: "C",
-                tempo: 120,
-                chart: {
-                    progression: {
-                        1: { 1: "1^7" },
-                        2: { 1: "4^7" },
-                        3: { 1: "1^7" },
-                        4: { 1: "1^7" },
-                        5: { 1: "4^7" },
-                        6: { 1: "4^7" },
-                        7: { 1: "1^7" },
-                        8: { 1: "1^7" },
-                        9: { 1: "5^7" },
-                        10: { 1: "4^7" },
-                        11: { 1: "1^7" },
-                        12: { 1: "2^-7", 3: "5^7" },
-                    },
-                    keys: { 
-                        1: "1^7", 
-                        2: "4^7", 
-                        3: "1^7", 
-                        5: "4^7", 
-                        7: "1^7", 
-                        9: "5^7", 
-                        10: "4^7", 
-                        11: "1^7", 
-                        12: "1^ma7"
-                    },
-                    sections: {
-
-                    }
-                }
-            }
+            songTitles: null,
+            selectedSong: null,
         };
     }
 
-    componentDidMount() {
-        console.log("PRECOMP - playviewcontroller Did mount");
-        let { midiInputSettings } = this.state;
-        let { inputId } = midiInputSettings;
-        let stateUpdate = { loading: false };
+    componentWillMount() {
+        console.log("PRECOMP - playviewcontroller Will mount");
 
-        MIDI.loadPlugin({
-            soundfontUrl: "./soundfont/",
-            instruments: ["acoustic_grand_piano"],
-            onsuccess: () => {
-                LoadGrand(MIDI);
+        let localStorage = StorageHelper.getLocalStorage();
+        let { 
+            midiInputId, 
+            selectedSong 
+        } = localStorage;
 
-                MIDI.setContext(new AudioContext(), () => {
+        let stateUpdate = {
+            songTitles: Api.getSongTitles(),
+            midiInputId,
+            selectedSong
+        }; 
+        
+        this.setState(stateUpdate);
 
-                    // Setting a note just to make sure midi output is working
-                    MIDI.noteOn(0, 60, 127, 0);
-                    
-                    let midiAccessCallback;
-
-                    if (inputId) {
-                        // TODO: refactor the one-at-a-time nature of getMIDIAccess followed by setupMIDIInput, I don't like the callback
-                        midiAccessCallback = () => this.setupMIDIInput(inputId);
+        this.setMidiContext()
+            .then(() => {
+                return this.getMidiAccess();
+            })
+            .then(midiAccess => {
+                if (midiAccess) {
+                    stateUpdate = { loading: false }
+                    if (midiInputId) {
+                        this.connectToMidiInput(midiInputId);
                     } else {
-                        this.setState({ midiSettingsModalOpen: true, loading: false });
+                        stateUpdate.midiSettingsModalOpen = true;
                     }
-
-                    this.getMIDIAccess(midiAccessCallback);
-
-                });
-                
-            }
-        });
+                    this.setState(stateUpdate);
+                }
+            });
     }
 
     render() {
         let { loading, songTitles, selectedSong } = this.state;
+        let selectedSongTitle = selectedSong ? selectedSong.title : null;
+
         return loading ? <h1>loading...</h1> : (
             <div id="play-view">
                 <div>
@@ -127,7 +79,7 @@ class PlayViewController extends Component {
                 <div className="top-row">
                     <SongListPanel 
                         songTitles={songTitles}
-                        selectedTitle={selectedSong.title} />
+                        selectedTitle={selectedSongTitle} />
                     <ChartViewer
                         song={selectedSong} />
                 </div>
@@ -143,7 +95,7 @@ class PlayViewController extends Component {
     renderMIDISettingsModal() {
         let onSubmitWrapper = event => { 
             event.preventDefault(); 
-            this.setupMIDIInput(event.target.midiInput.value); 
+            this.connectToMidiInput(event.target.midiInput.value); 
             this.closeModal(); 
         }
 
@@ -194,24 +146,44 @@ class PlayViewController extends Component {
         this.setState({ midiSettingsModalOpen: false });
     }
 
-    // TODO put all midi related functions into their own folder, they shouldn't be here in the play view controller
-    // TODO setup redux - with the above done, we're gunna need a single source of truth that exists beyond any one 
-    // view controller...
-    getMIDIAccess = callback => {
-        this.setState({ requestingMIDIAccess: true });
-        navigator.requestMIDIAccess()
-            .then(midiAccess => { 
-                    this.setState({ midiAccess, requestingMIDIAccess: false });
-                    if (typeof callback === "function") callback(); 
-                },
-                () => console.log("PRECOMP - navigator.requestMIDIAccess failed")
-            );
+    /*******************
+        MIDI ACTIONS   
+    *******************/
+
+    setMidiContext = () => {
+        return new Promise((resolve, reject) => {
+            MIDI.loadPlugin({
+                soundfontUrl: "./soundfont/",
+                instruments: ["acoustic_grand_piano"],
+                onsuccess: () => {
+                    LoadGrand(MIDI);
+                    MIDI.setContext(new AudioContext(), resolve);
+                }
+            });
+        });
     }
 
-    setupMIDIInput = inputId => {
+    getMidiAccess = () => {
+        this.setState({ requestingMIDIAccess: true });
+        return new Promise((resolve, reject) => {
+            navigator.requestMIDIAccess()
+            .then(midiAccess => { 
+                    this.setState({ midiAccess, requestingMIDIAccess: false });
+                    resolve(midiAccess);
+                },
+                () => { 
+                    console.log("PRECOMP - navigator.requestMIDIAccess failed");
+                    reject();
+                }
+            );
+        });
+        
+    }
+
+    connectToMidiInput = inputId => {
         let { midiAccess } = this.state;
         let inputs = midiAccess.inputs.values();    
-
+    
         for( let input = inputs.next(); input && !input.done; input = inputs.next()) {
             if (inputId === input.value.id) {
                 input.value.onmidimessage = this.playMidiMessage;
@@ -220,7 +192,7 @@ class PlayViewController extends Component {
             }
         }
     }
-
+    
     playMidiMessage = message => {
         let { data } = message;
         let type = data[0], note = data[1], velocity = data[2];
@@ -234,7 +206,9 @@ class PlayViewController extends Component {
                 MIDI.noteOff(0, note, 0);
                 break;
         }
-    }
+    };
+
+    
 }
 
 export default PlayViewController;

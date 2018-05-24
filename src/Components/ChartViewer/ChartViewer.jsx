@@ -12,14 +12,16 @@ class ChartViewer extends Component {
 
     render() {
         let { song } = this.props;
-        return (
-            <div id="chart-viewer">
-                <header className="chart-header">
-                    <h1>{song.title}</h1>
-                </header>
-                <section className="chart-body">{this.renderProgression()}</section>
-            </div>
-        );
+        return song 
+            ? (
+                <div id="chart-viewer">
+                    <header className="chart-header">
+                        <h1>{song.title}</h1>
+                    </header>
+                    <section className="chart-body">{this.renderProgression()}</section>
+                </div>
+            )
+            : <h2>No Song Selected</h2>;
     }
 
     renderProgression() {
