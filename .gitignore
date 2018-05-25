@@ -1,7 +1,13 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+/node_modules/*
+!/node_modules/midi.js/
+
+/node_modules/midi.js/*
+!/node_modules/midi.js/lib/
+
+/node_modules/midi.js/lib/*
 !/node_modules/midi.js/lib/midi.js
 
 # testing
