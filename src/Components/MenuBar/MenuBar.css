@@ -1,9 +1,0 @@
-#menu-bar {
-    display: flex;
-    flex-direction: row-reverse;
-    background-color: #444;
-}
-
-.btn {
-    margin: 10px;
-}
