@@ -1,0 +1,10 @@
+#keyboard {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 200px;
+}
+
+h2 {
+    align-self: center;
+}

@@ -1,0 +1,36 @@
+#song-list-panel {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    height: 500px;
+    background-color: rgb(235, 235, 235);
+    border-right: solid black 1px;
+    border-bottom: solid black 1px;
+    
+    
+}
+
+.song-list-panel-item {
+    height: 30px;
+    /* width: 100%; */
+    padding: 5px;
+    border-bottom: solid black 1px;
+    
+    color: #222;
+}
+
+.selected {
+    background-color: #bbb;
+}
+
+.song-list-panel-item:hover {
+    background-color: #222;
+    color: white;
+    cursor: pointer;
+}
+
+.song-list-panel-item span {
+    font-size: 125%;
+}
+
+
