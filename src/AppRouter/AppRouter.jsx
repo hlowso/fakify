@@ -5,7 +5,7 @@ import PlayViewController from "../ViewControllers/PlayViewController/PlayViewCo
 
 import * as StorageHelper from "../shared/StorageHelper";
 
-import MIDI from "../midi/midi";
+import MIDI from "midi.js";
 import loadSoundfonts from "../midi/loadSoundfonts";
 
 
