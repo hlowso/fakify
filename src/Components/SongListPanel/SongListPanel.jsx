@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import Cx from "classnames";
 
+import * as Util from "../../shared/Util";
+
 import "./SongListPanel.css";
 
 class SongListPanel extends Component {
@@ -12,23 +14,38 @@ class SongListPanel extends Component {
     }
 
     render() {
+        let { songTitles } = this.props; 
+        let songTitlesLoaded = !Util.objectIsEmpty(songTitles); 
+
         return (
             <div id="song-list-panel">
-                {this.renderSongList()}
+                {songTitlesLoaded ? this.renderSongList() : <p>loading songlist...</p>}
             </div>
         );
     }
 
     renderSongList() {
-        let { songTitles, selectedTitle } = this.props;
+        let { 
+            songTitles, 
+            selectedSongId,
+            onSongListItemClick 
+        } = this.props;
+
         let listItems = [];
-        for (let title of songTitles) {
+
+        for (let songId in songTitles) {
+            let title = songTitles[songId];
+            
             let classes = Cx({
                 "song-list-panel-item": true,
-                "selected": title === selectedTitle
+                "selected": songId === selectedSongId
             });
+
             listItems.push(
-                <div key={title} className={classes}>
+                <div 
+                    key={title} 
+                    className={classes}
+                    onClick={() => onSongListItemClick(songId)} >
                     <span>{title}</span>
                 </div>
             );

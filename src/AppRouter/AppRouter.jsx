@@ -1,9 +1,8 @@
 import React, { Component } from "react";
-import { Switch, Route } from "react-router";
+import { Switch, Route, Redirect } from "react-router";
 
 import PlayViewController from "../ViewControllers/PlayViewController/PlayViewController";
 
-import Api from "../shared/Api";
 import * as StorageHelper from "../shared/StorageHelper";
 
 import MIDI from "midi.js";
@@ -25,9 +24,7 @@ class AppRouter extends Component {
     }
 
     componentWillMount() {
-        let localStorage = StorageHelper.getLocalStorage();
-        let { midiInputId } = localStorage;
-
+        let midiInputId = StorageHelper.getMidiInputId();
         let stateUpdate = { loading: false }
 
         this.setMidiContextAsync()
@@ -37,13 +34,6 @@ class AppRouter extends Component {
             .then(midiAccess => {
                 if (midiAccess) {
                     stateUpdate.midiAccess = midiAccess;
-                    
-                    if (midiInputId) {
-                        let connectionSuccessful = this.connectToMidiInput(midiInputId);
-                        if (!connectionSuccessful) {
-                            StorageHelper.setLocalVariable("midiInputId", null);
-                        }
-                    }
                 }
                 this.setState(stateUpdate);
             });
@@ -66,8 +56,8 @@ class AppRouter extends Component {
 
         let VCProps = {
             MidiActions,
-            StorageHelper,
-            StateHelper
+            StateHelper,            
+            StorageHelper
         };
 
         return loading
@@ -75,9 +65,13 @@ class AppRouter extends Component {
                 : (
                     <Switch id="app-router">
                         <Route 
-                            exact 
+                            exact
                             path="/play" 
                             render={ () => <PlayViewController {...VCProps}/> }
+                        />
+                        <Route 
+                            path="/" 
+                            render={ () => <Redirect to="/play" /> }
                         />
                     </Switch>
                 );
@@ -127,11 +121,19 @@ class AppRouter extends Component {
     }
 
     connectToMidiInput = inputId => {
+        if (!inputId) return false;
+
         let { midiAccess } = this.state;
+        if (!midiAccess) return false;
+
         let inputs = midiAccess.inputs.values();  
         let connectionSuccessful = false;  
 
-        for( let input = inputs.next(); input && !input.done; input = inputs.next()) {
+        for( 
+            let input = inputs.next(); 
+            input && !input.done; 
+            input = inputs.next()
+        ) {
             if (inputId === input.value.id) {
                 input.value.onmidimessage = this.playMidiMessage;
                 connectionSuccessful = true;

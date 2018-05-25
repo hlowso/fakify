@@ -51,3 +51,7 @@ export class CookieManager {
 export const redirect = route => {
     window.location.replace(`http://localhost:3000/${route}`);
 };
+
+export const objectIsEmpty = object => {
+    return Object.keys(object).length === 0;
+};

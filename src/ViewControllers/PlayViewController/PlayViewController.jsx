@@ -8,7 +8,6 @@ import ChartViewer from "../../Components/ChartViewer/ChartViewer";
 import Keyboard from "../../Components/Keyboard/Keyboard";
 
 import * as Api from "../../shared/Api";
-import * as StorageHelper from "../../shared/StorageHelper";
 
 import "./PlayViewController.css";
 
@@ -18,18 +17,45 @@ class PlayViewController extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            loadingSelectedSong: false,
             midiSettingsModalOpen: true,
             requestingMidiAccess: false,
-            songTitles: [],
-            selectedSong: {
-                chart: {}
-            },
+            songTitles: {},
+            selectedSong: {},
         };
+    }
+
+    componentWillMount() {
+        let { MidiActions, StorageHelper } = this.props;
+        let midiInputId = StorageHelper.getMidiInputId();
+        let selectedSongId = StorageHelper.getSelectedSongId();
+
+        if (midiInputId) {
+            let connectionSuccessful = MidiActions.connectToMidiInput(midiInputId);
+            if (!connectionSuccessful) {
+                StorageHelper.setMidiInputId("");
+            }
+            this.setState({ midiSettingsModalOpen: !connectionSuccessful });
+        }
+
+        Api.getSongTitlesAsync()
+            .then(songTitles => {
+                this.setState({ songTitles });
+                if (selectedSongId in songTitles) {
+                    return Api.getSongAsync(selectedSongId);
+                } 
+                return;
+            })
+            .then(selectedSong => {
+                if (selectedSong) {
+                    this.setState({ selectedSong });
+                }
+            });
     }
 
     render() {
         let { songTitles, selectedSong } = this.state;
-        let selectedSongTitle = selectedSong ? selectedSong.title : null;
+        let selectedSongId = selectedSong ? selectedSong.songId: null;
 
         return (
             <div id="play-view">
@@ -40,7 +66,8 @@ class PlayViewController extends Component {
                 <div className="top-row">
                     <SongListPanel 
                         songTitles={songTitles}
-                        selectedTitle={selectedSongTitle} />
+                        selectedSongId={selectedSongId} 
+                        onSongListItemClick={this.onSongListItemClick} />
                     <ChartViewer
                         song={selectedSong} />
                 </div>
@@ -53,22 +80,21 @@ class PlayViewController extends Component {
         ); 
     }
 
-    // TODO refactor the midi settings modal render function
+    /**************************
+        MIDI SETTINGS MODAL   
+    **************************/
+
     // TODO style the Modal
     renderMIDISettingsModal() {
-        let { 
-            StateHelper,
-            StorageHelper,
-            MidiActions 
-        } = this.props;
+        let { StateHelper } = this.props;
 
         let midiAccess = StateHelper.getMidiAccess();
-        let { requestingMidiAccess } = this.state;
+        let { midiSettingsModalOpen, requestingMidiAccess } = this.state;
 
-        let inputRadioButtons = [], form, inputs;
+        let inputRadioButtons = [], form;
 
         if (midiAccess && midiAccess.inputs) {
-            inputs = midiAccess.inputs.values();  
+            let inputs = midiAccess.inputs.values();  
 
             for( let input = inputs.next(); input && !input.done; input = inputs.next()) {
                 let { name, id } = input.value;
@@ -90,10 +116,12 @@ class PlayViewController extends Component {
 
         return (
             <Modal 
-                isOpen={this.state.midiSettingsModalOpen}
+                isOpen={midiSettingsModalOpen}
                 onRequestClose={this.closeModal}
                 contentLabel={"MIDI Input Settings"} >
+
                 <h2>MIDI Settings</h2>
+
                 {requestingMidiAccess 
                     ? <p>Getting midi access</p>
                     : inputRadioButtons
@@ -121,15 +149,39 @@ class PlayViewController extends Component {
     onSubmitMidiSettingsForm = event => { 
         event.preventDefault(); 
         
-        let { MidiActions } = this.props;
+        let { MidiActions, StorageHelper } = this.props;
         let { value } = event.target.midiInput;
 
-        MidiActions.connectToMidiInput(value); 
-        this.closeModal(); 
+        let connectionSuccessful = MidiActions.connectToMidiInput(value); 
+
+        if (connectionSuccessful) {
+            StorageHelper.setMidiInputId(value);
+            this.closeModal(); 
+        } else {
+            StorageHelper.setMidiInputId("");
+            this.setState({ midiInputConnectionError: "Connection unsuccessful" });
+        }
     }
 
     closeModal = () => {
         this.setState({ midiSettingsModalOpen: false });
+    }
+
+    /**********************
+        SONG LIST PANEL   
+    **********************/
+
+    onSongListItemClick = selectedSongId => {
+        let { StorageHelper } = this.props;
+
+        StorageHelper.setSelectedSongId(selectedSongId);
+        
+        Api.getSongAsync(selectedSongId)
+            .then(selectedSong => {
+                if (selectedSong) {
+                    this.setState({ selectedSong });
+                }
+            });
     }
     
 }

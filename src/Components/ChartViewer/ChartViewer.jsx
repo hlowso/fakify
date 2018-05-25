@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 
+import * as Util from "../../shared/Util";
+
 import "./ChartViewer.css";
 
 class ChartViewer extends Component {
@@ -12,7 +14,9 @@ class ChartViewer extends Component {
 
     render() {
         let { song } = this.props;
-        return song 
+        let songLoaded = !Util.objectIsEmpty(song);
+
+        return songLoaded 
             ? (
                 <div id="chart-viewer">
                     <header className="chart-header">
@@ -31,7 +35,6 @@ class ChartViewer extends Component {
         let barElements = [];
         for (let barNumber in progression) {
             let bar = progression[barNumber];
-            // console.log("bar", bar);
             let chordNames = [];
             let beats = [];
 
