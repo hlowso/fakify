@@ -5,8 +5,8 @@ import PlayViewController from "../ViewControllers/PlayViewController/PlayViewCo
 
 import * as StorageHelper from "../shared/StorageHelper";
 
-import MIDI from "midi.js";
-import LoadGrand from "./midi/soundfonts/acoustic_grand_piano-ogg";
+import MIDI from "../midi/midi";
+import loadSoundfonts from "../midi/loadSoundfonts";
 
 
 class AppRouter extends Component {
@@ -99,7 +99,7 @@ class AppRouter extends Component {
                 soundfontUrl: "./soundfont/",
                 instruments: ["acoustic_grand_piano"],
                 onsuccess: () => {
-                    LoadGrand(MIDI);
+                    loadSoundfonts(MIDI);
                     MIDI.setContext(new AudioContext(), resolve);
                 }
             });
@@ -113,7 +113,7 @@ class AppRouter extends Component {
                     resolve(midiAccess);
                 },
                 () => { 
-                    console.log("PRECOMP - navigator.requestMIDIAccess failed");
+                    console.log("PRECOMP - navigator.requestMIDIAccess() failed");
                     reject();
                 }
             );

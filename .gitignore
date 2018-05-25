@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+!/node_modules/midi.js/lib/midi.js
 
 # testing
 /coverage
