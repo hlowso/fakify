@@ -13,7 +13,7 @@ const soundfonts = {
     //  1. add the sf2_file.js file to publc/soundfonts
     //  2. add the instrument to the soundfonts object in the
     //  following format
-    
+
     piano: {
         variable: "_tone_0000_Aspirin_sf2_file",
         url: "/soundfonts/0000_Aspirin_sf2_file.js"
@@ -43,7 +43,6 @@ class AppRouter extends Component {
 
     componentWillMount() {
         let midiInputId = StorageHelper.getMidiInputId();
-        let stateUpdate = { loading: false };
 
         this.audioInitAsync()
             .then(() => {
@@ -181,13 +180,13 @@ class AppRouter extends Component {
         return message => {
             let { player, audioContext, envelopes } = this.state;
             let { data } = message;
-            let type = data[0], note = data[1], velocity = data[2];
+            let type = data[0], note = data[1], volume = data[2] / 127;
             let envelopesUpdate = envelopes;
             let existingEnvelop = envelopes[note];
 
             switch(type) {
                 case 144:
-                    if (velocity) {
+                    if (volume) {
                         envelopesUpdate[note] = player.queueWaveTable(
                             audioContext, 
                             audioContext.destination, 
@@ -195,8 +194,9 @@ class AppRouter extends Component {
                             0, 
                             note,
                             1000,
-                            velocity
+                            volume
                         );
+                        console.log(volume);
                     }
                     else {
                         if (existingEnvelop) {
@@ -212,6 +212,9 @@ class AppRouter extends Component {
                         envelopesUpdate[note] = null;
                     }
                     break;
+
+                default:
+                    console.log("PRECOMP - unknown midi message type:", type);
             }
 
             this.setState({ envelopes: envelopesUpdate });
