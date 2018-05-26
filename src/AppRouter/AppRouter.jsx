@@ -6,7 +6,7 @@ import PlayViewController from "../ViewControllers/PlayViewController/PlayViewCo
 import * as StorageHelper from "../shared/StorageHelper";
 
 import WebAudioFontPlayer from "webaudiofont";
-import _tone_0000_Aspirin_sf2 from "../midi/0000_Aspirin_sf2_file";
+import _tone_0000_Aspirin_sf2_file from "../midi/0000_Aspirin_sf2_file";
 
 
 class AppRouter extends Component {
@@ -32,15 +32,20 @@ class AppRouter extends Component {
         var audioContext = new AudioContextFunc();
         
         var player = new WebAudioFontPlayer();
-        player.loader.decodeAfterLoading(audioContext, "_tone_0000_Aspirin_sf2");
+        // player.loader.decodeAfterLoading(audioContext, "_tone_0000_Aspirin_sf2");
 
         let info = player.loader.instrumentInfo(0);
-        // console.log(window[info.variable]);
-        player.loader.startLoad(audioContext, info.url, info.variable);
+        console.log(info);
+
+        player.loader.startLoad(audioContext, "/0000_Aspirin_sf2_file.js", info.variable);
         player.loader.waitLoad(() => {
-            console.log("cached", info.title);
+            // console.log("cached", info.variable);
             player.queueWaveTable(audioContext, audioContext.destination, window[info.variable], 0, 55, 2);
+
+            console.log("from import", _tone_0000_Aspirin_sf2_file);
+            console.log("from lib", window[info.variable]);
         });
+
     }
 
     render() {

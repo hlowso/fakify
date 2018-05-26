@@ -1,3 +1,4 @@
+console.log('load _tone_0000_Aspirin_sf2_file');
 var _tone_0000_Aspirin_sf2_file={
 	zones:[
 		{
@@ -332,5 +333,3 @@ var _tone_0000_Aspirin_sf2_file={
 		}
 	]
 };
-
-export default _tone_0000_Aspirin_sf2_file;
