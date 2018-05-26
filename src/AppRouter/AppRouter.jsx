@@ -1,31 +1,14 @@
+// TODO: reorginize file structure
+
 import React, { Component } from "react";
 import { Switch, Route, Redirect } from "react-router";
+
+import WebAudioFontPlayer from "webaudiofont";
 
 import PlayViewController from "../ViewControllers/PlayViewController/PlayViewController";
 
 import * as StorageHelper from "../shared/StorageHelper";
-
-import WebAudioFontPlayer from "webaudiofont";
-
-const soundfonts = {
-
-    // TODO: steps for adding another instrument to the project:
-    //  1. add the sf2.js file to publc/soundfonts
-    //  2. add the instrument to the soundfonts object in the
-    //  following format
-
-    piano: {
-        name: "piano",
-        variable: "_tone_0000_Aspirin_sf2_file",
-        url: "/soundfonts/0000_Aspirin_sf2_file.js"
-    },
-
-    bassDrum: {
-        name: "bassDrum",
-        variable: "_drum_35_0_SBLive_sf2",
-        url: "/soundfonts/drums/12835_0_SBLive_sf2.js"
-    }
-}
+import soundfonts from "../soundfontsIndex";
 
 class AppRouter extends Component {
     constructor(props) {
@@ -52,13 +35,8 @@ class AppRouter extends Component {
         let midiInputId = StorageHelper.getMidiInputId();
 
         this.audioInitAsync()
-            .then(() => {
-                return this.loadInstrumentsAsync();
-            })
-            .then(() => {
-                this.state.player.queueWaveTable(this.state.audioContext, this.state.audioContext.destination, window[soundfonts["bassDrum"].variable], 0, 35, 2, 1);
-                return this.setMidiAccessAsync();
-            })
+            .then(() => this.loadInstrumentsAsync())
+            .then(() => this.setMidiAccessAsync())
             .then(() => {
                 if (midiInputId) {
                     let connectionSuccessful = this.connectToMidiInput(midiInputId);
@@ -147,10 +125,7 @@ class AppRouter extends Component {
     }
 
     loadInstrumentsAsync = () => {
-        return Promise.all([
-            this.loadInstrumentAsync("piano"),
-            this.loadInstrumentAsync("bassDrum")
-        ]);
+        return Promise.all(Object.keys(soundfonts).map(instrument => this.loadInstrumentAsync(instrument)));
     }
 
     /*******************
