@@ -10,13 +10,20 @@ import WebAudioFontPlayer from "webaudiofont";
 const soundfonts = {
 
     // TODO: steps for adding another instrument to the project:
-    //  1. add the sf2_file.js file to publc/soundfonts
+    //  1. add the sf2.js file to publc/soundfonts
     //  2. add the instrument to the soundfonts object in the
     //  following format
 
     piano: {
+        name: "piano",
         variable: "_tone_0000_Aspirin_sf2_file",
         url: "/soundfonts/0000_Aspirin_sf2_file.js"
+    },
+
+    bassDrum: {
+        name: "bassDrum",
+        variable: "_drum_35_0_SBLive_sf2",
+        url: "/soundfonts/drums/12835_0_SBLive_sf2.js"
     }
 }
 
@@ -46,9 +53,10 @@ class AppRouter extends Component {
 
         this.audioInitAsync()
             .then(() => {
-                return this.loadInstrumentAsync("piano");
+                return this.loadInstrumentsAsync();
             })
             .then(() => {
+                this.state.player.queueWaveTable(this.state.audioContext, this.state.audioContext.destination, window[soundfonts["bassDrum"].variable], 0, 35, 2, 1);
                 return this.setMidiAccessAsync();
             })
             .then(() => {
@@ -136,6 +144,13 @@ class AppRouter extends Component {
             player.loader.startLoad(audioContext, font.url, font.variable);
             player.loader.waitLoad(resolve);
         });
+    }
+
+    loadInstrumentsAsync = () => {
+        return Promise.all([
+            this.loadInstrumentAsync("piano"),
+            this.loadInstrumentAsync("bassDrum")
+        ]);
     }
 
     /*******************
