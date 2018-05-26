@@ -1,9 +1,10 @@
-const soundfonts = {
-    // Steps for adding a new instrument:
-    //  1. add the sf2.js file to publc/soundfonts/ 
-    //  2. add the instrument to the soundfonts object in the
-    //  following format
+// Steps for adding a new instrument:
+//  1. download some sf2.js from https://surikov.github.io/webaudiofontdata/sound/
+//  2. add the sf2.js file to publc/soundfonts/ 
+//  3. add the instrument to the soundfonts object in the
+//  following format
 
+const soundfonts = {
     piano: {
         name: "piano",
         variable: "_tone_0000_Aspirin_sf2_file",
