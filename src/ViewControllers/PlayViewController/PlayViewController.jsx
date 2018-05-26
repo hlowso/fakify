@@ -136,12 +136,11 @@ class PlayViewController extends Component {
     }
 
     onMidiInputsRefresh = event => {
-        let { MidiActions, StateHelper } = this.props;
+        let { MidiActions } = this.props;
 
         this.setState({ requestingMidiAccess: true });
-        MidiActions.requestMidiAccessAsync()
-            .then(midiAccess => {
-                StateHelper.setMidiAccess(midiAccess);
+        MidiActions.setMidiAccessAsync()
+            .then(() => {
                 this.setState({ requestingMidiAccess: false });
             });
     }

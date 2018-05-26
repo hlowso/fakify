@@ -67,7 +67,7 @@ class AppRouter extends Component {
 
         let MidiActions = {
             setMidiContextAsync: this.setMidiContextAsync,
-            requestMidiAccessAsync: this.requestMidiAccessAsync,
+            setMidiAccessAsync: this.setMidiAccessAsync,
             connectToMidiInput: this.connectToMidiInput,
             generateMidiMessagePlayer: this.generateMidiMessagePlayer
         };
@@ -196,7 +196,6 @@ class AppRouter extends Component {
                             1000,
                             volume
                         );
-                        console.log(volume);
                     }
                     else {
                         if (existingEnvelop) {
