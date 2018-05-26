@@ -6,8 +6,19 @@ import PlayViewController from "../ViewControllers/PlayViewController/PlayViewCo
 import * as StorageHelper from "../shared/StorageHelper";
 
 import WebAudioFontPlayer from "webaudiofont";
-import _tone_0000_Aspirin_sf2_file from "../midi/0000_Aspirin_sf2_file";
 
+const soundfonts = {
+
+    // TODO: steps for adding another instrument to the project:
+    //  1. add the sf2_file.js file to publc/soundfonts
+    //  2. add the instrument to the soundfonts object in the
+    //  following format
+    
+    piano: {
+        variable: "_tone_0000_Aspirin_sf2_file",
+        url: "/soundfonts/0000_Aspirin_sf2_file.js"
+    }
+}
 
 class AppRouter extends Component {
     constructor(props) {
@@ -21,31 +32,35 @@ class AppRouter extends Component {
         this.state = {
             loading: true,
             midiAccess: null,
+            audioContext: null,
+            player: null,
+
+            // Unfortunately, it seems that WebAudioFont forces the developer to 
+            // manage their own sound envelopes ...
+            envelopes: {}
         };
     }
 
     componentWillMount() {
         let midiInputId = StorageHelper.getMidiInputId();
-        let stateUpdate = { loading: false }
+        let stateUpdate = { loading: false };
 
-        var AudioContextFunc = window.AudioContext || window.webkitAudioContext;
-        var audioContext = new AudioContextFunc();
-        
-        var player = new WebAudioFontPlayer();
-        // player.loader.decodeAfterLoading(audioContext, "_tone_0000_Aspirin_sf2");
-
-        let info = player.loader.instrumentInfo(0);
-        console.log(info);
-
-        player.loader.startLoad(audioContext, "/0000_Aspirin_sf2_file.js", info.variable);
-        player.loader.waitLoad(() => {
-            // console.log("cached", info.variable);
-            player.queueWaveTable(audioContext, audioContext.destination, window[info.variable], 0, 55, 2);
-
-            console.log("from import", _tone_0000_Aspirin_sf2_file);
-            console.log("from lib", window[info.variable]);
-        });
-
+        this.audioInitAsync()
+            .then(() => {
+                return this.loadInstrumentAsync("piano");
+            })
+            .then(() => {
+                return this.setMidiAccessAsync();
+            })
+            .then(() => {
+                if (midiInputId) {
+                    let connectionSuccessful = this.connectToMidiInput(midiInputId);
+                    if (!connectionSuccessful) {
+                        StorageHelper.setMidiInputId("");
+                    }
+                }
+                this.setState({ loading: false });
+            });
     }
 
     render() {
@@ -55,7 +70,7 @@ class AppRouter extends Component {
             setMidiContextAsync: this.setMidiContextAsync,
             requestMidiAccessAsync: this.requestMidiAccessAsync,
             connectToMidiInput: this.connectToMidiInput,
-            playMidiMessage: this.playMidiMessage
+            generateMidiMessagePlayer: this.generateMidiMessagePlayer
         };
 
         let StateHelper = {
@@ -98,21 +113,42 @@ class AppRouter extends Component {
         return this.state.midiAccess;
     }
 
+    /********************
+        AUDIO ACTIONS   
+    ********************/
+
+    audioInitAsync = () => {
+        return new Promise((resolve, reject) => {
+            let AudioContextFunc = window.AudioContext || window.webkitAudioContext;
+            let audioContext = new AudioContextFunc();
+            let player = new WebAudioFontPlayer();
+
+            this.setState({ audioContext, player }, resolve);
+        });
+    }
+
+    loadInstrumentAsync = instrument => {
+        let { audioContext, player } = this.state;
+        let font = soundfonts[instrument];
+
+        return new Promise((resolve, reject) => {
+            if (!audioContext) reject("PRECOMP - attempted to load instrument with unset AudioContext");
+
+            player.loader.startLoad(audioContext, font.url, font.variable);
+            player.loader.waitLoad(resolve);
+        });
+    }
+
     /*******************
         MIDI ACTIONS   
     *******************/
 
-    requestMidiAccessAsync = () => {
+    setMidiAccessAsync = () => {
         return new Promise((resolve, reject) => {
             navigator.requestMIDIAccess()
             .then(midiAccess => { 
-                    resolve(midiAccess);
-                },
-                () => { 
-                    console.log("PRECOMP - navigator.requestMIDIAccess() failed");
-                    reject();
-                }
-            );
+                    this.setState({ midiAccess }, resolve);
+            });
         });
     }
 
@@ -131,7 +167,7 @@ class AppRouter extends Component {
             input = inputs.next()
         ) {
             if (inputId === input.value.id) {
-                input.value.onmidimessage = this.playMidiMessage;
+                input.value.onmidimessage = this.generateMidiMessagePlayer("piano");
                 connectionSuccessful = true;
             } else {
                 input.value.onmidimessage = null;
@@ -141,21 +177,46 @@ class AppRouter extends Component {
         return connectionSuccessful;
     }
 
-    playMidiMessage = message => {
-        let { data } = message;
-        let type = data[0], note = data[1], velocity = data[2];
+    generateMidiMessagePlayer = instrument => {
+        return message => {
+            let { player, audioContext, envelopes } = this.state;
+            let { data } = message;
+            let type = data[0], note = data[1], velocity = data[2];
+            let envelopesUpdate = envelopes;
+            let existingEnvelop = envelopes[note];
 
-        switch(type) {
-            case 144:
-                // if (velocity) MIDI.noteOn(0, note, velocity, 0);
-                // else MIDI.noteOff(0, note, 0);
-                break;
-            case 128:
-                // MIDI.noteOff(0, note, 0);
-                break;
-        }
-    };
+            switch(type) {
+                case 144:
+                    if (velocity) {
+                        envelopesUpdate[note] = player.queueWaveTable(
+                            audioContext, 
+                            audioContext.destination, 
+                            window[soundfonts[instrument].variable], 
+                            0, 
+                            note,
+                            1000,
+                            velocity
+                        );
+                    }
+                    else {
+                        if (existingEnvelop) {
+                            existingEnvelop.cancel();
+                            envelopesUpdate[note] = null;
+                        }
+                    }
+                    break;
 
+                case 128:
+                    if (existingEnvelop) {
+                        existingEnvelop.cancel();
+                        envelopesUpdate[note] = null;
+                    }
+                    break;
+            }
+
+            this.setState({ envelopes: envelopesUpdate });
+        };
+    }
 };
 
 export default AppRouter;
