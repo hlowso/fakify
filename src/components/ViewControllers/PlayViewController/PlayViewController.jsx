@@ -1,27 +1,23 @@
 import React, { Component } from "react";
-import { Button } from "react-bootstrap";
-import Modal from "react-modal";
 
 import MenuBar from "../../views/MenuBar/MenuBar";
 import SongListPanel from "../../views/SongListPanel/SongListPanel";
 import ChartViewer from "../../views/ChartViewer/ChartViewer";
 import Keyboard from "../../views/Keyboard/Keyboard";
+import MidSettingsModal from "../../views/MidiSettingsModal/MidiSettingsModal";
 
 import * as Api from "../../../shared/Api";
 
 import "./PlayViewController.css";
-
-Modal.setAppElement("#root");
 
 class PlayViewController extends Component {
     constructor(props) {
         super(props);
         this.state = {
             loadingSelectedSong: false,
-            midiSettingsModalOpen: true,
-            requestingMidiAccess: false,
             songTitles: {},
             selectedSong: {},
+            midiSettingsModalOpen: true            
         };
     }
 
@@ -54,7 +50,8 @@ class PlayViewController extends Component {
     }
 
     render() {
-        let { songTitles, selectedSong } = this.state;
+        let { MidiActions, StorageHelper, StateHelper } = this.props;
+        let { songTitles, selectedSong, midiSettingsModalOpen } = this.state;
         let selectedSongId = selectedSong ? selectedSong.songId: null;
 
         return (
@@ -75,94 +72,14 @@ class PlayViewController extends Component {
                     <Keyboard />
                 </div>
 
-                {this.renderMIDISettingsModal()}
+                <MidSettingsModal 
+                    MidiActions={MidiActions} 
+                    StorageHelper={StorageHelper}
+                    StateHelper={StateHelper} 
+                    isOpen={midiSettingsModalOpen} 
+                    close={event => this.setState({ midiSettingsModalOpen: false }) } />
             </div>
         ); 
-    }
-
-    /**************************
-        MIDI SETTINGS MODAL   
-    **************************/
-
-    renderMIDISettingsModal() {
-        let { StateHelper } = this.props;
-
-        let midiAccess = StateHelper.getMidiAccess();
-        let { midiSettingsModalOpen, requestingMidiAccess } = this.state;
-
-        let inputRadioButtons = [], form;
-
-        if (midiAccess && midiAccess.inputs) {
-            let inputs = midiAccess.inputs.values();  
-
-            for( let input = inputs.next(); input && !input.done; input = inputs.next()) {
-                let { name, id } = input.value;
-                inputRadioButtons.push(
-                    <div key={name}>
-                        <input type="radio" key={name} name="midiInput" value={id} defaultChecked/>
-                        {name}
-                    </div>
-                );
-            }
-    
-            form = (
-                <form onSubmit={this.onSubmitMidiSettingsForm}>
-                    {inputRadioButtons}
-                    <input type="submit" value="Set Input" />
-                </form>
-            );
-        }
-
-        return (
-            <Modal 
-                isOpen={midiSettingsModalOpen}
-                onRequestClose={this.closeModal}
-                contentLabel={"MIDI Input Settings"} >
-
-                <h2>MIDI Settings</h2>
-
-                {requestingMidiAccess 
-                    ? <p>Getting midi access</p>
-                    : inputRadioButtons
-                        ? form 
-                        : <p>No midi inputs available!</p>
-                }
-                
-                <Button onClick={this.closeModal} >Done</Button>
-                <Button onClick={this.onMidiInputsRefresh}>Refresh</Button>
-            </Modal>
-        ); 
-    }
-
-    onMidiInputsRefresh = event => {
-        let { MidiActions } = this.props;
-
-        this.setState({ requestingMidiAccess: true });
-        MidiActions.setMidiAccessAsync()
-            .then(() => {
-                this.setState({ requestingMidiAccess: false });
-            });
-    }
-
-    onSubmitMidiSettingsForm = event => { 
-        event.preventDefault(); 
-        
-        let { MidiActions, StorageHelper } = this.props;
-        let { value } = event.target.midiInput;
-
-        let connectionSuccessful = MidiActions.connectToMidiInput(value); 
-
-        if (connectionSuccessful) {
-            StorageHelper.setMidiInputId(value);
-            this.closeModal(); 
-        } else {
-            StorageHelper.setMidiInputId("");
-            this.setState({ midiInputConnectionError: "Connection unsuccessful" });
-        }
-    }
-
-    closeModal = () => {
-        this.setState({ midiSettingsModalOpen: false });
     }
 
     /**********************
