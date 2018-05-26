@@ -17,6 +17,7 @@ class AppRouter extends Component {
         // until I decide to do something else. This means that all helper
         // functions for getting and setting global vars must be written
         // as AppRouter class methods.
+
         this.state = {
             loading: true,
             midiAccess: null,
@@ -36,6 +37,16 @@ class AppRouter extends Component {
                     stateUpdate.midiAccess = midiAccess;
                 }
                 this.setState(stateUpdate);
+
+                let i = 0;
+                console.log(MIDI);
+                setInterval(() => {
+                    if (i < 80) {
+                        console.log(i);
+                        MIDI.noteOn(2, i, 127, 0);
+                        MIDI.noteOff(2, i++, 0.5);
+                    }
+                }, 500)
             });
     }
 
@@ -96,10 +107,15 @@ class AppRouter extends Component {
     setMidiContextAsync = () => {
         return new Promise((resolve, reject) => {
             MIDI.loadPlugin({
-                soundfontUrl: "./soundfont/",
-                instruments: ["acoustic_grand_piano"],
+                // soundfontUrl: "./soundfont/",
+                // instruments: ["acoustic_grand_piano", "synth_drum"],
+                // onprogress: function(state, progress) {
+                //     console.log(state, progress);
+                // },
                 onsuccess: () => {
                     loadSoundfonts(MIDI);
+                    MIDI.programChange(1, 0);
+                    MIDI.programChange(2, 119);
                     MIDI.setContext(new AudioContext(), resolve);
                 }
             });
