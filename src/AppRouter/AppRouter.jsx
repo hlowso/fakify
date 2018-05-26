@@ -5,8 +5,8 @@ import PlayViewController from "../ViewControllers/PlayViewController/PlayViewCo
 
 import * as StorageHelper from "../shared/StorageHelper";
 
-import MIDI from "midi.js";
-import loadSoundfonts from "../midi/loadSoundfonts";
+import WebAudioFontPlayer from "webaudiofont";
+import _tone_0000_Aspirin_sf2 from "../midi/0000_Aspirin_sf2_file";
 
 
 class AppRouter extends Component {
@@ -28,26 +28,19 @@ class AppRouter extends Component {
         let midiInputId = StorageHelper.getMidiInputId();
         let stateUpdate = { loading: false }
 
-        this.setMidiContextAsync()
-            .then(() => {
-                return this.requestMidiAccessAsync();
-            })
-            .then(midiAccess => {
-                if (midiAccess) {
-                    stateUpdate.midiAccess = midiAccess;
-                }
-                this.setState(stateUpdate);
+        var AudioContextFunc = window.AudioContext || window.webkitAudioContext;
+        var audioContext = new AudioContextFunc();
+        
+        var player = new WebAudioFontPlayer();
+        player.loader.decodeAfterLoading(audioContext, "_tone_0000_Aspirin_sf2");
 
-                let i = 0;
-                console.log(MIDI);
-                setInterval(() => {
-                    if (i < 80) {
-                        console.log(i);
-                        MIDI.noteOn(2, i, 127, 0);
-                        MIDI.noteOff(2, i++, 0.5);
-                    }
-                }, 500)
-            });
+        let info = player.loader.instrumentInfo(0);
+        // console.log(window[info.variable]);
+        player.loader.startLoad(audioContext, info.url, info.variable);
+        player.loader.waitLoad(() => {
+            console.log("cached", info.title);
+            player.queueWaveTable(audioContext, audioContext.destination, window[info.variable], 0, 55, 2);
+        });
     }
 
     render() {
@@ -104,24 +97,6 @@ class AppRouter extends Component {
         MIDI ACTIONS   
     *******************/
 
-    setMidiContextAsync = () => {
-        return new Promise((resolve, reject) => {
-            MIDI.loadPlugin({
-                // soundfontUrl: "./soundfont/",
-                // instruments: ["acoustic_grand_piano", "synth_drum"],
-                // onprogress: function(state, progress) {
-                //     console.log(state, progress);
-                // },
-                onsuccess: () => {
-                    loadSoundfonts(MIDI);
-                    MIDI.programChange(1, 0);
-                    MIDI.programChange(2, 119);
-                    MIDI.setContext(new AudioContext(), resolve);
-                }
-            });
-        });
-    }
-
     requestMidiAccessAsync = () => {
         return new Promise((resolve, reject) => {
             navigator.requestMIDIAccess()
@@ -167,11 +142,11 @@ class AppRouter extends Component {
 
         switch(type) {
             case 144:
-                if (velocity) MIDI.noteOn(0, note, velocity, 0);
-                else MIDI.noteOff(0, note, 0);
+                // if (velocity) MIDI.noteOn(0, note, velocity, 0);
+                // else MIDI.noteOff(0, note, 0);
                 break;
             case 128:
-                MIDI.noteOff(0, note, 0);
+                // MIDI.noteOff(0, note, 0);
                 break;
         }
     };
