@@ -2,8 +2,8 @@ import React, { Component } from "react";
 
 import AppRouter from "../AppRouter/AppRouter";
 
-import * as Api from "../shared/Api";
-import * as Util from "../shared/Util";
+import * as Api from "../../shared/Api";
+import * as Util from "../../shared/Util";
 
 class Authenticator extends Component {
     constructor(props) {

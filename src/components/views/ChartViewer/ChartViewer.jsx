@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import * as Util from "../../shared/Util";
+import * as Util from "../../../shared/Util";
 
 import "./ChartViewer.css";
 

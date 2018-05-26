@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Switch, Route } from "react-router";
 
-import TopNav from "../TopNav/TopNav";
+import TopNav from "../views/TopNav/TopNav";
 import SignUpViewController from '../ViewControllers/SignUpViewController/SignUpViewController';
 import LoginViewController from '../ViewControllers/LoginViewController/LoginViewController';
 import Authenticator from "../Authenticator/Authenticator";

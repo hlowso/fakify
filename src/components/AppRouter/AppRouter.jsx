@@ -7,8 +7,8 @@ import WebAudioFontPlayer from "webaudiofont";
 
 import PlayViewController from "../ViewControllers/PlayViewController/PlayViewController";
 
-import * as StorageHelper from "../shared/StorageHelper";
-import soundfonts from "../soundfontsIndex";
+import * as StorageHelper from "../../shared/StorageHelper";
+import soundfonts from "../../shared/soundfontsIndex";
 
 class AppRouter extends Component {
     constructor(props) {

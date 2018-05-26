@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 
-import "./TopNav.css";
+import * as Api from "../../../shared/Api"; 
 
-import * as Api from "../shared/Api"; 
+import "./TopNav.css";
 
 class TopNav extends Component {
     constructor(props) {

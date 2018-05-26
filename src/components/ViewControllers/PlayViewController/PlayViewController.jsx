@@ -2,12 +2,12 @@ import React, { Component } from "react";
 import { Button } from "react-bootstrap";
 import Modal from "react-modal";
 
-import MenuBar from "../../Components/MenuBar/MenuBar";
-import SongListPanel from "../../Components/SongListPanel/SongListPanel";
-import ChartViewer from "../../Components/ChartViewer/ChartViewer";
-import Keyboard from "../../Components/Keyboard/Keyboard";
+import MenuBar from "../../views/MenuBar/MenuBar";
+import SongListPanel from "../../views/SongListPanel/SongListPanel";
+import ChartViewer from "../../views/ChartViewer/ChartViewer";
+import Keyboard from "../../views/Keyboard/Keyboard";
 
-import * as Api from "../../shared/Api";
+import * as Api from "../../../shared/Api";
 
 import "./PlayViewController.css";
 

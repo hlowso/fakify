@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import { Link, Redirect } from "react-router-dom";
-import "./SignUpViewController.css";
 
-import * as Api from "../../shared/Api";
+import * as Api from "../../../shared/Api";
+
+import "./SignUpViewController.css";
 
 const PASSWORD_MINIMUM_LENGTH = 8;
 const NO_MATCH_MESSAGE = "passwords don't match";

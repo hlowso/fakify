@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import { Link, Redirect } from "react-router-dom";
-import "./LoginViewController.css";
 
-import * as Api from "../../shared/Api";
+import * as Api from "../../../shared/Api";
+
+import "./LoginViewController.css";
 
 class LoginViewController extends Component {
     constructor(props) {
