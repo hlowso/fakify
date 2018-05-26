@@ -5,9 +5,6 @@
   "proxy": "http://localhost:3001",
   "dependencies": {
     "classnames": "^2.2.5",
-    "midi": "git+https://github.com/hlowso/MIDI.js.git",
-    "midi-sounds-react": "^1.2.54",
-    "midi.js": "^0.3.0",
     "react": "^16.3.2",
     "react-bootstrap": "^0.32.1",
     "react-dom": "^16.3.2",
@@ -16,8 +13,7 @@
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.1.4",
     "reactstrap": "^6.0.1",
-    "soundfont-player": "^0.10.6",
-    "webmidi": "^2.0.5"
+    "webaudiofont": "^2.5.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -27,7 +23,6 @@
   },
   "devDependencies": {
     "jasmine": "^3.1.0",
-    "wdio-jasmine-framework": "^0.3.4",
-    "webdriverio": "^4.12.0"
+    "wdio-jasmine-framework": "^0.3.4"
   }
 }
