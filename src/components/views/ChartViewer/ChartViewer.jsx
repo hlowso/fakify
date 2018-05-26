@@ -38,11 +38,11 @@ class ChartViewer extends Component {
             let chordNames = [];
             let beats = [];
 
-            // TODO: the following logic doesn't cover all timeSignature cases
             for (let beat = 1; beat <= song.timeSignature[1]; beat ++) {
                 chordNames.push(<span className="chord-name" key={beat}>{bar[beat]}</span>);
                 beats.push(<span className="beat" key={beat}>{beat}</span>);
             }
+
             barElements.push(
                 <div className="bar-container" key={barNumber}>
                     <div className="bar-chord-group">

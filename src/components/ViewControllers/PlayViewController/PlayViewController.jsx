@@ -84,7 +84,6 @@ class PlayViewController extends Component {
         MIDI SETTINGS MODAL   
     **************************/
 
-    // TODO style the Modal
     renderMIDISettingsModal() {
         let { StateHelper } = this.props;
 
