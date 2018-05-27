@@ -55,3 +55,14 @@ export const redirect = route => {
 export const objectIsEmpty = object => {
     return Object.keys(object).length === 0;
 };
+
+export const waitFor = (checker, rate) => {
+    return new Promise((resolve, reject) => {
+        (function check() {
+            setTimeout(() => {
+                if (checker()) resolve();
+                else check();
+            }, rate);
+        })();
+    });
+}

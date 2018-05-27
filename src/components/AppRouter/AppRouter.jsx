@@ -6,6 +6,7 @@ import WebAudioFontPlayer from "webaudiofont";
 import PlayViewController from "../ViewControllers/PlayViewController/PlayViewController";
 
 import * as StorageHelper from "../../shared/StorageHelper";
+import * as Util from "../../shared/Util";
 import soundfonts from "../../shared/soundfontsIndex";
 
 class AppRouter extends Component {
@@ -22,6 +23,7 @@ class AppRouter extends Component {
             midiAccess: null,
             audioContext: null,
             player: null,
+            playing: true,
 
             // Unfortunately, it seems that WebAudioFont forces the developer to 
             // manage their own sound envelopes ...
@@ -43,7 +45,39 @@ class AppRouter extends Component {
                     }
                 }
                 this.setState({ loading: false });
+                
+
             });
+    }
+
+    componentDidMount() {
+        // ------------
+
+        console.log("compdidmount");
+
+        Util.waitFor(() => this.musicTarget, 500)
+            .then(() => {
+                let arr = [3, 4, 7, 8, 10, 15];
+                let target = this.musicTarget;
+
+                for (let a of arr) {
+                    target.addEventListener(`queue:${a}`, () => {
+                        console.log("HANDLING", a, "OUTPUT:", a*a - 10);
+                    }, { once: true });
+                }
+
+                console.log("Added event listeners", target);
+
+                let counter = 0;
+                // setInterval(() => {
+                //     console.log("BEAT", counter);
+                //     let event = document.createEvent("Event");
+                //     event.initEvent(`queue:${counter}`, true, true);
+                //     target.dispatchEvent(event);
+                //     counter++;
+                // }, 1000);
+            });
+        
     }
 
     render() {
@@ -70,18 +104,28 @@ class AppRouter extends Component {
         return loading
                 ? <h1>loading...</h1> 
                 : (
-                    <Switch id="app-router">
-                        <Route 
-                            exact
-                            path="/play" 
-                            render={ () => <PlayViewController {...VCProps}/> }
-                        />
-                        <Route 
-                            path="/" 
-                            render={ () => <Redirect to="/play" /> }
-                        />
-                    </Switch>
+                    <div id="app-router">
+                        <Switch>
+                            <Route 
+                                exact
+                                path="/play" 
+                                render={ () => <PlayViewController {...VCProps}/> }
+                            />
+                            <Route 
+                                path="/" 
+                                render={ () => <Redirect to="/play" /> }
+                            />
+                        </Switch>
+                        {this.renderMusicTarget()}
+                    </div>
                 );
+    }
+
+    renderMusicTarget() {
+        console.log("rendermusictarget");
+        
+        this.musicTarget = React.createRef();
+        return this.state.playing && <span id="music-target" ref={current => this.musicTarget = current} />;
     }
 
     /*******************
