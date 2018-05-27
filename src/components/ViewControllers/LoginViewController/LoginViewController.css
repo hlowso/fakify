@@ -1,10 +1,10 @@
-.login-container {
+#login-view .login-container {
     margin: auto;
     width: 600px;
     margin-top: 20px;
 }
 
-.form-container {
+#login-view .form-container {
     padding: 45px 15px 15px;
 
     height: 300px;
@@ -14,7 +14,7 @@
     border-radius: 10px;
 }
 
-input {
+#login-view input {
     font-size: 130%;
     margin-left: 10%;
     padding: 10px 20px;
@@ -23,43 +23,43 @@ input {
     border-radius: 4px;
 }
 
-input[type="submit"] {
+#login-view input[type="submit"] {
     width: 200px;
     border: 1px solid #666
 }
 
-input[type="submit"]:hover {
+#login-view input[type="submit"]:hover {
     background-color: #222;
     border: 1px solid white;
     color: white;
 }
 
-.header-container {
+#login-view .header-container {
     border-bottom: 1px solid #666 
 }
 
-h1 {
+#login-view h1 {
     font-size: 300%;
 }
 
-label {
+#login-view label {
     color: #eee;
     font-size: 125%;
 }
 
-tr {
+#login-view tr {
     height: 50px;
 }
 
-a, a:visited {
+#login-view a, a:visited {
     color: #eee;    
 }
 
-a:hover {
+#login-view a:hover {
     color: #222;
 }
 
-.error {
+#login-view .error {
     margin-left: 10%;
     color: #f66;
 }

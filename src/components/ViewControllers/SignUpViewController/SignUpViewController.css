@@ -1,10 +1,10 @@
-.signup-container {
+#signup-view .signup-container {
     margin: auto;
     width: 600px;
     margin-top: 20px;
 }
 
-.form-container {
+#signup-view .form-container {
     padding: 45px 15px 15px;
 
     height: 300px;
@@ -14,7 +14,7 @@
     border-radius: 10px;
 }
 
-input {
+#signup-view input {
     font-size: 130%;
     margin-left: 10%;
     padding: 10px 20px;
@@ -23,44 +23,44 @@ input {
     border-radius: 4px;
 }
 
-input[type="submit"] {
+#signup-view input[type="submit"] {
     margin-top: 5%;
     width: 200px;
     border: 1px solid #666
 }
 
-input[type="submit"]:hover {
+#signup-view input[type="submit"]:hover {
     background-color: #222;
     border: 1px solid white;
     color: white;
 }
 
-.header-container {
+#signup-view .header-container {
     border-bottom: 1px solid #666 
 }
 
-h1 {
+#signup-view h1 {
     font-size: 300%;
 }
 
-label {
+#signup-view label {
     color: #eee;
     font-size: 125%;
 }
 
-tr {
+#signup-view tr {
     height: 50px;
 }
 
-a, a:visited {
+#signup-view a, a:visited {
     color: #eee;    
 }
 
-a:hover {
+#signup-view a:hover {
     color: #222;
 }
 
-.error {
+#signup-view .error {
     margin-left: 10%;    
     color: #f66;
 }

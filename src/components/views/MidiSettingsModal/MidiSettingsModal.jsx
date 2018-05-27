@@ -1,6 +1,8 @@
 import React, { Component } from "react";
-import { Button } from "react-bootstrap";
+// import { button } from "react-bootstrap";
 import Modal from "react-modal";
+
+import "./MidiSettingsModal.css";
 
 const modalStyle={
     overlay: {
@@ -12,7 +14,7 @@ const modalStyle={
         margin: "auto",
         width: "600px",
         borderRadius: "10px",
-        backgroundColor: "#bbb",
+        backgroundColor: "#ddd",
     }
 };
 
@@ -34,15 +36,17 @@ class MidiSettingsModal extends Component {
     }
 
     render() {
-        let { StateHelper, isOpen, close } = this.props;
+        let { StorageHelper, StateHelper, isOpen, close } = this.props;
     
+        let midiInputId = StorageHelper.getMidiInputId();
         let midiAccess = StateHelper.getMidiAccess();
+
         let { 
             selectedMidiInputId, 
             requestingMidiAccess
         } = this.state;
     
-        let inputRadioButtons = [], form;
+        let inputRadioButtons = [], midiInputsForm;
     
         if (midiAccess && midiAccess.inputs) {
             let inputs = midiAccess.inputs.values();  
@@ -56,18 +60,22 @@ class MidiSettingsModal extends Component {
                             key={name} 
                             name="midiInput" 
                             value={id} 
-                            defaultChecked={id === selectedMidiInputId} 
+                            defaultChecked={id === midiInputId} 
                             onChange={this.onMidiInputSelectionChange} />
                         {name}
                     </div>
                 );
             }
     
-            form = (
-                <form >
+            midiInputsForm = (
+                <div className="section" >
+                    <p>Midi Input</p>
                     {inputRadioButtons}
-                    <Button onClick={this.onMidiInputsRefresh}>Refresh</Button>
-                </form>
+                    <div>
+                        <button className="btn" onClick={this.onMidiInputsRefresh} >Refresh</button>
+                        {requestingMidiAccess && "refreshing..."} 
+                    </div>
+                </div>
             );
         }
     
@@ -77,18 +85,20 @@ class MidiSettingsModal extends Component {
                 onRequestClose={close}
                 contentLabel={"MIDI Input Settings"} 
                 style={modalStyle} >
-                <div >
-                    <h2>MIDI Settings</h2>
+                <div id="midi-settings-modal" >
+                    <div className="header">
+                        <span>MIDI Settings</span>
+                    </div>
     
-                    {requestingMidiAccess 
-                        ? <p>Getting midi access</p>
-                        : inputRadioButtons
-                            ? form 
-                            : <p>No midi inputs available!</p>
+                    {inputRadioButtons
+                        ? midiInputsForm 
+                        : <p>No midi inputs available!</p>
                     }
                     
-                    <Button onClick={this.onSubmitMidiSettingsForm} >Save</Button>
-                    <Button onClick={close} >Cancel</Button>
+                    <div className="exit-btns" >
+                        <button className="btn" onClick={close} >Cancel</button>
+                        <button className="save btn" onClick={this.onSubmitMidiSettingsForm} >Save</button>
+                    </div>
                 </div>
             </Modal>
         ); 
@@ -99,6 +109,7 @@ class MidiSettingsModal extends Component {
     }
     
     onMidiInputsRefresh = event => {
+        event.preventDefault();
         let { MidiActions } = this.props;
     
         this.setState({ requestingMidiAccess: true });
@@ -109,6 +120,7 @@ class MidiSettingsModal extends Component {
     }
     
     onSubmitMidiSettingsForm = event => { 
+        event.preventDefault();
         let { MidiActions, StorageHelper, close } = this.props;
         let { selectedMidiInputId } = this.state;
     
@@ -116,7 +128,7 @@ class MidiSettingsModal extends Component {
     
         if (connectionSuccessful) {
             StorageHelper.setMidiInputId(selectedMidiInputId);
-            close(); 
+            close(event); 
         } else {
             StorageHelper.setMidiInputId("");
             this.setState({ midiInputConnectionError: "Connection unsuccessful" });
