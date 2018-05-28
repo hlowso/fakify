@@ -183,6 +183,7 @@ class AppRouter extends Component {
                 let barCounter = 0;
                 let queueBeat;
                 let scoreV2 = [];
+                let callbacksSet = [];
 
                 let D = 10;
 
@@ -206,9 +207,10 @@ class AppRouter extends Component {
                                 0.6
                             ));
                         }
-                        target.addEventListener(`queue:${queueBeat}`, () => {
-                            playerCallbacks.forEach(cb => cb());
-                        }, {once: true});
+                        // target.addEventListener(`queue:${queueBeat}`, () => {
+                        //     playerCallbacks.forEach(cb => cb());
+                        // }, {once: true});
+                        callbacksSet[`queue:${queueBeat}`] = playerCallbacks;
                     }   
 
                     barCounter += 4;
@@ -219,9 +221,13 @@ class AppRouter extends Component {
                 // let counter = 0;
                 // setInterval(() => {
                 //     console.log("BEAT", counter);
-                //     let event = document.createEvent("Event");
-                //     event.initEvent(`queue:${counter}`, true, true);
-                //     target.dispatchEvent(event);
+                //     // let event = document.createEvent("Event");
+                //     // event.initEvent(`queue:${counter}`, true, true);
+                //     // target.dispatchEvent(event);
+                //     let cbs = callbacksSet[`queue:${counter}`];
+                //     if (cbs) {
+                //         cbs.forEach(cb => cb());
+                //     }
                 //     counter++;
                 // }, 1000 / D);
 
