@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Switch, Route, Redirect } from "react-router";
-
 import WebAudioFontPlayer from "webaudiofont";
 
 import PlayViewController from "../ViewControllers/PlayViewController/PlayViewController";
@@ -8,6 +7,127 @@ import PlayViewController from "../ViewControllers/PlayViewController/PlayViewCo
 import * as StorageHelper from "../../shared/StorageHelper";
 import * as Util from "../../shared/Util";
 import soundfonts from "../../shared/soundfontsIndex";
+
+// const score = [
+//     {
+//         piano: {
+//             1: {
+                
+//             },
+
+//             3: {
+//                 note: 62,
+//                 duration: 1,
+//             }
+//         },
+
+//         bass: {
+//             2: {
+                
+//             },
+
+//             4: {
+//                 note: 31,
+//                 duration: 1
+//             }
+//         }
+//     }, {
+//         piano: {
+//             1: {
+//                 note: 60,
+//                 duration: 2,
+//             },
+
+//             3: {
+//                 note: 62,
+//                 duration: 1,
+//             }
+//         },
+
+//         bass: {
+//             2: {
+//                 note: 36,
+//                 duration: 1
+//             },
+
+//             4: {
+//                 note: 31,
+//                 duration: 1
+//             }
+//         }
+//     },
+// ];
+
+const scoreV1 = [
+    {
+        1: {
+            piano: {
+                note: 60,
+                duration: 2,
+            },
+            doubleBass: {
+                note: 36,
+                duration: 1
+            }
+        },
+        2: {
+            doubleBass: {
+                note: 36,
+                duration: 1
+            }
+        },
+        3: {
+            piano: {
+                note: 62,
+                duration: 1
+            },
+            doubleBass: {
+                note: 31,
+                duration: 1
+            }
+        },
+        4: {
+            doubleBass: {
+                note: 31,
+                duration: 1
+            }
+        }
+    },  
+    {
+        1: {
+            piano: {
+                note: 60,
+                duration: 2,
+            }, 
+            doubleBass: {
+                note: 36,
+                duration: 1
+            }
+        },
+        2: {
+            doubleBass: {
+                note: 36,
+                duration: 1
+            }
+        },
+        3: {
+            piano: {
+                note: 62,
+                duration: 1
+            },
+            doubleBass: {
+                note: 31,
+                duration: 1
+            }
+        },
+        4: {
+            doubleBass: {
+                note: 31,
+                duration: 1
+            }
+        }
+    }
+];
 
 class AppRouter extends Component {
     constructor(props) {
@@ -57,25 +177,55 @@ class AppRouter extends Component {
 
         Util.waitFor(() => this.musicTarget, 500)
             .then(() => {
-                let arr = [3, 4, 7, 8, 10, 15];
-                let target = this.musicTarget;
 
-                for (let a of arr) {
-                    target.addEventListener(`queue:${a}`, () => {
-                        console.log("HANDLING", a, "OUTPUT:", a*a - 10);
-                    }, { once: true });
+                let { player, audioContext } = this.state;
+                let target = this.musicTarget;
+                let barCounter = 0;
+                let queueBeat;
+                let scoreV2 = [];
+
+                let D = 10;
+
+                for (let i = 0; i < 1000; i ++) {
+                    scoreV2 = [...scoreV2, ...scoreV1];
                 }
 
-                console.log("Added event listeners", target);
+                for (let scoreBar of scoreV2) {
+                    for (let beat in scoreBar) {
+                        queueBeat = barCounter + Number(beat);
+                        let playerCallbacks = [];
+                        for (let instrument in scoreBar[beat]) {
+                            let data = scoreBar[beat][instrument];
+                            playerCallbacks.push(() => player.queueWaveTable(
+                                audioContext, 
+                                audioContext.destination, 
+                                window[soundfonts[instrument].variable], 
+                                0, 
+                                data.note,
+                                data.duration / D,
+                                0.6
+                            ));
+                        }
+                        target.addEventListener(`queue:${queueBeat}`, () => {
+                            playerCallbacks.forEach(cb => cb());
+                        }, {once: true});
+                    }   
 
-                let counter = 0;
+                    barCounter += 4;
+                }
+
+                console.log("done");
+
+                // let counter = 0;
                 // setInterval(() => {
                 //     console.log("BEAT", counter);
                 //     let event = document.createEvent("Event");
                 //     event.initEvent(`queue:${counter}`, true, true);
                 //     target.dispatchEvent(event);
                 //     counter++;
-                // }, 1000);
+                // }, 1000 / D);
+
+
             });
         
     }
@@ -122,8 +272,6 @@ class AppRouter extends Component {
     }
 
     renderMusicTarget() {
-        console.log("rendermusictarget");
-        
         this.musicTarget = React.createRef();
         return this.state.playing && <span id="music-target" ref={current => this.musicTarget = current} />;
     }
