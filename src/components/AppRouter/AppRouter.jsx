@@ -151,6 +151,47 @@ class AppRouter extends Component {
         };
     }
 
+    playRound() {
+        let { player, audioContext } = this.state;
+
+        let D = 10;
+
+        let scoreV2 = [];
+        for (let i = 0; i < 10 ; i ++) {
+            scoreV2 = [...scoreV2, ...scoreV1];
+        }
+
+        let beatCounter = 0;
+        let { currentTime } = audioContext;
+        currentTime += 10;
+
+        for (let bar of scoreV2) {
+
+            for(let beat in bar) {
+                let parts = bar[beat];
+                beat = Number(beat);
+
+                for(let instrument in parts) {
+
+                    let data = parts[instrument];
+
+                    player.queueWaveTable(
+                        audioContext, 
+                        audioContext.destination, 
+                        window[soundfonts[instrument].variable], 
+                        (currentTime + beatCounter + beat) / D, 
+                        data.note,
+                        data.duration / D,
+                        0.6
+                    );
+                }
+                
+            }
+
+            beatCounter += 4;
+        }
+    }
+
     componentWillMount() {
         let midiInputId = StorageHelper.getMidiInputId();
 
@@ -165,75 +206,11 @@ class AppRouter extends Component {
                     }
                 }
                 this.setState({ loading: false });
+                //----------------
                 
+                // this.playRound();
 
             });
-    }
-
-    componentDidMount() {
-        // ------------
-
-        console.log("compdidmount");
-
-        Util.waitFor(() => this.musicTarget, 500)
-            .then(() => {
-
-                let { player, audioContext } = this.state;
-                let target = this.musicTarget;
-                let barCounter = 0;
-                let queueBeat;
-                let scoreV2 = [];
-                let callbacksSet = [];
-
-                let D = 10;
-
-                for (let i = 0; i < 1000; i ++) {
-                    scoreV2 = [...scoreV2, ...scoreV1];
-                }
-
-                for (let scoreBar of scoreV2) {
-                    for (let beat in scoreBar) {
-                        queueBeat = barCounter + Number(beat);
-                        let playerCallbacks = [];
-                        for (let instrument in scoreBar[beat]) {
-                            let data = scoreBar[beat][instrument];
-                            playerCallbacks.push(() => player.queueWaveTable(
-                                audioContext, 
-                                audioContext.destination, 
-                                window[soundfonts[instrument].variable], 
-                                0, 
-                                data.note,
-                                data.duration / D,
-                                0.6
-                            ));
-                        }
-                        // target.addEventListener(`queue:${queueBeat}`, () => {
-                        //     playerCallbacks.forEach(cb => cb());
-                        // }, {once: true});
-                        callbacksSet[`queue:${queueBeat}`] = playerCallbacks;
-                    }   
-
-                    barCounter += 4;
-                }
-
-                console.log("done");
-
-                // let counter = 0;
-                // setInterval(() => {
-                //     console.log("BEAT", counter);
-                //     // let event = document.createEvent("Event");
-                //     // event.initEvent(`queue:${counter}`, true, true);
-                //     // target.dispatchEvent(event);
-                //     let cbs = callbacksSet[`queue:${counter}`];
-                //     if (cbs) {
-                //         cbs.forEach(cb => cb());
-                //     }
-                //     counter++;
-                // }, 1000 / D);
-
-
-            });
-        
     }
 
     render() {
@@ -300,8 +277,7 @@ class AppRouter extends Component {
 
     audioInitAsync = () => {
         return new Promise((resolve, reject) => {
-            let AudioContextFunc = window.AudioContext || window.webkitAudioContext;
-            let audioContext = new AudioContextFunc();
+            let audioContext = new (window.AudioContext || window.webkitAudioContext)();
             let player = new WebAudioFontPlayer();
 
             this.setState({ audioContext, player }, resolve);

@@ -65,4 +65,6 @@ export const waitFor = (checker, rate) => {
             }, rate);
         })();
     });
-}
+};
+
+export const copyObject = object => JSON.parse(JSON.stringify(object));

@@ -30,11 +30,11 @@ class ChartViewer extends Component {
 
     renderProgression() {
         let { song } = this.props;
-        let { progression } = song.chart;
+        let { bars } = song.chart;
 
         let barElements = [];
-        for (let barNumber in progression) {
-            let bar = progression[barNumber];
+        for (let barNumber in bars) {
+            let bar = bars[barNumber];
             let chordNames = [];
             let beats = [];
 

@@ -7,6 +7,7 @@ import Keyboard from "../../views/Keyboard/Keyboard";
 import MidSettingsModal from "../../views/MidiSettingsModal/MidiSettingsModal";
 
 import * as Api from "../../../shared/Api";
+import * as MusicHelper from "../../../shared/music/MusicHelper";
 
 import "./PlayViewController.css";
 
@@ -17,6 +18,7 @@ class PlayViewController extends Component {
             loadingSelectedSong: false,
             songTitles: {},
             selectedSong: {},
+            sessionSong: {},
             midiSettingsModalOpen: true            
         };
     }
@@ -44,14 +46,17 @@ class PlayViewController extends Component {
             })
             .then(selectedSong => {
                 if (selectedSong) {
-                    this.setState({ selectedSong });
+                    this.setState({ 
+                        selectedSong,
+                        sessionSong: MusicHelper.getSessionSong(selectedSong) 
+                    });
                 }
             });
     }
 
     render() {
         let { MidiActions, StorageHelper, StateHelper } = this.props;
-        let { songTitles, selectedSong, midiSettingsModalOpen } = this.state;
+        let { songTitles, selectedSong, midiSettingsModalOpen, sessionSong } = this.state;
         let selectedSongId = selectedSong ? selectedSong.songId: null;
 
         return (
@@ -66,7 +71,7 @@ class PlayViewController extends Component {
                         selectedSongId={selectedSongId} 
                         onSongListItemClick={this.onSongListItemClick} />
                     <ChartViewer
-                        song={selectedSong} />
+                        song={sessionSong} />
                 </div>
                 <div className="bottom-row">
                     <Keyboard />
