@@ -195,8 +195,8 @@ class AppRouter extends Component {
     componentWillMount() {
         let midiInputId = StorageHelper.getMidiInputId();
 
-        this.audioInitAsync()
-            .then(() => this.loadInstrumentsAsync())
+        this._audioInitAsync()
+            .then(() => this._loadInstrumentsAsync())
             .then(() => this.setMidiAccessAsync())
             .then(() => {
                 if (midiInputId) {
@@ -206,21 +206,18 @@ class AppRouter extends Component {
                     }
                 }
                 this.setState({ loading: false });
-                //----------------
-                
-                // this.playRound();
-
             });
     }
 
     render() {
         let { loading } = this.state;
 
-        let MidiActions = {
+        let SoundActions = {
             setMidiContextAsync: this.setMidiContextAsync,
             setMidiAccessAsync: this.setMidiAccessAsync,
             connectToMidiInput: this.connectToMidiInput,
-            generateMidiMessagePlayer: this.generateMidiMessagePlayer
+            generateMidiMessagePlayer: this.generateMidiMessagePlayer,
+            playScore: this.playScore
         };
 
         let StateHelper = {
@@ -229,7 +226,7 @@ class AppRouter extends Component {
         };
 
         let VCProps = {
-            MidiActions,
+            SoundActions,
             StateHelper,            
             StorageHelper
         };
@@ -237,26 +234,18 @@ class AppRouter extends Component {
         return loading
                 ? <h1>loading...</h1> 
                 : (
-                    <div id="app-router">
-                        <Switch>
-                            <Route 
-                                exact
-                                path="/play" 
-                                render={ () => <PlayViewController {...VCProps}/> }
-                            />
-                            <Route 
-                                path="/" 
-                                render={ () => <Redirect to="/play" /> }
-                            />
-                        </Switch>
-                        {this.renderMusicTarget()}
-                    </div>
+                    <Switch>
+                        <Route 
+                            exact
+                            path="/play" 
+                            render={ () => <PlayViewController {...VCProps}/> }
+                        />
+                        <Route 
+                            path="/" 
+                            render={ () => <Redirect to="/play" /> }
+                        />
+                    </Switch>
                 );
-    }
-
-    renderMusicTarget() {
-        this.musicTarget = React.createRef();
-        return this.state.playing && <span id="music-target" ref={current => this.musicTarget = current} />;
     }
 
     /*******************
@@ -272,10 +261,10 @@ class AppRouter extends Component {
     }
 
     /********************
-        AUDIO ACTIONS   
+        SOUND ACTIONS   
     ********************/
 
-    audioInitAsync = () => {
+    _audioInitAsync = () => {
         return new Promise((resolve, reject) => {
             let audioContext = new (window.AudioContext || window.webkitAudioContext)();
             let player = new WebAudioFontPlayer();
@@ -284,7 +273,7 @@ class AppRouter extends Component {
         });
     }
 
-    loadInstrumentAsync = instrument => {
+    _loadInstrumentAsync = instrument => {
         let { audioContext, player } = this.state;
         let font = soundfonts[instrument];
 
@@ -296,13 +285,9 @@ class AppRouter extends Component {
         });
     }
 
-    loadInstrumentsAsync = () => {
-        return Promise.all(Object.keys(soundfonts).map(instrument => this.loadInstrumentAsync(instrument)));
+    _loadInstrumentsAsync = () => {
+        return Promise.all(Object.keys(soundfonts).map(instrument => this._loadInstrumentAsync(instrument)));
     }
-
-    /*******************
-        MIDI ACTIONS   
-    *******************/
 
     setMidiAccessAsync = () => {
         return new Promise((resolve, reject) => {
@@ -380,6 +365,10 @@ class AppRouter extends Component {
 
             this.setState({ envelopes: envelopesUpdate });
         };
+    }
+
+    playScore = score => {
+        console.log("YOU'VE ASKED ME TO PLAY", score);
     }
 };
 

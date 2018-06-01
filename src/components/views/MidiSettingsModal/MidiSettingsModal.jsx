@@ -110,10 +110,10 @@ class MidiSettingsModal extends Component {
     
     onMidiInputsRefresh = event => {
         event.preventDefault();
-        let { MidiActions } = this.props;
+        let { SoundActions } = this.props;
     
         this.setState({ requestingMidiAccess: true });
-        MidiActions.setMidiAccessAsync()
+        SoundActions.setMidiAccessAsync()
             .then(() => {
                 this.setState({ requestingMidiAccess: false });
             });
@@ -121,10 +121,10 @@ class MidiSettingsModal extends Component {
     
     onSubmitMidiSettingsForm = event => { 
         event.preventDefault();
-        let { MidiActions, StorageHelper, close } = this.props;
+        let { SoundActions, StorageHelper, close } = this.props;
         let { selectedMidiInputId } = this.state;
     
-        let connectionSuccessful = MidiActions.connectToMidiInput(selectedMidiInputId); 
+        let connectionSuccessful = SoundActions.connectToMidiInput(selectedMidiInputId); 
     
         if (connectionSuccessful) {
             StorageHelper.setMidiInputId(selectedMidiInputId);

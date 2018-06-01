@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import MenuBar from "../../views/MenuBar/MenuBar";
 import SongListPanel from "../../views/SongListPanel/SongListPanel";
 import ChartViewer from "../../views/ChartViewer/ChartViewer";
+import TrainingWindow from "../../views/TrainingWindow/TrainingWindow"
 import Keyboard from "../../views/Keyboard/Keyboard";
 import MidSettingsModal from "../../views/MidiSettingsModal/MidiSettingsModal";
 
@@ -17,19 +18,20 @@ class PlayViewController extends Component {
         this.state = {
             loadingSelectedSong: false,
             songTitles: {},
-            selectedSong: {},
+            songBase: {},
             sessionSong: {},
+            score: {},
             midiSettingsModalOpen: true            
         };
     }
 
     componentWillMount() {
-        let { MidiActions, StorageHelper } = this.props;
+        let { SoundActions, StorageHelper } = this.props;
         let midiInputId = StorageHelper.getMidiInputId();
         let selectedSongId = StorageHelper.getSelectedSongId();
 
         if (midiInputId) {
-            let connectionSuccessful = MidiActions.connectToMidiInput(midiInputId);
+            let connectionSuccessful = SoundActions.connectToMidiInput(midiInputId);
             if (!connectionSuccessful) {
                 StorageHelper.setMidiInputId("");
             }
@@ -46,16 +48,19 @@ class PlayViewController extends Component {
             })
             .then(selectedSong => {
                 if (selectedSong) {
-                    this.setState({ 
-                        selectedSong,
+                    return new Promise(resolve => this.setState({ 
+                        songBase: selectedSong,
                         sessionSong: MusicHelper.getSessionSong(selectedSong) 
-                    });
+                    }, resolve));
                 }
+            })
+            .then(() => {
+                this.refreshScore();
             });
     }
 
     render() {
-        let { MidiActions, StorageHelper, StateHelper } = this.props;
+        let { SoundActions, StorageHelper, StateHelper } = this.props;
         let { songTitles, selectedSong, midiSettingsModalOpen, sessionSong } = this.state;
         let selectedSongId = selectedSong ? selectedSong.songId: null;
 
@@ -72,13 +77,15 @@ class PlayViewController extends Component {
                         onSongListItemClick={this.onSongListItemClick} />
                     <ChartViewer
                         song={sessionSong} />
+                    <TrainingWindow  
+                        startSession={() => SoundActions.playScore(this.state.score)} />
                 </div>
                 <div className="bottom-row">
                     <Keyboard />
                 </div>
 
                 <MidSettingsModal 
-                    MidiActions={MidiActions} 
+                    SoundActions={SoundActions} 
                     StorageHelper={StorageHelper}
                     StateHelper={StateHelper} 
                     isOpen={midiSettingsModalOpen} 
@@ -88,6 +95,16 @@ class PlayViewController extends Component {
                     }} />
             </div>
         ); 
+    }
+
+    /************
+        MUSIC
+    ************/
+    
+    refreshScore = () => {
+        let { sessionSong } = this.state;
+        let pianoPart = MusicHelper.composePianoAccompanimentV0(sessionSong.chart);
+        this.setState({ score: pianoPart });
     }
 
     /**********************

@@ -1,0 +1,19 @@
+#training-window {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 400px;
+    background-color: black;
+}
+
+#training-window button {
+    border-radius: 10px;
+    height: 70px;
+    width: 70px;
+    font-size: 200%;
+}
+
+#training-window button:hover {
+    background-color: #444;
+    color: white;
+}

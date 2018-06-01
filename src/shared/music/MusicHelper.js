@@ -1,5 +1,7 @@
 import * as Util from "../Util";
 
+export * from "./composers/piano/composePianoAccompanimentV0";
+
 const RELATIVE_SCALE= ["1", "H", "2", "N", "3", "4", "T", "5", "U", "6", "J", "7"];
 const NOTE_NAMES = ["C", "C#|Db", "D", "D#|Eb", "E", "F", "F#|Gb", "G", "G#|Ab", "A", "A#|Bb", "B"];
 
@@ -17,7 +19,7 @@ export const getSessionSong = (song, keySignature = "") => {
     if (!keySignature) keySignature = song.originalKeySignature;
 
     let { chart } = song;
-    let { bars, keyRanges, segments } = chart;
+    let { bars, keys, segments } = chart;
     let sessionChart = {};
 
     sessionChart.bars = {};
@@ -28,16 +30,19 @@ export const getSessionSong = (song, keySignature = "") => {
         });
     });
 
-    sessionChart.keyRanges = keyRanges.map(range => ({
-        from: range.from,
-        to: range.to,
-        key: _contextualize(range.key, keySignature)
-    }));
+    sessionChart.keys = keys.map(key => _contextualize(key, keySignature));
 
     sessionChart.segments = segments.map(segment => ({
         chartIndex: segment.chartIndex,
         chord: _contextualize(segment.chord, keySignature)
     }));
+
+    sessionChart.currentSegmentIndex = 0;
+
+    sessionChart.getCurrentKey = () => {
+        let { currentSegmentIndex, keys } = sessionChart;
+        return keys[currentSegmentIndex];
+    };
 
     let sessionSong = Util.copyObject(song);
     sessionSong.chart = sessionChart;
