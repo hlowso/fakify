@@ -20,15 +20,20 @@ class PlayViewController extends Component {
             songTitles: {},
             songBase: {},
             sessionSong: {},
-            score: {},
-            midiSettingsModalOpen: true            
+            take: {},
+            midiSettingsModalOpen: true,
+            feel: "swing"            
         };
     }
 
     componentWillMount() {
-        let { SoundActions, StorageHelper } = this.props;
+        let { SoundActions, StorageHelper, StateHelper } = this.props;
         let midiInputId = StorageHelper.getMidiInputId();
         let selectedSongId = StorageHelper.getSelectedSongId();
+
+        this.SoundActions = SoundActions;
+        this.StorageHelper = StorageHelper;
+        this.StateHelper = StateHelper;
 
         if (midiInputId) {
             let connectionSuccessful = SoundActions.connectToMidiInput(midiInputId);
@@ -50,12 +55,12 @@ class PlayViewController extends Component {
                 if (selectedSong) {
                     return new Promise(resolve => this.setState({ 
                         songBase: selectedSong,
-                        sessionSong: MusicHelper.getSessionSong(selectedSong) 
+                        sessionSong: MusicHelper.contextualize(selectedSong) 
                     }, resolve));
                 }
             })
             .then(() => {
-                this.refreshScore();
+                this.refreshTake();
             });
     }
 
@@ -78,7 +83,7 @@ class PlayViewController extends Component {
                     <ChartViewer
                         song={sessionSong} />
                     <TrainingWindow  
-                        startSession={() => SoundActions.playScore(this.state.score)} />
+                        startSession={this.startSession} />
                 </div>
                 <div className="bottom-row">
                     <Keyboard />
@@ -100,11 +105,18 @@ class PlayViewController extends Component {
     /************
         MUSIC
     ************/
+
+    startSession = () => {
+        // let { SoundActions } = this.props;
+        let callback = data => console.log("PLAYSCORE DATA", data)
+        this.SoundActions.playScore(this.state.sessionSong.tempo, this.state.take, callback);
+    }
     
-    refreshScore = () => {
-        let { sessionSong } = this.state;
-        let pianoPart = MusicHelper.composePianoAccompanimentV0(sessionSong.chart);
-        this.setState({ score: pianoPart });
+    refreshTake = () => {
+        let { sessionSong, feel } = this.state;
+
+        let take = MusicHelper.compAll(sessionSong, feel);
+        this.setState({ take });
     }
 
     /**********************

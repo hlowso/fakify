@@ -217,7 +217,7 @@ class AppRouter extends Component {
             setMidiAccessAsync: this.setMidiAccessAsync,
             connectToMidiInput: this.connectToMidiInput,
             generateMidiMessagePlayer: this.generateMidiMessagePlayer,
-            playScore: this.playScore
+            playTake: this.playTake
         };
 
         let StateHelper = {
@@ -293,7 +293,7 @@ class AppRouter extends Component {
         return new Promise((resolve, reject) => {
             navigator.requestMIDIAccess()
             .then(midiAccess => { 
-                    this.setState({ midiAccess }, resolve);
+                this.setState({ midiAccess }, resolve);
             });
         });
     }
@@ -367,8 +367,8 @@ class AppRouter extends Component {
         };
     }
 
-    playScore = score => {
-        console.log("YOU'VE ASKED ME TO PLAY", score);
+    playTake = (tempo, take, onQueue) => {
+        console.log("YOU'VE ASKED ME TO PLAY", take);
     }
 };
 

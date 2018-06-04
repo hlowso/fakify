@@ -30,21 +30,21 @@ class ChartViewer extends Component {
 
     renderProgression() {
         let { song } = this.props;
-        let { bars } = song.chart;
+        let { barsV1 } = song.chart;
 
-        let barElements = [];
-        for (let barNumber in bars) {
-            let bar = bars[barNumber];
+        return barsV1.map(bar => {
             let chordNames = [];
             let beats = [];
 
-            for (let beat = 1; beat <= song.timeSignature[1]; beat ++) {
-                chordNames.push(<span className="chord-name" key={beat}>{bar[beat]}</span>);
+            for (let beat = 1; beat <= bar.timeSignature[1]; beat ++) {
+                let chordEnvelope = bar.chordEnvelopes.find(envelope => Number(envelope.beat) === beat);
+
+                chordNames.push(<span className="chord-name" key={beat}>{chordEnvelope && chordEnvelope.chord}</span>);
                 beats.push(<span className="beat" key={beat}>{beat}</span>);
             }
 
-            barElements.push(
-                <div className="bar-container" key={barNumber}>
+            return (
+                <div className="bar-container" key={bar.barIndex}>
                     <div className="bar-chord-group">
                         {chordNames}
                     </div>
@@ -53,9 +53,7 @@ class ChartViewer extends Component {
                     </div>
                 </div>
             );
-        };
-
-        return barElements;
+        });
     }
 };
 
