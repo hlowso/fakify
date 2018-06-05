@@ -256,6 +256,7 @@ class AppRouter extends Component {
             setTimeout(() => {
 
                 console.log("waited ", waitTime, "now playing");
+                onQueue();
 
                 let segment = segments.next();
                 let { barSubdivision, timeSignature, outline } = segment.value;
@@ -277,7 +278,7 @@ class AppRouter extends Component {
                                 timeFactor * (stroke.subbeat - 1), 
                                 note,
                                 timeFactor * stroke.duration,
-                                stroke.velocity``
+                                stroke.velocity
                             );
                         });
                     });
