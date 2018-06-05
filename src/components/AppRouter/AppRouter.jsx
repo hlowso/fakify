@@ -283,18 +283,6 @@ class AppRouter extends Component {
                 queue(outline.totalDuration * timeFactor);
             }, waitTime)
         })(waitTime);
-
-        while (true) {
-            
-        }
-
-        // take.forEach(bar => {
-        //     let { barSubdivision, timeSignature } = bar;
-
-        //     bar.chordOutlines.forEach(outline => {
-                
-        //     });
-        // });
     }
 };
 
