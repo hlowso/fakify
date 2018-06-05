@@ -50,13 +50,16 @@ export const contextualize = (song, keySignature = "") => {
     return sessionSong;
 };
 
-export function* createSegmentsGenerator(take) {
+export function* createQueueableSegmentsGenerator(tempo, take) {
     let barIndex = 0;
     let outlineIndex = 0;
 
     while (true) {
         let { barSubdivision, timeSignature, chordOutlines, durationInSubbeats } = take[barIndex]; 
-        yield { barSubdivision, timeSignature, outline: chordOutlines[outlineIndex] };
+        let timeFactor = 60 / ( barSubdivision * (tempo[0] / ( timeSignature[0] * ( tempo[1] / timeSignature[1] ))));
+
+        yield { ...chordOutlines[outlineIndex], timeFactor };
+        
         outlineIndex += 1;
 
         if (outlineIndex >= take[barIndex].chordOutlines.length) {

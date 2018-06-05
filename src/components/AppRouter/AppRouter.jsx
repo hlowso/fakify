@@ -249,28 +249,20 @@ class AppRouter extends Component {
 
     playTake = (tempo, take, onQueue) => {
         let { audioContext, player } = this.state;
-
-        let segments = MusicHelper.createSegmentsGenerator(take);
+        let segments = MusicHelper.createQueueableSegmentsGenerator(tempo, take);
 
         (function queue(waitTime) {
             setTimeout(() => {
 
-                console.log("waited ", waitTime, "now playing");
+                let segment = segments.next();
+                let { parts, segmentDuration, timeFactor } = segment.value;
+
                 onQueue();
 
-                let segment = segments.next();
-                let { barSubdivision, timeSignature, outline } = segment.value;
-                let { parts, segmentDuration } = outline;
-
-                let timeFactor = 60 / ( barSubdivision * (tempo[0] / ( timeSignature[0] * ( tempo[1] / timeSignature[1] ))));
-
-                let currentTime = audioContext.currentTime;
-                
                 Object.keys(parts).forEach(instrument => {
-                    let instrumentOutline = parts[instrument];
-                    instrumentOutline.forEach(stroke => {
+                    let part = parts[instrument];
+                    part.forEach(stroke => {
                         stroke.notes.forEach(note => {
-
                             player.queueWaveTable(
                                 audioContext, 
                                 audioContext.destination, 
@@ -284,7 +276,7 @@ class AppRouter extends Component {
                     });
                 });
 
-                queue((segmentDuration * timeFactor) * 1000);
+                queue(timeFactor * segmentDuration * 1000);
             }, waitTime);
         })(0);
     }
