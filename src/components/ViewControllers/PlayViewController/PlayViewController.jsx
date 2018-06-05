@@ -109,7 +109,7 @@ class PlayViewController extends Component {
     startSession = () => {
         // let { SoundActions } = this.props;
         let callback = data => console.log("PLAYSCORE DATA", data)
-        this.SoundActions.playScore(this.state.sessionSong.tempo, this.state.take, callback);
+        this.SoundActions.playTake(this.state.sessionSong.tempo, this.state.take, callback);
     }
     
     refreshTake = () => {

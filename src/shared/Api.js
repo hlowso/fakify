@@ -55,7 +55,7 @@ export const getSongAsync = songId => {
             id: songId,
             title: "C Blues",
             originalKeySignature: "C",
-            originalTempo: 120,
+            originalTempo: [120, 4],
             chart: {
                 // barsV1: [
                 //     {

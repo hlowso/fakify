@@ -1,7 +1,7 @@
 import * as Util from "../Util";
 
-const RELATIVE_SCALE= ["1", "H", "2", "N", "3", "4", "T", "5", "U", "6", "J", "7"];
-const NOTE_NAMES = ["C", "C#|Db", "D", "D#|Eb", "E", "F", "F#|Gb", "G", "G#|Ab", "A", "A#|Bb", "B"];
+export const RELATIVE_SCALE= ["1", "H", "2", "N", "3", "4", "T", "5", "U", "6", "J", "7"];
+export const NOTE_NAMES = ["C", "C#|Db", "D", "D#|Eb", "E", "F", "F#|Gb", "G", "G#|Ab", "A", "A#|Bb", "B"];
 
 const NOTE_REGEX = /[A-G](#|b)?/g;
 const RELATIVE_SCALE_NOTE_REGEX = /[1H2N34T5U6J7]/g;
@@ -49,5 +49,21 @@ export const contextualize = (song, keySignature = "") => {
 
     return sessionSong;
 };
+
+export function* createSegmentsGenerator(take) {
+    let barIndex = 0;
+    let outlineIndex = 0;
+
+    while (true) {
+        let { barSubdivision, timeSignature, chordOutlines, durationInSubbeats } = take[barIndex]; 
+        yield { barSubdivision, timeSignature, outline: chordOutlines[outlineIndex] };
+        outlineIndex += 1;
+
+        if (outlineIndex >= take[barIndex].chordOutlines.length) {
+            outlineIndex = 0;
+            barIndex = (barIndex + 1) % take.length;
+        }
+    }
+}
 
 export * from "./compers/index";

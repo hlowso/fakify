@@ -41,8 +41,15 @@ const compSwingFeel = song => {
         });
     }
 
-    return compPianoSwingFeelV0(timeAdjustedSong).map(musicSegment => ({
-        "piano": musicSegment
+    return compPianoSwingFeelV0(timeAdjustedSong).map((musicSegments, i) => ({
+        timeSignature: timeAdjustedSong.chart.barsV1[i].timeSignature,
+        barSubdivision: 12,
+        chordOutlines: musicSegments.map((segment, j) => ({
+            segmentDuration: timeAdjustedSong.chart.barsV1[i].chordEnvelopes[j].durationInSubbeats,
+            parts: {
+                "piano": segment 
+            } 
+        }))
     }));
 };
 

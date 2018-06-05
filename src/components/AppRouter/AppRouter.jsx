@@ -5,129 +5,9 @@ import WebAudioFontPlayer from "webaudiofont";
 import PlayViewController from "../ViewControllers/PlayViewController/PlayViewController";
 
 import * as StorageHelper from "../../shared/StorageHelper";
+import * as MusicHelper from "../../shared/music/MusicHelper";
 import * as Util from "../../shared/Util";
 import soundfonts from "../../shared/soundfontsIndex";
-
-// const score = [
-//     {
-//         piano: {
-//             1: {
-                
-//             },
-
-//             3: {
-//                 note: 62,
-//                 duration: 1,
-//             }
-//         },
-
-//         bass: {
-//             2: {
-                
-//             },
-
-//             4: {
-//                 note: 31,
-//                 duration: 1
-//             }
-//         }
-//     }, {
-//         piano: {
-//             1: {
-//                 note: 60,
-//                 duration: 2,
-//             },
-
-//             3: {
-//                 note: 62,
-//                 duration: 1,
-//             }
-//         },
-
-//         bass: {
-//             2: {
-//                 note: 36,
-//                 duration: 1
-//             },
-
-//             4: {
-//                 note: 31,
-//                 duration: 1
-//             }
-//         }
-//     },
-// ];
-
-const scoreV1 = [
-    {
-        1: {
-            piano: {
-                note: 60,
-                duration: 2,
-            },
-            doubleBass: {
-                note: 36,
-                duration: 1
-            }
-        },
-        2: {
-            doubleBass: {
-                note: 36,
-                duration: 1
-            }
-        },
-        3: {
-            piano: {
-                note: 62,
-                duration: 1
-            },
-            doubleBass: {
-                note: 31,
-                duration: 1
-            }
-        },
-        4: {
-            doubleBass: {
-                note: 31,
-                duration: 1
-            }
-        }
-    },  
-    {
-        1: {
-            piano: {
-                note: 60,
-                duration: 2,
-            }, 
-            doubleBass: {
-                note: 36,
-                duration: 1
-            }
-        },
-        2: {
-            doubleBass: {
-                note: 36,
-                duration: 1
-            }
-        },
-        3: {
-            piano: {
-                note: 62,
-                duration: 1
-            },
-            doubleBass: {
-                note: 31,
-                duration: 1
-            }
-        },
-        4: {
-            doubleBass: {
-                note: 31,
-                duration: 1
-            }
-        }
-    }
-];
 
 class AppRouter extends Component {
     constructor(props) {
@@ -151,46 +31,46 @@ class AppRouter extends Component {
         };
     }
 
-    playRound() {
-        let { player, audioContext } = this.state;
+    // playRound() {
+    //     let { player, audioContext } = this.state;
 
-        let D = 10;
+    //     let D = 10;
 
-        let scoreV2 = [];
-        for (let i = 0; i < 10 ; i ++) {
-            scoreV2 = [...scoreV2, ...scoreV1];
-        }
+    //     let scoreV2 = [];
+    //     for (let i = 0; i < 10 ; i ++) {
+    //         scoreV2 = [...scoreV2, ...scoreV1];
+    //     }
 
-        let beatCounter = 0;
-        let { currentTime } = audioContext;
-        currentTime += 10;
+    //     let beatCounter = 0;
+    //     let { currentTime } = audioContext;
+    //     currentTime += 10;
 
-        for (let bar of scoreV2) {
+    //     for (let bar of scoreV2) {
 
-            for(let beat in bar) {
-                let parts = bar[beat];
-                beat = Number(beat);
+    //         for(let beat in bar) {
+    //             let parts = bar[beat];
+    //             beat = Number(beat);
 
-                for(let instrument in parts) {
+    //             for(let instrument in parts) {
 
-                    let data = parts[instrument];
+    //                 let data = parts[instrument];
 
-                    player.queueWaveTable(
-                        audioContext, 
-                        audioContext.destination, 
-                        window[soundfonts[instrument].variable], 
-                        (currentTime + beatCounter + beat) / D, 
-                        data.note,
-                        data.duration / D,
-                        0.6
-                    );
-                }
+    //                 player.queueWaveTable(
+    //                     audioContext, 
+    //                     audioContext.destination, 
+    //                     window[soundfonts[instrument].variable], 
+    //                     (currentTime + beatCounter + beat) / D, 
+    //                     data.note,
+    //                     data.duration / D,
+    //                     0.6
+    //                 );
+    //             }
                 
-            }
+    //         }
 
-            beatCounter += 4;
-        }
-    }
+    //         beatCounter += 4;
+    //     }
+    // }
 
     componentWillMount() {
         let midiInputId = StorageHelper.getMidiInputId();
@@ -368,7 +248,53 @@ class AppRouter extends Component {
     }
 
     playTake = (tempo, take, onQueue) => {
-        console.log("YOU'VE ASKED ME TO PLAY", take);
+        let { audioContext, player } = this.state;
+
+        let segments = MusicHelper.createSegmentsGenerator(take);
+        let waitTime = 0;
+
+        (function queue(waitTime) {
+            setTimeout(() => {
+                let segment = segments.next();
+
+                let { barSubdivision, timeSignature, outline } = segment;
+                let timeFactor = 60 / ( barSubdivision * (tempo[0] / ( timeSignature[0] * ( tempo[1] / timeSignature[1] ))));
+
+                let currentTime = audioContext.currentTime;
+                let time = currentTime;
+                
+                Object.keys(outline.parts).forEach(instrument => {
+                    let instrumentOutline = outline[instrument];
+                    instrumentOutline.forEach(stroke => {
+                        (stroke.notes.length > 1 ? player.queueWaveTable : player.queueChord)(
+                            audioContext, 
+                            audioContext.destination, 
+                            window[soundfonts[instrument].variable], 
+                            time, 
+                            stroke.notes.length > 1 ? stroke.notes : stroke.notes[0],
+                            timeFactor * instrumentOutline.durationInSubbeats,
+                            stroke.velocity
+                        );
+
+                        time += timeFactor * instrumentOutline.durationInSubbeats;
+                    });
+                });
+
+                queue(outline.totalDuration * timeFactor);
+            }, waitTime)
+        })(waitTime);
+
+        while (true) {
+            
+        }
+
+        // take.forEach(bar => {
+        //     let { barSubdivision, timeSignature } = bar;
+
+        //     bar.chordOutlines.forEach(outline => {
+                
+        //     });
+        // });
     }
 };
 
