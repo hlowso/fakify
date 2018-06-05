@@ -253,9 +253,8 @@ class AppRouter extends Component {
 
         (function queue(waitTime) {
             setTimeout(() => {
-
                 let segment = segments.next();
-                let { parts, segmentDuration, timeFactor } = segment.value;
+                let { parts, durationInSubbeats, timeFactor } = segment.value;
 
                 onQueue();
 
@@ -269,14 +268,14 @@ class AppRouter extends Component {
                                 window[soundfonts[instrument].variable], 
                                 timeFactor * (stroke.subbeat - 1), 
                                 note,
-                                timeFactor * stroke.duration,
+                                timeFactor * stroke.durationInSubbeats,
                                 stroke.velocity
                             );
                         });
                     });
                 });
 
-                queue(timeFactor * segmentDuration * 1000);
+                queue(timeFactor * durationInSubbeats * 1000);
             }, waitTime);
         })(0);
     }

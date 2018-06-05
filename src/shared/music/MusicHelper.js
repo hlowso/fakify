@@ -1,8 +1,5 @@
 import * as Util from "../Util";
 
-export const RELATIVE_SCALE= ["1", "H", "2", "N", "3", "4", "T", "5", "U", "6", "J", "7"];
-export const NOTE_NAMES = ["C", "C#|Db", "D", "D#|Eb", "E", "F", "F#|Gb", "G", "G#|Ab", "A", "A#|Bb", "B"];
-
 const NOTE_REGEX = /[A-G](#|b)?/g;
 const RELATIVE_SCALE_NOTE_REGEX = /[1H2N34T5U6J7]/g;
 
@@ -15,11 +12,16 @@ const _contextualize = (word, keySignature) => {
     return chordShape ? `${contextualizedBase}^${chordShape}` : contextualizedBase;
 };
 
+export * from "./compers/index";
+
+export const RELATIVE_SCALE= ["1", "H", "2", "N", "3", "4", "T", "5", "U", "6", "J", "7"];
+export const NOTE_NAMES = ["C", "C#|Db", "D", "D#|Eb", "E", "F", "F#|Gb", "G", "G#|Ab", "A", "A#|Bb", "B"];
+
 // TODO rename this function so it's more specific to key signatures.
 export const contextualize = (song, keySignature = "") => {
 
     let { tempo, originalTempo, originalKeySignature, chart } = song;
-    let { bars, barsV1, currentSegmentIndex } = chart;
+    let { barsV1 } = chart;
     let sessionChart = {};
 
     if (!keySignature) keySignature = originalKeySignature;
@@ -36,7 +38,7 @@ export const contextualize = (song, keySignature = "") => {
         return contextualizedBar;
     });
 
-    sessionChart.currentSegmentIndex = currentSegmentIndex;
+    // sessionChart.currentSegmentIndex = currentSegmentIndex;
 
     // The session song receives all the attributes of the song
     let sessionSong = Util.copyObject(song);
@@ -55,18 +57,16 @@ export function* createQueueableSegmentsGenerator(tempo, take) {
     let outlineIndex = 0;
 
     while (true) {
-        let { barSubdivision, timeSignature, chordOutlines, durationInSubbeats } = take[barIndex]; 
+        let { barSubdivision, timeSignature, musicSegments } = take[barIndex]; 
         let timeFactor = 60 / ( barSubdivision * (tempo[0] / ( timeSignature[0] * ( tempo[1] / timeSignature[1] ))));
 
-        yield { ...chordOutlines[outlineIndex], timeFactor };
-        
+        yield { ...musicSegments[outlineIndex], timeFactor };
+
         outlineIndex += 1;
 
-        if (outlineIndex >= take[barIndex].chordOutlines.length) {
+        if (outlineIndex >= take[barIndex].musicSegments.length) {
             outlineIndex = 0;
             barIndex = (barIndex + 1) % take.length;
         }
     }
 }
-
-export * from "./compers/index";

@@ -21,7 +21,7 @@ export const compPianoSwingFeelV0 = song => {
                 {
                     subbeat: 1, 
                     notes: convertChordNameToNotes(chordEnvelope.chord),
-                    duration: chordEnvelope.durationInSubbeats / 2,
+                    durationInSubbeats: chordEnvelope.durationInSubbeats / 2,
                     velocity: 1
                 }
             ];
