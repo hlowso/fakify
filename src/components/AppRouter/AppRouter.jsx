@@ -251,38 +251,41 @@ class AppRouter extends Component {
         let { audioContext, player } = this.state;
 
         let segments = MusicHelper.createSegmentsGenerator(take);
-        let waitTime = 0;
 
         (function queue(waitTime) {
             setTimeout(() => {
-                let segment = segments.next();
 
-                let { barSubdivision, timeSignature, outline } = segment;
+                console.log("waited ", waitTime, "now playing");
+
+                let segment = segments.next();
+                let { barSubdivision, timeSignature, outline } = segment.value;
+                let { parts, segmentDuration } = outline;
+
                 let timeFactor = 60 / ( barSubdivision * (tempo[0] / ( timeSignature[0] * ( tempo[1] / timeSignature[1] ))));
 
                 let currentTime = audioContext.currentTime;
-                let time = currentTime;
                 
-                Object.keys(outline.parts).forEach(instrument => {
-                    let instrumentOutline = outline[instrument];
+                Object.keys(parts).forEach(instrument => {
+                    let instrumentOutline = parts[instrument];
                     instrumentOutline.forEach(stroke => {
-                        (stroke.notes.length > 1 ? player.queueWaveTable : player.queueChord)(
-                            audioContext, 
-                            audioContext.destination, 
-                            window[soundfonts[instrument].variable], 
-                            time, 
-                            stroke.notes.length > 1 ? stroke.notes : stroke.notes[0],
-                            timeFactor * instrumentOutline.durationInSubbeats,
-                            stroke.velocity
-                        );
+                        stroke.notes.forEach(note => {
 
-                        time += timeFactor * instrumentOutline.durationInSubbeats;
+                            player.queueWaveTable(
+                                audioContext, 
+                                audioContext.destination, 
+                                window[soundfonts[instrument].variable], 
+                                timeFactor * (stroke.subbeat - 1), 
+                                note,
+                                timeFactor * stroke.duration,
+                                stroke.velocity``
+                            );
+                        });
                     });
                 });
 
-                queue(outline.totalDuration * timeFactor);
-            }, waitTime)
-        })(waitTime);
+                queue((segmentDuration * timeFactor) * 1000);
+            }, waitTime);
+        })(0);
     }
 };
 
