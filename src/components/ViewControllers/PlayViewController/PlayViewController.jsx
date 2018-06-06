@@ -65,7 +65,6 @@ class PlayViewController extends Component {
     }
 
     render() {
-        let { SoundActions, StorageHelper, StateHelper } = this.props;
         let { songTitles, selectedSong, midiSettingsModalOpen, sessionSong } = this.state;
         let selectedSongId = selectedSong ? selectedSong.songId: null;
 
@@ -90,9 +89,9 @@ class PlayViewController extends Component {
                 </div>
 
                 <MidSettingsModal 
-                    SoundActions={SoundActions} 
-                    StorageHelper={StorageHelper}
-                    StateHelper={StateHelper} 
+                    SoundActions={this.SoundActions} 
+                    StorageHelper={this.StorageHelper}
+                    StateHelper={this.StateHelper} 
                     isOpen={midiSettingsModalOpen} 
                     close={event => { 
                         event.preventDefault(); 
