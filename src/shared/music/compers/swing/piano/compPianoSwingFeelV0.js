@@ -12,8 +12,6 @@ const convertChordNameToNotes = chord => {
 };
 
 export const compPianoSwingFeelV0 = song => {
-
-    let segments = [];
     return song.chart.barsV1.map(bar => {
 
         let chordPhrases = bar.chordEnvelopes.map(chordEnvelope => {

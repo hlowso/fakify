@@ -7,7 +7,7 @@ import PlayViewController from "../ViewControllers/PlayViewController/PlayViewCo
 import * as StorageHelper from "../../shared/StorageHelper";
 import * as MusicHelper from "../../shared/music/MusicHelper";
 import * as Util from "../../shared/Util";
-import soundfonts from "../../shared/soundfontsIndex";
+import soundfonts from "../../shared/music/soundfontsIndex";
 
 class AppRouter extends Component {
     constructor(props) {
@@ -262,19 +262,21 @@ class AppRouter extends Component {
                 Object.keys(parts).forEach(instrument => {
                     let part = parts[instrument];
 
-                    part.forEach(stroke => {
-                        stroke.notes.forEach(note => {
-                            player.queueWaveTable(
-                                audioContext, 
-                                audioContext.destination, 
-                                window[soundfonts[instrument].variable], 
-                                currentTime + timeFactor * stroke.subbeatOffset, 
-                                note,
-                                timeFactor * stroke.durationInSubbeats,
-                                stroke.velocity
-                            );
+                    if (part) {
+                        part.forEach(stroke => {
+                            stroke.notes.forEach(note => {
+                                player.queueWaveTable(
+                                    audioContext, 
+                                    audioContext.destination, 
+                                    window[soundfonts[instrument].variable], 
+                                    currentTime + timeFactor * stroke.subbeatOffset, 
+                                    note,
+                                    timeFactor * stroke.durationInSubbeats,
+                                    stroke.velocity
+                                );
+                            });
                         });
-                    });
+                    }
                 });
 
                 queue(timeFactor * durationInSubbeats * 1000);

@@ -32,8 +32,8 @@ const soundfonts = {
         pitch: 40
     },
 
-    shutHiHat: {
-        name: "shutHiHat",
+    shutHihat: {
+        name: "shutHihat",
         variable: "_drum_44_0_Chaos_sf2_file",
         url: "/soundfonts/drums/12844_0_Chaos_sf2_file.js",
         pitch: 44
