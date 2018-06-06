@@ -107,7 +107,6 @@ class PlayViewController extends Component {
     ************/
 
     startSession = () => {
-        // let { SoundActions } = this.props;
         let callback = data => console.log("PLAYSCORE DATA", data)
         this.SoundActions.playTake(this.state.sessionSong.tempo, this.state.take, callback);
     }
@@ -124,9 +123,7 @@ class PlayViewController extends Component {
     **********************/
 
     onSongListItemClick = selectedSongId => {
-        let { StorageHelper } = this.props;
-
-        StorageHelper.setSelectedSongId(selectedSongId);
+        this.StorageHelper.setSelectedSongId(selectedSongId);
         
         Api.getSongAsync(selectedSongId)
             .then(selectedSong => {

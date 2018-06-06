@@ -31,47 +31,6 @@ class AppRouter extends Component {
         };
     }
 
-    // playRound() {
-    //     let { player, audioContext } = this.state;
-
-    //     let D = 10;
-
-    //     let scoreV2 = [];
-    //     for (let i = 0; i < 10 ; i ++) {
-    //         scoreV2 = [...scoreV2, ...scoreV1];
-    //     }
-
-    //     let beatCounter = 0;
-    //     let { currentTime } = audioContext;
-    //     currentTime += 10;
-
-    //     for (let bar of scoreV2) {
-
-    //         for(let beat in bar) {
-    //             let parts = bar[beat];
-    //             beat = Number(beat);
-
-    //             for(let instrument in parts) {
-
-    //                 let data = parts[instrument];
-
-    //                 player.queueWaveTable(
-    //                     audioContext, 
-    //                     audioContext.destination, 
-    //                     window[soundfonts[instrument].variable], 
-    //                     (currentTime + beatCounter + beat) / D, 
-    //                     data.note,
-    //                     data.duration / D,
-    //                     0.6
-    //                 );
-    //             }
-                
-    //         }
-
-    //         beatCounter += 4;
-    //     }
-    // }
-
     componentWillMount() {
         let midiInputId = StorageHelper.getMidiInputId();
 
@@ -138,6 +97,10 @@ class AppRouter extends Component {
 
     getMidiAccess = () => {
         return this.state.midiAccess;
+    }
+
+    getCurrentUserKeysDown = () => {
+        return Object.keys(this.state.envelopes);
     }
 
     /********************
@@ -208,8 +171,15 @@ class AppRouter extends Component {
             let { player, audioContext, envelopes } = this.state;
             let { data } = message;
             let type = data[0], note = data[1], volume = data[2] / 127;
-            let envelopesUpdate = envelopes;
+            let envelopesUpdate = Util.copyObject(envelopes);
             let existingEnvelop = envelopes[note];
+
+            let noteOff = (existingEnvelop, envelopesUpdate) => {
+                if (existingEnvelop) {
+                    existingEnvelop.cancel();
+                    delete envelopesUpdate[note];
+                }
+            }
 
             switch(type) {
                 case 144:
@@ -225,18 +195,12 @@ class AppRouter extends Component {
                         );
                     }
                     else {
-                        if (existingEnvelop) {
-                            existingEnvelop.cancel();
-                            envelopesUpdate[note] = null;
-                        }
+                        noteOff(existingEnvelop, envelopesUpdate);
                     }
                     break;
 
                 case 128:
-                    if (existingEnvelop) {
-                        existingEnvelop.cancel();
-                        envelopesUpdate[note] = null;
-                    }
+                    noteOff(existingEnvelop, envelopesUpdate);
                     break;
 
                 default:
