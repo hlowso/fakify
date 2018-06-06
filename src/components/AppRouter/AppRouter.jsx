@@ -253,6 +253,7 @@ class AppRouter extends Component {
 
         (function queue(waitTime) {
             setTimeout(() => {
+                let { currentTime } = audioContext;
                 let segment = segments.next();
                 let { parts, durationInSubbeats, timeFactor } = segment.value;
 
@@ -260,13 +261,14 @@ class AppRouter extends Component {
 
                 Object.keys(parts).forEach(instrument => {
                     let part = parts[instrument];
+
                     part.forEach(stroke => {
                         stroke.notes.forEach(note => {
                             player.queueWaveTable(
                                 audioContext, 
                                 audioContext.destination, 
                                 window[soundfonts[instrument].variable], 
-                                timeFactor * (stroke.subbeat - 1), 
+                                currentTime + timeFactor * stroke.subbeatOffset, 
                                 note,
                                 timeFactor * stroke.durationInSubbeats,
                                 stroke.velocity

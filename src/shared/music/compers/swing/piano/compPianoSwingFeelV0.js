@@ -19,7 +19,7 @@ export const compPianoSwingFeelV0 = song => {
         let chordPhrases = bar.chordEnvelopes.map(chordEnvelope => {
             return [
                 {
-                    subbeat: 1, 
+                    subbeatOffset: 0, 
                     notes: convertChordNameToNotes(chordEnvelope.chord),
                     durationInSubbeats: chordEnvelope.durationInSubbeats / 2,
                     velocity: 1

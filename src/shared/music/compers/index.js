@@ -1,5 +1,6 @@
 import * as Util from "../../Util";
 import compPianoSwingFeelV0 from "./swing/piano/compPianoSwingFeelV0";
+import compBassSwingFeelV0 from "./swing/bass/compBassSwingFeelV0";
 
 export const compAll = (song, feel) => {
 
@@ -45,10 +46,12 @@ const compSwingFeel = song => {
         });
     }
 
-    // let bassTake = compBassSwingFeelV0(timeAdjustedSong);
+    let bassTake = compBassSwingFeelV0(timeAdjustedSong);
     return compPianoSwingFeelV0(timeAdjustedSong).map((pianoBarPhrases, i) => { 
-        // let bassBarPhrases = bassTake[i];
+
+        let bassBarPhrases = bassTake[i];
         let chartBar = timeAdjustedSong.chart.barsV1[i];
+
         return {
             timeSignature: chartBar.timeSignature,
             barSubdivision: 12,
@@ -56,7 +59,7 @@ const compSwingFeel = song => {
                 durationInSubbeats: chartBar.chordEnvelopes[j].durationInSubbeats,
                 parts: {
                     "piano": pianoPhrase,
-                    //"bass": bassBarPhrases[j] 
+                    "doubleBass": bassBarPhrases[j] 
                 } 
             }))
         };
