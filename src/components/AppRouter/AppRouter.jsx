@@ -23,7 +23,6 @@ class AppRouter extends Component {
             midiAccess: null,
             audioContext: null,
             player: null,
-            playing: true,
 
             // Unfortunately, it seems that WebAudioFont forces the developer to 
             // manage their own sound envelopes ...
