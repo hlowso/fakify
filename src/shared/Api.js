@@ -218,6 +218,7 @@ export const getSongAsync = songId => {
                                 beat: '1',
                                 chord: "1^7",
                                 beatsBeforeChange: 4,
+                                durationInBeats: 4,
                                 key: "1^7"
                             }
                         ]
@@ -230,6 +231,7 @@ export const getSongAsync = songId => {
                                 beat: '1',
                                 chord: "4^7",
                                 beatsBeforeChange: 4,
+                                durationInBeats: 4,
                                 key: "4^7"
                             }
                         ]
@@ -242,6 +244,7 @@ export const getSongAsync = songId => {
                                 beat: '1',
                                 chord: "1^7",
                                 beatsBeforeChange: 8,
+                                durationInBeats: 4,
                                 key: "1^7"
                             }
                         ]
@@ -254,6 +257,7 @@ export const getSongAsync = songId => {
                                 beat: '1',
                                 chord: "1^7",
                                 beatsBeforeChange: 4,
+                                durationInBeats: 4,
                                 key: "1^7"
                             }
                         ]
@@ -266,6 +270,7 @@ export const getSongAsync = songId => {
                                 beat: '1',
                                 chord: "4^7",
                                 beatsBeforeChange: 8,
+                                durationInBeats: 4,
                                 key: "4^7"
                             }
                         ]
@@ -278,6 +283,7 @@ export const getSongAsync = songId => {
                                 beat: '1',
                                 chord: "4^7",
                                 beatsBeforeChange: 4,
+                                durationInBeats: 4,
                                 key: "4^7"
                             }
                         ]
@@ -290,6 +296,7 @@ export const getSongAsync = songId => {
                                 beat: '1',
                                 chord: "1^7",
                                 beatsBeforeChange: 8,
+                                durationInBeats: 4,
                                 key: "1^7"
                             }
                         ]
@@ -302,6 +309,7 @@ export const getSongAsync = songId => {
                                 beat: '1',
                                 chord: "1^7",
                                 beatsBeforeChange: 4,
+                                durationInBeats: 4,
                                 key: "1^7"
                             }
                         ]
@@ -314,6 +322,7 @@ export const getSongAsync = songId => {
                                 beat: '1',
                                 chord: "5^7",
                                 beatsBeforeChange: 4,
+                                durationInBeats: 4,
                                 key: "5^7"
                             }
                         ]
@@ -326,6 +335,7 @@ export const getSongAsync = songId => {
                                 beat: '1',
                                 chord: "4^7",
                                 beatsBeforeChange: 4,
+                                durationInBeats: 4,
                                 key: "4^7"
                             }
                         ]
@@ -338,6 +348,7 @@ export const getSongAsync = songId => {
                                 beat: '1',
                                 chord: "1^7",
                                 beatsBeforeChange: 4,
+                                durationInBeats: 4,
                                 key: "1^7"
                             }
                         ]
@@ -350,12 +361,14 @@ export const getSongAsync = songId => {
                                 beat: '1',
                                 chord: "2^-7",
                                 beatsBeforeChange: 2,
+                                durationInBeats: 2,
                                 key: "1"
                             },
                             {
                                 beat: '3',
                                 chord: "5^7",
                                 beatsBeforeChange: 2,
+                                durationInBeats: 2,
                                 key: "1"
                             }
                         ]

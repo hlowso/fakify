@@ -16,7 +16,7 @@ export const compPianoSwingFeelV0 = song => {
     let segments = [];
     return song.chart.barsV1.map(bar => {
 
-        let chordOutlines = bar.chordEnvelopes.map(chordEnvelope => {
+        let chordPhrases = bar.chordEnvelopes.map(chordEnvelope => {
             return [
                 {
                     subbeat: 1, 
@@ -27,7 +27,7 @@ export const compPianoSwingFeelV0 = song => {
             ];
         });
         
-        return chordOutlines;
+        return chordPhrases;
     }); 
 };
 

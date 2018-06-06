@@ -40,8 +40,8 @@ const compSwingFeel = song => {
 
         chordEnvelopes.forEach(chordEnvelope => {
             chordEnvelope.beat = beatConverter(chordEnvelope.beat);
-            chordEnvelope.durationInSubbeats = chordEnvelope.beatsBeforeChange * conversionFactor;
-            delete chordEnvelope.beatsBeforeChange;
+            chordEnvelope.subbeatsBeforeChange = chordEnvelope.beatsBeforeChange * conversionFactor;
+            chordEnvelope.durationInSubbeats = chordEnvelope.durationInBeats * conversionFactor;
         });
     }
 

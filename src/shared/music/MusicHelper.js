@@ -63,7 +63,6 @@ export function* createQueueableSegmentsGenerator(tempo, take) {
         yield { ...musicSegments[outlineIndex], timeFactor };
 
         outlineIndex += 1;
-
         if (outlineIndex >= take[barIndex].musicSegments.length) {
             outlineIndex = 0;
             barIndex = (barIndex + 1) % take.length;
