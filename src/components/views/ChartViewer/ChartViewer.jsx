@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Cx from "classnames";
 
 import * as Util from "../../../shared/Util";
 
@@ -29,22 +30,42 @@ class ChartViewer extends Component {
     }
 
     renderProgression() {
-        let { song } = this.props;
+        let { song, chartIndex } = this.props;
         let { barsV1 } = song.chart;
 
-        return barsV1.map(bar => {
+        return barsV1.map((bar, i) => {
             let chordNames = [];
             let beats = [];
+            let isCurrentBar = chartIndex.bar === i;
+
+            let barClasses = Cx({ 
+                "bar-container": true, 
+                "current-bar": isCurrentBar
+            });
 
             for (let beat = 1; beat <= bar.timeSignature[1]; beat ++) {
-                let chordEnvelope = bar.chordEnvelopes.find(envelope => Number(envelope.beat) === beat);
+                let chordEnvelopeIndex;
+                let chordEnvelope = bar.chordEnvelopes.find((envelope, i) => { 
+                    if (Number(envelope.beat) === beat) {
+                        chordEnvelopeIndex = i;
+                        return true;
+                    } 
+                });
 
-                chordNames.push(<span className="chord-name" key={beat}>{chordEnvelope && chordEnvelope.chord}</span>);
+                let isCurrentChord = isCurrentBar && 
+                                    chartIndex.chordEnvelope === chordEnvelopeIndex;
+
+                let chordNameClasses = Cx({
+                    "chord-name": true,
+                    "current-chord": isCurrentChord
+                });
+
+                chordNames.push(<span className={chordNameClasses} key={beat}>{chordEnvelope && chordEnvelope.chord}</span>);
                 beats.push(<span className="beat" key={beat}>{beat}</span>);
             }
 
             return (
-                <div className="bar-container" key={bar.barIndex}>
+                <div className={barClasses} key={bar.barIndex}>
                     <div className="bar-chord-group">
                         {chordNames}
                     </div>

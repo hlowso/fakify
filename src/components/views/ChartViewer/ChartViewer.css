@@ -30,6 +30,14 @@
     border-bottom: solid black 1px;
 }
 
+.current-bar {
+    background-color: cornflowerblue;
+}
+
+.current-chord {
+    color: white;
+}
+
 .bar-chord-group {
     display: flex;
     justify-content: space-around;

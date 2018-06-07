@@ -23,6 +23,7 @@ class AppRouter extends Component {
             midiAccess: null,
             audioContext: null,
             player: null,
+            playing: false,
 
             // Unfortunately, it seems that WebAudioFont forces the developer to 
             // manage their own sound envelopes ...
@@ -55,7 +56,8 @@ class AppRouter extends Component {
             setMidiAccessAsync: this.setMidiAccessAsync,
             connectToMidiInput: this.connectToMidiInput,
             generateMidiMessagePlayer: this.generateMidiMessagePlayer,
-            playTake: this.playTake
+            playTake: this.playTake,
+            killTake: this.killTake
         };
 
         let StateHelper = {
@@ -109,20 +111,24 @@ class AppRouter extends Component {
     _audioInitAsync = () => {
         return new Promise((resolve, reject) => {
             let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            let userPlayer = new WebAudioFontPlayer();
             let player = new WebAudioFontPlayer();
 
-            this.setState({ audioContext, player }, resolve);
+            this.setState({ audioContext, userPlayer, player }, resolve);
         });
     }
 
     _loadInstrumentAsync = instrument => {
-        let { audioContext, player } = this.state;
+        let { audioContext, userPlayer, player } = this.state;
         let font = soundfonts[instrument];
 
         return new Promise((resolve, reject) => {
             if (!audioContext) reject("PRECOMP - attempted to load instrument with unset AudioContext");
 
+            userPlayer.loader.startLoad(audioContext, font.url, font.variable);
             player.loader.startLoad(audioContext, font.url, font.variable);
+            
+            userPlayer.loader.waitLoad(resolve);
             player.loader.waitLoad(resolve);
         });
     }
@@ -167,7 +173,7 @@ class AppRouter extends Component {
 
     generateMidiMessagePlayer = instrument => {
         return message => {
-            let { player, audioContext, envelopes } = this.state;
+            let { userPlayer, audioContext, envelopes } = this.state;
             let { data } = message;
             let type = data[0], note = data[1], volume = data[2] / 127;
             let envelopesUpdate = Util.copyObject(envelopes);
@@ -183,7 +189,7 @@ class AppRouter extends Component {
             switch(type) {
                 case 144:
                     if (volume) {
-                        envelopesUpdate[note] = player.queueWaveTable(
+                        envelopesUpdate[note] = userPlayer.queueWaveTable(
                             audioContext, 
                             audioContext.destination, 
                             window[soundfonts[instrument].variable], 
@@ -214,37 +220,55 @@ class AppRouter extends Component {
         let { audioContext, player } = this.state;
         let segments = MusicHelper.createQueueableSegmentsGenerator(tempo, take);
 
-        (function queue(waitTime) {
+        let queue = waitTime => {
             setTimeout(() => {
-                let { currentTime } = audioContext;
-                let segment = segments.next();
-                let { parts, durationInSubbeats, timeFactor } = segment.value;
-
-                onQueue();
-
-                Object.keys(parts).forEach(instrument => {
-                    let part = parts[instrument];
-
-                    if (part) {
-                        part.forEach(stroke => {
-                            stroke.notes.forEach(note => {
-                                player.queueWaveTable(
-                                    audioContext, 
-                                    audioContext.destination, 
-                                    window[soundfonts[instrument].variable], 
-                                    currentTime + timeFactor * stroke.subbeatOffset, 
-                                    note,
-                                    timeFactor * stroke.durationInSubbeats,
-                                    stroke.velocity
-                                );
+                if (this.state.playing) {
+                    let { currentTime } = audioContext;
+                    let segment = segments.next();
+                    let { 
+                        parts, 
+                        durationInSubbeats, 
+                        timeFactor,
+                        barIndex,
+                        chordEnvelopeIndex 
+                    } = segment.value;
+    
+                    onQueue({
+                        barIndex,
+                        chordEnvelopeIndex
+                    });
+    
+                    Object.keys(parts).forEach(instrument => {
+                        let part = parts[instrument];
+    
+                        if (part) {
+                            part.forEach(stroke => {
+                                stroke.notes.forEach(note => {
+                                    player.queueWaveTable(
+                                        audioContext, 
+                                        audioContext.destination, 
+                                        window[soundfonts[instrument].variable], 
+                                        currentTime + timeFactor * stroke.subbeatOffset, 
+                                        note,
+                                        timeFactor * stroke.durationInSubbeats,
+                                        stroke.velocity
+                                    );
+                                });
                             });
-                        });
-                    }
-                });
+                        }
+                    });
 
-                queue(timeFactor * durationInSubbeats * 1000);
+                    queue(timeFactor * durationInSubbeats * 1000);
+                }
             }, waitTime);
-        })(0);
+        };
+
+        this.setState({ playing: true }, () => queue(0));
+    }
+
+    killTake = () => {
+        this.state.player.cancelQueue(this.state.audioContext);
+        this.setState({ playing: false });
     }
 };
 

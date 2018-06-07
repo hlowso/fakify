@@ -38,8 +38,6 @@ export const contextualize = (song, keySignature = "") => {
         return contextualizedBar;
     });
 
-    // sessionChart.currentSegmentIndex = currentSegmentIndex;
-
     // The session song receives all the attributes of the song
     let sessionSong = Util.copyObject(song);
 
@@ -54,17 +52,17 @@ export const contextualize = (song, keySignature = "") => {
 
 export function* createQueueableSegmentsGenerator(tempo, take) {
     let barIndex = 0;
-    let outlineIndex = 0;
+    let chordEnvelopeIndex = 0;
 
     while (true) {
         let { barSubdivision, timeSignature, musicSegments } = take[barIndex]; 
         let timeFactor = 60 / ( barSubdivision * (tempo[0] / ( timeSignature[0] * ( tempo[1] / timeSignature[1] ))));
 
-        yield { ...musicSegments[outlineIndex], timeFactor };
+        yield { ...musicSegments[chordEnvelopeIndex], timeFactor, barIndex, chordEnvelopeIndex };
 
-        outlineIndex += 1;
-        if (outlineIndex >= take[barIndex].musicSegments.length) {
-            outlineIndex = 0;
+        chordEnvelopeIndex += 1;
+        if (chordEnvelopeIndex >= take[barIndex].musicSegments.length) {
+            chordEnvelopeIndex = 0;
             barIndex = (barIndex + 1) % take.length;
         }
     }

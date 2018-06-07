@@ -21,6 +21,7 @@ class PlayViewController extends Component {
             songBase: {},
             sessionSong: {},
             take: {},
+            chartIndex: {},
             midiSettingsModalOpen: true,
             feel: "swing"            
         };
@@ -65,7 +66,14 @@ class PlayViewController extends Component {
     }
 
     render() {
-        let { songTitles, selectedSong, midiSettingsModalOpen, sessionSong } = this.state;
+        let { 
+            songTitles, 
+            selectedSong, 
+            midiSettingsModalOpen, 
+            sessionSong,
+            chartIndex 
+        } = this.state;
+
         let selectedSongId = selectedSong ? selectedSong.songId: null;
 
         return (
@@ -80,9 +88,11 @@ class PlayViewController extends Component {
                         selectedSongId={selectedSongId} 
                         onSongListItemClick={this.onSongListItemClick} />
                     <ChartViewer
-                        song={sessionSong} />
+                        song={sessionSong} 
+                        chartIndex={chartIndex} />
                     <TrainingWindow  
-                        startSession={this.startSession} />
+                        startSession={this.startSession} 
+                        stopSession={this.stopSession} />
                 </div>
                 <div className="bottom-row">
                     <Keyboard />
@@ -106,8 +116,19 @@ class PlayViewController extends Component {
     ************/
 
     startSession = () => {
-        let callback = data => console.log("PLAYSCORE DATA", data)
-        this.SoundActions.playTake(this.state.sessionSong.tempo, this.state.take, callback);
+        let onQueue = data => {
+            this.setState({ chartIndex: {
+                bar: data.barIndex,
+                chordEnvelope: data.chordEnvelopeIndex
+            }});
+        };
+
+        this.SoundActions.playTake(this.state.sessionSong.tempo, this.state.take, onQueue);
+    }
+
+    stopSession = () => {
+        this.setState({ chartIndex: {} });
+        this.SoundActions.killTake();
     }
     
     refreshTake = () => {

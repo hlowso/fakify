@@ -16,6 +16,9 @@ class TrainingWindow extends Component {
                 <button onClick={this.props.startSession} >
                     Play
                 </button>
+                <button onClick={this.props.stopSession} >
+                    Stop
+                </button>
             </div>
         );
     }

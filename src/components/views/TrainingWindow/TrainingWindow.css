@@ -8,6 +8,7 @@
 
 #training-window button {
     border-radius: 10px;
+    margin: 5px;
     height: 70px;
     width: 70px;
     font-size: 200%;
