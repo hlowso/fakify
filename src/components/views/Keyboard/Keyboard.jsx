@@ -70,11 +70,11 @@ class Keyboard extends Component {
             case NOTE_NAMES[11]:  // B
                 return {
                     upperElement: (
-                        <div key={`${noteName}${note}`} className={classNames} style={{width: this.WIDER_UPPER_WHITE_KEY_WIDTH, height: this.KEY_HEIGHT, backgroundColor: "white"}}>
+                        <div key={`${noteName}${note}-upper`} className={classNames} style={{width: this.WIDER_UPPER_WHITE_KEY_WIDTH, height: this.KEY_HEIGHT, backgroundColor: "white"}}>
                         </div>
                     ),
                     lowerElement: (
-                        <div key={`${noteName}${note}`} className={classNames} style={{width: this.LOWER_WHITE_KEY_WIDTH, height: this.KEY_HEIGHT, backgroundColor: "white"}}>
+                        <div key={`${noteName}${note}-lower`} className={classNames} style={{width: this.LOWER_WHITE_KEY_WIDTH, height: this.KEY_HEIGHT, backgroundColor: "white"}}>
                         </div>
                     )
                 };
@@ -83,11 +83,11 @@ class Keyboard extends Component {
             case NOTE_NAMES[9]:   // A
                 return {
                     upperElement: (
-                        <div key={`${noteName}${note}`} className={classNames} style={{width: this.NARROWER_UPPER_WHITE_KEY_WIDTH, height: this.KEY_HEIGHT, backgroundColor: "white"}}>
+                        <div key={`${noteName}${note}-upper`} className={classNames} style={{width: this.NARROWER_UPPER_WHITE_KEY_WIDTH, height: this.KEY_HEIGHT, backgroundColor: "white"}}>
                         </div>
                     ),
                     lowerElement: (
-                        <div key={`${noteName}${note}`} className={classNames} style={{width: this.LOWER_WHITE_KEY_WIDTH, height: this.KEY_HEIGHT, backgroundColor: "white"}}>
+                        <div key={`${noteName}${note}-lower`} className={classNames} style={{width: this.LOWER_WHITE_KEY_WIDTH, height: this.KEY_HEIGHT, backgroundColor: "white"}}>
                         </div>
                     )
                 };
