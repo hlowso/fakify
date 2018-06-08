@@ -8,7 +8,6 @@
     display: flex;
 }
 
-/* .bottom-row {
-    display: flex;
-    justify-content: center;
-} */
+.bottom-row {
+    justify-self: flex-end;
+}

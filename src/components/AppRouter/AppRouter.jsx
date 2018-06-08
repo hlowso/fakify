@@ -45,6 +45,25 @@ class AppRouter extends Component {
                     }
                 }
                 this.setState({ loading: false });
+
+                // let i = 0;
+                // // for (let i = 0; i < 100; i ++) {
+                //     setInterval(() => {
+                //         console.log("Playing", i );
+                        
+                //         this.state.userPlayer.queueWaveTable(
+                //             this.state.audioContext, 
+                //             this.state.audioContext.destination, 
+                //             window[soundfonts["piano"].variable], 
+                //             0, i, 
+                //             1 / 2,
+                //             1
+                //         );
+                //         i ++
+                //     }, 500);
+                // // }
+
+                
             });
     }
 

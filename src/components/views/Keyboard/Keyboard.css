@@ -5,6 +5,22 @@
     height: 200px;
 }
 
+.keys {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.upper-keys {
+    display: flex;
+    width: 100%;
+}
+
+.lower-keys {
+    display: flex;
+    width: 100%;
+}
+
 h2 {
     align-self: center;
 }
