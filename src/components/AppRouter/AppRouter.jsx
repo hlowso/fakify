@@ -23,10 +23,7 @@ class AppRouter extends Component {
             midiAccess: null,
             audioContext: null,
             player: null,
-            playing: false,
-
-            // Unfortunately, it seems that WebAudioFont forces the developer to 
-            // manage their own sound envelopes ...
+            isPlaying: false,
             envelopes: {}
         };
     }
@@ -45,25 +42,6 @@ class AppRouter extends Component {
                     }
                 }
                 this.setState({ loading: false });
-
-                // let i = 0;
-                // // for (let i = 0; i < 100; i ++) {
-                //     setInterval(() => {
-                //         console.log("Playing", i );
-                        
-                //         this.state.userPlayer.queueWaveTable(
-                //             this.state.audioContext, 
-                //             this.state.audioContext.destination, 
-                //             window[soundfonts["piano"].variable], 
-                //             0, i, 
-                //             1 / 2,
-                //             1
-                //         );
-                //         i ++
-                //     }, 500);
-                // // }
-
-                
             });
     }
 
@@ -76,12 +54,15 @@ class AppRouter extends Component {
             connectToMidiInput: this.connectToMidiInput,
             generateMidiMessagePlayer: this.generateMidiMessagePlayer,
             playTake: this.playTake,
-            killTake: this.killTake
+            killTake: this.killTake,
+            playUserMidiMessage: this.playUserMidiMessage
         };
 
         let StateHelper = {
+            getState: () => this.state,
             getMidiAccess: this.getMidiAccess,
-            setMidiAccess: this.setMidiAccess
+            setMidiAccess: this.setMidiAccess,
+            getCurrentUserKeysDepressed: this.getCurrentUserKeysDepressed
         };
 
         let VCProps = {
@@ -119,8 +100,8 @@ class AppRouter extends Component {
         return this.state.midiAccess;
     }
 
-    getCurrentUserKeysDown = () => {
-        return Object.keys(this.state.envelopes);
+    getCurrentUserKeysDepressed = () => {
+        return Object.keys(this.state.envelopes).map(key => Number(key));
     }
 
     /********************
@@ -133,7 +114,11 @@ class AppRouter extends Component {
             let userPlayer = new WebAudioFontPlayer();
             let player = new WebAudioFontPlayer();
 
-            this.setState({ audioContext, userPlayer, player }, resolve);
+            this.setState({ 
+                audioContext, 
+                userPlayer, 
+                player
+            }, resolve);
         });
     }
 
@@ -180,7 +165,7 @@ class AppRouter extends Component {
             input = inputs.next()
         ) {
             if (inputId === input.value.id) {
-                input.value.onmidimessage = this.generateMidiMessagePlayer("piano");
+                input.value.onmidimessage = this.playUserMidiMessage;
                 connectionSuccessful = true;
             } else {
                 input.value.onmidimessage = null;
@@ -190,58 +175,74 @@ class AppRouter extends Component {
         return connectionSuccessful;
     }
 
-    generateMidiMessagePlayer = instrument => {
-        return message => {
-            let { userPlayer, audioContext, envelopes } = this.state;
-            let { data } = message;
-            let type = data[0], note = data[1], volume = data[2] / 127;
-            let envelopesUpdate = Util.copyObject(envelopes);
-            let existingEnvelop = envelopes[note];
+    playUserMidiMessage = message => {
+        let { userPlayer, audioContext, envelopes } = this.state;
+        let { data } = message;
+        let type = data[0], note = data[1], volume = data[2] / 127;
+        let envelopesUpdate = Util.copyObject(envelopes);
+        let existingEnvelop = envelopes[note];
 
-            let noteOff = (existingEnvelop, envelopesUpdate) => {
-                if (existingEnvelop) {
-                    existingEnvelop.cancel();
-                    delete envelopesUpdate[note];
+        let noteOff = (existingEnvelop, envelopesUpdate) => {
+            if (existingEnvelop) {
+                existingEnvelop.cancel();
+                delete envelopesUpdate[note];
+            }
+        }
+
+        switch(type) {
+            case 144:
+                if (volume) {
+                    envelopesUpdate[note] = userPlayer.queueWaveTable(
+                        audioContext, 
+                        audioContext.destination, 
+                        window[soundfonts["piano"].variable], 
+                        0, 
+                        note,
+                        1000,
+                        volume
+                    );
                 }
-            }
-
-            switch(type) {
-                case 144:
-                    if (volume) {
-                        envelopesUpdate[note] = userPlayer.queueWaveTable(
-                            audioContext, 
-                            audioContext.destination, 
-                            window[soundfonts[instrument].variable], 
-                            0, 
-                            note,
-                            1000,
-                            volume
-                        );
-                    }
-                    else {
-                        noteOff(existingEnvelop, envelopesUpdate);
-                    }
-                    break;
-
-                case 128:
+                else {
                     noteOff(existingEnvelop, envelopesUpdate);
-                    break;
+                }
+                break;
 
-                default:
-                    console.log("PRECOMP - unknown midi message type:", type);
+            case 128:
+                noteOff(existingEnvelop, envelopesUpdate);
+                break;
+
+            default:
+                console.log("PRECOMP - unknown midi message type:", type);
+        }
+
+        this.setState({ envelopes: envelopesUpdate });
+    }
+
+    _createQueueableSegmentsGenerator = function* (tempo, take) {
+        let barIndex = 0;
+        let chordEnvelopeIndex = 0;
+    
+        while (true) {
+            let { barSubdivision, timeSignature, musicSegments } = take[barIndex]; 
+            let timeFactor = 60 / ( barSubdivision * (tempo[0] / ( timeSignature[0] * ( tempo[1] / timeSignature[1] ))));
+    
+            yield { ...musicSegments[chordEnvelopeIndex], timeFactor, barIndex, chordEnvelopeIndex };
+    
+            chordEnvelopeIndex += 1;
+            if (chordEnvelopeIndex >= take[barIndex].musicSegments.length) {
+                chordEnvelopeIndex = 0;
+                barIndex = (barIndex + 1) % take.length;
             }
-
-            this.setState({ envelopes: envelopesUpdate });
-        };
+        }
     }
 
     playTake = (tempo, take, onQueue) => {
         let { audioContext, player } = this.state;
-        let segments = MusicHelper.createQueueableSegmentsGenerator(tempo, take);
+        let segments = this._createQueueableSegmentsGenerator(tempo, take);
 
         let queue = waitTime => {
             setTimeout(() => {
-                if (this.state.playing) {
+                if (this.state.isPlaying) {
                     let { currentTime } = audioContext;
                     let segment = segments.next();
                     let { 
@@ -282,12 +283,12 @@ class AppRouter extends Component {
             }, waitTime);
         };
 
-        this.setState({ playing: true }, () => queue(0));
+        this.setState({ isPlaying: true }, () => queue(0));
     }
 
     killTake = () => {
         this.state.player.cancelQueue(this.state.audioContext);
-        this.setState({ playing: false });
+        this.setState({ isPlaying: false });
     }
 };
 

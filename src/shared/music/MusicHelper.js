@@ -17,6 +17,18 @@ export * from "./compers/index";
 export const RELATIVE_SCALE= ["1", "H", "2", "N", "3", "4", "T", "5", "U", "6", "J", "7"];
 export const NOTE_NAMES = ["C", "C#|Db", "D", "D#|Eb", "E", "F", "F#|Gb", "G", "G#|Ab", "A", "A#|Bb", "B"];
 
+export const C_NOTE_NAMES_INDECES = [0, 2, 4, 5, 7, 9, 11];
+
+export const noteIsInKey = (note, key) => {
+    return getKeyNoteNameIndeces(key).indexOf(note % 12) !== -1;
+}
+
+export const getKeyNoteNameIndeces = key => {
+    let offset = NOTE_NAMES.indexOf(key);
+    if (offset === -1) return [];
+    return C_NOTE_NAMES_INDECES.map(pitch => (pitch + offset) % 12);
+}
+
 // TODO rename this function so it's more specific to key signatures.
 export const contextualize = (song, keySignature = "") => {
 
@@ -49,21 +61,3 @@ export const contextualize = (song, keySignature = "") => {
 
     return sessionSong;
 };
-
-export function* createQueueableSegmentsGenerator(tempo, take) {
-    let barIndex = 0;
-    let chordEnvelopeIndex = 0;
-
-    while (true) {
-        let { barSubdivision, timeSignature, musicSegments } = take[barIndex]; 
-        let timeFactor = 60 / ( barSubdivision * (tempo[0] / ( timeSignature[0] * ( tempo[1] / timeSignature[1] ))));
-
-        yield { ...musicSegments[chordEnvelopeIndex], timeFactor, barIndex, chordEnvelopeIndex };
-
-        chordEnvelopeIndex += 1;
-        if (chordEnvelopeIndex >= take[barIndex].musicSegments.length) {
-            chordEnvelopeIndex = 0;
-            barIndex = (barIndex + 1) % take.length;
-        }
-    }
-}

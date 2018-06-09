@@ -56,11 +56,11 @@ export const objectIsEmpty = object => {
     return Object.keys(object).length === 0;
 };
 
-export const waitFor = (checker, rate) => {
+export const waitFor = (getUpdate, rate) => {
     return new Promise((resolve, reject) => {
         (function check() {
             setTimeout(() => {
-                if (checker()) resolve();
+                if (getUpdate()) resolve();
                 else check();
             }, rate);
         })();

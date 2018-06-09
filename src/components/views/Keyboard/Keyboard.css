@@ -21,6 +21,27 @@
     width: 100%;
 }
 
+.key {
+    border-left: 1px solid black;
+}
+
+.white-key {
+    background-color: white;
+}
+
+.black-key {
+    background-color: #222;
+    border-bottom: 1px solid black;
+}
+
+.in-current-key.take-playing {
+    background-color: coral;
+}
+
+.depressed {
+    background: lawngreen;
+}
+
 h2 {
     align-self: center;
 }

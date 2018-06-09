@@ -67,7 +67,7 @@ export const getSongAsync = songId => {
                                 chord: "1^7",
                                 beatsBeforeChange: 8,
                                 durationInBeats: 8,
-                                key: "1^7"
+                                key: "4"
                             }
                         ]
                     },
@@ -80,7 +80,7 @@ export const getSongAsync = songId => {
                                 chord: "4^7",
                                 beatsBeforeChange: 8,
                                 durationInBeats: 8,
-                                key: "4^7"
+                                key: "J"
                             }
                         ]
                     },
@@ -93,7 +93,7 @@ export const getSongAsync = songId => {
                                 chord: "1^7",
                                 beatsBeforeChange: 16,
                                 durationInBeats: 8,
-                                key: "1^7"
+                                key: "4"
                             }
                         ]
                     },
@@ -106,7 +106,7 @@ export const getSongAsync = songId => {
                                 chord: "1^7",
                                 beatsBeforeChange: 8,
                                 durationInBeats: 8,
-                                key: "1^7"
+                                key: "4"
                             }
                         ]
                     },
@@ -119,7 +119,7 @@ export const getSongAsync = songId => {
                                 chord: "4^7",
                                 beatsBeforeChange: 16,
                                 durationInBeats: 8,
-                                key: "4^7"
+                                key: "J"
                             }
                         ]
                     },
@@ -132,7 +132,7 @@ export const getSongAsync = songId => {
                                 chord: "4^7",
                                 beatsBeforeChange: 8,
                                 durationInBeats: 8,
-                                key: "4^7"
+                                key: "J"
                             }
                         ]
                     }, 
@@ -145,7 +145,7 @@ export const getSongAsync = songId => {
                                 chord: "1^7",
                                 beatsBeforeChange: 16,
                                 durationInBeats: 8,
-                                key: "1^7"
+                                key: "4"
                             }
                         ]
                     },
@@ -158,7 +158,7 @@ export const getSongAsync = songId => {
                                 chord: "1^7",
                                 beatsBeforeChange: 8,
                                 durationInBeats: 8,
-                                key: "1^7"
+                                key: "4"
                             }
                         ]
                     },
@@ -171,7 +171,7 @@ export const getSongAsync = songId => {
                                 chord: "5^7",
                                 beatsBeforeChange: 8,
                                 durationInBeats: 8,
-                                key: "5^7"
+                                key: "1"
                             }
                         ]
                     },
@@ -184,7 +184,7 @@ export const getSongAsync = songId => {
                                 chord: "4^7",
                                 beatsBeforeChange: 8,
                                 durationInBeats: 8,
-                                key: "4^7"
+                                key: "J"
                             }
                         ]
                     },
@@ -197,7 +197,7 @@ export const getSongAsync = songId => {
                                 chord: "1^7",
                                 beatsBeforeChange: 8,
                                 durationInBeats: 8,
-                                key: "1^7"
+                                key: "4"
                             }
                         ]
                     },

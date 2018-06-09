@@ -8,6 +8,7 @@ import Keyboard from "../../views/Keyboard/Keyboard";
 import MidSettingsModal from "../../views/MidiSettingsModal/MidiSettingsModal";
 
 import * as Api from "../../../shared/Api";
+import * as Util from "../../../shared/Util";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
 
 import "./PlayViewController.css";
@@ -22,6 +23,7 @@ class PlayViewController extends Component {
             sessionSong: {},
             take: {},
             chartIndex: {},
+            currentKey: "",
             midiSettingsModalOpen: true,
             feel: "swing"            
         };
@@ -56,7 +58,8 @@ class PlayViewController extends Component {
                 if (selectedSong) {
                     return new Promise(resolve => this.setState({ 
                         songBase: selectedSong,
-                        sessionSong: MusicHelper.contextualize(selectedSong) 
+                        sessionSong: MusicHelper.contextualize(selectedSong),
+                        currentKey: selectedSong.originalKeySignature 
                     }, resolve));
                 }
             })
@@ -71,7 +74,8 @@ class PlayViewController extends Component {
             selectedSong, 
             midiSettingsModalOpen, 
             sessionSong,
-            chartIndex 
+            chartIndex,
+            currentKey 
         } = this.state;
 
         let selectedSongId = selectedSong ? selectedSong.songId: null;
@@ -95,7 +99,11 @@ class PlayViewController extends Component {
                         stopSession={this.stopSession} />
                 </div>
                 <div className="bottom-row">
-                    <Keyboard />
+                    <Keyboard 
+                        depressedKeys={this.StateHelper.getCurrentUserKeysDepressed()} 
+                        currentKey={currentKey} 
+                        playUserMidiMessage={this.SoundActions.playUserMidiMessage} 
+                        takeIsPlaying={this.StateHelper.getState().isPlaying} />
                 </div>
 
                 <MidSettingsModal 
@@ -116,18 +124,23 @@ class PlayViewController extends Component {
     ************/
 
     startSession = () => {
+        let { sessionSong, take } = this.state;
         let onQueue = data => {
-            this.setState({ chartIndex: {
-                bar: data.barIndex,
-                chordEnvelope: data.chordEnvelopeIndex
-            }});
+            let { barIndex, chordEnvelopeIndex } = data;
+            this.setState({ 
+                chartIndex: {
+                    bar: barIndex,
+                    chordEnvelope: chordEnvelopeIndex
+                },
+                currentKey: sessionSong.chart.barsV1[barIndex].chordEnvelopes[chordEnvelopeIndex].key
+            });
         };
 
-        this.SoundActions.playTake(this.state.sessionSong.tempo, this.state.take, onQueue);
+        this.SoundActions.playTake(sessionSong.tempo, take, onQueue);
     }
 
     stopSession = () => {
-        this.setState({ chartIndex: {} });
+        this.setState({ chartIndex: {}, currentKey: "" });
         this.SoundActions.killTake();
     }
     
