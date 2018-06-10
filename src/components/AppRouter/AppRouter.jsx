@@ -23,9 +23,16 @@ class AppRouter extends Component {
             midiAccess: null,
             audioContext: null,
             player: null,
+            userPlayer: null,
+            userInstrument: "piano",
             isPlaying: false,
             envelopes: {}
         };
+
+        this.WAIT_TIME_FRACTION = 4 / 5;
+        this.WAIT_TIME_FACTOR = 1000 * this.WAIT_TIME_FRACTION;
+        this.SHORTENED_WAIT_TIME_FACTOR = 1 / this.WAIT_TIME_FRACTION;
+        this.TIME_CHECKER_RATE = 5;
     }
 
     componentWillMount() {
@@ -176,7 +183,7 @@ class AppRouter extends Component {
     }
 
     playUserMidiMessage = message => {
-        let { userPlayer, audioContext, envelopes } = this.state;
+        let { userPlayer, userInstrument, audioContext, envelopes } = this.state;
         let { data } = message;
         let type = data[0], note = data[1], volume = data[2] / 127;
         let envelopesUpdate = Util.copyObject(envelopes);
@@ -195,7 +202,7 @@ class AppRouter extends Component {
                     envelopesUpdate[note] = userPlayer.queueWaveTable(
                         audioContext, 
                         audioContext.destination, 
-                        window[soundfonts["piano"].variable], 
+                        window[soundfonts[userInstrument].variable], 
                         0, 
                         note,
                         1000,
@@ -239,11 +246,11 @@ class AppRouter extends Component {
     playTake = (tempo, take, onQueue) => {
         let { audioContext, player } = this.state;
         let segments = this._createQueueableSegmentsGenerator(tempo, take);
+        let prevQueueTime = audioContext.currentTime;
 
-        let queue = waitTime => {
+        let queue = shortenedWaitTime => {
             setTimeout(() => {
                 if (this.state.isPlaying) {
-                    let { currentTime } = audioContext;
                     let segment = segments.next();
                     let { 
                         parts, 
@@ -252,35 +259,43 @@ class AppRouter extends Component {
                         barIndex,
                         chordEnvelopeIndex 
                     } = segment.value;
-    
-                    onQueue({
-                        barIndex,
-                        chordEnvelopeIndex
-                    });
-    
-                    Object.keys(parts).forEach(instrument => {
-                        let part = parts[instrument];
-    
-                        if (part) {
-                            part.forEach(stroke => {
-                                stroke.notes.forEach(note => {
-                                    player.queueWaveTable(
-                                        audioContext, 
-                                        audioContext.destination, 
-                                        window[soundfonts[instrument].variable], 
-                                        currentTime + timeFactor * stroke.subbeatOffset, 
-                                        note,
-                                        timeFactor * stroke.durationInSubbeats,
-                                        stroke.velocity
-                                    );
-                                });
-                            });
-                        }
-                    });
+        
+                    let queueTime = prevQueueTime + (shortenedWaitTime * this.SHORTENED_WAIT_TIME_FACTOR) / 1000;
+                    let getUpdate = () => audioContext.currentTime > queueTime;
 
-                    queue(timeFactor * durationInSubbeats * 1000);
+                    Util.waitFor(getUpdate, this.TIME_CHECKER_RATE).then(() => {
+                        let { currentTime } = audioContext;
+
+                        onQueue({
+                            barIndex,
+                            chordEnvelopeIndex
+                        });
+        
+                        Object.keys(parts).forEach(instrument => {
+                            let part = parts[instrument];
+        
+                            if (part) {
+                                part.forEach(stroke => {
+                                    stroke.notes.forEach(note => {
+                                        player.queueWaveTable(
+                                            audioContext, 
+                                            audioContext.destination, 
+                                            window[soundfonts[instrument].variable], 
+                                            currentTime + timeFactor * stroke.subbeatOffset, 
+                                            note,
+                                            timeFactor * stroke.durationInSubbeats,
+                                            stroke.velocity
+                                        );
+                                    });
+                                });
+                            }
+                        });
+
+                        prevQueueTime = currentTime;
+                        queue(timeFactor * durationInSubbeats * this.WAIT_TIME_FACTOR);
+                    });
                 }
-            }, waitTime);
+            }, shortenedWaitTime);
         };
 
         this.setState({ isPlaying: true }, () => queue(0));
