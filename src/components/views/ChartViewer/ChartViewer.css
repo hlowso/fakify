@@ -7,11 +7,20 @@
 
 .chart-header {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     height: 20%;
     border-right: solid black 1px;
     border-bottom: solid black 1px;
-    
+}
+
+.left-hand-settings {
+    display: flex;
+    flex-direction: column;
+}
+
+.left-hand-settings-row {
+    display: flex;
+    justify-content: space-between;
 }
 
 .chart-body {

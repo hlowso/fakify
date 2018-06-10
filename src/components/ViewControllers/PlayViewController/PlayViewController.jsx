@@ -93,7 +93,9 @@ class PlayViewController extends Component {
                         onSongListItemClick={this.onSongListItemClick} />
                     <ChartViewer
                         song={sessionSong} 
-                        chartIndex={chartIndex} />
+                        chartIndex={chartIndex} 
+                        recontextualize={this.recontextualize} 
+                        resetTempo={this.resetTempo} />
                     <TrainingWindow  
                         startSession={this.startSession} 
                         stopSession={this.stopSession} />
@@ -149,6 +151,20 @@ class PlayViewController extends Component {
 
         let take = MusicHelper.compAll(sessionSong, feel);
         this.setState({ take });
+    }
+
+    recontextualize = newKeySignature => {
+        let { sessionSong } = this.state;
+        this.setState({ 
+            sessionSong: MusicHelper.contextualize(sessionSong, newKeySignature) 
+        });
+    }
+
+    resetTempo = newTempo => {
+        let { sessionSong } = this.state;
+        let sessionSongUpdate = Util.copyObject(sessionSong);
+        sessionSongUpdate.tempo = newTempo;
+        this.setState({ sessionSong: sessionSongUpdate });
     }
 
     /**********************
