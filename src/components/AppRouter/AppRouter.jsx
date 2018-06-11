@@ -256,7 +256,6 @@ class AppRouter extends Component {
                 let getUpdate = () => audioContext.currentTime > queueTime;
 
                 Util.waitFor(getUpdate, this.TIME_CHECKER_RATE).then(() => {
-
                     let segment = segments.next();
                     let { 
                         parts, 
