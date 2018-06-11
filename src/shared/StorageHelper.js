@@ -21,9 +21,12 @@ export const setSelectedSongId = selectedSongId => {
 }
 
 export const getSongSettings = songId => {
-    let settings = window.localStorage[`${_keys.SONG_SETTINGS_PREFIX}${songId}`];
-    if (typeof settings === "object") {
-        return JSON.parse(settings);
+    let settingsString = window.localStorage[`${_keys.SONG_SETTINGS_PREFIX}${songId}`];
+    try {
+        let settings = JSON.parse(settingsString);
+        return settings;
+    } catch (error) {
+        console.log("PRECOMP - cannot parse string:", settingsString);
     }
     return null;
 }

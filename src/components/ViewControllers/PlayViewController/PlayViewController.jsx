@@ -60,13 +60,7 @@ class PlayViewController extends Component {
 
                     if (chartSettings) {
                         sessionSong.chart = { ...sessionSong.chart, ...chartSettings };
-                    } 
-
-                    console.log(chartSettings);
-
-                    console.log(window.localStorage);
-
-                    console.log("chart", sessionSong.chart);
+                    }
 
                     return new Promise(resolve => this.setState({ 
                         sessionSong,
@@ -166,6 +160,7 @@ class PlayViewController extends Component {
     }
 
     recontextualize = newKeySignature => {
+        this.stopSession();
         let { sessionSong } = this.state;
         
         this.setState({ 
@@ -179,10 +174,14 @@ class PlayViewController extends Component {
     }
 
     resetTempo = newTempo => {
+        this.stopSession();
         let { sessionSong } = this.state;
         let sessionSongUpdate = Util.copyObject(sessionSong);
         sessionSongUpdate.chart.tempo = newTempo;
-        this.setState({ sessionSong: sessionSongUpdate });
+
+        this.setState({ 
+            sessionSong: sessionSongUpdate 
+        });
 
         this.StorageHelper.setSongSettings(sessionSong.id, {
             tempo: newTempo,

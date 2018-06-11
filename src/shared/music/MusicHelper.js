@@ -30,28 +30,30 @@ export const getKeyNoteNameIndeces = key => {
 }
 
 // TODO rename this function so it's more specific to key signatures.
-export const contextualize = (song, keySignature = "") => {
+export const contextualize = (song, newKeySignature = "") => {
 
-    let { tempo, originalTempo, originalKeySignature, chart } = song;
-    let { barsBase } = chart;
+    let { originalTempo, originalKeySignature, chart } = song;
+    let { tempo, keySignature, barsBase } = chart;
     let sessionChart = { barsBase };
 
-    if (!keySignature) keySignature = originalKeySignature;
+    if (!newKeySignature) {
+        newKeySignature = keySignature ? keySignature : originalKeySignature;
+    }
     if (!tempo) tempo = originalTempo;
+
+    sessionChart.keySignature = newKeySignature;
+    sessionChart.tempo = tempo;
 
     sessionChart.barsV1 = barsBase.map(bar => {
         let contextualizedBar = Util.copyObject(bar);
         contextualizedBar.chordEnvelopes = bar.chordEnvelopes.map(chordEnvelope => {
             let contextualizedChordEnvelope = Util.copyObject(chordEnvelope);
-            contextualizedChordEnvelope.chord = _contextualize(chordEnvelope.chord, keySignature);
-            contextualizedChordEnvelope.key = _contextualize(chordEnvelope.key, keySignature);
+            contextualizedChordEnvelope.chord = _contextualize(chordEnvelope.chord, newKeySignature);
+            contextualizedChordEnvelope.key = _contextualize(chordEnvelope.key, newKeySignature);
             return contextualizedChordEnvelope;
         });
         return contextualizedBar;
     });
-
-    sessionChart.keySignature = keySignature;
-    sessionChart.tempo = tempo;
 
     // The session song receives all the attributes of the song
     let sessionSong = Util.copyObject(song);
