@@ -56,13 +56,18 @@ class PlayViewController extends Component {
             .then(selectedSong => {
                 if (selectedSong) {
                     let sessionSong = MusicHelper.contextualize(selectedSong);
-                    let songSettings = StorageHelper.getSongSettings(sessionSong.id);
+                    let chartSettings = StorageHelper.getSongSettings(selectedSongId);
 
-                    console.log("settings", songSettings);
-
-                    if (songSettings) {
-                        sessionSong = { ...sessionSong, ...songSettings };
+                    if (chartSettings) {
+                        sessionSong.chart = { ...sessionSong.chart, ...chartSettings };
                     } 
+
+                    console.log(chartSettings);
+
+                    console.log(window.localStorage);
+
+                    console.log("chart", sessionSong.chart);
+
                     return new Promise(resolve => this.setState({ 
                         sessionSong,
                         currentKey: selectedSong.originalKeySignature 
@@ -72,6 +77,7 @@ class PlayViewController extends Component {
             .then(() => {
                 this.refreshTake();
             });
+
     }
 
     render() {
@@ -144,7 +150,7 @@ class PlayViewController extends Component {
             });
         };
 
-        this.SoundActions.playTake(sessionSong.tempo, take, onQueue);
+        this.SoundActions.playTake(sessionSong.chart.tempo, take, onQueue);
     }
 
     stopSession = () => {
@@ -167,7 +173,7 @@ class PlayViewController extends Component {
         }, this.refreshTake);
 
         this.StorageHelper.setSongSettings(sessionSong.id, {
-            tempo: sessionSong.tempo,
+            tempo: sessionSong.chart.tempo,
             keySignature: newKeySignature
         });
     }
@@ -175,12 +181,12 @@ class PlayViewController extends Component {
     resetTempo = newTempo => {
         let { sessionSong } = this.state;
         let sessionSongUpdate = Util.copyObject(sessionSong);
-        sessionSongUpdate.tempo = newTempo;
+        sessionSongUpdate.chart.tempo = newTempo;
         this.setState({ sessionSong: sessionSongUpdate });
 
         this.StorageHelper.setSongSettings(sessionSong.id, {
             tempo: newTempo,
-            keySignature: sessionSong.keySignature
+            keySignature: sessionSong.chart.keySignature
         });
     }
 

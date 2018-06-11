@@ -50,14 +50,14 @@ export const contextualize = (song, keySignature = "") => {
         return contextualizedBar;
     });
 
+    sessionChart.keySignature = keySignature;
+    sessionChart.tempo = tempo;
+
     // The session song receives all the attributes of the song
     let sessionSong = Util.copyObject(song);
 
     // But the chart is contains the contextualize barsV1 array
     sessionSong.chart = sessionChart;
-
-    sessionSong.keySignature = keySignature;
-    sessionSong.tempo = tempo; 
 
     return sessionSong;
 };

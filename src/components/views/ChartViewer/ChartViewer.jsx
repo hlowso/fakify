@@ -97,7 +97,7 @@ class ChartViewer extends Component {
      */
 
     renderKeySignatureSelect = () => {
-        let { keySignature } = this.props.song;
+        let { keySignature } = this.props.song.chart;
         let options = MusicHelper.NOTE_NAMES.map(
             key => (
                 <option key={key} value={key} >
@@ -128,7 +128,7 @@ class ChartViewer extends Component {
      */
 
     renderTempoSelect = () => {
-        let { tempo } = this.props.song;
+        let { tempo } = this.props.song.chart;
         let bpms = tempo[0];
         let options = [];
         for (
