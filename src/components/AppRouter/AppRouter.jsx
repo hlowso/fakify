@@ -270,7 +270,6 @@ class AppRouter extends Component {
                     let stateSessionId = this.state.sessionId;
 
                     if (stateSessionId && stateSessionId === sessionId) {
-
                         let { currentTime } = audioContext;
 
                         onQueue({
