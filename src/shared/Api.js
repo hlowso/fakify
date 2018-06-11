@@ -57,7 +57,7 @@ export const getSongAsync = songId => {
             originalKeySignature: "C",
             originalTempo: [120, 4],
             chart: {
-                barsV1: [
+                barsBase: [
                     {
                         barIndex: 1,
                         timeSignature: [8, 8],

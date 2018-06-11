@@ -33,13 +33,13 @@ export const getKeyNoteNameIndeces = key => {
 export const contextualize = (song, keySignature = "") => {
 
     let { tempo, originalTempo, originalKeySignature, chart } = song;
-    let { barsV1 } = chart;
-    let sessionChart = {};
+    let { barsBase } = chart;
+    let sessionChart = { barsBase };
 
     if (!keySignature) keySignature = originalKeySignature;
     if (!tempo) tempo = originalTempo;
 
-    sessionChart.barsV1 = barsV1.map(bar => {
+    sessionChart.barsV1 = barsBase.map(bar => {
         let contextualizedBar = Util.copyObject(bar);
         contextualizedBar.chordEnvelopes = bar.chordEnvelopes.map(chordEnvelope => {
             let contextualizedChordEnvelope = Util.copyObject(chordEnvelope);
@@ -53,7 +53,7 @@ export const contextualize = (song, keySignature = "") => {
     // The session song receives all the attributes of the song
     let sessionSong = Util.copyObject(song);
 
-    // But the chart is contextualized
+    // But the chart is contains the contextualize barsV1 array
     sessionSong.chart = sessionChart;
 
     sessionSong.keySignature = keySignature;

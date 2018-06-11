@@ -12,6 +12,9 @@ class ChartViewer extends Component {
         this.state = {
 
         };
+
+        this.LOWER_TEMPO_LIMIT = 60;
+        this.UPPER_TEMPO_LIMIT = 180;
     }
 
     render() {
@@ -97,7 +100,7 @@ class ChartViewer extends Component {
         let { keySignature } = this.props.song;
         let options = MusicHelper.NOTE_NAMES.map(
             key => (
-                <option value={key} defaultValue={key === keySignature}>
+                <option key={key} value={key} >
                     {key}
                 </option>
             )
@@ -110,6 +113,7 @@ class ChartViewer extends Component {
                 </div>
                 <select 
                     className="left-hand-settings-right" 
+                    value={keySignature}
                     onChange={event => this.props.recontextualize(event.target.value)}
                 >
                     {options}
@@ -125,10 +129,15 @@ class ChartViewer extends Component {
 
     renderTempoSelect = () => {
         let { tempo } = this.props.song;
+        let bpms = tempo[0];
         let options = [];
-        for (let t = 60; t < 181; t ++) {
+        for (
+                let t = this.LOWER_TEMPO_LIMIT; 
+                t <= this.UPPER_TEMPO_LIMIT; 
+                t ++
+        ) {
             options.push(
-                <option value={t} defaultValue={t === tempo}>
+                <option key={t} value={t} >
                     {t}
                 </option>
             );
@@ -141,7 +150,8 @@ class ChartViewer extends Component {
                 </div>
                 <select 
                     className="left-hand-settings-right" 
-                    onChange={event => this.props.resetTempo(Number(event.target.value))}
+                    value={bpms}
+                    onChange={event => this.props.resetTempo([Number(event.target.value), 4])}
                 >
                     {options}
                 </select> 

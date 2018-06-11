@@ -19,7 +19,6 @@ class PlayViewController extends Component {
         this.state = {
             loadingSelectedSong: false,
             songTitles: {},
-            songBase: {},
             sessionSong: {},
             take: {},
             chartIndex: {},
@@ -56,9 +55,16 @@ class PlayViewController extends Component {
             })
             .then(selectedSong => {
                 if (selectedSong) {
+                    let sessionSong = MusicHelper.contextualize(selectedSong);
+                    let songSettings = StorageHelper.getSongSettings(sessionSong.id);
+
+                    console.log("settings", songSettings);
+
+                    if (songSettings) {
+                        sessionSong = { ...sessionSong, ...songSettings };
+                    } 
                     return new Promise(resolve => this.setState({ 
-                        songBase: selectedSong,
-                        sessionSong: MusicHelper.contextualize(selectedSong),
+                        sessionSong,
                         currentKey: selectedSong.originalKeySignature 
                     }, resolve));
                 }
@@ -155,8 +161,14 @@ class PlayViewController extends Component {
 
     recontextualize = newKeySignature => {
         let { sessionSong } = this.state;
+        
         this.setState({ 
             sessionSong: MusicHelper.contextualize(sessionSong, newKeySignature) 
+        }, this.refreshTake);
+
+        this.StorageHelper.setSongSettings(sessionSong.id, {
+            tempo: sessionSong.tempo,
+            keySignature: newKeySignature
         });
     }
 
@@ -165,6 +177,11 @@ class PlayViewController extends Component {
         let sessionSongUpdate = Util.copyObject(sessionSong);
         sessionSongUpdate.tempo = newTempo;
         this.setState({ sessionSong: sessionSongUpdate });
+
+        this.StorageHelper.setSongSettings(sessionSong.id, {
+            tempo: newTempo,
+            keySignature: sessionSong.keySignature
+        });
     }
 
     /**********************
