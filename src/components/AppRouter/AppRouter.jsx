@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Switch, Route, Redirect } from "react-router";
 import WebAudioFontPlayer from "webaudiofont";
+import uuid from "uuid";
 
 import PlayViewController from "../ViewControllers/PlayViewController/PlayViewController";
 
@@ -225,7 +226,7 @@ class AppRouter extends Component {
         this.setState({ envelopes: envelopesUpdate });
     }
 
-    _createQueueableSegmentsGenerator = function* (tempo, take) {
+    _createQueueableSegmentsGenerator = function* (sessionId, tempo, take) {
         let barIndex = 0;
         let chordEnvelopeIndex = 0;
     
@@ -233,7 +234,7 @@ class AppRouter extends Component {
             let { barSubdivision, timeSignature, musicSegments } = take[barIndex]; 
             let timeFactor = 60 / ( barSubdivision * (tempo[0] / ( timeSignature[0] * ( tempo[1] / timeSignature[1] ))));
     
-            yield { ...musicSegments[chordEnvelopeIndex], timeFactor, barIndex, chordEnvelopeIndex };
+            yield { ...musicSegments[chordEnvelopeIndex], timeFactor, barIndex, chordEnvelopeIndex, sessionId };
     
             chordEnvelopeIndex += 1;
             if (chordEnvelopeIndex >= take[barIndex].musicSegments.length) {
@@ -245,25 +246,31 @@ class AppRouter extends Component {
 
     playTake = (tempo, take, onQueue) => {
         let { audioContext, player } = this.state;
-        let segments = this._createQueueableSegmentsGenerator(tempo, take);
+        let sessionId = uuid();
+        let segments = this._createQueueableSegmentsGenerator(sessionId, tempo, take);
         let prevQueueTime = audioContext.currentTime;
 
         let queue = shortenedWaitTime => {
             setTimeout(() => {
-                if (this.state.isPlaying) {
+                let queueTime = prevQueueTime + (shortenedWaitTime * this.SHORTENED_WAIT_TIME_FACTOR) / 1000;
+                let getUpdate = () => audioContext.currentTime > queueTime;
+
+                Util.waitFor(getUpdate, this.TIME_CHECKER_RATE).then(() => {
+
                     let segment = segments.next();
                     let { 
                         parts, 
                         durationInSubbeats, 
                         timeFactor,
                         barIndex,
-                        chordEnvelopeIndex 
+                        chordEnvelopeIndex,
+                        sessionId 
                     } = segment.value;
-        
-                    let queueTime = prevQueueTime + (shortenedWaitTime * this.SHORTENED_WAIT_TIME_FACTOR) / 1000;
-                    let getUpdate = () => audioContext.currentTime > queueTime;
 
-                    Util.waitFor(getUpdate, this.TIME_CHECKER_RATE).then(() => {
+                    let stateSessionId = this.state.sessionId;
+
+                    if (stateSessionId && stateSessionId === sessionId) {
+
                         let { currentTime } = audioContext;
 
                         onQueue({
@@ -293,17 +300,17 @@ class AppRouter extends Component {
 
                         prevQueueTime = currentTime;
                         queue(timeFactor * durationInSubbeats * this.WAIT_TIME_FACTOR);
-                    });
-                }
+                    }
+                });
             }, shortenedWaitTime);
         };
 
-        this.setState({ isPlaying: true }, () => queue(0));
+        this.setState({ sessionId }, () => queue(0));
     }
 
     killTake = () => {
         this.state.player.cancelQueue(this.state.audioContext);
-        this.setState({ isPlaying: false });
+        this.setState({ sessionId: null });
     }
 };
 
