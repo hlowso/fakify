@@ -7,7 +7,11 @@ const _contextualize = (word, keySignature) => {
     let constituents = word.split("^");
     let base = constituents[0], chordShape = constituents[1];
     let baseIndex = NOTE_NAMES.indexOf(keySignature);
-    let contextualizedBase = base.replace(RELATIVE_SCALE_NOTE_REGEX, note => NOTE_NAMES[(baseIndex + RELATIVE_SCALE.indexOf(note)) % 12]);
+    
+    let contextualizedBase = base.replace(
+        RELATIVE_SCALE_NOTE_REGEX, 
+        note => NOTE_NAMES[(baseIndex + RELATIVE_SCALE.indexOf(note)) % 12]
+    );
 
     return chordShape ? `${contextualizedBase}^${chordShape}` : contextualizedBase;
 };
