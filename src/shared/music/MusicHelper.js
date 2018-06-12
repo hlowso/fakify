@@ -26,7 +26,7 @@ export const getWordConstituents = word => {
 export * from "./compers/index";
 
 export const RELATIVE_SCALE= ["1", "H", "2", "N", "3", "4", "T", "5", "U", "6", "J", "7"];
-export const NOTE_NAMES = ["C", "C#|Db", "D", "D#|Eb", "E", "E#|F", "F#|Gb", "G", "G#|Ab", "A", "A#|Bb", "B"];
+export const NOTE_NAMES = ["C", "C#|Db", "D", "D#|Eb", "E", "F", "F#|Gb", "G", "G#|Ab", "A", "A#|Bb", "B|Cb"];
 
 // The chart viewer passes the key of the first chordEnvelope of the first
 // bar of the chart object to the getPresentableChord function below to 
@@ -34,13 +34,13 @@ export const NOTE_NAMES = ["C", "C#|Db", "D", "D#|Eb", "E", "E#|F", "F#|Gb", "G"
 // that can be written with either sharps or flats are written with flats by 
 // convention
 
-export const getPresentableNoteName = (noteName, keySignature = "b") => {
-    let noteNameChoices = /#/g.test(noteName) ? noteName.split("|") : [noteName, noteName];
+export const getPresentableNoteName = (noteName, keySignature = "") => {
+    let noteNameChoices = /b/g.test(noteName) ? noteName.split("|") : [noteName, noteName];
 
-    if (keySignature === "C" | !/b/g.test(keySignature)) { 
-        return noteNameChoices[0];
+    if (!keySignature || keySignature === "F" || /b/g.test(keySignature)) {
+        return noteNameChoices[1];
     }
-    return noteNameChoices[1]; 
+    return noteNameChoices[0]; 
 }
 
 export const getPresentableChord = (chord, keySignature = "") => {
