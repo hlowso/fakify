@@ -38,7 +38,7 @@
     background-color: coral;
 }
 
-.depressed {
+.in-current-key.take-playing.depressed, .depressed {
     background: lawngreen;
 }
 

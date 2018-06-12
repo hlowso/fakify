@@ -109,7 +109,7 @@ class ChartViewer extends Component {
         return (
             <div className="left-hand-settings-row">
                 <div>
-                    Key Signature:
+                    Key Context:
                 </div>
                 <select 
                     className="left-hand-settings-right" 

@@ -55,12 +55,11 @@ class PlayViewController extends Component {
             })
             .then(selectedSong => {
                 if (selectedSong) {
-                    let sessionSong = MusicHelper.contextualize(selectedSong);
                     let chartSettings = StorageHelper.getSongSettings(selectedSongId);
+                    let { tempo, keySignature } = chartSettings;
 
-                    if (chartSettings) {
-                        sessionSong.chart = { ...sessionSong.chart, ...chartSettings };
-                    }
+                    let sessionSong = MusicHelper.contextualize(selectedSong, keySignature);
+                    if (tempo) sessionSong.chart.tempo = tempo;
 
                     return new Promise(resolve => this.setState({ 
                         sessionSong,
@@ -111,7 +110,7 @@ class PlayViewController extends Component {
                         depressedKeys={this.StateHelper.getCurrentUserKeysDepressed()} 
                         currentKey={currentKey} 
                         playUserMidiMessage={this.SoundActions.playUserMidiMessage} 
-                        takeIsPlaying={this.StateHelper.getState().isPlaying} />
+                        takeIsPlaying={this.StateHelper.getState().sessionId} />
                 </div>
 
                 <MidSettingsModal 

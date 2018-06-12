@@ -25,7 +25,6 @@ class Keyboard extends Component {
     }
 
     render() {
-        this.renderKeys();
         return (
             <div id="keyboard">
                 {this.renderKeys()}
