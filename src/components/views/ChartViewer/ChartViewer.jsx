@@ -38,6 +38,7 @@ class ChartViewer extends Component {
     renderProgression = () => {
         let { song, chartIndex } = this.props;
         let { barsV1 } = song.chart;
+        let baseKey = barsV1[0].chordEnvelopes[0].key;
 
         return barsV1.map((bar, i) => {
             let chordNames = [];
@@ -66,7 +67,11 @@ class ChartViewer extends Component {
                     "current-chord": isCurrentChord
                 });
 
-                chordNames.push(<span className={chordNameClasses} key={beat}>{chordEnvelope && chordEnvelope.chord}</span>);
+                chordNames.push(
+                    <span className={chordNameClasses} key={beat}>
+                        {chordEnvelope && MusicHelper.getPresentableChord(chordEnvelope.chord, baseKey)}
+                    </span>
+                );
                 beats.push(<span className="beat" key={beat}>{beat}</span>);
             }
 

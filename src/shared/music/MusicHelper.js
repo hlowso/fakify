@@ -4,10 +4,9 @@ const NOTE_REGEX = /[A-G](#|b)?/g;
 const RELATIVE_SCALE_NOTE_REGEX = /[1H2N34T5U6J7]/g;
 
 const _contextualize = (word, keySignature) => {
-    let constituents = word.split("^");
-    let base = constituents[0], chordShape = constituents[1];
+    let { base, chordShape } = getWordConstituents(word);
     let baseIndex = NOTE_NAMES.indexOf(keySignature);
-    
+
     let contextualizedBase = base.replace(
         RELATIVE_SCALE_NOTE_REGEX, 
         note => NOTE_NAMES[(baseIndex + RELATIVE_SCALE.indexOf(note)) % 12]
@@ -16,10 +15,32 @@ const _contextualize = (word, keySignature) => {
     return chordShape ? `${contextualizedBase}^${chordShape}` : contextualizedBase;
 };
 
+export const getWordConstituents = word => {
+    let constituents = word.split("^");
+    return {
+        base: constituents[0],
+        chordShape: constituents[1]
+    };
+}
+
 export * from "./compers/index";
 
 export const RELATIVE_SCALE= ["1", "H", "2", "N", "3", "4", "T", "5", "U", "6", "J", "7"];
-export const NOTE_NAMES = ["C", "C#|Db", "D", "D#|Eb", "E", "F", "F#|Gb", "G", "G#|Ab", "A", "A#|Bb", "B"];
+export const NOTE_NAMES = ["C", "C#|Db", "D", "D#|Eb", "E", "E#|F", "F#|Gb", "G", "G#|Ab", "A", "A#|Bb", "B"];
+
+export const getPresentableNoteName = (noteName, keySignature = "b") => {
+    let noteNameChoices = /#/g.test(noteName) ? noteName.split("|") : [noteName, noteName];
+
+    if (keySignature === "C" | !/b/g.test(keySignature)) { 
+        return noteNameChoices[0];
+    }
+    return noteNameChoices[1]; 
+}
+
+export const getPresentableChord = (chord, keySignature = "") => {
+    let { base, chordShape } = getWordConstituents(chord);
+    return `${getPresentableNoteName(base, keySignature)}^${chordShape}`;
+}
 
 export const C_NOTE_NAMES_INDECES = [0, 2, 4, 5, 7, 9, 11];
 
