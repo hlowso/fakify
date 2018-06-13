@@ -239,7 +239,9 @@ class AppRouter extends Component {
             chordEnvelopeIndex += 1;
             if (chordEnvelopeIndex >= take[barIndex].musicSegments.length) {
                 chordEnvelopeIndex = 0;
-                barIndex = (barIndex + 1) % take.length;
+                do {
+                    barIndex = (barIndex + 1) % take.length;
+                } while (!take[barIndex].withinRange)
             }
         }
     }

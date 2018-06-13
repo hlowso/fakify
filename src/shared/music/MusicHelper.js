@@ -62,10 +62,11 @@ export const getKeyNoteNameIndeces = key => {
 
 // TODO rename this function so it's more specific to key signatures.
 export const contextualize = (song, newKeySignature = "") => {
-
     let { originalTempo, originalKeySignature, chart } = song;
     let { tempo, keySignature, barsBase } = chart;
-    let sessionChart = { barsBase };
+
+    // To begin with, session chart gets everything that chart has
+    let sessionChart = Util.copyObject(chart);
 
     if (!newKeySignature) {
         newKeySignature = keySignature ? keySignature : originalKeySignature;

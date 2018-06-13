@@ -10,6 +10,7 @@ import MidSettingsModal from "../../views/MidiSettingsModal/MidiSettingsModal";
 import * as Api from "../../../shared/Api";
 import * as Util from "../../../shared/Util";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
+import PlayModes from "../../../shared/PlayModes";
 
 import "./PlayViewController.css";
 
@@ -20,7 +21,6 @@ class PlayViewController extends Component {
             loadingSelectedSong: false,
             songTitles: {},
             sessionSong: {},
-            take: {},
             chartIndex: {},
             currentKey: "",
             midiSettingsModalOpen: true,
@@ -53,22 +53,12 @@ class PlayViewController extends Component {
                 } 
                 return;
             })
-            .then(selectedSong => {
-                if (selectedSong) {
-                    let chartSettings = StorageHelper.getSongSettings(selectedSongId);
-                    let { tempo, keySignature } = chartSettings;
-
-                    let sessionSong = MusicHelper.contextualize(selectedSong, keySignature);
-                    if (tempo) sessionSong.chart.tempo = tempo;
-
+            .then(songBase => {
+                if (songBase) {
                     return new Promise(resolve => this.setState({ 
-                        sessionSong,
-                        currentKey: selectedSong.originalKeySignature 
+                        sessionSong: this.prepareSessionSong(songBase)
                     }, resolve));
                 }
-            })
-            .then(() => {
-                this.refreshTake();
             });
 
     }
@@ -130,8 +120,33 @@ class PlayViewController extends Component {
         MUSIC
     ************/
 
+    prepareSessionSong(songBase) {
+        let chartSettings = this.StorageHelper.getSongSettings(songBase.id);
+        let { tempo, keySignature, rangeStartIndex, rangeEndIndex } = chartSettings;
+        let playMode = this.StorageHelper.getPlayMode();
+
+        let sessionSong = MusicHelper.contextualize(songBase, keySignature);
+        if (tempo) sessionSong.chart.tempo = tempo;
+
+        sessionSong.chart.rangeStartIndex = (
+            rangeStartIndex 
+                ? rangeStartIndex
+                : 0 
+        );
+
+        sessionSong.chart.rangeEndIndex = (
+            rangeEndIndex
+                ? rangeEndIndex
+                : (playMode === PlayModes.LISTEN_AND_REPEAT)
+                    ? 1
+                    : sessionSong.chart.barsV1.length - 1
+        );
+
+        return sessionSong;
+    }
+
     startSession = () => {
-        let { sessionSong, take } = this.state;
+        let { sessionSong, feel } = this.state;
         let onQueue = data => {
             let { barIndex, chordEnvelopeIndex } = data;
             this.setState({ 
@@ -143,19 +158,15 @@ class PlayViewController extends Component {
             });
         };
 
+        // Prepare the take
+        let take = MusicHelper.compAll(sessionSong, feel);
+
         this.SoundActions.playTake(sessionSong.chart.tempo, take, onQueue);
     }
 
     stopSession = () => {
         this.setState({ chartIndex: {}, currentKey: "" });
         this.SoundActions.killTake();
-    }
-    
-    refreshTake = () => {
-        let { sessionSong, feel } = this.state;
-
-        let take = MusicHelper.compAll(sessionSong, feel);
-        this.setState({ take });
     }
 
     recontextualize = newKeySignature => {
@@ -164,10 +175,9 @@ class PlayViewController extends Component {
         
         this.setState({ 
             sessionSong: MusicHelper.contextualize(sessionSong, newKeySignature) 
-        }, this.refreshTake);
+        });
 
-        this.StorageHelper.setSongSettings(sessionSong.id, {
-            tempo: sessionSong.chart.tempo,
+        this.StorageHelper.updateSongSettings(sessionSong.id, {
             keySignature: newKeySignature
         });
     }
@@ -182,9 +192,8 @@ class PlayViewController extends Component {
             sessionSong: sessionSongUpdate 
         });
 
-        this.StorageHelper.setSongSettings(sessionSong.id, {
-            tempo: newTempo,
-            keySignature: sessionSong.chart.keySignature
+        this.StorageHelper.updateSongSettings(sessionSong.id, {
+            tempo: newTempo
         });
     }
 

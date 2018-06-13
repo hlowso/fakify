@@ -4,12 +4,23 @@ import compBassSwingFeelV0 from "./swing/bass/compBassSwingFeelV0";
 import compDrumsSwingFeelV0 from "./swing/drums/compDrumsSwingFeelV0";
 
 export const compAll = (song, feel) => {
+    let take;
 
     switch(feel) {
         case "swing":
-            return compSwingFeel(song);
+            take = compSwingFeel(song);
+            break;
     }
 
+    for (
+            let i = song.chart.rangeStartIndex;
+            i <= song.chart.rangeEndIndex;
+            i ++
+    ) {
+        take[i].withinRange = true;
+    }
+    
+    return take;
 };
 
 const compSwingFeel = song => {
