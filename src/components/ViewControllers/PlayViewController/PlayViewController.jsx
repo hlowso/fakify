@@ -90,7 +90,8 @@ class PlayViewController extends Component {
                         song={sessionSong} 
                         chartIndex={chartIndex} 
                         recontextualize={this.recontextualize} 
-                        resetTempo={this.resetTempo} />
+                        resetTempo={this.resetTempo} 
+                        onBarClick={this.onBarClick} />
                     <TrainingWindow  
                         startSession={this.startSession} 
                         stopSession={this.stopSession} />
@@ -167,6 +168,49 @@ class PlayViewController extends Component {
     stopSession = () => {
         this.setState({ chartIndex: {}, currentKey: "" });
         this.SoundActions.killTake();
+    }
+
+    /*******************
+        CHART VIEWER
+    *******************/
+
+    onBarClick = i => {
+        this.stopSession();
+        let { sessionSong } = this.state;
+        let { rangeEndIndex, rangeStartIndex } = sessionSong.chart;
+        let sessionSongUpdate = Util.copyObject(sessionSong);
+        let withinRange = rangeStartIndex <= i && 
+                          i <= rangeEndIndex;
+
+        let rangeStartIndexUpdate = (
+            withinRange
+                ? i
+                : i < rangeStartIndex
+                    ? i
+                    : rangeStartIndex
+        );
+        let rangeEndIndexUpdate = (
+            withinRange
+                ? i
+                : rangeEndIndex < i
+                    ? i
+                    : rangeEndIndex
+        );
+
+        sessionSongUpdate.chart = {
+            ...sessionSong.chart,
+            rangeStartIndex: rangeStartIndexUpdate,
+            rangeEndIndex: rangeEndIndexUpdate
+        };
+
+        this.setState({ 
+            sessionSong: sessionSongUpdate 
+        });
+
+        this.StorageHelper.updateSongSettings(sessionSong.id, {
+            rangeStartIndex: rangeStartIndexUpdate,
+            rangeEndIndex: rangeEndIndexUpdate
+        });
     }
 
     recontextualize = newKeySignature => {

@@ -37,17 +37,20 @@ class ChartViewer extends Component {
 
     renderProgression = () => {
         let { song, chartIndex } = this.props;
-        let { barsV1 } = song.chart;
+        let { barsV1, rangeStartIndex, rangeEndIndex } = song.chart;
         let baseKey = barsV1[0].chordEnvelopes[0].key;
 
         return barsV1.map((bar, i) => {
             let chordNames = [];
             let beats = [];
-            let isCurrentBar = chartIndex.bar === i;
+            let isCurrentlyPlayingBar = chartIndex.bar === i;
+            let isWithinRange = rangeStartIndex <= i &&
+                                i <= rangeEndIndex;
 
             let barClasses = Cx({ 
                 "bar-container": true, 
-                "current-bar": isCurrentBar
+                "within-range": isWithinRange,
+                "current-bar": isCurrentlyPlayingBar
             });
 
             for (let beat = 1; beat <= bar.timeSignature[1]; beat ++) {
@@ -59,7 +62,7 @@ class ChartViewer extends Component {
                     } 
                 });
 
-                let isCurrentChord = isCurrentBar && 
+                let isCurrentChord = isCurrentlyPlayingBar && 
                                     chartIndex.chordEnvelope === chordEnvelopeIndex;
 
                 let chordNameClasses = Cx({
@@ -76,7 +79,11 @@ class ChartViewer extends Component {
             }
 
             return (
-                <div className={barClasses} key={bar.barIndex}>
+                <div 
+                    key={i}
+                    className={barClasses}
+                    onClick={() => this.props.onBarClick(i)} 
+                >
                     <div className="bar-chord-group">
                         {chordNames}
                     </div>

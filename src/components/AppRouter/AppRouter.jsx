@@ -227,22 +227,36 @@ class AppRouter extends Component {
     }
 
     _createQueueableSegmentsGenerator = function* (sessionId, tempo, take) {
-        let barIndex = 0;
-        let chordEnvelopeIndex = 0;
+        let barIndex = take.length - 1;
+        let chordEnvelopeIndex = Infinity;
     
-        while (true) {
-            let { barSubdivision, timeSignature, musicSegments } = take[barIndex]; 
-            let timeFactor = 60 / ( barSubdivision * (tempo[0] / ( timeSignature[0] * ( tempo[1] / timeSignature[1] ))));
-    
-            yield { ...musicSegments[chordEnvelopeIndex], timeFactor, barIndex, chordEnvelopeIndex, sessionId };
-    
+        while (true) {    
+            // Increment the chord envelope index by 1.             
+            // If the chord envelope index has reached the end of the segment,
+            // set the chord envelope index to 0 and increment the bar index by
+            // at least 1. Keep incrementing the bar index until it's within
+            // the range of the take
             chordEnvelopeIndex += 1;
+            
             if (chordEnvelopeIndex >= take[barIndex].musicSegments.length) {
                 chordEnvelopeIndex = 0;
                 do {
                     barIndex = (barIndex + 1) % take.length;
                 } while (!take[barIndex].withinRange)
             }
+
+            // Calculate the time factor
+            let { barSubdivision, timeSignature, musicSegments } = take[barIndex]; 
+            let timeFactor = 60 / ( barSubdivision * (tempo[0] / ( timeSignature[0] * ( tempo[1] / timeSignature[1] ))));
+    
+            // Return the segment
+            yield { 
+                ...musicSegments[chordEnvelopeIndex], 
+                timeFactor, 
+                barIndex, 
+                chordEnvelopeIndex, 
+                sessionId 
+            };
         }
     }
 
