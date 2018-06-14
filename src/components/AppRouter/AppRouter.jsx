@@ -61,7 +61,7 @@ class AppRouter extends Component {
             setMidiAccessAsync: this.setMidiAccessAsync,
             connectToMidiInput: this.connectToMidiInput,
             generateMidiMessagePlayer: this.generateMidiMessagePlayer,
-            playTake: this.playTake,
+            playRangeLoop: this.playRangeLoop,
             killTake: this.killTake,
             playUserMidiMessage: this.playUserMidiMessage
         };
@@ -226,22 +226,29 @@ class AppRouter extends Component {
         this.setState({ envelopes: envelopesUpdate });
     }
 
-    _createQueueableSegmentsGenerator = function* (sessionId, tempo, take) {
-        let barIndex = take.length - 1;
+    _createQueueableSegmentsGenerator = function* (sessionId, song, feel) {
+        let { tempo, barsV1 } = song.chart;
+        let numberOfBars = barsV1.length;
+        let barIndex = numberOfBars - 1;
         let chordEnvelopeIndex = Infinity;
+        let take;
     
         while (true) {    
             // Increment the chord envelope index by 1.             
             // If the chord envelope index has reached the end of the segment,
             // set the chord envelope index to 0 and increment the bar index by
             // at least 1. Keep incrementing the bar index until it's within
-            // the range of the take
+            // the range of the take. Whenever the bar index lands on 0, we refresh
+            // the take, even if bar 0 is not within the range
             chordEnvelopeIndex += 1;
             
-            if (chordEnvelopeIndex >= take[barIndex].musicSegments.length) {
+            if (!take || chordEnvelopeIndex >= take[barIndex].musicSegments.length) {
                 chordEnvelopeIndex = 0;
                 do {
-                    barIndex = (barIndex + 1) % take.length;
+                    barIndex = (barIndex + 1) % numberOfBars;
+                    if (barIndex === 0) {
+                        take = MusicHelper.compAll(song, feel);
+                    }
                 } while (!take[barIndex].withinRange)
             }
 
@@ -260,10 +267,10 @@ class AppRouter extends Component {
         }
     }
 
-    playTake = (tempo, take, onQueue) => {
+    playRangeLoop = (song, feel, onQueue) => {
         let { audioContext, player } = this.state;
         let sessionId = uuid();
-        let segments = this._createQueueableSegmentsGenerator(sessionId, tempo, take);
+        let segments = this._createQueueableSegmentsGenerator(sessionId, song, feel);
         let prevQueueTime = audioContext.currentTime;
 
         let queue = shortenedWaitTime => {

@@ -159,10 +159,7 @@ class PlayViewController extends Component {
             });
         };
 
-        // Prepare the take
-        let take = MusicHelper.compAll(sessionSong, feel);
-
-        this.SoundActions.playTake(sessionSong.chart.tempo, take, onQueue);
+        this.SoundActions.playRangeLoop(sessionSong, feel, onQueue);
     }
 
     stopSession = () => {
