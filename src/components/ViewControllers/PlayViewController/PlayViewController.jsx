@@ -10,11 +10,13 @@ import MidSettingsModal from "../../views/MidiSettingsModal/MidiSettingsModal";
 import * as Api from "../../../shared/Api";
 import * as Util from "../../../shared/Util";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
-import PlayModes from "../../../shared/PlayModes";
 
 import "./PlayViewController.css";
 
 class PlayViewController extends Component {
+
+    PRECISION_THRESHOLD = 0.2;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -24,7 +26,9 @@ class PlayViewController extends Component {
             sessionChart: {},
             sessionIndex: {},
             currentKey: "",
-            midiSettingsModalOpen: true          
+            midiSettingsModalOpen: true,
+            playMode: "improv",
+            trainingFeedback: {}          
         };
     }
 
@@ -69,7 +73,9 @@ class PlayViewController extends Component {
             midiSettingsModalOpen, 
             sessionChart,
             sessionIndex,
-            currentKey 
+            currentKey,
+            playMode,
+            trainingFeedback 
         } = this.state;
 
         let selectedSongId = selectedSong ? selectedSong.songId: null;
@@ -94,7 +100,10 @@ class PlayViewController extends Component {
                         onBarClick={this.onBarClick} />
                     <TrainingWindow  
                         startSession={this.startSession} 
-                        stopSession={this.stopSession} />
+                        stopSession={this.stopSession} 
+                        setPlayMode={this.setPlayMode} 
+                        playMode={playMode} 
+                        trainingFeedback={trainingFeedback} />
                 </div>
                 <div className="bottom-row">
                     <Keyboard 
@@ -117,11 +126,19 @@ class PlayViewController extends Component {
         ); 
     }
 
+    /*********************
+        TRAINING WINDOW
+    **********************/
+
+    setPlayMode = playMode => {
+        this.setState({ playMode });
+    }
+
     /************
         MUSIC
     ************/
 
-    resetSessionChart() {
+    resetSessionChart = () => {
         let { id, barsBase, originalTempo, originalKeyContext, suitableFeels } = this.state.selectedSong;
         let chartSettings = this.StorageHelper.getChartSettings(id);
         let playMode = this.StorageHelper.getPlayMode();
@@ -141,7 +158,7 @@ class PlayViewController extends Component {
         }
         if (!Number.isInteger(rangeEndIndex)) {
             rangeEndIndex = (
-                (playMode === PlayModes.LISTEN_AND_REPEAT)
+                (playMode === "listenAndRepeat")
                         ? 1
                         : barsBase.length - 1
             );
@@ -163,7 +180,7 @@ class PlayViewController extends Component {
     }
 
     startSession = () => {
-        let { sessionChart } = this.state;
+        let { sessionChart, playMode } = this.state;
         let { barsV1, rangeStartIndex } = sessionChart;
 
         let onQueue = musicIndex => {
@@ -178,6 +195,35 @@ class PlayViewController extends Component {
                 currentKey: barsV1[barIndex].chordEnvelopes[chordIdx].key
             });
         };
+
+        switch(playMode) {
+            case "improv":
+                this.setState({
+                    trainingFeedback: {
+                        notesOutOfTime: 0,
+                        notesInKeyAndInTime: 0,
+                        notesInTime: 0
+                    }
+                })
+                this.StateHelper.subscribeToUserSessionKeyStroke(
+                    keyStrokeRecord => {
+                        let { trainingFeedback, currentKey } = this.state;
+                        let trainingFeedbackUpdate = Util.copyObject(trainingFeedback);
+
+                        if (Math.abs(keyStrokeRecord.precision) > this.PRECISION_THRESHOLD) {
+                            trainingFeedbackUpdate.notesOutOfTime++;
+                        } else {
+                            if (MusicHelper.noteIsInKey(keyStrokeRecord.note, currentKey)) {
+                                trainingFeedbackUpdate.notesInKeyAndInTime++;
+                            }
+                            trainingFeedbackUpdate.notesInTime++;
+                        }
+
+                        this.setState({ trainingFeedback: trainingFeedbackUpdate });
+                    }
+                );
+                break;
+        }
 
         this.SoundActions.playRangeLoop(sessionChart, onQueue);
     }

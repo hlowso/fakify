@@ -63,3 +63,8 @@ export interface ISessionPassage {
         [instrument: string]: IStroke[];
     }
 }
+
+export enum PlayMode {
+    Improv = "improv",
+    ListenAndRepeat = "listenAndRepeat"
+}
