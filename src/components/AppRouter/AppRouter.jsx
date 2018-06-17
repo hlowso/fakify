@@ -246,11 +246,10 @@ class AppRouter extends Component {
         }
     }
 
-    _createQueueableSegmentsGenerator = function* (sessionId, chart, musicGenerator) {
-        let { tempo, barsV1 } = chart;
-        let take;
-        let barIndex = -1;
-        let chordEnvelopeIndex = Infinity;
+    _createQueueableSegmentsGenerator = function* (sessionId, tempo, musicGenerator) {
+        let musicBars;
+        let musicIndex = -1;
+        let chordPassageIndex = Infinity;
     
         while (true) {   
             // Increment the chord envelope index by 1.             
@@ -258,27 +257,27 @@ class AppRouter extends Component {
             // set the chord envelope index to 0 and increment the bar index by 1. 
             // Whenever the bar index lands on 0, we refresh the take.
 
-            chordEnvelopeIndex += 1;
+            chordPassageIndex += 1;
             
-            if (barIndex < 0 || chordEnvelopeIndex >= take[barIndex].musicSegments.length) {
-                chordEnvelopeIndex = 0;
-                barIndex ++;
-                if (barIndex === 0) {
-                    take = musicGenerator();
+            if (musicIndex < 0 || chordPassageIndex >= musicBars[musicIndex].chordPassages.length) {
+                chordPassageIndex = 0;
+                musicIndex ++;
+                if (musicIndex === 0) {
+                    musicBars = musicGenerator();
                 }
-                barIndex %= take.length;
+                musicIndex %= musicBars.length;
             }
 
             // Calculate the time factor
-            let { barSubdivision, timeSignature, musicSegments } = take[barIndex]; 
-            let timeFactor = 60 / ( barSubdivision * (tempo[0] / ( timeSignature[0] * ( tempo[1] / timeSignature[1] ))));
+            let { durationInSubbeats, timeSignature, chordPassages } = musicBars[musicIndex]; 
+            let subbeatDuration = 60 / ( durationInSubbeats * (tempo[0] / ( timeSignature[0] * ( tempo[1] / timeSignature[1] ))));
     
             // Return the segment
             yield { 
-                ...musicSegments[chordEnvelopeIndex], 
-                timeFactor, 
-                barIndex, 
-                chordEnvelopeIndex, 
+                ...chordPassages[chordPassageIndex], 
+                subbeatDuration, 
+                musicIndex, 
+                chordPassageIndex, 
                 sessionId 
             };
         }
@@ -290,12 +289,12 @@ class AppRouter extends Component {
 
         let segments = this._createQueueableSegmentsGenerator(
             sessionId, 
-            chart, 
+            chart.tempo, 
             () => MusicHelper.comp(chart, feel)
         );
         let prevQueueTime = audioContext.currentTime;
 
-        let queue = shortenedWaitTime => {
+        let loopedQueue = shortenedWaitTime => {
             setTimeout(() => {
                 let queueTime = prevQueueTime + (shortenedWaitTime * this.SHORTENED_WAIT_TIME_FACTOR) / 1000;
                 let getUpdate = () => audioContext.currentTime > queueTime;
@@ -305,9 +304,9 @@ class AppRouter extends Component {
                     let { 
                         parts, 
                         durationInSubbeats, 
-                        timeFactor,
-                        barIndex,
-                        chordEnvelopeIndex,
+                        subbeatDuration,
+                        musicIndex,
+                        chordPassageIndex,
                         sessionId 
                     } = segment.value;
 
@@ -315,20 +314,20 @@ class AppRouter extends Component {
 
                     if (stateSessionId && stateSessionId === sessionId) {
                         onQueue({
-                            barIndex,
-                            chordEnvelopeIndex
+                            musicIndex,
+                            chordPassageIndex
                         });
         
-                        this.queueParts(parts, timeFactor);
+                        this.queueParts(parts, subbeatDuration);
 
                         prevQueueTime = audioContext.currentTime;
-                        queue(timeFactor * durationInSubbeats * this.WAIT_TIME_FACTOR);
+                        loopedQueue(subbeatDuration * durationInSubbeats * this.WAIT_TIME_FACTOR);
                     }
                 });
             }, shortenedWaitTime);
         };
 
-        this.setState({ sessionId }, () => queue(0));
+        this.setState({ sessionId }, () => loopedQueue(0));
     }
 
     queueParts = (parts, timeFactor) => {

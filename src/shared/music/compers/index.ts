@@ -2,37 +2,44 @@ import * as Util from "../../Util";
 import compPianoSwingFeelV0 from "./swing/piano/compPianoSwingFeelV0";
 import compBassSwingFeelV0 from "./swing/bass/compBassSwingFeelV0";
 import compDrumsSwingFeelV0 from "./swing/drums/compDrumsSwingFeelV0";
+import { IChart, IMusicBar, Feel } from "../../types";
 
-export const comp = (chart, feel, ignoreRange = false) => {
-    let take, compChart = Util.copyObject(chart);
+export const comp = (chart: IChart, feel: Feel, ignoreRange = false): IMusicBar[] => {
+    let chartSection = Util.copyObject(chart);
 
     if (!ignoreRange) {
         let { barsV1, rangeStartIndex, rangeEndIndex } = chart;
-        compChart.barsV1 = chart.barsV1.filter(
-            (bar, i) => rangeStartIndex <= i && i <= rangeEndIndex
+        chartSection.barsV1 = barsV1.filter(
+            (bar: any, i: number) => rangeStartIndex <= i && i <= rangeEndIndex
         );
     }
 
     switch(feel) {
-        case "swing":
-            return compSwingFeel(compChart);
+        case Feel.Swing:
+            return compSwingFeel(chartSection);
+
+        default:
+            return [];
     }
 };
 
-const compSwingFeel = chart => {
+const compSwingFeel = (chartSection: IChart): IMusicBar[] => {
 
     // Adjust chart attributes, etc. that have to do with time so that
     // the every quarter note is divided into 3 subbeats. This makes
     // it easier for the instrument-specific comp functions to write their
     // parts. 
-    let timeAdjustedChart = Util.copyObject(chart);
+    let timeAdjustedChart = Util.copyObject(chartSection);
     
     for (let bar of timeAdjustedChart.barsV1) {
         let { timeSignature, chordEnvelopes } = bar;
-        let conversionFactor, beatConverter;
+        let conversionFactor: number, 
+            beatConverter: (beat: string) => string;
 
         if (timeSignature[1] === 8) {
-            if (timeSignature[0] % 2 === 1) return null;
+            if (timeSignature[0] % 2 === 1) {
+                return [];
+            }
 
             timeSignature[0] /= 2;
             timeSignature[1] = 4;
@@ -44,10 +51,10 @@ const compSwingFeel = chart => {
             conversionFactor = 3;
             beatConverter = beat => beat;
         } else {
-            return null;
+            return [];
         }
 
-        chordEnvelopes.forEach(chordEnvelope => {
+        chordEnvelopes.forEach((chordEnvelope: any) => {
             chordEnvelope.beat = beatConverter(chordEnvelope.beat);
             chordEnvelope.subbeatsBeforeChange = chordEnvelope.beatsBeforeChange * conversionFactor;
             chordEnvelope.durationInSubbeats = chordEnvelope.durationInBeats * conversionFactor;
@@ -57,7 +64,7 @@ const compSwingFeel = chart => {
     let bassTake = compBassSwingFeelV0(timeAdjustedChart);
     let drumsTake = compDrumsSwingFeelV0(timeAdjustedChart);
 
-    return compPianoSwingFeelV0(timeAdjustedChart).map((pianoBarPhrases, i) => { 
+    return compPianoSwingFeelV0(timeAdjustedChart).map((pianoBarPhrases: any, i: number) => { 
 
         let bassBarPhrases = bassTake[i];
         let drumsBarPhrases = drumsTake[i];
@@ -65,8 +72,8 @@ const compSwingFeel = chart => {
 
         return {
             timeSignature: chartBar.timeSignature,
-            barSubdivision: 12,
-            musicSegments: pianoBarPhrases.map((pianoPhrase, j) => ({
+            durationInSubbeats: 12,
+            chordPassages: pianoBarPhrases.map((pianoPhrase: any, j: number) => ({
                 durationInSubbeats: chartBar.chordEnvelopes[j].durationInSubbeats,
                 parts: {
                     "piano": pianoPhrase,
