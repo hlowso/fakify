@@ -1,3 +1,11 @@
+// export interface ISong {
+
+// }
+
+// export interface IChartBar {
+
+// }
+
 export interface IChart {
     barsV1: any;
     tempo: number[];
