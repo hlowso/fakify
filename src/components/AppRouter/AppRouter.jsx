@@ -26,9 +26,10 @@ class AppRouter extends Component {
             player: null,
             userPlayer: null,
             userInstrument: "piano",
-            isPlaying: false,
+            sessionId: null,
+            currentSessionPassage: {},
             userEnvelopes: {},
-            onUserSessionKeyStroke: (note, time) => {},
+            onUserSessionKeyStroke: (keyStrokeRecord) => {},
             userSessionRecord: []
         };
 
@@ -203,18 +204,20 @@ class AppRouter extends Component {
         switch(type) {
             case 144:
                 if (volume) {
+                    let { currentTime, destination } = audioContext;
                     userEnvelopesUpdate[note] = userPlayer.queueWaveTable(
                         audioContext, 
-                        audioContext.destination, 
+                        destination, 
                         window[soundfonts[userInstrument].variable], 
-                        0, 
+                        currentTime, 
                         note,
                         1000,
                         volume
                     );
                     this.onUserKeyStroke(
                         note,
-                        audioContext.currentTime
+                        currentTime,
+                        volume
                     );
                 }
                 else {
@@ -233,16 +236,46 @@ class AppRouter extends Component {
         this.setState({ userEnvelopes: userEnvelopesUpdate });
     }
 
-    onUserKeyStroke = (note, time) => {
-        let { sessionId, onUserSessionKeyStroke } = this.state;
+    onUserKeyStroke = (note, time, velocity) => {
+        let { 
+            sessionId, 
+            currentSessionPassage,
+            userSessionRecord,
+            onUserSessionKeyStroke 
+        } = this.state;
 
         // If there's a session going, we record
         // the notes the user plays in the userSessionRecord
-        // state object
+        // state array
         if (sessionId) {
+            let { musicIndex, subbeatDuration, subbeatOffsetToQueueTime } = currentSessionPassage;
+            let [closestSubbeatOffset, closestSubbeatOffsetTime] = Util.arrayBinarySearch(subbeatOffsetToQueueTime, time);
+            let precision = (time - closestSubbeatOffsetTime) / subbeatDuration;
+            
+            if (precision < -0.5) {
+                closestSubbeatOffset--;
+                precision++
+            } else if (precision > 0.5) {
+                closestSubbeatOffset ++;
+                precision--;
+            }
+            
+            let keyStrokeRecord = {
+                note,
+                velocity,
+                musicIndex: { 
+                    ...musicIndex, 
+                    subbeatOffset: closestSubbeatOffset
+                },
+                precision
+            }
+
+            let userSessionRecordUpdate = Util.copyObject(userSessionRecord);
+            userSessionRecordUpdate.push(keyStrokeRecord);
+            this.setState({ userSessionRecord: userSessionRecordUpdate });
             
             // And call the user key stroke subscriber's function
-            onUserSessionKeyStroke(note, time);
+            onUserSessionKeyStroke(keyStrokeRecord);
         }
     }
 
@@ -271,14 +304,30 @@ class AppRouter extends Component {
             // Calculate the time factor
             let { durationInSubbeats, timeSignature, chordPassages } = musicBars[musicIndex]; 
             let subbeatDuration = 60 / ( durationInSubbeats * (tempo[0] / ( timeSignature[0] * ( tempo[1] / timeSignature[1] ))));
-    
+
+            let chordPassage = chordPassages[chordPassageIndex];
+            let { currentTime } = this.state.audioContext;
+            let subbeatOffsetToQueueTime = [];
+
+            for (
+                let subbeatOffset = 0; 
+                subbeatOffset < chordPassage.durationInSubbeats; 
+                subbeatOffset++
+            ) {
+                subbeatOffsetToQueueTime.push(currentTime + subbeatDuration * subbeatOffset);
+            }
+
             // Return the segment
             yield { 
-                ...chordPassages[chordPassageIndex], 
+                sessionId, 
+                duration: chordPassage.durationInSubbeats * subbeatDuration,
                 subbeatDuration, 
-                musicIndex, 
-                chordPassageIndex, 
-                sessionId 
+                subbeatOffsetToQueueTime,
+                musicIndex: {
+                    barIdx: musicIndex,
+                    chordIdx: chordPassageIndex
+                }, 
+                parts: chordPassage.parts
             };
         }
     }
@@ -300,37 +349,38 @@ class AppRouter extends Component {
                 let getUpdate = () => audioContext.currentTime > queueTime;
 
                 Util.waitFor(getUpdate, this.TIME_CHECKER_RATE).then(() => {
-                    let segment = segments.next();
-                    let { 
-                        parts, 
-                        durationInSubbeats, 
-                        subbeatDuration,
-                        musicIndex,
-                        chordPassageIndex,
-                        sessionId 
-                    } = segment.value;
-
-                    let stateSessionId = this.state.sessionId;
-
-                    if (stateSessionId && stateSessionId === sessionId) {
-                        onQueue({
+                    this.setState({ currentSessionPassage: segments.next().value },
+                    () => {
+                        let {
+                            sessionId,
+                            duration,
+                            subbeatDuration,
+                            subbeatOffsetToQueueTime,
                             musicIndex,
-                            chordPassageIndex
-                        });
-        
-                        this.queueParts(parts, subbeatDuration);
+                            parts
+                        } = this.state.currentSessionPassage;
 
-                        prevQueueTime = audioContext.currentTime;
-                        loopedQueue(subbeatDuration * durationInSubbeats * this.WAIT_TIME_FACTOR);
-                    }
+                        if (this.state.sessionId && 
+                            this.state.sessionId === sessionId
+                        ) {
+                            this.queueParts(parts, subbeatOffsetToQueueTime, subbeatDuration);
+                            onQueue(musicIndex);
+
+                            prevQueueTime = audioContext.currentTime;
+                            loopedQueue(duration * this.WAIT_TIME_FACTOR);
+                        }
+                    });
                 });
             }, shortenedWaitTime);
         };
 
-        this.setState({ sessionId }, () => loopedQueue(0));
+        this.setState({ 
+            sessionId, 
+            userSessionRecord: [] 
+        }, () => loopedQueue(0));
     }
 
-    queueParts = (parts, timeFactor) => {
+    queueParts = (parts, subbeatOffsetToQueueTime, timeFactor) => {
         let { player, audioContext } = this.state;
         let { currentTime } = audioContext;
 
@@ -344,7 +394,7 @@ class AppRouter extends Component {
                             audioContext, 
                             audioContext.destination, 
                             window[soundfonts[instrument].variable], 
-                            currentTime + timeFactor * stroke.subbeatOffset, 
+                            subbeatOffsetToQueueTime[stroke.subbeatOffset], 
                             note,
                             timeFactor * stroke.durationInSubbeats,
                             stroke.velocity
@@ -357,7 +407,10 @@ class AppRouter extends Component {
 
     killTake = () => {
         this.state.player.cancelQueue(this.state.audioContext);
-        this.setState({ sessionId: null });
+        this.setState({ 
+            sessionId: null, 
+            currentSessionPassage: {} 
+        });
     }
 };
 

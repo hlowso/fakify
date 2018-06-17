@@ -55,9 +55,9 @@ class PlayViewController extends Component {
             })
             .then(song => {
                 if (song) {
-                    return new Promise(resolve => this.setState({ 
+                    this.setState({ 
                         selectedSong: song
-                    }, this.resetSessionChart));
+                    }, this.resetSessionChart);
                 }
             });
     }
@@ -166,16 +166,16 @@ class PlayViewController extends Component {
         let { sessionChart } = this.state;
         let { barsV1, rangeStartIndex } = sessionChart;
 
-        let onQueue = data => {
-            let { musicIndex, chordPassageIndex } = data;
-            let barIndex = musicIndex + rangeStartIndex;
+        let onQueue = musicIndex => {
+            let { barIdx, chordIdx } = musicIndex;
+            let barIndex = barIdx + rangeStartIndex;
 
             this.setState({ 
                 sessionIndex: {
                     bar: barIndex,
-                    chordEnvelope: chordPassageIndex
+                    chordEnvelope: chordIdx
                 },
-                currentKey: barsV1[barIndex].chordEnvelopes[chordPassageIndex].key
+                currentKey: barsV1[barIndex].chordEnvelopes[chordIdx].key
             });
         };
 
@@ -183,7 +183,7 @@ class PlayViewController extends Component {
     }
 
     stopSession = () => {
-        this.setState({ chartIndex: {}, currentKey: "" });
+        this.setState({ sessionIndex: {}, currentKey: "" });
         this.SoundActions.killTake();
     }
 

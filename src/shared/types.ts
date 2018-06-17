@@ -6,6 +6,20 @@
 
 // }
 
+export interface IUserStrokeRecord {
+    musicIndex: IMusicIdx;
+    precision: number;
+    note: number;
+    velocity: number;
+    duration?: number;
+}
+
+export interface IMusicIdx {
+    barIdx: number;
+    chordIdx: number;
+    subbeatOffset?: number;
+}
+
 export interface IChart {
     barsV1: any;
     tempo: number[];
@@ -37,4 +51,15 @@ export interface IStroke {
     durationInSubbeats: number;
     notes: number[];
     velocity: number;
+}
+
+export interface ISessionPassage {
+    sessionId: string;
+    duration: number;
+    subbeatDuration: number;
+    subbeatOffsetToQueueTime: number[];
+    musicIndex: IMusicIdx;
+    parts: {
+        [instrument: string]: IStroke[];
+    }
 }
