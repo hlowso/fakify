@@ -3,35 +3,31 @@ import compPianoSwingFeelV0 from "./swing/piano/compPianoSwingFeelV0";
 import compBassSwingFeelV0 from "./swing/bass/compBassSwingFeelV0";
 import compDrumsSwingFeelV0 from "./swing/drums/compDrumsSwingFeelV0";
 
-export const compAll = (song, feel) => {
-    let take;
+export const comp = (chart, feel, ignoreRange = false) => {
+    let take, compChart = Util.copyObject(chart);
+
+    if (!ignoreRange) {
+        let { barsV1, rangeStartIndex, rangeEndIndex } = chart;
+        compChart.barsV1 = chart.barsV1.filter(
+            (bar, i) => rangeStartIndex <= i && i <= rangeEndIndex
+        );
+    }
 
     switch(feel) {
         case "swing":
-            take = compSwingFeel(song);
-            break;
+            return compSwingFeel(compChart);
     }
-
-    for (
-            let i = song.chart.rangeStartIndex;
-            i <= song.chart.rangeEndIndex;
-            i ++
-    ) {
-        take[i].withinRange = true;
-    }
-    
-    return take;
 };
 
-const compSwingFeel = song => {
+const compSwingFeel = chart => {
 
-    // Adjust song attributes, etc. that have to do with time so that
+    // Adjust chart attributes, etc. that have to do with time so that
     // the every quarter note is divided into 3 subbeats. This makes
     // it easier for the instrument-specific comp functions to write their
-    // parts. At the moment, only songs 
-    let timeAdjustedSong = Util.copyObject(song);
+    // parts. 
+    let timeAdjustedChart = Util.copyObject(chart);
     
-    for (let bar of timeAdjustedSong.chart.barsV1) {
+    for (let bar of timeAdjustedChart.barsV1) {
         let { timeSignature, chordEnvelopes } = bar;
         let conversionFactor, beatConverter;
 
@@ -58,14 +54,14 @@ const compSwingFeel = song => {
         });
     }
 
-    let bassTake = compBassSwingFeelV0(timeAdjustedSong);
-    let drumsTake = compDrumsSwingFeelV0(timeAdjustedSong);
+    let bassTake = compBassSwingFeelV0(timeAdjustedChart);
+    let drumsTake = compDrumsSwingFeelV0(timeAdjustedChart);
 
-    return compPianoSwingFeelV0(timeAdjustedSong).map((pianoBarPhrases, i) => { 
+    return compPianoSwingFeelV0(timeAdjustedChart).map((pianoBarPhrases, i) => { 
 
         let bassBarPhrases = bassTake[i];
         let drumsBarPhrases = drumsTake[i];
-        let chartBar = timeAdjustedSong.chart.barsV1[i];
+        let chartBar = timeAdjustedChart.barsV1[i];
 
         return {
             timeSignature: chartBar.timeSignature,

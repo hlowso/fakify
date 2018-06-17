@@ -27,7 +27,9 @@ class AppRouter extends Component {
             userPlayer: null,
             userInstrument: "piano",
             isPlaying: false,
-            envelopes: {}
+            userEnvelopes: {},
+            onUserSessionKeyStroke: (note, time) => {},
+            userSessionRecord: []
         };
 
         this.WAIT_TIME_FRACTION = 4 / 5;
@@ -70,7 +72,8 @@ class AppRouter extends Component {
             getState: () => this.state,
             getMidiAccess: this.getMidiAccess,
             setMidiAccess: this.setMidiAccess,
-            getCurrentUserKeysDepressed: this.getCurrentUserKeysDepressed
+            getCurrentUserKeysDepressed: this.getCurrentUserKeysDepressed,
+            subscribeToUserSessionKeyStroke: handler => this.setState({ onUserSessionKeyStroke: handler })
         };
 
         let VCProps = {
@@ -109,7 +112,7 @@ class AppRouter extends Component {
     }
 
     getCurrentUserKeysDepressed = () => {
-        return Object.keys(this.state.envelopes).map(key => Number(key));
+        return Object.keys(this.state.userEnvelopes).map(key => Number(key));
     }
 
     /********************
@@ -184,23 +187,23 @@ class AppRouter extends Component {
     }
 
     playUserMidiMessage = message => {
-        let { userPlayer, userInstrument, audioContext, envelopes } = this.state;
+        let { userPlayer, userInstrument, audioContext, userEnvelopes } = this.state;
         let { data } = message;
         let type = data[0], note = data[1], volume = data[2] / 127;
-        let envelopesUpdate = Util.copyObject(envelopes);
-        let existingEnvelop = envelopes[note];
+        let userEnvelopesUpdate = Util.copyObject(userEnvelopes);
+        let existingEnvelop = userEnvelopes[note];
 
-        let noteOff = (existingEnvelop, envelopesUpdate) => {
+        let noteOff = (existingEnvelop, userEnvelopesUpdate) => {
             if (existingEnvelop) {
                 existingEnvelop.cancel();
-                delete envelopesUpdate[note];
+                delete userEnvelopesUpdate[note];
             }
         }
 
         switch(type) {
             case 144:
                 if (volume) {
-                    envelopesUpdate[note] = userPlayer.queueWaveTable(
+                    userEnvelopesUpdate[note] = userPlayer.queueWaveTable(
                         audioContext, 
                         audioContext.destination, 
                         window[soundfonts[userInstrument].variable], 
@@ -209,47 +212,61 @@ class AppRouter extends Component {
                         1000,
                         volume
                     );
+                    this.onUserKeyStroke(
+                        note,
+                        audioContext.currentTime
+                    );
                 }
                 else {
-                    noteOff(existingEnvelop, envelopesUpdate);
+                    noteOff(existingEnvelop, userEnvelopesUpdate);
                 }
                 break;
 
             case 128:
-                noteOff(existingEnvelop, envelopesUpdate);
+                noteOff(existingEnvelop, userEnvelopesUpdate);
                 break;
 
             default:
                 console.log("PRECOMP - unknown midi message type:", type);
         }
 
-        this.setState({ envelopes: envelopesUpdate });
+        this.setState({ userEnvelopes: userEnvelopesUpdate });
     }
 
-    _createQueueableSegmentsGenerator = function* (sessionId, song, feel) {
-        let { tempo, barsV1 } = song.chart;
-        let numberOfBars = barsV1.length;
-        let barIndex = numberOfBars - 1;
-        let chordEnvelopeIndex = Infinity;
+    onUserKeyStroke = (note, time) => {
+        let { sessionId, onUserSessionKeyStroke } = this.state;
+
+        // If there's a session going, we record
+        // the notes the user plays in the userSessionRecord
+        // state object
+        if (sessionId) {
+            
+            // And call the user key stroke subscriber's function
+            onUserSessionKeyStroke(note, time);
+        }
+    }
+
+    _createQueueableSegmentsGenerator = function* (sessionId, chart, musicGenerator) {
+        let { tempo, barsV1 } = chart;
         let take;
+        let barIndex = -1;
+        let chordEnvelopeIndex = Infinity;
     
-        while (true) {    
+        while (true) {   
             // Increment the chord envelope index by 1.             
             // If the chord envelope index has reached the end of the segment,
-            // set the chord envelope index to 0 and increment the bar index by
-            // at least 1. Keep incrementing the bar index until it's within
-            // the range of the take. Whenever the bar index lands on 0, we refresh
-            // the take, even if bar 0 is not within the range
+            // set the chord envelope index to 0 and increment the bar index by 1. 
+            // Whenever the bar index lands on 0, we refresh the take.
+
             chordEnvelopeIndex += 1;
             
-            if (!take || chordEnvelopeIndex >= take[barIndex].musicSegments.length) {
+            if (barIndex < 0 || chordEnvelopeIndex >= take[barIndex].musicSegments.length) {
                 chordEnvelopeIndex = 0;
-                do {
-                    barIndex = (barIndex + 1) % numberOfBars;
-                    if (barIndex === 0) {
-                        take = MusicHelper.compAll(song, feel);
-                    }
-                } while (!take[barIndex].withinRange)
+                barIndex ++;
+                if (barIndex === 0) {
+                    take = musicGenerator();
+                }
+                barIndex %= take.length;
             }
 
             // Calculate the time factor
@@ -267,10 +284,15 @@ class AppRouter extends Component {
         }
     }
 
-    playRangeLoop = (song, feel, onQueue) => {
+    playRangeLoop = (chart, feel, onQueue) => {
         let { audioContext, player } = this.state;
         let sessionId = uuid();
-        let segments = this._createQueueableSegmentsGenerator(sessionId, song, feel);
+
+        let segments = this._createQueueableSegmentsGenerator(
+            sessionId, 
+            chart, 
+            () => MusicHelper.comp(chart, feel)
+        );
         let prevQueueTime = audioContext.currentTime;
 
         let queue = shortenedWaitTime => {
@@ -292,34 +314,14 @@ class AppRouter extends Component {
                     let stateSessionId = this.state.sessionId;
 
                     if (stateSessionId && stateSessionId === sessionId) {
-                        let { currentTime } = audioContext;
-
                         onQueue({
                             barIndex,
                             chordEnvelopeIndex
                         });
         
-                        Object.keys(parts).forEach(instrument => {
-                            let part = parts[instrument];
-        
-                            if (part) {
-                                part.forEach(stroke => {
-                                    stroke.notes.forEach(note => {
-                                        player.queueWaveTable(
-                                            audioContext, 
-                                            audioContext.destination, 
-                                            window[soundfonts[instrument].variable], 
-                                            currentTime + timeFactor * stroke.subbeatOffset, 
-                                            note,
-                                            timeFactor * stroke.durationInSubbeats,
-                                            stroke.velocity
-                                        );
-                                    });
-                                });
-                            }
-                        });
+                        this.queueParts(parts, timeFactor);
 
-                        prevQueueTime = currentTime;
+                        prevQueueTime = audioContext.currentTime;
                         queue(timeFactor * durationInSubbeats * this.WAIT_TIME_FACTOR);
                     }
                 });
@@ -327,6 +329,31 @@ class AppRouter extends Component {
         };
 
         this.setState({ sessionId }, () => queue(0));
+    }
+
+    queueParts = (parts, timeFactor) => {
+        let { player, audioContext } = this.state;
+        let { currentTime } = audioContext;
+
+        Object.keys(parts).forEach(instrument => {
+            let part = parts[instrument];
+
+            if (part) {
+                part.forEach(stroke => {
+                    stroke.notes.forEach(note => {
+                        player.queueWaveTable(
+                            audioContext, 
+                            audioContext.destination, 
+                            window[soundfonts[instrument].variable], 
+                            currentTime + timeFactor * stroke.subbeatOffset, 
+                            note,
+                            timeFactor * stroke.durationInSubbeats,
+                            stroke.velocity
+                        );
+                    });
+                });
+            }
+        });
     }
 
     killTake = () => {

@@ -60,7 +60,6 @@ class PlayViewController extends Component {
                     }, resolve));
                 }
             });
-
     }
 
     render() {
@@ -148,6 +147,7 @@ class PlayViewController extends Component {
 
     startSession = () => {
         let { sessionSong, feel } = this.state;
+        let { chart } = sessionSong;
         let onQueue = data => {
             let { barIndex, chordEnvelopeIndex } = data;
             this.setState({ 
@@ -155,11 +155,11 @@ class PlayViewController extends Component {
                     bar: barIndex,
                     chordEnvelope: chordEnvelopeIndex
                 },
-                currentKey: sessionSong.chart.barsV1[barIndex].chordEnvelopes[chordEnvelopeIndex].key
+                currentKey: chart.barsV1[barIndex].chordEnvelopes[chordEnvelopeIndex].key
             });
         };
 
-        this.SoundActions.playRangeLoop(sessionSong, feel, onQueue);
+        this.SoundActions.playRangeLoop(chart, feel, onQueue);
     }
 
     stopSession = () => {
