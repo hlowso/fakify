@@ -3,9 +3,9 @@ import * as Util from "../Util";
 const NOTE_REGEX = /[A-G](#|b)?/g;
 const RELATIVE_SCALE_NOTE_REGEX = /[1H2N34T5U6J7]/g;
 
-const _contextualize = (word, keySignature) => {
+const _contextualize = (word, keyContext) => {
     let { base, chordShape } = getWordConstituents(word);
-    let baseIndex = NOTE_NAMES.indexOf(keySignature);
+    let baseIndex = NOTE_NAMES.indexOf(keyContext);
 
     let contextualizedBase = base.replace(
         RELATIVE_SCALE_NOTE_REGEX, 
@@ -34,18 +34,18 @@ export const NOTE_NAMES = ["C", "C#|Db", "D", "D#|Eb", "E", "F", "F#|Gb", "G", "
 // that can be written with either sharps or flats are written with flats by 
 // convention
 
-export const getPresentableNoteName = (noteName, keySignature = "") => {
+export const getPresentableNoteName = (noteName, keyContext = "") => {
     let noteNameChoices = /b/g.test(noteName) ? noteName.split("|") : [noteName, noteName];
 
-    if (!keySignature || keySignature === "F" || /b/g.test(keySignature)) {
+    if (!keyContext || keyContext === "F" || /b/g.test(keyContext)) {
         return noteNameChoices[1];
     }
     return noteNameChoices[0]; 
 }
 
-export const getPresentableChord = (chord, keySignature = "") => {
+export const getPresentableChord = (chord, keyContext = "") => {
     let { base, chordShape } = getWordConstituents(chord);
-    return `${getPresentableNoteName(base, keySignature)}^${chordShape}`;
+    return `${getPresentableNoteName(base, keyContext)}^${chordShape}`;
 }
 
 export const C_NOTE_NAMES_INDECES = [0, 2, 4, 5, 7, 9, 11];
@@ -60,38 +60,15 @@ export const getKeyNoteNameIndeces = key => {
     return C_NOTE_NAMES_INDECES.map(pitch => (pitch + offset) % 12);
 }
 
-// TODO rename this function so it's more specific to key signatures.
-export const contextualize = (song, newKeySignature = "") => {
-    let { originalTempo, originalKeySignature, chart } = song;
-    let { tempo, keySignature, barsBase } = chart;
-
-    // To begin with, session chart gets everything that chart has
-    let sessionChart = Util.copyObject(chart);
-
-    if (!newKeySignature) {
-        newKeySignature = keySignature ? keySignature : originalKeySignature;
-    }
-    if (!tempo) tempo = originalTempo;
-
-    sessionChart.keySignature = newKeySignature;
-    sessionChart.tempo = tempo;
-
-    sessionChart.barsV1 = barsBase.map(bar => {
+export const contextualizeBars = (barsBase, newKeyContext) => {
+    return barsBase.map(bar => {
         let contextualizedBar = Util.copyObject(bar);
         contextualizedBar.chordEnvelopes = bar.chordEnvelopes.map(chordEnvelope => {
             let contextualizedChordEnvelope = Util.copyObject(chordEnvelope);
-            contextualizedChordEnvelope.chord = _contextualize(chordEnvelope.chord, newKeySignature);
-            contextualizedChordEnvelope.key = _contextualize(chordEnvelope.key, newKeySignature);
+            contextualizedChordEnvelope.chord = _contextualize(chordEnvelope.chord, newKeyContext);
+            contextualizedChordEnvelope.key = _contextualize(chordEnvelope.key, newKeyContext);
             return contextualizedChordEnvelope;
         });
         return contextualizedBar;
     });
-
-    // The session song receives all the attributes of the song
-    let sessionSong = Util.copyObject(song);
-
-    // But the chart contains the contextualized barsV1 array
-    sessionSong.chart = sessionChart;
-
-    return sessionSong;
 };

@@ -15,7 +15,7 @@ const _set = (keySuffix, value) => {
 const _keys = {
     MIDI_INPUT_ID: "MIDI_INPUT_ID",
     SELECTED_SONG_ID: "SELECTED_SONG_ID",
-    SONG_SETTINGS_PREFIX: "SONG_SETTINGS_",
+    CHART_SETTINGS_PREFIX: "CHART_SETTINGS_",
     PLAY_MODE: "PLAY_MODE"
 }
 
@@ -35,8 +35,8 @@ export const setSelectedSongId = selectedSongId => {
     _set(_keys.SELECTED_SONG_ID, selectedSongId);
 }
 
-export const getSongSettings = songId => {
-    let settingsString = _get(`${_keys.SONG_SETTINGS_PREFIX}${songId}`);
+export const getChartSettings = songId => {
+    let settingsString = _get(`${_keys.CHART_SETTINGS_PREFIX}${songId}`);
     try {
         let settings = JSON.parse(settingsString);
         return settings;
@@ -46,9 +46,9 @@ export const getSongSettings = songId => {
     return {};
 }
 
-export const updateSongSettings = (songId, settingsUpdate) => {
-    let settings = getSongSettings(songId);
-    _set(`${_keys.SONG_SETTINGS_PREFIX}${songId}`, JSON.stringify({ 
+export const updateChartSettings = (songId, settingsUpdate) => {
+    let settings = getChartSettings(songId);
+    _set(`${_keys.CHART_SETTINGS_PREFIX}${songId}`, JSON.stringify({ 
         ...settings,
         ...settingsUpdate 
     }));

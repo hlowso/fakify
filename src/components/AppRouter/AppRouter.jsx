@@ -283,14 +283,14 @@ class AppRouter extends Component {
         }
     }
 
-    playRangeLoop = (chart, feel, onQueue) => {
+    playRangeLoop = (chart, onQueue) => {
         let { audioContext, player } = this.state;
         let sessionId = uuid();
 
         let segments = this._createQueueableSegmentsGenerator(
             sessionId, 
             chart.tempo, 
-            () => MusicHelper.comp(chart, feel)
+            () => MusicHelper.comp(chart)
         );
         let prevQueueTime = audioContext.currentTime;
 

@@ -18,10 +18,11 @@ class ChartViewer extends Component {
     }
 
     render() {
-        let { song } = this.props;
-        let songLoaded = !Util.objectIsEmpty(song);
+        let { song, chart } = this.props;
+        let loading = !Util.objectIsEmpty(song) &&
+                        !Util.objectIsEmpty(chart);
 
-        return songLoaded 
+        return loading 
             ? (
                 <div id="chart-viewer">
                     <header className="chart-header">
@@ -36,8 +37,8 @@ class ChartViewer extends Component {
     }
 
     renderProgression = () => {
-        let { song, chartIndex } = this.props;
-        let { barsV1, rangeStartIndex, rangeEndIndex } = song.chart;
+        let { chart, chartIndex } = this.props;
+        let { barsV1, rangeStartIndex, rangeEndIndex } = chart;
         let baseKey = barsV1[0].chordEnvelopes[0].key;
 
         return barsV1.map((bar, i) => {
@@ -98,7 +99,7 @@ class ChartViewer extends Component {
     renderLeftHandSettings = () => {
         return (
             <div className="left-hand-settings">
-                {this.renderKeySignatureSelect()}
+                {this.renderKeyContextSelect()}
                 {this.renderTempoSelect()}
             </div>
         );
@@ -108,8 +109,8 @@ class ChartViewer extends Component {
      * KEY SIGNATURE SELECT
      */
 
-    renderKeySignatureSelect = () => {
-        let { keySignature } = this.props.song.chart;
+    renderKeyContextSelect = () => {
+        let { keyContext } = this.props.chart;
         let options = MusicHelper.NOTE_NAMES.map(
             key => (
                 <option key={key} value={key} >
@@ -125,7 +126,7 @@ class ChartViewer extends Component {
                 </div>
                 <select 
                     className="left-hand-settings-right" 
-                    value={keySignature}
+                    value={keyContext}
                     onChange={event => this.props.recontextualize(event.target.value)}
                 >
                     {options}
@@ -140,7 +141,7 @@ class ChartViewer extends Component {
      */
 
     renderTempoSelect = () => {
-        let { tempo } = this.props.song.chart;
+        let { tempo } = this.props.chart;
         let bpms = tempo[0];
         let options = [];
         for (

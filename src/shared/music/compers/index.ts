@@ -4,7 +4,7 @@ import compBassSwingFeelV0 from "./swing/bass/compBassSwingFeelV0";
 import compDrumsSwingFeelV0 from "./swing/drums/compDrumsSwingFeelV0";
 import { IChart, IMusicBar, Feel } from "../../types";
 
-export const comp = (chart: IChart, feel: Feel, ignoreRange = false): IMusicBar[] => {
+export const comp = (chart: IChart, ignoreRange = false): IMusicBar[] => {
     let chartSection = Util.copyObject(chart);
 
     if (!ignoreRange) {
@@ -14,7 +14,7 @@ export const comp = (chart: IChart, feel: Feel, ignoreRange = false): IMusicBar[
         );
     }
 
-    switch(feel) {
+    switch(chart.feel) {
         case Feel.Swing:
             return compSwingFeel(chartSection);
 

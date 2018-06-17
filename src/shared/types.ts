@@ -1,8 +1,8 @@
 export interface IChart {
-    barsBase?: any;
     barsV1: any;
     tempo: number[];
     keyContext: string;
+    feel: Feel;
     rangeStartIndex: number;
     rangeEndIndex: number;
 }

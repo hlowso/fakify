@@ -54,340 +54,339 @@ export const getSongAsync = songId => {
         resolve({
             id: songId,
             title: "C Blues",
-            originalKeySignature: "C",
+            originalKeyContext: "C",
             originalTempo: [120, 4],
-            chart: {
-                barsBase: [
-                    {
-                        barIndex: 1,
-                        timeSignature: [8, 8],
-                        chordEnvelopes: [
-                            {
-                                beat: '1',
-                                chord: "1^7",
-                                beatsBeforeChange: 8,
-                                durationInBeats: 8,
-                                key: "4"
-                            }
-                        ]
-                    },
-                    {
-                        barIndex: 2,
-                        timeSignature: [8, 8],
-                        chordEnvelopes: [
-                            {
-                                beat: '1',
-                                chord: "4^7",
-                                beatsBeforeChange: 8,
-                                durationInBeats: 8,
-                                key: "J"
-                            }
-                        ]
-                    },
-                    {
-                        barIndex: 3,
-                        timeSignature: [8, 8],
-                        chordEnvelopes: [
-                            {
-                                beat: '1',
-                                chord: "1^7",
-                                beatsBeforeChange: 16,
-                                durationInBeats: 8,
-                                key: "4"
-                            }
-                        ]
-                    },
-                    {
-                        barIndex: 4,
-                        timeSignature: [8, 8],
-                        chordEnvelopes: [
-                            {
-                                beat: '1',
-                                chord: "1^7",
-                                beatsBeforeChange: 8,
-                                durationInBeats: 8,
-                                key: "4"
-                            }
-                        ]
-                    },
-                    {
-                        barIndex: 5,
-                        timeSignature: [8, 8],
-                        chordEnvelopes: [
-                            {
-                                beat: '1',
-                                chord: "4^7",
-                                beatsBeforeChange: 16,
-                                durationInBeats: 8,
-                                key: "J"
-                            }
-                        ]
-                    },
-                    {
-                        barIndex: 6,
-                        timeSignature: [8, 8],
-                        chordEnvelopes: [
-                            {
-                                beat: '1',
-                                chord: "4^7",
-                                beatsBeforeChange: 8,
-                                durationInBeats: 8,
-                                key: "J"
-                            }
-                        ]
-                    }, 
-                    {
-                        barIndex: 7,
-                        timeSignature: [8, 8],
-                        chordEnvelopes: [
-                            {
-                                beat: '1',
-                                chord: "1^7",
-                                beatsBeforeChange: 16,
-                                durationInBeats: 8,
-                                key: "4"
-                            }
-                        ]
-                    },
-                    {
-                        barIndex: 8,
-                        timeSignature: [8, 8],
-                        chordEnvelopes: [
-                            {
-                                beat: '1',
-                                chord: "1^7",
-                                beatsBeforeChange: 8,
-                                durationInBeats: 8,
-                                key: "4"
-                            }
-                        ]
-                    },
-                    {
-                        barIndex: 9,
-                        timeSignature: [8, 8],
-                        chordEnvelopes: [
-                            {
-                                beat: '1',
-                                chord: "5^7",
-                                beatsBeforeChange: 8,
-                                durationInBeats: 8,
-                                key: "1"
-                            }
-                        ]
-                    },
-                    {
-                        barIndex: 10,
-                        timeSignature: [8, 8],
-                        chordEnvelopes: [
-                            {
-                                beat: '1',
-                                chord: "4^7",
-                                beatsBeforeChange: 8,
-                                durationInBeats: 8,
-                                key: "J"
-                            }
-                        ]
-                    },
-                    {
-                        barIndex: 11,
-                        timeSignature: [8, 8],
-                        chordEnvelopes: [
-                            {
-                                beat: '1',
-                                chord: "1^7",
-                                beatsBeforeChange: 8,
-                                durationInBeats: 8,
-                                key: "4"
-                            }
-                        ]
-                    },
-                    {
-                        barIndex: 12,
-                        timeSignature: [8, 8],
-                        chordEnvelopes: [
-                            {
-                                beat: '1',
-                                chord: "2^-7",
-                                beatsBeforeChange: 4,
-                                durationInBeats: 4,
-                                key: "1"
-                            },
-                            {
-                                beat: '5',
-                                chord: "5^7",
-                                beatsBeforeChange: 4,
-                                durationInBeats: 4,
-                                key: "1"
-                            }
-                        ]
-                    }
-                ]
-                // barsV1: [
-                //     {
-                //         barIndex: 1,
-                //         timeSignature: [4, 4],
-                //         chordEnvelopes: [
-                //             {
-                //                 beat: '1',
-                //                 chord: "1^7",
-                //                 beatsBeforeChange: 4,
-                //                 durationInBeats: 4,
-                //                 key: "1^7"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         barIndex: 2,
-                //         timeSignature: [4, 4],
-                //         chordEnvelopes: [
-                //             {
-                //                 beat: '1',
-                //                 chord: "4^7",
-                //                 beatsBeforeChange: 4,
-                //                 durationInBeats: 4,
-                //                 key: "4^7"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         barIndex: 3,
-                //         timeSignature: [4, 4],
-                //         chordEnvelopes: [
-                //             {
-                //                 beat: '1',
-                //                 chord: "1^7",
-                //                 beatsBeforeChange: 8,
-                //                 durationInBeats: 4,
-                //                 key: "1^7"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         barIndex: 4,
-                //         timeSignature: [4, 4],
-                //         chordEnvelopes: [
-                //             {
-                //                 beat: '1',
-                //                 chord: "1^7",
-                //                 beatsBeforeChange: 4,
-                //                 durationInBeats: 4,
-                //                 key: "1^7"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         barIndex: 5,
-                //         timeSignature: [4, 4],
-                //         chordEnvelopes: [
-                //             {
-                //                 beat: '1',
-                //                 chord: "4^7",
-                //                 beatsBeforeChange: 8,
-                //                 durationInBeats: 4,
-                //                 key: "4^7"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         barIndex: 6,
-                //         timeSignature: [4, 4],
-                //         chordEnvelopes: [
-                //             {
-                //                 beat: '1',
-                //                 chord: "4^7",
-                //                 beatsBeforeChange: 4,
-                //                 durationInBeats: 4,
-                //                 key: "4^7"
-                //             }
-                //         ]
-                //     }, 
-                //     {
-                //         barIndex: 7,
-                //         timeSignature: [4, 4],
-                //         chordEnvelopes: [
-                //             {
-                //                 beat: '1',
-                //                 chord: "1^7",
-                //                 beatsBeforeChange: 8,
-                //                 durationInBeats: 4,
-                //                 key: "1^7"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         barIndex: 8,
-                //         timeSignature: [4, 4],
-                //         chordEnvelopes: [
-                //             {
-                //                 beat: '1',
-                //                 chord: "1^7",
-                //                 beatsBeforeChange: 4,
-                //                 durationInBeats: 4,
-                //                 key: "1^7"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         barIndex: 9,
-                //         timeSignature: [4, 4],
-                //         chordEnvelopes: [
-                //             {
-                //                 beat: '1',
-                //                 chord: "5^7",
-                //                 beatsBeforeChange: 4,
-                //                 durationInBeats: 4,
-                //                 key: "5^7"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         barIndex: 10,
-                //         timeSignature: [4, 4],
-                //         chordEnvelopes: [
-                //             {
-                //                 beat: '1',
-                //                 chord: "4^7",
-                //                 beatsBeforeChange: 4,
-                //                 durationInBeats: 4,
-                //                 key: "4^7"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         barIndex: 11,
-                //         timeSignature: [4, 4],
-                //         chordEnvelopes: [
-                //             {
-                //                 beat: '1',
-                //                 chord: "1^7",
-                //                 beatsBeforeChange: 4,
-                //                 durationInBeats: 4,
-                //                 key: "1^7"
-                //             }
-                //         ]
-                //     },
-                //     {
-                //         barIndex: 12,
-                //         timeSignature: [4, 4],
-                //         chordEnvelopes: [
-                //             {
-                //                 beat: '1',
-                //                 chord: "2^-7",
-                //                 beatsBeforeChange: 2,
-                //                 durationInBeats: 2,
-                //                 key: "1"
-                //             },
-                //             {
-                //                 beat: '3',
-                //                 chord: "5^7",
-                //                 beatsBeforeChange: 2,
-                //                 durationInBeats: 2,
-                //                 key: "1"
-                //             }
-                //         ]
-                //     }
-                // ]
-            }
+            suitableFeels: ["swing"],
+            barsBase: [
+                {
+                    // barIndex: 1,
+                    timeSignature: [8, 8],
+                    chordEnvelopes: [
+                        {
+                            beat: '1',
+                            chord: "1^7",
+                            beatsBeforeChange: 8,
+                            durationInBeats: 8,
+                            key: "4"
+                        }
+                    ]
+                },
+                {
+                    // barIndex: 2,
+                    timeSignature: [8, 8],
+                    chordEnvelopes: [
+                        {
+                            beat: '1',
+                            chord: "4^7",
+                            beatsBeforeChange: 8,
+                            durationInBeats: 8,
+                            key: "J"
+                        }
+                    ]
+                },
+                {
+                    // barIndex: 3,
+                    timeSignature: [8, 8],
+                    chordEnvelopes: [
+                        {
+                            beat: '1',
+                            chord: "1^7",
+                            beatsBeforeChange: 16,
+                            durationInBeats: 8,
+                            key: "4"
+                        }
+                    ]
+                },
+                {
+                    // barIndex: 4,
+                    timeSignature: [8, 8],
+                    chordEnvelopes: [
+                        {
+                            beat: '1',
+                            chord: "1^7",
+                            beatsBeforeChange: 8,
+                            durationInBeats: 8,
+                            key: "4"
+                        }
+                    ]
+                },
+                {
+                    // barIndex: 5,
+                    timeSignature: [8, 8],
+                    chordEnvelopes: [
+                        {
+                            beat: '1',
+                            chord: "4^7",
+                            beatsBeforeChange: 16,
+                            durationInBeats: 8,
+                            key: "J"
+                        }
+                    ]
+                },
+                {
+                    // barIndex: 6,
+                    timeSignature: [8, 8],
+                    chordEnvelopes: [
+                        {
+                            beat: '1',
+                            chord: "4^7",
+                            beatsBeforeChange: 8,
+                            durationInBeats: 8,
+                            key: "J"
+                        }
+                    ]
+                }, 
+                {
+                    // barIndex: 7,
+                    timeSignature: [8, 8],
+                    chordEnvelopes: [
+                        {
+                            beat: '1',
+                            chord: "1^7",
+                            beatsBeforeChange: 16,
+                            durationInBeats: 8,
+                            key: "4"
+                        }
+                    ]
+                },
+                {
+                    // barIndex: 8,
+                    timeSignature: [8, 8],
+                    chordEnvelopes: [
+                        {
+                            beat: '1',
+                            chord: "1^7",
+                            beatsBeforeChange: 8,
+                            durationInBeats: 8,
+                            key: "4"
+                        }
+                    ]
+                },
+                {
+                    // barIndex: 9,
+                    timeSignature: [8, 8],
+                    chordEnvelopes: [
+                        {
+                            beat: '1',
+                            chord: "5^7",
+                            beatsBeforeChange: 8,
+                            durationInBeats: 8,
+                            key: "1"
+                        }
+                    ]
+                },
+                {
+                    // barIndex: 10,
+                    timeSignature: [8, 8],
+                    chordEnvelopes: [
+                        {
+                            beat: '1',
+                            chord: "4^7",
+                            beatsBeforeChange: 8,
+                            durationInBeats: 8,
+                            key: "J"
+                        }
+                    ]
+                },
+                {
+                    // barIndex: 11,
+                    timeSignature: [8, 8],
+                    chordEnvelopes: [
+                        {
+                            beat: '1',
+                            chord: "1^7",
+                            beatsBeforeChange: 8,
+                            durationInBeats: 8,
+                            key: "4"
+                        }
+                    ]
+                },
+                {
+                    // barIndex: 12,
+                    timeSignature: [8, 8],
+                    chordEnvelopes: [
+                        {
+                            beat: '1',
+                            chord: "2^-7",
+                            beatsBeforeChange: 4,
+                            durationInBeats: 4,
+                            key: "1"
+                        },
+                        {
+                            beat: '5',
+                            chord: "5^7",
+                            beatsBeforeChange: 4,
+                            durationInBeats: 4,
+                            key: "1"
+                        }
+                    ]
+                }
+            ]
+            // barsV1: [
+            //     {
+            //         barIndex: 1,
+            //         timeSignature: [4, 4],
+            //         chordEnvelopes: [
+            //             {
+            //                 beat: '1',
+            //                 chord: "1^7",
+            //                 beatsBeforeChange: 4,
+            //                 durationInBeats: 4,
+            //                 key: "1^7"
+            //             }
+            //         ]
+            //     },
+            //     {
+            //         barIndex: 2,
+            //         timeSignature: [4, 4],
+            //         chordEnvelopes: [
+            //             {
+            //                 beat: '1',
+            //                 chord: "4^7",
+            //                 beatsBeforeChange: 4,
+            //                 durationInBeats: 4,
+            //                 key: "4^7"
+            //             }
+            //         ]
+            //     },
+            //     {
+            //         barIndex: 3,
+            //         timeSignature: [4, 4],
+            //         chordEnvelopes: [
+            //             {
+            //                 beat: '1',
+            //                 chord: "1^7",
+            //                 beatsBeforeChange: 8,
+            //                 durationInBeats: 4,
+            //                 key: "1^7"
+            //             }
+            //         ]
+            //     },
+            //     {
+            //         barIndex: 4,
+            //         timeSignature: [4, 4],
+            //         chordEnvelopes: [
+            //             {
+            //                 beat: '1',
+            //                 chord: "1^7",
+            //                 beatsBeforeChange: 4,
+            //                 durationInBeats: 4,
+            //                 key: "1^7"
+            //             }
+            //         ]
+            //     },
+            //     {
+            //         barIndex: 5,
+            //         timeSignature: [4, 4],
+            //         chordEnvelopes: [
+            //             {
+            //                 beat: '1',
+            //                 chord: "4^7",
+            //                 beatsBeforeChange: 8,
+            //                 durationInBeats: 4,
+            //                 key: "4^7"
+            //             }
+            //         ]
+            //     },
+            //     {
+            //         barIndex: 6,
+            //         timeSignature: [4, 4],
+            //         chordEnvelopes: [
+            //             {
+            //                 beat: '1',
+            //                 chord: "4^7",
+            //                 beatsBeforeChange: 4,
+            //                 durationInBeats: 4,
+            //                 key: "4^7"
+            //             }
+            //         ]
+            //     }, 
+            //     {
+            //         barIndex: 7,
+            //         timeSignature: [4, 4],
+            //         chordEnvelopes: [
+            //             {
+            //                 beat: '1',
+            //                 chord: "1^7",
+            //                 beatsBeforeChange: 8,
+            //                 durationInBeats: 4,
+            //                 key: "1^7"
+            //             }
+            //         ]
+            //     },
+            //     {
+            //         barIndex: 8,
+            //         timeSignature: [4, 4],
+            //         chordEnvelopes: [
+            //             {
+            //                 beat: '1',
+            //                 chord: "1^7",
+            //                 beatsBeforeChange: 4,
+            //                 durationInBeats: 4,
+            //                 key: "1^7"
+            //             }
+            //         ]
+            //     },
+            //     {
+            //         barIndex: 9,
+            //         timeSignature: [4, 4],
+            //         chordEnvelopes: [
+            //             {
+            //                 beat: '1',
+            //                 chord: "5^7",
+            //                 beatsBeforeChange: 4,
+            //                 durationInBeats: 4,
+            //                 key: "5^7"
+            //             }
+            //         ]
+            //     },
+            //     {
+            //         barIndex: 10,
+            //         timeSignature: [4, 4],
+            //         chordEnvelopes: [
+            //             {
+            //                 beat: '1',
+            //                 chord: "4^7",
+            //                 beatsBeforeChange: 4,
+            //                 durationInBeats: 4,
+            //                 key: "4^7"
+            //             }
+            //         ]
+            //     },
+            //     {
+            //         barIndex: 11,
+            //         timeSignature: [4, 4],
+            //         chordEnvelopes: [
+            //             {
+            //                 beat: '1',
+            //                 chord: "1^7",
+            //                 beatsBeforeChange: 4,
+            //                 durationInBeats: 4,
+            //                 key: "1^7"
+            //             }
+            //         ]
+            //     },
+            //     {
+            //         barIndex: 12,
+            //         timeSignature: [4, 4],
+            //         chordEnvelopes: [
+            //             {
+            //                 beat: '1',
+            //                 chord: "2^-7",
+            //                 beatsBeforeChange: 2,
+            //                 durationInBeats: 2,
+            //                 key: "1"
+            //             },
+            //             {
+            //                 beat: '3',
+            //                 chord: "5^7",
+            //                 beatsBeforeChange: 2,
+            //                 durationInBeats: 2,
+            //                 key: "1"
+            //             }
+            //         ]
+            //     }
+            // ]
         });
     });
 }
