@@ -11,6 +11,11 @@ import * as Util from "../../shared/Util";
 import soundfonts from "../../shared/music/soundfontsIndex";
 
 class AppRouter extends Component {
+    WAIT_TIME_FRACTION = 9 / 10;
+    WAIT_TIME_FACTOR = 1000 * this.WAIT_TIME_FRACTION;
+    TIME_CHECKER_RATE = 5;
+    PREP_TIME = 0.02;
+
     constructor(props) {
         super(props);
 
@@ -32,11 +37,6 @@ class AppRouter extends Component {
             onUserSessionKeyStroke: (keyStrokeRecord) => {},
             userSessionRecord: []
         };
-
-        this.WAIT_TIME_FRACTION = 4 / 5;
-        this.WAIT_TIME_FACTOR = 1000 * this.WAIT_TIME_FRACTION;
-        this.SHORTENED_WAIT_TIME_FACTOR = 1 / this.WAIT_TIME_FRACTION;
-        this.TIME_CHECKER_RATE = 5;
     }
 
     componentWillMount() {
@@ -343,10 +343,11 @@ class AppRouter extends Component {
         );
         let prevQueueTime = audioContext.currentTime;
 
-        let loopedQueue = shortenedWaitTime => {
+        let loopedQueue = (shortenedWaitTime, fullWaitTime) => {
             setTimeout(() => {
-                let queueTime = prevQueueTime + (shortenedWaitTime * this.SHORTENED_WAIT_TIME_FACTOR) / 1000;
-                let getUpdate = () => audioContext.currentTime > queueTime;
+                let queueTime = prevQueueTime + fullWaitTime;
+                let queueTimeMinusPrepTime = queueTime - this.PREP_TIME;
+                let getUpdate = () => audioContext.currentTime > queueTimeMinusPrepTime;
 
                 Util.waitFor(getUpdate, this.TIME_CHECKER_RATE).then(() => {
                     this.setState({ currentSessionPassage: segments.next().value },
@@ -365,9 +366,9 @@ class AppRouter extends Component {
                         ) {
                             this.queueParts(parts, subbeatOffsetToQueueTime, subbeatDuration);
                             onQueue(musicIndex);
-
+                            
                             prevQueueTime = audioContext.currentTime;
-                            loopedQueue(duration * this.WAIT_TIME_FACTOR);
+                            loopedQueue(duration * this.WAIT_TIME_FACTOR, duration);
                         }
                     });
                 });
@@ -377,12 +378,11 @@ class AppRouter extends Component {
         this.setState({ 
             sessionId, 
             userSessionRecord: [] 
-        }, () => loopedQueue(0));
+        }, () => loopedQueue(0, 0));
     }
 
     queueParts = (parts, subbeatOffsetToQueueTime, timeFactor) => {
         let { player, audioContext } = this.state;
-        let { currentTime } = audioContext;
 
         Object.keys(parts).forEach(instrument => {
             let part = parts[instrument];
