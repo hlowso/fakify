@@ -32,6 +32,7 @@ class AppRouter extends Component {
             userPlayer: null,
             userInstrument: "piano",
             sessionId: null,
+            sessionChart: {},
             currentSessionPassage: {},
             userEnvelopes: {},
             onUserSessionKeyStroke: (keyStrokeRecord) => {},
@@ -248,7 +249,7 @@ class AppRouter extends Component {
         // the notes the user plays in the userSessionRecord
         // state array
         if (sessionId) {
-            let { musicIndex, subbeatDuration, subbeatOffsetToQueueTime } = currentSessionPassage;
+            let { chartIndex, subbeatDuration, subbeatOffsetToQueueTime } = currentSessionPassage;
             let [closestSubbeatOffset, closestSubbeatOffsetTime] = Util.arrayBinarySearch(subbeatOffsetToQueueTime, time);
             let precision = (time - closestSubbeatOffsetTime) / subbeatDuration;
             
@@ -263,8 +264,8 @@ class AppRouter extends Component {
             let keyStrokeRecord = {
                 note,
                 velocity,
-                musicIndex: { 
-                    ...musicIndex, 
+                chartIndex: { 
+                    ...chartIndex, 
                     subbeatOffset: closestSubbeatOffset
                 },
                 precision
@@ -279,7 +280,7 @@ class AppRouter extends Component {
         }
     }
 
-    _createQueueableSegmentsGenerator = function* (sessionId, tempo, musicGenerator) {
+    _createQueueableSegmentsGenerator = function* (sessionId, tempo, resetMusic) {
         let musicBars;
         let musicIndex = -1;
         let chordPassageIndex = Infinity;
@@ -296,13 +297,13 @@ class AppRouter extends Component {
                 chordPassageIndex = 0;
                 musicIndex ++;
                 if (musicIndex === 0) {
-                    musicBars = musicGenerator();
+                    resetMusic();
                 }
                 musicIndex %= musicBars.length;
             }
 
             // Calculate the time factor
-            let { durationInSubbeats, timeSignature, chordPassages } = musicBars[musicIndex]; 
+            let { chartBarIndex, durationInSubbeats, timeSignature, chordPassages } = musicBars[musicIndex]; 
             let subbeatDuration = 60 / ( durationInSubbeats * (tempo[0] / ( timeSignature[0] * ( tempo[1] / timeSignature[1] ))));
 
             let chordPassage = chordPassages[chordPassageIndex];
@@ -323,8 +324,8 @@ class AppRouter extends Component {
                 duration: chordPassage.durationInSubbeats * subbeatDuration,
                 subbeatDuration, 
                 subbeatOffsetToQueueTime,
-                musicIndex: {
-                    barIdx: musicIndex,
+                chartIndex: {
+                    barIdx: chartBarIndex,
                     chordIdx: chordPassageIndex
                 }, 
                 parts: chordPassage.parts
@@ -339,7 +340,9 @@ class AppRouter extends Component {
         let segments = this._createQueueableSegmentsGenerator(
             sessionId, 
             chart.tempo, 
-            () => MusicHelper.comp(chart)
+            () => { 
+                this.setState({ sessionMusic: MusicHelper.comp(chart) }) 
+            }
         );
         let prevQueueTime = audioContext.currentTime;
 

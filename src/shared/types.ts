@@ -2,12 +2,22 @@
 
 // }
 
-// export interface IChartBar {
+export interface IChartBar {
+    timeSignature: number[];
+    chordEnvelopes: IChartChord[];
+}
 
-// }
+export interface IChartChord {
+    beat: string;
+    chord: string;
+    beatsBeforeChange: number;
+    durationInBeats: number;
+    durationInSubbeats?: number;
+    key: string;
+}
 
 export interface IUserStrokeRecord {
-    musicIndex: IMusicIdx;
+    chartIndex: IMusicIdx;
     precision: number;
     note: number;
     velocity: number;
@@ -34,6 +44,7 @@ export enum Feel {
 }
 
 export interface IMusicBar {
+    chartBarIndex?: number;
     timeSignature: number[];
     durationInSubbeats: number;
     chordPassages: IChordPassage[];
@@ -58,7 +69,7 @@ export interface ISessionPassage {
     duration: number;
     subbeatDuration: number;
     subbeatOffsetToQueueTime: number[];
-    musicIndex: IMusicIdx;
+    chartIndex: IMusicIdx;
     parts: {
         [instrument: string]: IStroke[];
     }

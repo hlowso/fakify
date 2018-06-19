@@ -11,8 +11,8 @@ const convertChordNameToNotes = chord => {
     ];
 };
 
-export const compPianoSwingFeelV0 = chart => {
-    return chart.barsV1.map(bar => {
+export const compPianoSwingFeelV0 = bars => {
+    return bars.map(bar => {
 
         let strokes = bar.chordEnvelopes.map(chordEnvelope => {
             return [

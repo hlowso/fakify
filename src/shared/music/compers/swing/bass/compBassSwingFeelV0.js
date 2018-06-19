@@ -14,9 +14,9 @@ const getFifth = chord => {
     return [43 + index];
 }
 
-export const compBassSwingFeelV0 = chart => {
+export const compBassSwingFeelV0 = bars => {
 
-    return chart.barsV1.map(bar => {
+    return bars.map(bar => {
 
         let chordPhrases = bar.chordEnvelopes.map(chordEnvelope => {
             let fullBeatsCouplets = chordEnvelope.durationInSubbeats / 6;

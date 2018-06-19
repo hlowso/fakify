@@ -1,8 +1,8 @@
 import soundfonts from "../../../soundfontsIndex";
 
-export const compDrumsSwingFeelV0 = chart => {
+export const compDrumsSwingFeelV0 = bars => {
 
-    return chart.barsV1.map(bar => {
+    return bars.map(bar => {
 
         let phrases = [];
 

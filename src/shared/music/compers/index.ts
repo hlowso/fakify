@@ -2,47 +2,79 @@ import * as Util from "../../Util";
 import compPianoSwingFeelV0 from "./swing/piano/compPianoSwingFeelV0";
 import compBassSwingFeelV0 from "./swing/bass/compBassSwingFeelV0";
 import compDrumsSwingFeelV0 from "./swing/drums/compDrumsSwingFeelV0";
-import { IChart, IMusicBar, Feel } from "../../types";
+import { IChart, IMusicBar, Feel, IChartBar, IChartChord } from "../../types";
 
 export const comp = (chart: IChart, ignoreRange = false): IMusicBar[] => {
-    let chartSection = Util.copyObject(chart);
+    let { barsV1, rangeStartIndex, rangeEndIndex } = chart;
+    let pianoAccompaniment: any; 
+    let bassAccompaniment: any;
+    let drumsAccompaniment: any;
+    let timeAdjustedBars: any;
+    let timeBarsAdjuster: any;
+    let getAccompaniment: any;
 
-    if (!ignoreRange) {
-        let { barsV1, rangeStartIndex, rangeEndIndex } = chart;
-        chartSection.barsV1 = barsV1.filter(
-            (bar: any, i: number) => rangeStartIndex <= i && i <= rangeEndIndex
-        );
-    }
+    let barsInRange = (
+        ignoreRange 
+            ? barsV1
+            : barsV1.filter(
+                (bar: IChartBar, i: number) => rangeStartIndex <= i && i <= rangeEndIndex
+            )
+    );
 
     switch(chart.feel) {
         case Feel.Swing:
-            return compSwingFeel(chartSection);
-
-        default:
-            return [];
+            timeBarsAdjuster = adjustBarsSwingFeel;
+            getAccompaniment = getSwingFeelAccompaniment;
+            break;        
     }
+
+    timeAdjustedBars = timeBarsAdjuster(barsInRange);
+    [
+        pianoAccompaniment, 
+        bassAccompaniment, 
+        drumsAccompaniment
+    ] = getAccompaniment(timeAdjustedBars);
+
+    return timeAdjustedBars.map((chartBar: IChartBar, i: number) => { 
+
+        let pianoBarPassages = pianoAccompaniment[i];
+        let bassBarPassages = bassAccompaniment[i];
+        let drumsBarPassages = drumsAccompaniment[i];
+
+        return {
+            chartBarIndex: ignoreRange ? i : i + rangeStartIndex,
+            timeSignature: chartBar.timeSignature,
+            durationInSubbeats: 3 * chartBar.timeSignature[0],
+            chordPassages: pianoBarPassages.map((pianoPhrase: any, j: number) => ({
+                durationInSubbeats: chartBar.chordEnvelopes[j].durationInSubbeats,
+                parts: {
+                    "piano": pianoPhrase,
+                    "doubleBass": bassBarPassages[j],
+                    ...drumsBarPassages[j]  
+                } 
+            }))
+        };
+    });
 };
 
-const compSwingFeel = (chartSection: IChart): IMusicBar[] => {
-
-    // Adjust chart attributes, etc. that have to do with time so that
-    // the every quarter note is divided into 3 subbeats. This makes
-    // it easier for the instrument-specific comp functions to write their
-    // parts. 
-    let timeAdjustedChart = Util.copyObject(chartSection);
-    
-    for (let bar of timeAdjustedChart.barsV1) {
+// Adjust chart attributes, etc. that have to do with time so that
+// the every quarter note is divided into 3 subbeats. This makes
+// it easier for the instrument-specific comp functions to write their
+// parts. 
+const adjustBarsSwingFeel = (bars: IChartBar[]): IChartBar[] => {
+    return bars.map((bar: IChartBar) => {
         let { timeSignature, chordEnvelopes } = bar;
         let conversionFactor: number, 
+            updatedTimeSignature = Util.copyObject(timeSignature),
             beatConverter: (beat: string) => string;
 
         if (timeSignature[1] === 8) {
             if (timeSignature[0] % 2 === 1) {
-                return [];
+                throw new Error("PRECOMP: cannot convert to swing feel");
             }
 
-            timeSignature[0] /= 2;
-            timeSignature[1] = 4;
+            updatedTimeSignature[0] /= 2;
+            updatedTimeSignature[1] = 4;
             conversionFactor = 3 / 2;
             beatConverter = beat => Number(beat) % 2 
                                         ? `${(Number(beat) - 1) / 2 + 1}`
@@ -51,37 +83,27 @@ const compSwingFeel = (chartSection: IChart): IMusicBar[] => {
             conversionFactor = 3;
             beatConverter = beat => beat;
         } else {
-            return [];
+            throw new Error("PRECOMP: cannot convert to swing feel");
         }
 
-        chordEnvelopes.forEach((chordEnvelope: any) => {
-            chordEnvelope.beat = beatConverter(chordEnvelope.beat);
-            chordEnvelope.subbeatsBeforeChange = chordEnvelope.beatsBeforeChange * conversionFactor;
-            chordEnvelope.durationInSubbeats = chordEnvelope.durationInBeats * conversionFactor;
-        });
-    }
-
-    let bassTake = compBassSwingFeelV0(timeAdjustedChart);
-    let drumsTake = compDrumsSwingFeelV0(timeAdjustedChart);
-
-    return compPianoSwingFeelV0(timeAdjustedChart).map((pianoBarPhrases: any, i: number) => { 
-
-        let bassBarPhrases = bassTake[i];
-        let drumsBarPhrases = drumsTake[i];
-        let chartBar = timeAdjustedChart.barsV1[i];
-
         return {
-            timeSignature: chartBar.timeSignature,
-            durationInSubbeats: 12,
-            chordPassages: pianoBarPhrases.map((pianoPhrase: any, j: number) => ({
-                durationInSubbeats: chartBar.chordEnvelopes[j].durationInSubbeats,
-                parts: {
-                    "piano": pianoPhrase,
-                    "doubleBass": bassBarPhrases[j],
-                    ...drumsBarPhrases[j]  
-                } 
-            }))
+            timeSignature: updatedTimeSignature,
+            chordEnvelopes: chordEnvelopes.map((chordEnvelope: IChartChord) => {
+                let updatedChordEnvelope = Util.copyObject(chordEnvelope);
+                updatedChordEnvelope.beat = beatConverter(chordEnvelope.beat);
+                updatedChordEnvelope.subbeatsBeforeChange = chordEnvelope.beatsBeforeChange * conversionFactor;
+                updatedChordEnvelope.durationInSubbeats = chordEnvelope.durationInBeats * conversionFactor;
+                return updatedChordEnvelope;
+            })
         };
     });
+}
+
+const getSwingFeelAccompaniment = (bars: IChartBar[]): any => {
+    return [
+        compPianoSwingFeelV0(bars),
+        compBassSwingFeelV0(bars),
+        compDrumsSwingFeelV0(bars)
+    ];
 };
 
