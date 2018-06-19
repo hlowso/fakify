@@ -6,7 +6,8 @@
     "prefer-const": false,
     "one-variable-per-declaration": false,
     "object-literal-sort-keys": false,
-    "jsx-no-lambda": false
+    "jsx-no-lambda": false,
+    "variable-name": false
   },
   "linterOptions": {
     "exclude": [
