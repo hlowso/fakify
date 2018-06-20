@@ -7,6 +7,7 @@ import PlayViewController from "../ViewControllers/PlayViewController/PlayViewCo
 
 import * as StorageHelper from "../../shared/StorageHelper";
 import * as MusicHelper from "../../shared/music/MusicHelper";
+import SessionManager from "../../shared/music/SessionManager";
 import * as Util from "../../shared/Util";
 import soundfonts from "../../shared/music/soundfontsIndex";
 
@@ -32,8 +33,7 @@ class AppRouter extends Component {
             userPlayer: null,
             userInstrument: "piano",
             sessionId: null,
-            sessionChart: {},
-            currentSessionPassage: {},
+            sessionManager: null,
             userEnvelopes: {},
             onUserSessionKeyStroke: (keyStrokeRecord) => {},
             userSessionRecord: []
@@ -215,11 +215,11 @@ class AppRouter extends Component {
                         1000,
                         volume
                     );
-                    this.onUserKeyStroke(
-                        note,
-                        currentTime,
-                        volume
-                    );
+                    // this.onUserKeyStroke(
+                    //     note,
+                    //     currentTime,
+                    //     volume
+                    // );
                 }
                 else {
                     noteOff(existingEnvelop, userEnvelopesUpdate);
@@ -240,7 +240,7 @@ class AppRouter extends Component {
     onUserKeyStroke = (note, time, velocity) => {
         let { 
             sessionId, 
-            currentSessionPassage,
+            sessionManager,
             userSessionRecord,
             onUserSessionKeyStroke 
         } = this.state;
@@ -249,15 +249,15 @@ class AppRouter extends Component {
         // the notes the user plays in the userSessionRecord
         // state array
         if (sessionId) {
-            let { chartIndex, subbeatDuration, subbeatOffsetToQueueTime } = currentSessionPassage;
+            let { chartIndex, subbeatDuration, subbeatOffsetToQueueTime } = sessionManager.sessionPassage;
             let [closestSubbeatOffset, closestSubbeatOffsetTime] = Util.arrayBinarySearch(subbeatOffsetToQueueTime, time);
             let precision = (time - closestSubbeatOffsetTime) / subbeatDuration;
             
             if (precision < -0.5) {
-                closestSubbeatOffset--;
+                closestSubbeatOffset = sessionManager.peekPreviousSubbeat({...chartIndex, subbeatOffset: closestSubbeatOffset});
                 precision++
             } else if (precision > 0.5) {
-                closestSubbeatOffset ++;
+                closestSubbeatOffset = sessionManager.peekNextSubbeat(...chartIndex, closestSubbeatOffset);
                 precision--;
             }
             
@@ -268,7 +268,8 @@ class AppRouter extends Component {
                     ...chartIndex, 
                     subbeatOffset: closestSubbeatOffset
                 },
-                precision
+                precision,
+                inKey
             }
 
             let userSessionRecordUpdate = Util.copyObject(userSessionRecord);
@@ -280,70 +281,9 @@ class AppRouter extends Component {
         }
     }
 
-    _createQueueableSegmentsGenerator = function* (sessionId, tempo, resetMusic) {
-        let musicBars;
-        let musicIndex = -1;
-        let chordPassageIndex = Infinity;
-    
-        while (true) {   
-            // Increment the chord envelope index by 1.             
-            // If the chord envelope index has reached the end of the segment,
-            // set the chord envelope index to 0 and increment the bar index by 1. 
-            // Whenever the bar index lands on 0, we refresh the take.
-
-            chordPassageIndex += 1;
-            
-            if (musicIndex < 0 || chordPassageIndex >= musicBars[musicIndex].chordPassages.length) {
-                chordPassageIndex = 0;
-                musicIndex ++;
-                if (musicIndex === 0) {
-                    resetMusic();
-                }
-                musicIndex %= musicBars.length;
-            }
-
-            // Calculate the time factor
-            let { chartBarIndex, durationInSubbeats, timeSignature, chordPassages } = musicBars[musicIndex]; 
-            let subbeatDuration = 60 / ( durationInSubbeats * (tempo[0] / ( timeSignature[0] * ( tempo[1] / timeSignature[1] ))));
-
-            let chordPassage = chordPassages[chordPassageIndex];
-            let { currentTime } = this.state.audioContext;
-            let subbeatOffsetToQueueTime = [];
-
-            for (
-                let subbeatOffset = 0; 
-                subbeatOffset < chordPassage.durationInSubbeats; 
-                subbeatOffset++
-            ) {
-                subbeatOffsetToQueueTime.push(currentTime + subbeatDuration * subbeatOffset);
-            }
-
-            // Return the segment
-            yield { 
-                sessionId, 
-                duration: chordPassage.durationInSubbeats * subbeatDuration,
-                subbeatDuration, 
-                subbeatOffsetToQueueTime,
-                chartIndex: {
-                    barIdx: chartBarIndex,
-                    chordIdx: chordPassageIndex
-                }, 
-                parts: chordPassage.parts
-            };
-        }
-    }
-
     playRangeLoop = (chart, onQueue) => {
         let { audioContext, player } = this.state;
-        let sessionId = uuid();
-
-        let segments = this._createQueueableSegmentsGenerator(
-            sessionId, 
-            chart.tempo, 
-            () => { 
-                this.setState({ sessionMusic: MusicHelper.comp(chart) }) 
-            }
-        );
+        let sessionManager = new SessionManager(audioContext, chart);
         let prevQueueTime = audioContext.currentTime;
 
         let loopedQueue = (shortenedWaitTime, fullWaitTime) => {
@@ -353,33 +293,31 @@ class AppRouter extends Component {
                 let getUpdate = () => audioContext.currentTime > queueTimeMinusPrepTime;
 
                 Util.waitFor(getUpdate, this.TIME_CHECKER_RATE).then(() => {
-                    this.setState({ currentSessionPassage: segments.next().value },
-                    () => {
-                        let {
-                            sessionId,
-                            duration,
-                            subbeatDuration,
-                            subbeatOffsetToQueueTime,
-                            musicIndex,
-                            parts
-                        } = this.state.currentSessionPassage;
+                    let {
+                        sessionId,
+                        duration,
+                        subbeatDuration,
+                        subbeatOffsetToQueueTime,
+                        chartIndex,
+                        parts
+                    } = sessionManager.nextSessionPassage();
 
-                        if (this.state.sessionId && 
-                            this.state.sessionId === sessionId
-                        ) {
-                            this.queueParts(parts, subbeatOffsetToQueueTime, subbeatDuration);
-                            onQueue(musicIndex);
-                            
-                            prevQueueTime = audioContext.currentTime;
-                            loopedQueue(duration * this.WAIT_TIME_FACTOR, duration);
-                        }
-                    });
+                    if (this.state.sessionId && 
+                        this.state.sessionId === sessionId
+                    ) {
+                        this.queueParts(parts, subbeatOffsetToQueueTime, subbeatDuration);
+                        onQueue(chartIndex);
+                        
+                        prevQueueTime = audioContext.currentTime;
+                        loopedQueue(duration * this.WAIT_TIME_FACTOR, duration);
+                    }
                 });
             }, shortenedWaitTime);
         };
 
         this.setState({ 
-            sessionId, 
+            sessionId: sessionManager.sessionId,
+            sessionManager, 
             userSessionRecord: [] 
         }, () => loopedQueue(0, 0));
     }

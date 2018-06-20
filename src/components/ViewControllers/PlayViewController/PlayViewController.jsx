@@ -185,14 +185,13 @@ class PlayViewController extends Component {
 
         let onQueue = musicIndex => {
             let { barIdx, chordIdx } = musicIndex;
-            let barIndex = barIdx + rangeStartIndex;
 
             this.setState({ 
                 sessionIndex: {
-                    bar: barIndex,
+                    bar: barIdx,
                     chordEnvelope: chordIdx
                 },
-                currentKey: barsV1[barIndex].chordEnvelopes[chordIdx].key
+                currentKey: barsV1[barIdx].chordEnvelopes[chordIdx].key
             });
         };
 

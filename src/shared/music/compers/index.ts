@@ -5,21 +5,12 @@ import compDrumsSwingFeelV0 from "./swing/drums/compDrumsSwingFeelV0";
 import { IChart, IMusicBar, Feel, IChartBar, IChartChord } from "../../types";
 
 export const comp = (chart: IChart, ignoreRange = false): IMusicBar[] => {
-    let { barsV1, rangeStartIndex, rangeEndIndex } = chart;
     let pianoAccompaniment: any; 
     let bassAccompaniment: any;
     let drumsAccompaniment: any;
     let timeAdjustedBars: any;
     let timeBarsAdjuster: any;
     let getAccompaniment: any;
-
-    let barsInRange = (
-        ignoreRange 
-            ? barsV1
-            : barsV1.filter(
-                (bar: IChartBar, i: number) => rangeStartIndex <= i && i <= rangeEndIndex
-            )
-    );
 
     switch(chart.feel) {
         case Feel.Swing:
@@ -28,7 +19,7 @@ export const comp = (chart: IChart, ignoreRange = false): IMusicBar[] => {
             break;        
     }
 
-    timeAdjustedBars = timeBarsAdjuster(barsInRange);
+    timeAdjustedBars = timeBarsAdjuster(chart.barsV1);
     [
         pianoAccompaniment, 
         bassAccompaniment, 
@@ -42,7 +33,6 @@ export const comp = (chart: IChart, ignoreRange = false): IMusicBar[] => {
         let drumsBarPassages = drumsAccompaniment[i];
 
         return {
-            chartBarIndex: ignoreRange ? i : i + rangeStartIndex,
             timeSignature: chartBar.timeSignature,
             durationInSubbeats: 3 * chartBar.timeSignature[0],
             chordPassages: pianoBarPassages.map((pianoPhrase: any, j: number) => ({

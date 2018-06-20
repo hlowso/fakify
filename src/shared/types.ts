@@ -44,7 +44,7 @@ export enum Feel {
 }
 
 export interface IMusicBar {
-    chartBarIndex: number;
+    chartBarIndex?: number;
     timeSignature: number[];
     durationInSubbeats: number;
     chordPassages: IChordPassage[];
