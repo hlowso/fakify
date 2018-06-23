@@ -61,11 +61,10 @@ export const getSongAsync = songId => {
                 {
                     barIndex: 0,
                     timeSignature: [8, 8],
-                    chordEnvelopes: [
+                    chordSegments: [
                         {
-                            beat: '1',
+                            beatIdx: 0,
                             chord: "1^7",
-                            beatsBeforeChange: 8,
                             durationInBeats: 8,
                             key: "4"
                         }
@@ -74,11 +73,10 @@ export const getSongAsync = songId => {
                 {
                     barIndex: 1,
                     timeSignature: [8, 8],
-                    chordEnvelopes: [
+                    chordSegments: [
                         {
-                            beat: '1',
+                            beatIdx: 0,
                             chord: "4^7",
-                            beatsBeforeChange: 8,
                             durationInBeats: 8,
                             key: "J"
                         }
@@ -87,11 +85,10 @@ export const getSongAsync = songId => {
                 {
                     barIndex: 2,
                     timeSignature: [8, 8],
-                    chordEnvelopes: [
+                    chordSegments: [
                         {
-                            beat: '1',
+                            beatIdx: 0,
                             chord: "1^7",
-                            beatsBeforeChange: 16,
                             durationInBeats: 8,
                             key: "4"
                         }
@@ -100,11 +97,10 @@ export const getSongAsync = songId => {
                 {
                     barIndex: 3,
                     timeSignature: [8, 8],
-                    chordEnvelopes: [
+                    chordSegments: [
                         {
-                            beat: '1',
+                            beatIdx: 0,
                             chord: "1^7",
-                            beatsBeforeChange: 8,
                             durationInBeats: 8,
                             key: "4"
                         }
@@ -113,11 +109,10 @@ export const getSongAsync = songId => {
                 {
                     barIndex: 4,
                     timeSignature: [8, 8],
-                    chordEnvelopes: [
+                    chordSegments: [
                         {
-                            beat: '1',
+                            beatIdx: 0,
                             chord: "4^7",
-                            beatsBeforeChange: 16,
                             durationInBeats: 8,
                             key: "J"
                         }
@@ -126,11 +121,10 @@ export const getSongAsync = songId => {
                 {
                     barIndex: 5,
                     timeSignature: [8, 8],
-                    chordEnvelopes: [
+                    chordSegments: [
                         {
-                            beat: '1',
+                            beatIdx: 0,
                             chord: "4^7",
-                            beatsBeforeChange: 8,
                             durationInBeats: 8,
                             key: "J"
                         }
@@ -139,11 +133,10 @@ export const getSongAsync = songId => {
                 {
                     barIndex: 6,
                     timeSignature: [8, 8],
-                    chordEnvelopes: [
+                    chordSegments: [
                         {
-                            beat: '1',
+                            beatIdx: 0,
                             chord: "1^7",
-                            beatsBeforeChange: 16,
                             durationInBeats: 8,
                             key: "4"
                         }
@@ -152,11 +145,10 @@ export const getSongAsync = songId => {
                 {
                     barIndex: 7,
                     timeSignature: [8, 8],
-                    chordEnvelopes: [
+                    chordSegments: [
                         {
-                            beat: '1',
+                            beatIdx: 0,
                             chord: "1^7",
-                            beatsBeforeChange: 8,
                             durationInBeats: 8,
                             key: "4"
                         }
@@ -165,11 +157,10 @@ export const getSongAsync = songId => {
                 {
                     barIndex: 8,
                     timeSignature: [8, 8],
-                    chordEnvelopes: [
+                    chordSegments: [
                         {
-                            beat: '1',
+                            beatIdx: 0,
                             chord: "5^7",
-                            beatsBeforeChange: 8,
                             durationInBeats: 8,
                             key: "1"
                         }
@@ -178,11 +169,10 @@ export const getSongAsync = songId => {
                 {
                     barIndex: 9,
                     timeSignature: [8, 8],
-                    chordEnvelopes: [
+                    chordSegments: [
                         {
-                            beat: '1',
+                            beatIdx: 0,
                             chord: "4^7",
-                            beatsBeforeChange: 8,
                             durationInBeats: 8,
                             key: "J"
                         }
@@ -191,11 +181,10 @@ export const getSongAsync = songId => {
                 {
                     barIndex: 10,
                     timeSignature: [8, 8],
-                    chordEnvelopes: [
+                    chordSegments: [
                         {
-                            beat: '1',
+                            beatIdx: 0,
                             chord: "1^7",
-                            beatsBeforeChange: 8,
                             durationInBeats: 8,
                             key: "4"
                         }
@@ -204,18 +193,16 @@ export const getSongAsync = songId => {
                 {
                     barIndex: 11,
                     timeSignature: [8, 8],
-                    chordEnvelopes: [
+                    chordSegments: [
                         {
-                            beat: '1',
+                            beatIdx: 0,
                             chord: "2^-7",
-                            beatsBeforeChange: 4,
                             durationInBeats: 4,
                             key: "1"
                         },
                         {
-                            beat: '5',
+                            beatIdx: 4,
                             chord: "5^7",
-                            beatsBeforeChange: 4,
                             durationInBeats: 4,
                             key: "1"
                         }
@@ -226,9 +213,9 @@ export const getSongAsync = songId => {
             //     {
             //         barIndex: 1,
             //         timeSignature: [4, 4],
-            //         chordEnvelopes: [
+            //         chordSegments: [
             //             {
-            //                 beat: '1',
+            //                 beat: 0,
             //                 chord: "1^7",
             //                 beatsBeforeChange: 4,
             //                 durationInBeats: 4,

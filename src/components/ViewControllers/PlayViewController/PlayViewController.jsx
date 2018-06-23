@@ -10,6 +10,7 @@ import MidSettingsModal from "../../views/MidiSettingsModal/MidiSettingsModal";
 import * as Api from "../../../shared/Api";
 import * as Util from "../../../shared/Util";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
+import Chart from "../../../shared/music/Chart";
 
 import "./PlayViewController.css";
 
@@ -23,7 +24,7 @@ class PlayViewController extends Component {
             loadingSelectedSong: false,
             songTitles: {},
             selectedSong: {},
-            sessionChart: {},
+            chart: {},
             sessionIndex: {},
             currentKey: "",
             midiSettingsModalOpen: true,
@@ -61,7 +62,7 @@ class PlayViewController extends Component {
                 if (song) {
                     this.setState({ 
                         selectedSong: song
-                    }, this.resetSessionChart);
+                    }, this.resetChart);
                 }
             });
     }
@@ -71,7 +72,7 @@ class PlayViewController extends Component {
             songTitles, 
             selectedSong, 
             midiSettingsModalOpen, 
-            sessionChart,
+            chart,
             sessionIndex,
             currentKey,
             playMode,
@@ -93,8 +94,8 @@ class PlayViewController extends Component {
                         onSongListItemClick={this.onSongListItemClick} />
                     <ChartViewer
                         song={selectedSong}
-                        chart={sessionChart} 
-                        chartIndex={sessionIndex} 
+                        chart={chart} 
+                        currChartIdx={sessionIndex} 
                         recontextualize={this.recontextualize} 
                         resetTempo={this.resetTempo} 
                         onBarClick={this.onBarClick} />
@@ -138,7 +139,7 @@ class PlayViewController extends Component {
         MUSIC
     ************/
 
-    resetSessionChart = () => {
+    resetChart = () => {
         let { id, barsBase, originalTempo, originalKeyContext, suitableFeels } = this.state.selectedSong;
         let chartSettings = this.StorageHelper.getChartSettings(id);
         let playMode = this.StorageHelper.getPlayMode();
@@ -164,24 +165,22 @@ class PlayViewController extends Component {
             );
         }
 
-        let sessionChart = {
-            barsV1: MusicHelper.contextualizeBars(
-                barsBase,
-                keyContext
-            ),
-            tempo,
-            keyContext,
-            feel,
-            rangeStartIndex,
-            rangeEndIndex 
-        }
-
-        this.setState({ sessionChart });
+        this.setState({ 
+            chart: new Chart(
+                barsBase, 
+                keyContext, 
+                tempo, 
+                feel,
+                this.forceUpdate.bind(this), 
+                rangeStartIndex, 
+                rangeEndIndex
+            ) 
+        });
     }
 
     startSession = () => {
-        let { sessionChart, playMode } = this.state;
-        let { barsV1, rangeStartIndex } = sessionChart;
+        let { chart, playMode } = this.state;
+        let { barsV1, rangeStartIndex } = chart;
 
         let onQueue = musicIndex => {
             let { barIdx, chordIdx } = musicIndex;
@@ -224,7 +223,7 @@ class PlayViewController extends Component {
                 break;
         }
 
-        this.SoundActions.playRangeLoop(sessionChart, onQueue);
+        this.SoundActions.playRangeLoop(chart, onQueue);
     }
 
     stopSession = () => {
@@ -242,58 +241,41 @@ class PlayViewController extends Component {
 
     onBarClick = i => {
         this.stopSession();
-        let { selectedSong, sessionChart } = this.state;
-        let { rangeEndIndex, rangeStartIndex } = sessionChart;
-        let sessionChartUpdate = Util.copyObject(sessionChart);
-        let withinRange = rangeStartIndex <= i && 
-                          i <= rangeEndIndex;
+        let { selectedSong, chart } = this.state;
+        let { rangeEndIdx, rangeStartIdx } = chart;
+        let withinRange = rangeStartIdx <= i && 
+                          i <= rangeEndIdx;
 
-        let rangeStartIndexUpdate = (
+        let rangeStartIdxUpdate = (
             withinRange
                 ? i
-                : i < rangeStartIndex
+                : i < rangeStartIdx
                     ? i
-                    : rangeStartIndex
+                    : rangeStartIdx
         );
-        let rangeEndIndexUpdate = (
+        let rangeEndIdxUpdate = (
             withinRange
                 ? i
-                : rangeEndIndex < i
+                : rangeEndIdx < i
                     ? i
-                    : rangeEndIndex
+                    : rangeEndIdx
         );
 
-        sessionChartUpdate = {
-            ...sessionChart,
-            rangeStartIndex: rangeStartIndexUpdate,
-            rangeEndIndex: rangeEndIndexUpdate
-        };
-
-        this.setState({ 
-            sessionChart: sessionChartUpdate 
-        });
+        chart.rangeStartIdx = rangeStartIdxUpdate;
+        chart.rangeEndIdx = rangeEndIdxUpdate;
 
         this.StorageHelper.updateChartSettings(selectedSong.id, {
-            rangeStartIndex: rangeStartIndexUpdate,
-            rangeEndIndex: rangeEndIndexUpdate
+            rangeStartIdx: rangeStartIdxUpdate,
+            rangeEndIdx: rangeEndIdxUpdate
         });
     }
 
     recontextualize = newKeyContext => {
         this.stopSession();
-        let { selectedSong, sessionChart } = this.state;
-        let sessionChartUpdate = Util.copyObject(sessionChart);
+        let { selectedSong, chart } = this.state;
 
-        sessionChartUpdate.keyContext = newKeyContext;
-        sessionChartUpdate.barsV1 = MusicHelper.contextualizeBars(
-            selectedSong.barsBase,
-            newKeyContext
-        );
+        chart.context = newKeyContext;
         
-        this.setState({ 
-            sessionChart: sessionChartUpdate 
-        });
-
         this.StorageHelper.updateChartSettings(selectedSong.id, {
             keyContext: newKeyContext
         });
@@ -301,14 +283,9 @@ class PlayViewController extends Component {
 
     resetTempo = newTempo => {
         this.stopSession();
-        let { selectedSong, sessionChart } = this.state;
-        let sessionChartUpdate = Util.copyObject(sessionChart);
+        let { selectedSong, chart } = this.state;
 
-        sessionChartUpdate.tempo = newTempo;
-
-        this.setState({ 
-            sessionChart: sessionChartUpdate 
-        });
+        chart.tempo = newTempo;
 
         this.StorageHelper.updateChartSettings(selectedSong.id, {
             tempo: newTempo

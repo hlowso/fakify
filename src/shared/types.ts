@@ -2,18 +2,35 @@
 
 // }
 
-export interface IChartBar {
-    timeSignature: number[];
-    chordEnvelopes: IChartChord[];
+export type Tempo = [number, number];
+export type TimeSignature = [number, number];
+export type NoteName = "C" | "C#|Db" | "D" | "D#|Eb" | "E" | "F" | "F#|Gb" | "G" | "G#|Ab" | "A" | "A#|Bb" | "B|Cb";
+export type RelativeNoteName = "1" | "H" | "2" | "N" | "3" | "4" | "T" | "5" | "U" | "6" | "J" | "7";
+
+export interface IBarBase {
+    timeSignature: TimeSignature;
+    chordSegments: IChordBase[];
 }
 
-export interface IChartChord {
-    beat: string;
+export interface IChordBase {
+    beatIdx: number;
     chord: string;
-    beatsBeforeChange: number;
+    key: RelativeNoteName | NoteName;
     durationInBeats: number;
-    durationInSubbeats?: number;
-    key: string;
+}
+
+export interface IChartBar {
+    timeSignature: TimeSignature;
+    chordSegments: IChordSegment[];
+}
+
+export interface IChordSegment {
+    beatIdx: number;
+    subbeatIdx: number;
+    chord: string;
+    key: NoteName;
+    durationInSubbeats: number;
+    subbeatsBeforeChange: number;
 }
 
 export interface IUserStrokeRecord {
@@ -26,8 +43,7 @@ export interface IUserStrokeRecord {
 
 export interface IMusicIdx {
     barIdx: number;
-    chordIdx: number;
-    subbeatOffset?: number;
+    subbeatIdx: number;
 }
 
 export interface IChart {
@@ -39,7 +55,7 @@ export interface IChart {
     rangeEndIndex: number;
 }
 
-export enum Feel { 
+export enum Feel {
     Swing = "swing"
 }
 
@@ -58,7 +74,7 @@ export interface IChordPassage {
 }
 
 export interface IStroke {
-    subbeatOffset: number;
+    subbeatOffset?: number;
     durationInSubbeats: number;
     notes: number[];
     velocity: number;
@@ -79,3 +95,13 @@ export enum PlayMode {
     Improv = "improv",
     ListenAndRepeat = "listenAndRepeat"
 }
+
+/**
+ * MUSIC V2 SPECIFIC
+ */
+
+ export interface IMusicBarV2 {
+    [subbeat: number]: {
+        [instrument: string]: IStroke;
+    };
+ }

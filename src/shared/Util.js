@@ -1,5 +1,4 @@
 export class CookieManager {
-
     constructor() {
         this._cookies = {}; 
         this._cookieString = "";
@@ -85,3 +84,8 @@ export const arrayBinarySearch = (array, element, difference = (a, b) => a - b, 
     }
     return arrayBinarySearch(array, element, difference, middleIdx, endIdx);
 }
+
+export const mod = (m, n) => {
+    let r = m % n;
+    return r >= 0 ? r : n + r;
+} 

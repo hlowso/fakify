@@ -1,12 +1,12 @@
 import uuid from "uuid";
-import { comp } from "../music/MusicHelper";
+// import { CompV2 } from "../music/MusicHelper";
+import Chart from "../music/Chart";
 import { 
-    IChart, 
     IMusicIdx, 
     IMusicBar, 
     IChordPassage, 
-    IChartBar, 
-    IChartChord, 
+    // IChartBar, 
+    // IChordSegment, 
     ISessionPassage 
 } from "../types";
 
@@ -16,19 +16,20 @@ class SessionManager {
     // STATIC 
     //
 
-    public static getMusicIdx = (barIdx: number, chordIdx: number, subbeatOffset: number): IMusicIdx => ({
-        barIdx, chordIdx, subbeatOffset
+    public static getMusicIdx = (barIdx: number, subbeatIdx: number): IMusicIdx => ({
+        barIdx, subbeatIdx
     });
 
     private _audioContext: any;
+    // private _fontPlayer: any;
     private _sessionId: string;
-    private _chart: IChart;
-    private _take: IMusicBar[];
+    private _chart: Chart;
+    // private _take: IMusicBar[];
 
     private _rangeLength: number;
 
-    private _currentChartBar: IChartBar;
-    private _currentChartChord: IChartChord;
+    // private _currentChartBar: IChartBar;
+    // private _currentChartChord: IChartChord;
     private _currentMusicBar: IMusicBar;
     private _currentPassage: IChordPassage;
 
@@ -36,13 +37,14 @@ class SessionManager {
     private _chordIdx: number;
     private _subbeatIdx: number;
     
-    constructor(audioContext:any, chart: IChart) {
+    constructor(audioContext: any, fontPlayer: any, chart: Chart) {
         this._audioContext = audioContext;
+        // this._fontPlayer = fontPlayer;
         this._sessionId = uuid();
         this._chart = chart;
-        this._rangeLength = chart.rangeEndIndex - chart.rangeStartIndex;
+        this._rangeLength = chart.rangeEndIdx - chart.rangeStartIdx;
 
-        this._barIdx = chart.rangeStartIndex - 1;
+        this._barIdx = chart.rangeStartIdx - 1;
         this._chordIdx = -1;
         this._subbeatIdx = -1;
     }
@@ -66,68 +68,23 @@ class SessionManager {
         this._chordIdx ++;
         this._subbeatIdx = 0;
 
-        this._moveToIdx();        
         return this._getMusicIdx();
     }
 
     public stepByBar = (): IMusicIdx => {
         this._barIdx++;
-        if (this._barIdx > this._chart.rangeEndIndex) {
-            this._barIdx = this._chart.rangeStartIndex;
+        if (this._barIdx > this._chart.rangeEndIdx) {
+            this._barIdx = this._chart.rangeStartIdx;
         } 
         this._chordIdx = 0;
         this._subbeatIdx = 0;
      
-        this._moveToIdx();
-        return this._getMusicIdx();
-    }
-
-    public stepBackBySubbeat = (): IMusicIdx => {
-        if (!this._subbeatIdx) {
-            return this.stepBackByPassage();
-        }
-        this._subbeatIdx --;
-        return this._getMusicIdx();
-    };
-
-    public stepBackByPassage = (): IMusicIdx => {
-        if (!this._chordIdx) {
-            return this.stepBackByBar();
-        }
-        this._chordIdx --;
-        this._subbeatIdx = this._currentMusicBar.chordPassages[this._chordIdx].durationInSubbeats - 1;
-        
-        this._moveToIdx();
-        return this._getMusicIdx();
-    }
-
-    public stepBackByBar = (): IMusicIdx => {
-        this._barIdx--;
-        if (this._barIdx < this._chart.rangeStartIndex) {
-            this._barIdx = this._chart.rangeEndIndex;
-        } 
-        this._chordIdx = this._take[this._barIdx].chordPassages.length - 1;
-        this._subbeatIdx = this._currentMusicBar[this._chordIdx].durationInSubbeats - 1;
-
-        this._moveToIdx();
         return this._getMusicIdx();
     }
 
     public nextSessionPassage = (): ISessionPassage => {
         this.stepByPassage();
         return this.sessionPassage;
-    }
-
-    public peekNextSubbeat = (): IMusicIdx => {
-        let idx = this.stepBySubbeat();
-        this.stepBackBySubbeat();
-        return idx;
-    }
-
-    public peekPreviousSubbeat = (): IMusicIdx => {
-        let idx = this.stepBackBySubbeat();
-        this.stepBySubbeat();
-        return idx;
     }
 
     /**
@@ -138,9 +95,9 @@ class SessionManager {
         return this._sessionId;
     }
 
-    public get currentKey(): string {
-        return this._currentChartChord.key;
-    }
+    // public get currentKey(): string {
+    //     return this._currentChartChord.key;
+    // }
 
     public get atlastPassage(): boolean {
         return this._barIdx === this._rangeLength - 1 && this._chordIdx === this._currentMusicBar.chordPassages.length - 1;
@@ -184,21 +141,33 @@ class SessionManager {
         };
     }
 
+    public start = () => {
+
+    }
+
+    public stop = () => {
+
+    }
+
+    /**
+     * PRIVATE FUNCTIONS
+     */
+
     private _getMusicIdx = (): IMusicIdx => {
-        return SessionManager.getMusicIdx(this._barIdx, this._chordIdx, this._subbeatIdx);
+        return SessionManager.getMusicIdx(this._barIdx, this._subbeatIdx);
     }
 
-    private _moveToIdx = () => {
-        if (this._barIdx === this._chart.rangeStartIndex) {
-            this._take = comp(this._chart);
-        }
+    // private _moveToIdx = () => {
+    //     if (this._barIdx === this._chart.rangeStartIdx) {
+    //         this._take = CompV2(this._chart);
+    //     }
 
-        this._currentChartBar = this._chart.barsV1[this._barIdx];
-        this._currentChartChord = this._currentChartBar.chordEnvelopes[this._chordIdx];
+    //     this._currentChartBar = this._chart.barsV1[this._barIdx];
+    //     this._currentChartChord = this._currentChartBar.chordEnvelopes[this._chordIdx];
 
-        this._currentMusicBar = this._take[this._barIdx];
-        this._currentPassage = this._currentMusicBar.chordPassages[this._chordIdx];
-    }
+    //     this._currentMusicBar = this._take[this._barIdx];
+    //     this._currentPassage = this._currentMusicBar.chordPassages[this._chordIdx];
+    // }
     
 }
 

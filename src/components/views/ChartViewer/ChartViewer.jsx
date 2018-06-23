@@ -37,16 +37,16 @@ class ChartViewer extends Component {
     }
 
     renderProgression = () => {
-        let { chart, chartIndex } = this.props;
-        let { barsV1, rangeStartIndex, rangeEndIndex } = chart;
-        let baseKey = barsV1[0].chordEnvelopes[0].key;
+        let { chart, currChartIdx } = this.props;
+        let { bars, rangeStartIdx, rangeEndIdx } = chart;
+        let baseKey = bars[0].chordSegments[0].key;
 
-        return barsV1.map((bar, i) => {
+        return bars.map((bar, i) => {
             let chordNames = [];
             let beats = [];
-            let isCurrentlyPlayingBar = chartIndex.bar === i;
-            let isWithinRange = rangeStartIndex <= i &&
-                                i <= rangeEndIndex;
+            let isCurrentlyPlayingBar = currChartIdx.bar === i;
+            let isWithinRange = rangeStartIdx <= i &&
+                                i <= rangeEndIdx;
 
             let barClasses = Cx({ 
                 "bar-container": true, 
@@ -54,17 +54,17 @@ class ChartViewer extends Component {
                 "current-bar": isCurrentlyPlayingBar
             });
 
-            for (let beat = 1; beat <= bar.timeSignature[1]; beat ++) {
-                let chordEnvelopeIndex;
-                let chordEnvelope = bar.chordEnvelopes.find((envelope, i) => { 
-                    if (Number(envelope.beat) === beat) {
-                        chordEnvelopeIndex = i;
+            for (let beatIdx = 0; beatIdx < bar.timeSignature[1]; beatIdx ++) {
+                let segmentIdx;
+                let chordSegment = bar.chordSegments.find((segment, i) => { 
+                    if (segment.beatIdx === beatIdx) {
+                        segmentIdx = i;
                         return true;
                     } 
                 });
 
                 let isCurrentChord = isCurrentlyPlayingBar && 
-                                    chartIndex.chordEnvelope === chordEnvelopeIndex;
+                                    currChartIdx.chordEnvelope === segmentIdx;
 
                 let chordNameClasses = Cx({
                     "chord-name": true,
@@ -72,11 +72,11 @@ class ChartViewer extends Component {
                 });
 
                 chordNames.push(
-                    <span className={chordNameClasses} key={beat}>
-                        {chordEnvelope && MusicHelper.getPresentableChord(chordEnvelope.chord, baseKey)}
+                    <span className={chordNameClasses} key={beatIdx}>
+                        {chordSegment && MusicHelper.getPresentableChord(chordSegment.chord, baseKey)}
                     </span>
                 );
-                beats.push(<span className="beat" key={beat}>{beat}</span>);
+                beats.push(<span className="beat" key={beatIdx}>{beatIdx + 1}</span>);
             }
 
             return (
