@@ -216,8 +216,8 @@ class PlayViewController extends Component {
 
     stopSession = () => {
         this.setState({ 
-            sessionIndex: {}, 
-            currentKey: "",
+            // sessionIndex: {}, 
+            // currentKey: "",
             trainingFeedback: {} 
         });
         this.SoundActions.killTake();

@@ -319,10 +319,7 @@ class AppRouter extends Component {
     }
 
     killTake = () => {
-        this.state.player.cancelQueue(this.state.audioContext);
-        this.setState({ 
-            sessionId: null
-        });
+        this.state.sessionManager.stop();
     }
 };
 
