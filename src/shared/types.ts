@@ -102,7 +102,9 @@ export enum PlayMode {
  */
 
 export interface IScoreBar {
-    [instrument: string]: IMusicBarV2
+    [subbeatIdx: number]: {
+        [instrument: string]: IStroke[];
+    }
 }
 
 

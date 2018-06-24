@@ -3,7 +3,7 @@ import uuid from "uuid";
 import * as Util from "../Util";
 import { CompV1 } from "../music/MusicHelper";
 import Chart from "../music/Chart";
-import { IScoreBar, NoteName } from "../types";
+import { IScoreBar, IChartBar, NoteName, IChordSegment } from "../types";
 import soundfonts from "./soundfontsIndex";
 
 class SessionManager {
@@ -53,79 +53,25 @@ class SessionManager {
         return "C"; // this._chart.bars[this._barIdx].chordSegments[]
     }
 
-    // public get currentKey(): string {
-    //     return this._currentChartChord.key;
-    // }
-
-
-    // public get bar(): IMusicBar {
-    //     return this._currentMusicBar;
-    // }
-
-    // public get sessionPassage(): ISessionPassage {
-    //     let { tempo } = this._chart;
-    //     let { durationInSubbeats, timeSignature } = this._currentMusicBar;
-    //     let subbeatDuration = ;
-
-    //     let { currentTime } = this._audioContext;
-    //     let subbeatOffsetToQueueTime = [];
-
-    //     for (
-    //         let subbeatOffset = 0; 
-    //         subbeatOffset < this._currentPassage.durationInSubbeats; 
-    //         subbeatOffset++
-    //     ) {
-    //         subbeatOffsetToQueueTime.push(currentTime + subbeatDuration * subbeatOffset);
-    //     }
-
-    //     return { 
-    //         sessionId: this._sessionId, 
-    //         duration: this._currentPassage.durationInSubbeats * subbeatDuration,
-    //         subbeatDuration, 
-    //         subbeatOffsetToQueueTime,
-    //         chartIndex: this._getMusicIdx(),
-    //         parts: this._currentPassage.parts
-    //     };
-    // }
-
     public start = () => {
-        let _subbeatDuration = this._subbeatDuration;
-        let queueLoop = () => {
-            setTimeout(() => {
-                this._tick();
-                let queueTime = this._queueTimes[this._barIdx][this._subbeatIdx];
-                let queueTimeMinusPrepTime = queueTime - this._PREP_TIME;
-                let getUpdate = () => this._audioContext.currentTime > queueTimeMinusPrepTime;
+        this._tick();
+        let queueLoop = (prevQueueTime: number) => {
+            let queueTime = this._queueTimes[this._barIdx][this._subbeatIdx];
+            let queueTimeMinusPrepTime = queueTime - this._PREP_TIME;
+            let getUpdate = () => this._audioContext.currentTime > queueTimeMinusPrepTime;
 
+            setTimeout(() => {
                 Util.waitFor(getUpdate, this._TIME_CHECKER_RATE)
                     .then(() => {
                         if (!isNaN(this._startTime)) {
-                            let scoreBar = this._currScoreBar;
-                            for (let instrument in scoreBar) {
-                                let musicBar = scoreBar[instrument];
-                                let strokes = musicBar[this._subbeatIdx];
-                                if (strokes) {
-                                    strokes.forEach(stroke => {
-                                        stroke.notes.forEach(note => {
-                                            this._fontPlayer.queueWaveTable(
-                                                this._audioContext, 
-                                                this._audioContext.destination, 
-                                                window[soundfonts[instrument].variable], 
-                                                queueTime, 
-                                                note,
-                                                _subbeatDuration * stroke.durationInSubbeats,
-                                                stroke.velocity
-                                            );
-                                        });
-                                    });
-                                }
-                            }
-                            queueLoop();
+                            this._queueCurrSegment();
+                            this._stepBySegment();
+                            queueLoop(queueTime);
                         }
                     });
-            }, (_subbeatDuration * this._WAITTIME_FRACTION) * 1000);
+            }, ((queueTime -  prevQueueTime) * this._WAITTIME_FRACTION) * 1000);
         };
-        queueLoop();
+        queueLoop(0);
     }
 
     public stop = () => {
@@ -137,6 +83,41 @@ class SessionManager {
      * PRIVATE FUNCTIONS
      */
 
+    private _queueCurrSegment = () => {
+        let scoreBar = this._currScoreBar;
+        let currSegment = this._currChordSegment;
+        let subbeatDuration = this._subbeatDuration;
+        let startIdx = currSegment.subbeatIdx;
+        for (
+            let subbeatIdx = startIdx; 
+            subbeatIdx < startIdx + currSegment.durationInSubbeats; 
+            subbeatIdx ++ 
+        ) {
+            let parts = scoreBar[subbeatIdx];
+            if (parts) {
+                for (let instrument in parts) {
+                    let strokes = parts[instrument];
+                    if (strokes) {
+                        strokes.forEach(stroke => {
+                            stroke.notes.forEach(note => {
+                                this._fontPlayer.queueWaveTable(
+                                    this._audioContext, 
+                                    this._audioContext.destination, 
+                                    window[soundfonts[instrument].variable], 
+                                    this._queueTimes[this._barIdx][subbeatIdx], 
+                                    note,
+                                    subbeatDuration * stroke.durationInSubbeats,
+                                    stroke.velocity
+                                );
+                            });
+                        });
+                    }
+                }
+            }
+           
+        }
+    }
+
     private _tick = () => {
         this._subbeatIdx = (this._subbeatIdx + 1) % this._chart.bars[this._barIdx].durationInSubbeats;; 
         if (!this._subbeatIdx) {
@@ -144,6 +125,7 @@ class SessionManager {
             if (this._barIdx === this._chart.rangeStartIdx) {
                 // If the bar index is back at the start of the range,
                 // we refresh the score
+
                 this._score = CompV1(this._chart);
 
                 // ... and we reset the queue times
@@ -156,6 +138,18 @@ class SessionManager {
                 
                 this._resetQueueTimes(startTime);
             }
+        }
+    }
+
+    private _stepBySegment = () => {
+        let currSegment = this._currChordSegment;
+        let startIdx = currSegment.subbeatIdx
+        for (
+            let subbeatIdx = startIdx; 
+            subbeatIdx < startIdx + currSegment.durationInSubbeats; 
+            subbeatIdx ++
+        ) {
+            this._tick();
         }
     }
 
@@ -212,17 +206,23 @@ class SessionManager {
         return this._score[this._barIdx];
     }
 
-    // private _moveToIdx = () => {
-    //     if (this._barIdx === this._chart.rangeStartIdx) {
-    //         this._take = CompV1(this._chart);
-    //     }
+    private get _currChartBar(): IChartBar {
+        return this._chart.bars[this._barIdx];
+    }
 
-    //     this._currentChartBar = this._chart.barsV1[this._barIdx];
-    //     this._currentChartChord = this._currentChartBar.chordEnvelopes[this._chordIdx];
+    private get _currChordSegment(): IChordSegment {
+        let currBar = this._currChartBar;
+        let segIdx = -1;
+        let subbeatCount = 0;
+        let chordSegment;
+        
+        do {
+            chordSegment = currBar.chordSegments[++segIdx];
+            subbeatCount += chordSegment.durationInSubbeats;
+        } while (subbeatCount <= this._subbeatIdx)
 
-    //     this._currentMusicBar = this._take[this._barIdx];
-    //     this._currentPassage = this._currentMusicBar.chordPassages[this._chordIdx];
-    // }
+        return chordSegment;
+    }
     
 }
 

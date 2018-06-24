@@ -1,25 +1,21 @@
 import soundfonts from "../../../soundfontsIndex";
 import { IChartBar, IMusicBarV2 } from "../../../../types";
 
-export const compDrumsSwingV1 = (bars: IChartBar[]): Array<{ rideCymbal: IMusicBarV2; shutHiHat: IMusicBarV2 }> => {
+export const compDrumsSwingV1 = (bars: IChartBar[]): { rideCymbal: IMusicBarV2[]; shutHiHat: IMusicBarV2[] } => {
 
     let { rideCymbal, shutHiHat } = soundfonts;
+    let rideCymbalBars: IMusicBarV2[] = [];
+    let shutHiHatBars: IMusicBarV2[] = [];
 
-    return bars.map(bar => {
-
-        let musicBarPair: { 
-            rideCymbal: IMusicBarV2;
-            shutHiHat: IMusicBarV2;
-        } = {
-            rideCymbal: {},
-            shutHiHat: {}
-        };
+    bars.forEach(bar => {
+        let rideCymbalBar: IMusicBarV2 = {};
+        let shutHiHatBar: IMusicBarV2 = {};
 
         bar.chordSegments.forEach(segment => {
             let fullBeatCouplets = segment.durationInSubbeats / 6;
             
             if (segment.durationInSubbeats % 6) {
-                musicBarPair.rideCymbal[segment.subbeatIdx] = [
+                rideCymbalBar[segment.subbeatIdx] = [
                     {
                         notes: [rideCymbal.pitch || 0],
                         durationInSubbeats: segment.durationInSubbeats,
@@ -29,21 +25,21 @@ export const compDrumsSwingV1 = (bars: IChartBar[]): Array<{ rideCymbal: IMusicB
             } else {
                 for (let i = 0; i < fullBeatCouplets; i ++) {
                     // ding, ding-gah
-                    musicBarPair.rideCymbal[i * 6] = [
+                    rideCymbalBar[i * 6] = [
                         {
                             notes: [rideCymbal.pitch || 0], 
                             durationInSubbeats: 3, 
                             velocity: 1
                         }
                     ];
-                    musicBarPair.rideCymbal[3 + i * 6] = [
+                    rideCymbalBar[3 + i * 6] = [
                         { 
                             notes: [rideCymbal.pitch || 0], 
                             durationInSubbeats: 2, 
                             velocity: 1
                         }
                     ];
-                    musicBarPair.rideCymbal[5 + i * 6] = [
+                    rideCymbalBar[5 + i * 6] = [
                         {
                             notes: [rideCymbal.pitch || 0], 
                             durationInSubbeats: 1, 
@@ -52,7 +48,7 @@ export const compDrumsSwingV1 = (bars: IChartBar[]): Array<{ rideCymbal: IMusicB
                     ];
 
 
-                    musicBarPair.shutHiHat[i * 6 + 3] = [
+                    shutHiHatBar[i * 6 + 3] = [
                         {
                             notes: [shutHiHat.pitch || 0], 
                             durationInSubbeats: 3, 
@@ -63,8 +59,14 @@ export const compDrumsSwingV1 = (bars: IChartBar[]): Array<{ rideCymbal: IMusicB
             }
         });
 
-        return musicBarPair;
+        rideCymbalBars.push(rideCymbalBar);
+        shutHiHatBars.push(shutHiHatBar);
     }); 
+
+    return {
+        rideCymbal: rideCymbalBars,
+        shutHiHat: shutHiHatBars
+    };
 };
 
 export default compDrumsSwingV1;

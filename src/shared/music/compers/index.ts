@@ -9,9 +9,6 @@ import Chart from "../Chart";
 export const CompV1 = (chart: Chart): IScoreBar[] => {
     let { bars, feel } = chart;
     let getAccompaniment: any;
-    let pianoAccompaniment: IMusicBarV2[];
-    let bassAccompaniment: IMusicBarV2[];
-    let drumsAccompaniment: IMusicBarV2[];
 
     switch (feel) {
         case Feel.Swing:
@@ -19,25 +16,26 @@ export const CompV1 = (chart: Chart): IScoreBar[] => {
             break;
     }
 
-    [
-        pianoAccompaniment, 
-        bassAccompaniment, 
-        drumsAccompaniment
-    ] = getAccompaniment(bars);
+    let accompaniment = getAccompaniment(bars);
 
     return bars.map((bar: IChartBar, i: number) => {
-        return {
-            piano: pianoAccompaniment[i],
-            doubleBass: bassAccompaniment[i],
-            ...drumsAccompaniment[i]
-        };
+        let scoreBar = {};
+        for (let instrument in accompaniment) {
+            let musicBar = accompaniment[instrument][i];
+            for (let subbeatIdx in musicBar) {
+                let subbeatStrokes = scoreBar[subbeatIdx] || {};
+                subbeatStrokes[instrument] = musicBar[subbeatIdx];
+                scoreBar[subbeatIdx] = subbeatStrokes;
+            }
+        }
+        return scoreBar;
     });
 }
 
-const _getSwingAccompaniment = (bars: IChartBar[]): [IMusicBarV2[], IMusicBarV2[], Array<{ rideCymbal: IMusicBarV2; shutHiHat: IMusicBarV2 }>] => {
-    return [
-        compSwingPianoV1(bars),
-        compBassSwingV1(bars),
-        compDrumsSwingV1(bars)
-    ];
+const _getSwingAccompaniment = (bars: IChartBar[]): {piano: IMusicBarV2[], doubleBass: IMusicBarV2[], rideCymbal: IMusicBarV2[], shutHiHat: IMusicBarV2[]} => {
+    return {
+        piano: compSwingPianoV1(bars),
+        doubleBass: compBassSwingV1(bars),
+        ...compDrumsSwingV1(bars)
+    };
 }
