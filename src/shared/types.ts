@@ -22,6 +22,7 @@ export interface IChordBase {
 export interface IChartBar {
     timeSignature: TimeSignature;
     chordSegments: IChordSegment[];
+    durationInSubbeats: number;
 }
 
 export interface IChordSegment {
@@ -100,8 +101,11 @@ export enum PlayMode {
  * MUSIC V2 SPECIFIC
  */
 
- export interface IMusicBarV2 {
-    [subbeat: number]: {
-        [instrument: string]: IStroke;
-    };
- }
+export interface IScoreBar {
+    [instrument: string]: IMusicBarV2
+}
+
+
+export interface IMusicBarV2 {
+    [subbeatIdx: number]: IStroke[];
+}

@@ -93,6 +93,7 @@ const _adjustBarsSwingFeel = (bars: IBarBase[]): IChartBar[] => {
         let { timeSignature, chordSegments } = bar;
         let conversionFactor: number; 
         let adjustedTimeSignature = Util.copyObject(timeSignature);
+        let subbeatsInBar = 0;
 
         if (timeSignature[1] === 8) {
             if (timeSignature[0] % 2 === 1) {
@@ -120,11 +121,13 @@ const _adjustBarsSwingFeel = (bars: IBarBase[]): IChartBar[] => {
                 // subbeatsBegoreChange will be corrected below (if necessary)
                 subbeatsBeforeChange: Infinity
             };
+            subbeatsInBar += durationInSubbeats;
             return adjustedSegment;
         });
 
         return {
             timeSignature: adjustedTimeSignature,
+            durationInSubbeats: subbeatsInBar,
             chordSegments: adjustedSegments
         };
     });

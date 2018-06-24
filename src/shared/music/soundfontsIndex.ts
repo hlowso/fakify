@@ -3,8 +3,16 @@
 //  2. add the sf2.js file to publc/soundfonts/ 
 //  3. add the instrument to the soundfonts object in the
 //  following format
+export interface ISoundFonts {
+    [instrument: string]: { 
+        name: string, 
+        variable: string, 
+        url: string, 
+        pitch?: number 
+    } 
+}
 
-const soundfonts = {
+const soundfonts: ISoundFonts = {
     piano: {
         name: "piano",
         variable: "_tone_0000_Aspirin_sf2_file",
@@ -32,8 +40,8 @@ const soundfonts = {
         pitch: 40
     },
 
-    shutHihat: {
-        name: "shutHihat",
+    shutHiHat: {
+        name: "shutHiHat",
         variable: "_drum_44_0_Chaos_sf2_file",
         url: "/soundfonts/drums/12844_0_Chaos_sf2_file.js",
         pitch: 44

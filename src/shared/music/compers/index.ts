@@ -1,20 +1,43 @@
 // import * as Util from "../../Util";
-// import compPianoSwingFeelV0 from "./swing/piano/compPianoSwingFeelV0";
-// import compBassSwingFeelV0 from "./swing/bass/compBassSwingFeelV0";
-// import compDrumsSwingFeelV0 from "./swing/drums/compDrumsSwingFeelV0";
-// import { IChart, IMusicBar, Feel, IChartBar } from "../../types";
+import compSwingPianoV1 from "./swing/piano/compPianoSwingV1";
+import compBassSwingV1 from "./swing/bass/compBassSwingV1";
+import compDrumsSwingV1 from "./swing/drums/compDrumsSwingV1";
+import { Feel, IChartBar, IMusicBarV2, IScoreBar } from "../../types";
 import Chart from "../Chart";
 
 
-export const CompV2 = (chart: Chart) => {
-    // let getAccompaniment: any;
+export const CompV1 = (chart: Chart): IScoreBar[] => {
+    let { bars, feel } = chart;
+    let getAccompaniment: any;
+    let pianoAccompaniment: IMusicBarV2[];
+    let bassAccompaniment: IMusicBarV2[];
+    let drumsAccompaniment: IMusicBarV2[];
 
-    switch (chart.feel) {
-        // case Feel.Swing:
-            // getAccompaniment = getSwingFeelAccompaniment;
-            // break;
+    switch (feel) {
+        case Feel.Swing:
+            getAccompaniment = _getSwingAccompaniment;
+            break;
     }
 
-    // TODO write new comping functions to deal with new music structure.
+    [
+        pianoAccompaniment, 
+        bassAccompaniment, 
+        drumsAccompaniment
+    ] = getAccompaniment(bars);
 
+    return bars.map((bar: IChartBar, i: number) => {
+        return {
+            piano: pianoAccompaniment[i],
+            doubleBass: bassAccompaniment[i],
+            ...drumsAccompaniment[i]
+        };
+    });
+}
+
+const _getSwingAccompaniment = (bars: IChartBar[]): [IMusicBarV2[], IMusicBarV2[], Array<{ rideCymbal: IMusicBarV2; shutHiHat: IMusicBarV2 }>] => {
+    return [
+        compSwingPianoV1(bars),
+        compBassSwingV1(bars),
+        compDrumsSwingV1(bars)
+    ];
 }

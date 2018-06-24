@@ -36,6 +36,12 @@ class Chart {
         this._rangeEndIdx = rangeEndIdx;
     }
 
+    public forEachBarInRange = (callback: (bar: IChartBar, idx: number) => void) => {
+        for (let barIdx = this._rangeStartIdx; barIdx <= this._rangeEndIdx; barIdx ++) {
+            callback(this._bars[barIdx], barIdx);
+        }
+    }
+
     /**
      * GETTERS
      */
@@ -62,6 +68,14 @@ class Chart {
 
     get rangeEndIdx(): number {
         return this._rangeEndIdx;
+    }
+
+    get firstBarInRange(): IChartBar {
+        return this._bars[this._rangeStartIdx];
+    }
+
+    get lastBarInRange(): IChartBar {
+        return this._bars[this._rangeEndIdx];
     }
 
     /**

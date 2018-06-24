@@ -182,48 +182,36 @@ class PlayViewController extends Component {
         let { chart, playMode } = this.state;
         let { barsV1, rangeStartIndex } = chart;
 
-        let onQueue = musicIndex => {
-            let { barIdx, chordIdx } = musicIndex;
+        // switch(playMode) {
+        //     case "improv":
+        //         this.setState({
+        //             trainingFeedback: {
+        //                 notesOutOfTime: 0,
+        //                 notesInKeyAndInTime: 0,
+        //                 notesInTime: 0
+        //             }
+        //         })
+        //         this.StateHelper.subscribeToUserSessionKeyStroke(
+        //             keyStrokeRecord => {
+        //                 let { trainingFeedback, currentKey } = this.state;
+        //                 let trainingFeedbackUpdate = Util.copyObject(trainingFeedback);
 
-            this.setState({ 
-                sessionIndex: {
-                    bar: barIdx,
-                    chordEnvelope: chordIdx
-                },
-                currentKey: barsV1[barIdx].chordEnvelopes[chordIdx].key
-            });
-        };
+        //                 if (Math.abs(keyStrokeRecord.precision) > this.PRECISION_THRESHOLD) {
+        //                     trainingFeedbackUpdate.notesOutOfTime++;
+        //                 } else {
+        //                     if (MusicHelper.noteIsInKey(keyStrokeRecord.note, currentKey)) {
+        //                         trainingFeedbackUpdate.notesInKeyAndInTime++;
+        //                     }
+        //                     trainingFeedbackUpdate.notesInTime++;
+        //                 }
 
-        switch(playMode) {
-            case "improv":
-                this.setState({
-                    trainingFeedback: {
-                        notesOutOfTime: 0,
-                        notesInKeyAndInTime: 0,
-                        notesInTime: 0
-                    }
-                })
-                this.StateHelper.subscribeToUserSessionKeyStroke(
-                    keyStrokeRecord => {
-                        let { trainingFeedback, currentKey } = this.state;
-                        let trainingFeedbackUpdate = Util.copyObject(trainingFeedback);
+        //                 this.setState({ trainingFeedback: trainingFeedbackUpdate });
+        //             }
+        //         );
+        //         break;
+        // }
 
-                        if (Math.abs(keyStrokeRecord.precision) > this.PRECISION_THRESHOLD) {
-                            trainingFeedbackUpdate.notesOutOfTime++;
-                        } else {
-                            if (MusicHelper.noteIsInKey(keyStrokeRecord.note, currentKey)) {
-                                trainingFeedbackUpdate.notesInKeyAndInTime++;
-                            }
-                            trainingFeedbackUpdate.notesInTime++;
-                        }
-
-                        this.setState({ trainingFeedback: trainingFeedbackUpdate });
-                    }
-                );
-                break;
-        }
-
-        this.SoundActions.playRangeLoop(chart, onQueue);
+        this.SoundActions.playRangeLoop(chart);
     }
 
     stopSession = () => {

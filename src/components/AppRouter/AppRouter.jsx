@@ -281,45 +281,17 @@ class AppRouter extends Component {
         }
     }
 
-    playRangeLoop = (chart, onQueue) => {
+    playRangeLoop = (chart) => {
         let { audioContext, player } = this.state;
-        let sessionManager = new SessionManager(audioContext, chart);
-        let prevQueueTime = audioContext.currentTime;
+        let sessionManager = new SessionManager(audioContext, player, chart);
 
-        let loopedQueue = (shortenedWaitTime, fullWaitTime) => {
-            setTimeout(() => {
-                let queueTime = prevQueueTime + fullWaitTime;
-                let queueTimeMinusPrepTime = queueTime - this.PREP_TIME;
-                let getUpdate = () => audioContext.currentTime > queueTimeMinusPrepTime;
-
-                Util.waitFor(getUpdate, this.TIME_CHECKER_RATE).then(() => {
-                    let {
-                        sessionId,
-                        duration,
-                        subbeatDuration,
-                        subbeatOffsetToQueueTime,
-                        chartIndex,
-                        parts
-                    } = sessionManager.nextSessionPassage();
-
-                    if (this.state.sessionId && 
-                        this.state.sessionId === sessionId
-                    ) {
-                        this.queueParts(parts, subbeatOffsetToQueueTime, subbeatDuration);
-                        onQueue(chartIndex);
-                        
-                        prevQueueTime = audioContext.currentTime;
-                        loopedQueue(duration * this.WAIT_TIME_FACTOR, duration);
-                    }
-                });
-            }, shortenedWaitTime);
-        };
+        sessionManager.start();
 
         this.setState({ 
             sessionId: sessionManager.sessionId,
             sessionManager, 
             userSessionRecord: [] 
-        }, () => loopedQueue(0, 0));
+        });
     }
 
     queueParts = (parts, subbeatOffsetToQueueTime, timeFactor) => {
