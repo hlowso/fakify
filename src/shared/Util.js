@@ -19,21 +19,26 @@ export const waitFor = (getUpdate, rate) => {
 
 export const copyObject = object => JSON.parse(JSON.stringify(object));
 
-export const arrayBinarySearch = (array, element, difference = (a, b) => a - b, startIdx = 0, endIdx = array.length - 1) => {
+export const length = obj => {
+    return Array.isArray(obj) ? obj.length : Object.keys(obj).length;
+}
+
+export const binarySearch = (obj, element, difference = (a, b) => a - b, startIdx = 0, endIdx = length(obj) - 1) => {
     let middleIdx = startIdx + Math.floor((endIdx - startIdx) / 2);
-    let currentElement = array[middleIdx];
+    let currentElement = obj[middleIdx];
+
     if (element === currentElement) {
-        return [middleIdx, currentElement];
+        return [Number(middleIdx), currentElement];
     }
     if (startIdx === middleIdx) {
-        let greaterElement = array[endIdx];
-        return Math.abs(difference(element, currentElement)) > Math.abs(difference(element, greaterElement)) ? [endIdx, greaterElement] : [middleIdx, currentElement];
+        let greaterElement = obj[endIdx];
+        return Math.abs(difference(element, currentElement)) > Math.abs(difference(element, greaterElement)) ? [Number(endIdx), greaterElement] : [Number(middleIdx), currentElement];
     }
-    
+
     if (difference(element, currentElement) < 0) {
-        return arrayBinarySearch(array, element, difference, startIdx, middleIdx);
+        return binarySearch(obj, element, difference, startIdx, middleIdx);
     }
-    return arrayBinarySearch(array, element, difference, middleIdx, endIdx);
+    return binarySearch(obj, element, difference, middleIdx, endIdx);
 }
 
 export const mod = (m, n) => {

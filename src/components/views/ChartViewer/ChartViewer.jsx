@@ -111,7 +111,7 @@ class ChartViewer extends Component {
      */
 
     renderKeyContextSelect = () => {
-        let { keyContext } = this.props.chart;
+        let { context } = this.props.chart;
         let options = MusicHelper.NOTE_NAMES.map(
             key => (
                 <option key={key} value={key} >
@@ -127,7 +127,7 @@ class ChartViewer extends Component {
                 </div>
                 <select 
                     className="left-hand-settings-right" 
-                    value={keyContext}
+                    value={context}
                     onChange={event => this.props.recontextualize(event.target.value)}
                 >
                     {options}

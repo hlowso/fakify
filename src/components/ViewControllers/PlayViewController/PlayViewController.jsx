@@ -146,12 +146,12 @@ class PlayViewController extends Component {
         let chartSettings = this.StorageHelper.getChartSettings(id);
         let playMode = this.StorageHelper.getPlayMode();
 
-        let { tempo, keyContext, feel, rangeStartIdx, rangeEndIdx } = chartSettings;
+        let { tempo, context, feel, rangeStartIdx, rangeEndIdx } = chartSettings;
         if (!tempo) {
             tempo = originalTempo;
         }
-        if (!keyContext) {
-            keyContext = originalKeyContext;
+        if (!context) {
+            context = originalKeyContext;
         }
         if (!feel) {
             feel = suitableFeels[0];
@@ -170,7 +170,7 @@ class PlayViewController extends Component {
         this.setState({ 
             chart: new Chart(
                 barsBase, 
-                keyContext, 
+                context, 
                 tempo, 
                 feel,
                 this.forceUpdate.bind(this), 
@@ -265,7 +265,7 @@ class PlayViewController extends Component {
         chart.context = newKeyContext;
         
         this.StorageHelper.updateChartSettings(selectedSong.id, {
-            keyContext: newKeyContext
+            context: newKeyContext
         });
     }
 

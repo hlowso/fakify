@@ -34,7 +34,7 @@ export interface IChordSegment {
     subbeatsBeforeChange: number;
 }
 
-export interface IUserKeyStrokeRecord {
+export interface IKeyStrokeRecord {
     barIdx: number;
     subbeatIdx: number;
     precision: number;

@@ -1,12 +1,12 @@
 import * as Util from "../Util";
 import { CompV1 } from "../music/MusicHelper";
 import Chart from "../music/Chart";
-import { IScoreBar, IChartBar, NoteName, IChordSegment, IUserKeyStrokeRecord, IMusicIdx } from "../types";
+import { IScoreBar, IChartBar, NoteName, IChordSegment, IKeyStrokeRecord, IMusicIdx } from "../types";
 import soundfonts from "./soundfontsIndex";
 
 class SessionManager {
     private _WAITTIME_FACTOR = (3 / 4) * 1000;
-    // private _PREP_TIME = 0.02;
+    private _PREP_TIME = 0.02;
     private _TIME_CHECKER_RATE = 5;
 
     private _audioContext: any;
@@ -15,6 +15,7 @@ class SessionManager {
     private _score: IScoreBar[];
     private _queueTimes: { [barIdx: number]: { [subbeatIdx: number]: number }};
     private _startTime: number;
+    private _userKeyStrokes: IKeyStrokeRecord[];
 
     private _rangeLength: number;
 
@@ -22,6 +23,7 @@ class SessionManager {
     private _barIdx: number;
     private _segmentIdx: number;
     private _subbeatIdx: number;
+
     private _onUpdate: () => void;
     
     constructor(audioContext: any, fontPlayer: any, chart: Chart, onUpdate: () => void) {
@@ -36,6 +38,7 @@ class SessionManager {
         this._subbeatIdx = -1;
 
         this._startTime = NaN;
+        this._userKeyStrokes = [];
         this._onUpdate = onUpdate;
     }
 
@@ -91,12 +94,14 @@ class SessionManager {
                 Util.waitFor(getUpdate, this._TIME_CHECKER_RATE)
                     .then(() => {
                         if (!timeout || this.inSession) {
+                            console.log(this._userKeyStrokes);
                             this._stepBySegment();
                             this._queueCurrSegment();
                             let nextQueueTime = this._nextSegmentQueueTime;
+                            let nextQueueTimeMinusPrepTime = nextQueueTime - this._PREP_TIME;
                             queueLoop(
                                 (nextQueueTime - this._currQueueTime) * this._WAITTIME_FACTOR,
-                                () => (this._audioContext.currentTime > nextQueueTime)
+                                () => (this._audioContext.currentTime > nextQueueTimeMinusPrepTime)
                             );
                         }
                     });
@@ -110,16 +115,35 @@ class SessionManager {
         this._startTime = NaN;
     }
 
-    public recordUserKeyStroke = (note: number, time: number, velocity: number): IUserKeyStrokeRecord => {
-        // TODO...
-        console.log("note, time, velocity", note, time, velocity);
-        return {
-            barIdx: -1,
-            subbeatIdx: -1,
-            precision: -1,
-            note: -1,
-            velocity: -1
+    public recordUserKeyStroke = (note: number, time: number, velocity: number): IKeyStrokeRecord => {
+        let queueTimeBarComparison = (a: { [subbeatIdx: number]: number }, b: { [subbeatIdx: number]: number }) => {
+            let aCenter = Math.floor(Util.length(a) / 2);
+            let bCenter = Math.floor(Util.length(b) / 2);
+            return a[aCenter] - b[bCenter];
         };
+
+        let [barIdx, queueTimeBar] = Util.binarySearch(
+            this._queueTimes, 
+            { 0: time }, 
+            queueTimeBarComparison, 
+            this._chart.rangeStartIdx - 1, 
+            this._chart.rangeEndIdx + 1
+        );
+        let [subbeatIdx, closestTime] = Util.binarySearch(
+            queueTimeBar, 
+            time
+        );
+
+        let record = {
+            barIdx,
+            subbeatIdx,
+            precision: time - closestTime,
+            note,
+            velocity
+        }
+
+        this._userKeyStrokes.push(record);
+        return record;
     }
 
     /**
