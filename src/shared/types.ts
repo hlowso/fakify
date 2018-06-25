@@ -34,8 +34,9 @@ export interface IChordSegment {
     subbeatsBeforeChange: number;
 }
 
-export interface IUserStrokeRecord {
-    chartIndex: IMusicIdx;
+export interface IUserKeyStrokeRecord {
+    barIdx: number;
+    subbeatIdx: number;
     precision: number;
     note: number;
     velocity: number;
@@ -43,7 +44,9 @@ export interface IUserStrokeRecord {
 }
 
 export interface IMusicIdx {
+    chorusIdx?: number;
     barIdx: number;
+    segmentIdx?: number;
     subbeatIdx: number;
 }
 
@@ -81,16 +84,16 @@ export interface IStroke {
     velocity: number;
 }
 
-export interface ISessionPassage {
-    sessionId: string;
-    duration: number;
-    subbeatDuration: number;
-    subbeatOffsetToQueueTime: number[];
-    chartIndex: IMusicIdx;
-    parts: {
-        [instrument: string]: IStroke[];
-    }
-}
+// export interface ISessionPassage {
+//     sessionId: string;
+//     duration: number;
+//     subbeatDuration: number;
+//     subbeatOffsetToQueueTime: number[];
+//     chartIndex: IMusicIdx;
+//     parts: {
+//         [instrument: string]: IStroke[];
+//     }
+// }
 
 export enum PlayMode {
     Improv = "improv",

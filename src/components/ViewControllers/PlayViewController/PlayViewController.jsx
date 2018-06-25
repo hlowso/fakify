@@ -25,8 +25,6 @@ class PlayViewController extends Component {
             songTitles: {},
             selectedSong: {},
             chart: {},
-            sessionIndex: {},
-            currentKey: "",
             midiSettingsModalOpen: true,
             playMode: "improv",
             trainingFeedback: {}          
@@ -68,18 +66,22 @@ class PlayViewController extends Component {
     }
 
     render() {
+        let {
+            sessionManager
+        } = this.props;
         let { 
             songTitles, 
             selectedSong, 
             midiSettingsModalOpen, 
             chart,
-            sessionIndex,
-            currentKey,
             playMode,
             trainingFeedback 
         } = this.state;
 
         let selectedSongId = selectedSong ? selectedSong.songId: null;
+        let inSession = sessionManager && sessionManager.inSession;
+        let sessionIdx = inSession ? sessionManager.sessionIdx : null;
+        let currKey = inSession ? sessionManager.currKey : "";
 
         return (
             <div id="play-view">
@@ -95,7 +97,7 @@ class PlayViewController extends Component {
                     <ChartViewer
                         song={selectedSong}
                         chart={chart} 
-                        currChartIdx={sessionIndex} 
+                        currChartIdx={sessionIdx} 
                         recontextualize={this.recontextualize} 
                         resetTempo={this.resetTempo} 
                         onBarClick={this.onBarClick} />
@@ -109,9 +111,9 @@ class PlayViewController extends Component {
                 <div className="bottom-row">
                     <Keyboard 
                         depressedKeys={this.StateHelper.getCurrentUserKeysDepressed()} 
-                        currentKey={currentKey} 
+                        currentKey={currKey} 
                         playUserMidiMessage={this.SoundActions.playUserMidiMessage} 
-                        takeIsPlaying={this.StateHelper.getState().sessionId} />
+                        takeIsPlaying={inSession} />
                 </div>
 
                 <MidSettingsModal 
@@ -144,7 +146,7 @@ class PlayViewController extends Component {
         let chartSettings = this.StorageHelper.getChartSettings(id);
         let playMode = this.StorageHelper.getPlayMode();
 
-        let { tempo, keyContext, feel, rangeStartIndex, rangeEndIndex } = chartSettings;
+        let { tempo, keyContext, feel, rangeStartIdx, rangeEndIdx } = chartSettings;
         if (!tempo) {
             tempo = originalTempo;
         }
@@ -154,11 +156,11 @@ class PlayViewController extends Component {
         if (!feel) {
             feel = suitableFeels[0];
         }
-        if (!Number.isInteger(rangeStartIndex)) {
-            rangeStartIndex = 0;
+        if (!Number.isInteger(rangeStartIdx)) {
+            rangeStartIdx = 0;
         }
-        if (!Number.isInteger(rangeEndIndex)) {
-            rangeEndIndex = (
+        if (!Number.isInteger(rangeEndIdx)) {
+            rangeEndIdx = (
                 (playMode === "listenAndRepeat")
                         ? 1
                         : barsBase.length - 1
@@ -172,8 +174,8 @@ class PlayViewController extends Component {
                 tempo, 
                 feel,
                 this.forceUpdate.bind(this), 
-                rangeStartIndex, 
-                rangeEndIndex
+                rangeStartIdx, 
+                rangeEndIdx
             ) 
         });
     }
@@ -216,8 +218,6 @@ class PlayViewController extends Component {
 
     stopSession = () => {
         this.setState({ 
-            // sessionIndex: {}, 
-            // currentKey: "",
             trainingFeedback: {} 
         });
         this.SoundActions.killTake();

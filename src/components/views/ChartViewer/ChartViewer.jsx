@@ -40,11 +40,12 @@ class ChartViewer extends Component {
         let { chart, currChartIdx } = this.props;
         let { bars, rangeStartIdx, rangeEndIdx } = chart;
         let baseKey = bars[0].chordSegments[0].key;
+        currChartIdx = currChartIdx || {};
 
         return bars.map((bar, i) => {
             let chordNames = [];
             let beats = [];
-            let isCurrentlyPlayingBar = currChartIdx.bar === i;
+            let isCurrentlyPlayingBar = currChartIdx.barIdx === i;
             let isWithinRange = rangeStartIdx <= i &&
                                 i <= rangeEndIdx;
 
@@ -64,7 +65,7 @@ class ChartViewer extends Component {
                 });
 
                 let isCurrentChord = isCurrentlyPlayingBar && 
-                                    currChartIdx.chordEnvelope === segmentIdx;
+                                    currChartIdx.segmentIdx === segmentIdx;
 
                 let chordNameClasses = Cx({
                     "chord-name": true,

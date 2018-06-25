@@ -29,14 +29,12 @@ class AppRouter extends Component {
             loading: true,
             midiAccess: null,
             audioContext: null,
-            player: null,
+            fontPlayer: null,
             userPlayer: null,
             userInstrument: "piano",
-            sessionId: null,
             sessionManager: null,
             userEnvelopes: {},
             onUserSessionKeyStroke: (keyStrokeRecord) => {},
-            userSessionRecord: []
         };
     }
 
@@ -58,13 +56,12 @@ class AppRouter extends Component {
     }
 
     render() {
-        let { loading } = this.state;
+        let { loading, sessionManager } = this.state;
 
         let SoundActions = {
             setMidiContextAsync: this.setMidiContextAsync,
             setMidiAccessAsync: this.setMidiAccessAsync,
             connectToMidiInput: this.connectToMidiInput,
-            generateMidiMessagePlayer: this.generateMidiMessagePlayer,
             playRangeLoop: this.playRangeLoop,
             killTake: this.killTake,
             playUserMidiMessage: this.playUserMidiMessage
@@ -81,7 +78,8 @@ class AppRouter extends Component {
         let VCProps = {
             SoundActions,
             StateHelper,            
-            StorageHelper
+            StorageHelper,
+            sessionManager
         };
 
         return loading
@@ -125,28 +123,28 @@ class AppRouter extends Component {
         return new Promise((resolve, reject) => {
             let audioContext = new (window.AudioContext || window.webkitAudioContext)();
             let userPlayer = new WebAudioFontPlayer();
-            let player = new WebAudioFontPlayer();
+            let fontPlayer = new WebAudioFontPlayer();
 
             this.setState({ 
                 audioContext, 
                 userPlayer, 
-                player
+                fontPlayer
             }, resolve);
         });
     }
 
     _loadInstrumentAsync = instrument => {
-        let { audioContext, userPlayer, player } = this.state;
+        let { audioContext, userPlayer, fontPlayer } = this.state;
         let font = soundfonts[instrument];
 
         return new Promise((resolve, reject) => {
             if (!audioContext) reject("PRECOMP - attempted to load instrument with unset AudioContext");
 
             userPlayer.loader.startLoad(audioContext, font.url, font.variable);
-            player.loader.startLoad(audioContext, font.url, font.variable);
+            fontPlayer.loader.startLoad(audioContext, font.url, font.variable);
             
             userPlayer.loader.waitLoad(resolve);
-            player.loader.waitLoad(resolve);
+            fontPlayer.loader.waitLoad(resolve);
         });
     }
 
@@ -189,9 +187,9 @@ class AppRouter extends Component {
     }
 
     playUserMidiMessage = message => {
-        let { userPlayer, userInstrument, audioContext, userEnvelopes } = this.state;
+        let { userPlayer, userInstrument, audioContext, userEnvelopes, sessionManager } = this.state;
         let { data } = message;
-        let type = data[0], note = data[1], volume = data[2] / 127;
+        let type = data[0], note = data[1], velocity = data[2] / 127;
         let userEnvelopesUpdate = Util.copyObject(userEnvelopes);
         let existingEnvelop = userEnvelopes[note];
 
@@ -204,7 +202,7 @@ class AppRouter extends Component {
 
         switch(type) {
             case 144:
-                if (volume) {
+                if (velocity) {
                     let { currentTime, destination } = audioContext;
                     userEnvelopesUpdate[note] = userPlayer.queueWaveTable(
                         audioContext, 
@@ -213,13 +211,13 @@ class AppRouter extends Component {
                         currentTime, 
                         note,
                         1000,
-                        volume
+                        velocity
                     );
-                    // this.onUserKeyStroke(
-                    //     note,
-                    //     currentTime,
-                    //     volume
-                    // );
+                    this.onUserKeyStroke(
+                        note, 
+                        currentTime, 
+                        velocity
+                    );
                 }
                 else {
                     noteOff(existingEnvelop, userEnvelopesUpdate);
@@ -239,87 +237,69 @@ class AppRouter extends Component {
 
     onUserKeyStroke = (note, time, velocity) => {
         let { 
-            sessionId, 
             sessionManager,
-            userSessionRecord,
             onUserSessionKeyStroke 
         } = this.state;
+
+        if (sessionManager && sessionManager.inSession) {
+            let record = sessionManager.recordUserKeyStroke(note, time, velocity);
+            onUserSessionKeyStroke(record);
+        }
 
         // If there's a session going, we record
         // the notes the user plays in the userSessionRecord
         // state array
-        if (sessionId) {
-            let { chartIndex, subbeatDuration, subbeatOffsetToQueueTime } = sessionManager.sessionPassage;
-            let [closestSubbeatOffset, closestSubbeatOffsetTime] = Util.arrayBinarySearch(subbeatOffsetToQueueTime, time);
-            let precision = (time - closestSubbeatOffsetTime) / subbeatDuration;
+        // if (sessionManager.inSession) {
+        //     let { chartIndex, subbeatDuration, subbeatOffsetToQueueTime } = sessionManager.sessionPassage;
+        //     let [closestSubbeatOffset, closestSubbeatOffsetTime] = Util.arrayBinarySearch(subbeatOffsetToQueueTime, time);
+        //     let precision = (time - closestSubbeatOffsetTime) / subbeatDuration;
             
-            if (precision < -0.5) {
-                closestSubbeatOffset = sessionManager.peekPreviousSubbeat({...chartIndex, subbeatOffset: closestSubbeatOffset});
-                precision++
-            } else if (precision > 0.5) {
-                closestSubbeatOffset = sessionManager.peekNextSubbeat(...chartIndex, closestSubbeatOffset);
-                precision--;
-            }
+        //     if (precision < -0.5) {
+        //         closestSubbeatOffset = sessionManager.peekPreviousSubbeat({...chartIndex, subbeatOffset: closestSubbeatOffset});
+        //         precision++
+        //     } else if (precision > 0.5) {
+        //         closestSubbeatOffset = sessionManager.peekNextSubbeat(...chartIndex, closestSubbeatOffset);
+        //         precision--;
+        //     }
             
-            let keyStrokeRecord = {
-                note,
-                velocity,
-                chartIndex: { 
-                    ...chartIndex, 
-                    subbeatOffset: closestSubbeatOffset
-                },
-                precision,
-                inKey
-            }
+        //     let keyStrokeRecord = {
+        //         note,
+        //         velocity,
+        //         chartIndex: { 
+        //             ...chartIndex, 
+        //             subbeatOffset: closestSubbeatOffset
+        //         },
+        //         precision,
+        //         inKey
+        //     }
 
-            let userSessionRecordUpdate = Util.copyObject(userSessionRecord);
-            userSessionRecordUpdate.push(keyStrokeRecord);
-            this.setState({ userSessionRecord: userSessionRecordUpdate });
+        //     let userSessionRecordUpdate = Util.copyObject(userSessionRecord);
+        //     userSessionRecordUpdate.push(keyStrokeRecord);
+        //     this.setState({ userSessionRecord: userSessionRecordUpdate });
             
-            // And call the user key stroke subscriber's function
-            onUserSessionKeyStroke(keyStrokeRecord);
-        }
+        //     // And call the user key stroke subscriber's function
+        //     onUserSessionKeyStroke(keyStrokeRecord);
+        // }
     }
 
     playRangeLoop = (chart) => {
-        let { audioContext, player } = this.state;
-        let sessionManager = new SessionManager(audioContext, player, chart);
+        let { audioContext, fontPlayer } = this.state;
+        let sessionManager = new SessionManager(
+            audioContext, 
+            fontPlayer, 
+            chart,
+            this.forceUpdate.bind(this)
+        );
 
         sessionManager.start();
-
-        this.setState({ 
-            sessionId: sessionManager.sessionId,
-            sessionManager, 
-            userSessionRecord: [] 
-        });
-    }
-
-    queueParts = (parts, subbeatOffsetToQueueTime, timeFactor) => {
-        let { player, audioContext } = this.state;
-
-        Object.keys(parts).forEach(instrument => {
-            let part = parts[instrument];
-
-            if (part) {
-                part.forEach(stroke => {
-                    stroke.notes.forEach(note => {
-                        player.queueWaveTable(
-                            audioContext, 
-                            audioContext.destination, 
-                            window[soundfonts[instrument].variable], 
-                            subbeatOffsetToQueueTime[stroke.subbeatOffset], 
-                            note,
-                            timeFactor * stroke.durationInSubbeats,
-                            stroke.velocity
-                        );
-                    });
-                });
-            }
-        });
+        this.setState({ sessionManager });
     }
 
     killTake = () => {
-        this.state.sessionManager.stop();
+        let { sessionManager } = this.state;
+        if (sessionManager) {
+            sessionManager.stop();
+        }
     }
 };
 
