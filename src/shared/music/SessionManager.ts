@@ -94,7 +94,6 @@ class SessionManager {
                 Util.waitFor(getUpdate, this._TIME_CHECKER_RATE)
                     .then(() => {
                         if (!timeout || this.inSession) {
-                            console.log(this._userKeyStrokes);
                             this._stepBySegment();
                             this._queueCurrSegment();
                             let nextQueueTime = this._nextSegmentQueueTime;
