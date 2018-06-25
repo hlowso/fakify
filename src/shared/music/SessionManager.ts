@@ -1,7 +1,7 @@
 import * as Util from "../Util";
 import { CompV1 } from "../music/MusicHelper";
 import Chart from "../music/Chart";
-import { IScoreBar, IChartBar, NoteName, IChordSegment, IKeyStrokeRecord, IMusicIdx } from "../types";
+import { IScoreBar, IChartBar, NoteName, IChordSegment, IKeyStrokeRecord, IMusicIdx, ISubbeatTimeMap } from "../types";
 import soundfonts from "./soundfontsIndex";
 
 class SessionManager {
@@ -13,7 +13,7 @@ class SessionManager {
     private _fontPlayer: any;
     private _chart: Chart;
     private _score: IScoreBar[];
-    private _queueTimes: { [barIdx: number]: { [subbeatIdx: number]: number }};
+    private _queueTimes: ISubbeatTimeMap;
     private _startTime: number;
     private _userKeyStrokes: IKeyStrokeRecord[];
 
@@ -115,27 +115,12 @@ class SessionManager {
     }
 
     public recordUserKeyStroke = (note: number, time: number, velocity: number): IKeyStrokeRecord => {
-        let queueTimeBarComparison = (a: { [subbeatIdx: number]: number }, b: { [subbeatIdx: number]: number }) => {
-            let aCenter = Math.floor(Util.length(a) / 2);
-            let bCenter = Math.floor(Util.length(b) / 2);
-            return a[aCenter] - b[bCenter];
-        };
-
-        let [barIdx, queueTimeBar] = Util.binarySearch(
-            this._queueTimes, 
-            { 0: time }, 
-            queueTimeBarComparison, 
-            this._chart.rangeStartIdx - 1, 
-            this._chart.rangeEndIdx + 1
-        );
-        let [subbeatIdx, closestTime] = Util.binarySearch(
-            queueTimeBar, 
-            time
-        );
+        let [musicIdx, closestTime] = Util.getClosestQueueTime(this._queueTimes, time);
+        musicIdx.chorusIdx = this._chorusIdx;
+        musicIdx.segmentIdx = this._segmentIdx;
 
         let record = {
-            barIdx,
-            subbeatIdx,
+            musicIdx,
             precision: time - closestTime,
             note,
             velocity

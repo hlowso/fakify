@@ -35,8 +35,7 @@ export interface IChordSegment {
 }
 
 export interface IKeyStrokeRecord {
-    barIdx: number;
-    subbeatIdx: number;
+    musicIdx: IMusicIdx;
     precision: number;
     note: number;
     velocity: number;
@@ -110,7 +109,10 @@ export interface IScoreBar {
     }
 }
 
-
 export interface IMusicBarV2 {
     [subbeatIdx: number]: IStroke[];
+}
+
+export interface ISubbeatTimeMap { 
+    [barIdx: number]: { [subbeatIdx: number]: number };
 }
