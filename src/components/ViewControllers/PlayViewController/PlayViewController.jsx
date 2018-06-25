@@ -69,6 +69,7 @@ class PlayViewController extends Component {
         let {
             sessionManager
         } = this.props;
+        
         let { 
             songTitles, 
             selectedSong, 
