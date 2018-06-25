@@ -245,41 +245,6 @@ class AppRouter extends Component {
             let record = sessionManager.recordUserKeyStroke(note, time, velocity);
             onUserSessionKeyStroke(record);
         }
-
-        // If there's a session going, we record
-        // the notes the user plays in the userSessionRecord
-        // state array
-        // if (sessionManager.inSession) {
-        //     let { chartIndex, subbeatDuration, subbeatOffsetToQueueTime } = sessionManager.sessionPassage;
-        //     let [closestSubbeatOffset, closestSubbeatOffsetTime] = Util.arrayBinarySearch(subbeatOffsetToQueueTime, time);
-        //     let precision = (time - closestSubbeatOffsetTime) / subbeatDuration;
-            
-        //     if (precision < -0.5) {
-        //         closestSubbeatOffset = sessionManager.peekPreviousSubbeat({...chartIndex, subbeatOffset: closestSubbeatOffset});
-        //         precision++
-        //     } else if (precision > 0.5) {
-        //         closestSubbeatOffset = sessionManager.peekNextSubbeat(...chartIndex, closestSubbeatOffset);
-        //         precision--;
-        //     }
-            
-        //     let keyStrokeRecord = {
-        //         note,
-        //         velocity,
-        //         chartIndex: { 
-        //             ...chartIndex, 
-        //             subbeatOffset: closestSubbeatOffset
-        //         },
-        //         precision,
-        //         inKey
-        //     }
-
-        //     let userSessionRecordUpdate = Util.copyObject(userSessionRecord);
-        //     userSessionRecordUpdate.push(keyStrokeRecord);
-        //     this.setState({ userSessionRecord: userSessionRecordUpdate });
-            
-        //     // And call the user key stroke subscriber's function
-        //     onUserSessionKeyStroke(keyStrokeRecord);
-        // }
     }
 
     playRangeLoop = (chart) => {
