@@ -200,7 +200,7 @@ class AppRouter extends Component {
 
         let noteOff = (existingEnvelop, userEnvelopesUpdate) => {
             if (existingEnvelop) {
-                existingEnvelop.cancel();
+                if (existingEnvelop.cancel) existingEnvelop.cancel();
                 delete userEnvelopesUpdate[note];
             }
         }
