@@ -69,6 +69,7 @@ export interface IStroke {
 }
 
 export enum PlayMode {
+    None = "none",
     Improv = "improv",
     ListenAndRepeat = "listenAndRepeat"
 }
