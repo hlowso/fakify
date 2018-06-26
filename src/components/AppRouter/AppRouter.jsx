@@ -253,6 +253,7 @@ class AppRouter extends Component {
     }
 
     playRangeLoop = (chart) => {
+        this.killTake();
         let { audioContext, fontPlayer } = this.state;
         let sessionManager = new SessionManager(
             audioContext, 
