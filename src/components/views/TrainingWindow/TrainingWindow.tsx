@@ -1,8 +1,5 @@
 import React, { Component } from "react";
-
 import { PlayMode } from "../../../shared/types";
-import * as Util from "../../../shared/Util";
-
 import "./TrainingWindow.css";
 
 class TrainingWindow extends Component<any, any> {
@@ -13,27 +10,27 @@ class TrainingWindow extends Component<any, any> {
         };
     }
 
-    public render() {
-        let { trainingFeedback } = this.props;
+    public render(): JSX.Element {
+        let { startSession, stopSession } = this.props;
         return (
             <div id="training-window">
-                <button onClick={this.props.startSession} >
-                    Play
-                </button>
-                <button onClick={this.props.stopSession} >
-                    Stop
-                </button>
-                {this.renderPlayModeSelect()}
-                {!Util.objectIsEmpty(trainingFeedback) && [
-                    <div style={{color: "white"}} key={0}>{`Notes Out Of Time: ${trainingFeedback.notesOutOfTime}`}</div>,
-                    <div style={{color: "white"}} key={1}>{`Notes In Key: ${trainingFeedback.notesInKeyAndInTime}`}</div>,
-                    <div style={{color: "white"}} key={2}>{`Total in Time: ${trainingFeedback.notesInTime}`}</div>
-                ]}
+                <div className="menu-bar">
+                    <button onClick={startSession} >
+                        Play
+                    </button>
+                    <button onClick={stopSession} >
+                        Stop
+                    </button>
+                    {this.renderPlayModeSelect()}
+                </div>
+                <div className="feedback-window">
+                    {this.renderFeedback()}
+                </div>
             </div>
         );
     }
 
-    private renderPlayModeSelect = () => {
+    public renderPlayModeSelect = (): JSX.Element => {
         let options = Object.keys(PlayMode).map(key => (
             <option key={PlayMode[key]} value={PlayMode[key]}>
                 {PlayMode[key]}
@@ -41,10 +38,33 @@ class TrainingWindow extends Component<any, any> {
         ));
         return (
             <select
+                className="play-mode-select"
                 value={this.props.playMode} 
                 onChange={event => this.props.setPlayMode(event.target.value)} >
                 {options}
             </select>
+        );
+    }
+
+    public renderFeedback = (): JSX.Element => {
+        if (!this.props.score) {
+            return <div />;
+        }
+        switch (this.props.playMode) {
+            case PlayMode.Improv:
+                return this.renderImprovFeedback();
+            default:
+                return <div />
+        }
+    }
+
+    public renderImprovFeedback = (): JSX.Element => {
+        let { notesInKey, notesInTime, notesPlayed } = this.props.score;
+        return (
+            <div className="feedback">
+                <span>In Key: {notesInKey} / {notesPlayed}</span>
+                <span>In Time: {notesInTime} / {notesPlayed}</span>
+            </div>
         );
     }
 };

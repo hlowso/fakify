@@ -79,7 +79,12 @@ class AppRouter extends Component {
             SoundActions,
             StateHelper,            
             StorageHelper,
-            sessionManager
+            sessionManager,
+            improvScore: (
+                sessionManager && sessionManager.inSession 
+                    ? sessionManager.currImprovScore 
+                    : null
+            )
         };
 
         return loading

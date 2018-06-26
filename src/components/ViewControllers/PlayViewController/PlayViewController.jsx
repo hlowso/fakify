@@ -15,9 +15,6 @@ import Chart from "../../../shared/music/Chart";
 import "./PlayViewController.css";
 
 class PlayViewController extends Component {
-
-    PRECISION_THRESHOLD = 0.2;
-
     constructor(props) {
         super(props);
         this.state = {
@@ -26,8 +23,7 @@ class PlayViewController extends Component {
             selectedSong: {},
             chart: {},
             midiSettingsModalOpen: true,
-            playMode: "improv",
-            trainingFeedback: {}          
+            playMode: "improv"         
         };
     }
 
@@ -67,7 +63,8 @@ class PlayViewController extends Component {
 
     render() {
         let {
-            sessionManager
+            sessionManager,
+            improvScore
         } = this.props;
         
         let { 
@@ -75,14 +72,15 @@ class PlayViewController extends Component {
             selectedSong, 
             midiSettingsModalOpen, 
             chart,
-            playMode,
-            trainingFeedback 
+            playMode
         } = this.state;
 
         let selectedSongId = selectedSong ? selectedSong.songId: null;
         let inSession = sessionManager && sessionManager.inSession;
         let sessionIdx = inSession ? sessionManager.sessionIdx : null;
         let currKey = inSession ? sessionManager.currKey : "";
+
+        let score = playMode === "improv" ? improvScore : {};
 
         return (
             <div id="play-view">
@@ -107,7 +105,7 @@ class PlayViewController extends Component {
                         stopSession={this.stopSession} 
                         setPlayMode={this.setPlayMode} 
                         playMode={playMode} 
-                        trainingFeedback={trainingFeedback} />
+                        score={score} />
                 </div>
                 <div className="bottom-row">
                     <Keyboard 
@@ -133,6 +131,15 @@ class PlayViewController extends Component {
     /*********************
         TRAINING WINDOW
     **********************/
+
+    startSession = () => {
+        let { chart } = this.state;
+        this.SoundActions.playRangeLoop(chart);
+    }
+
+    stopSession = () => {
+        this.SoundActions.killTake();
+    }
 
     setPlayMode = playMode => {
         this.setState({ playMode });
@@ -179,49 +186,6 @@ class PlayViewController extends Component {
                 rangeEndIdx
             ) 
         });
-    }
-
-    startSession = () => {
-        let { chart, playMode } = this.state;
-        let { barsV1, rangeStartIndex } = chart;
-
-        // switch(playMode) {
-        //     case "improv":
-        //         this.setState({
-        //             trainingFeedback: {
-        //                 notesOutOfTime: 0,
-        //                 notesInKeyAndInTime: 0,
-        //                 notesInTime: 0
-        //             }
-        //         })
-        //         this.StateHelper.subscribeToUserSessionKeyStroke(
-        //             keyStrokeRecord => {
-        //                 let { trainingFeedback, currentKey } = this.state;
-        //                 let trainingFeedbackUpdate = Util.copyObject(trainingFeedback);
-
-        //                 if (Math.abs(keyStrokeRecord.precision) > this.PRECISION_THRESHOLD) {
-        //                     trainingFeedbackUpdate.notesOutOfTime++;
-        //                 } else {
-        //                     if (MusicHelper.noteIsInKey(keyStrokeRecord.note, currentKey)) {
-        //                         trainingFeedbackUpdate.notesInKeyAndInTime++;
-        //                     }
-        //                     trainingFeedbackUpdate.notesInTime++;
-        //                 }
-
-        //                 this.setState({ trainingFeedback: trainingFeedbackUpdate });
-        //             }
-        //         );
-        //         break;
-        // }
-
-        this.SoundActions.playRangeLoop(chart);
-    }
-
-    stopSession = () => {
-        this.setState({ 
-            trainingFeedback: {} 
-        });
-        this.SoundActions.killTake();
     }
 
     /*******************

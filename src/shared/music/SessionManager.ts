@@ -1,13 +1,17 @@
 import * as Util from "../Util";
-import { CompV1 } from "../music/MusicHelper";
+import * as MusicHelper from "../music/MusicHelper";
 import Chart from "../music/Chart";
-import { IScoreBar, IChartBar, NoteName, IChordSegment, IKeyStrokeRecord, IMusicIdx, ISubbeatTimeMap } from "../types";
+import { IScoreBar, IChartBar, NoteName, IChordSegment, IKeyStrokeRecord, IMusicIdx, ISubbeatTimeMap, IImprovScore } from "../types";
 import soundfonts from "./soundfontsIndex";
 
 class SessionManager {
     private _WAITTIME_FACTOR = (3 / 4) * 1000;
     private _PREP_TIME = 0.02;
     private _TIME_CHECKER_RATE = 5;
+
+    // The higher the index, the harder it is
+    // for the user to get a high precision score
+    private _PRECISION_INDEX = 6;
 
     private _audioContext: any;
     private _fontPlayer: any;
@@ -16,6 +20,7 @@ class SessionManager {
     private _queueTimes: ISubbeatTimeMap;
     private _startTime: number;
     private _userKeyStrokes: IKeyStrokeRecord[];
+    private _improveScore: IImprovScore;
 
     private _rangeLength: number;
 
@@ -39,6 +44,11 @@ class SessionManager {
 
         this._startTime = NaN;
         this._userKeyStrokes = [];
+        this._improveScore = {
+            notesPlayed: 0,
+            notesInTime: 0,
+            notesInKey: 0
+        }
         this._onUpdate = onUpdate;
     }
 
@@ -84,6 +94,10 @@ class SessionManager {
         }
     }
 
+    get currImprovScore(): IImprovScore {
+        return this._improveScore;
+    }
+
     /**
      * PUBLIC FUNCTIONS
      */
@@ -112,6 +126,7 @@ class SessionManager {
     public stop = () => {
         this._fontPlayer.cancelQueue(this._audioContext);
         this._startTime = NaN;
+        this._onUpdate();
     }
 
     public recordUserKeyStroke = (note: number, time: number, velocity: number): IKeyStrokeRecord => {
@@ -121,12 +136,14 @@ class SessionManager {
 
         let record = {
             musicIdx,
-            precision: time - closestTime,
             note,
-            velocity
+            velocity,
+            inKey: MusicHelper.noteIsInKey(note, this.currKey),
+            precision: time - closestTime
         }
 
         this._userKeyStrokes.push(record);
+        this._updateUserScores(record);
         return record;
     }
 
@@ -183,7 +200,7 @@ class SessionManager {
                 this._chorusIdx ++;
 
                 // Refresh the score
-                this._score = CompV1(this._chart);
+                this._score = MusicHelper.CompV1(this._chart);
 
                 // Reset the queue times
                 this._resetQueueTimes();
@@ -268,6 +285,19 @@ class SessionManager {
         }
     }
 
+    private _updateUserScores = (record: IKeyStrokeRecord) => {
+        // Improve Score
+        this._improveScore.notesPlayed ++;
+        if (Math.abs(record.precision) <= this._precisionThreshold) {
+            this._improveScore.notesInTime ++;
+        }
+        if (record.inKey) {
+            this._improveScore.notesInKey ++;
+        }
+
+        console.log(record.precision, this._precisionThreshold);
+    };
+
     /**
      * PRIVATE GETTERS
      */
@@ -285,6 +315,10 @@ class SessionManager {
 
     private get _currScoreBar(): IScoreBar {
         return this._score[this._barIdx];
+    }
+
+    private get _precisionThreshold(): number {
+        return this.subbeatDuration / this._PRECISION_INDEX;
     }
 }
 

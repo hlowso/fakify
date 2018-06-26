@@ -44,7 +44,7 @@ export const binarySearch = <T>(obj: T[] | { [key: number]: T }, element: T, dif
 }
 
 export const getClosestQueueTime = (queueTimes: ISubbeatTimeMap, time: number): [IMusicIdx, number] => {
-    let barIndeces = Object.keys(queueTimes).map(barIdx => Number(barIdx));
+    let barIndeces = Object.keys(queueTimes).map((idx: string) => Number(idx));
     let minIdx = Math.min(...barIndeces);
     let maxIdx = Math.max(...barIndeces);
 

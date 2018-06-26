@@ -36,9 +36,10 @@ export interface IChordSegment {
 
 export interface IKeyStrokeRecord {
     musicIdx: IMusicIdx;
-    precision: number;
     note: number;
     velocity: number;
+    precision: number;
+    inKey: boolean;
     duration?: number;
 }
 
@@ -49,24 +50,8 @@ export interface IMusicIdx {
     subbeatIdx: number;
 }
 
-export interface IChart {
-    barsV1: any;
-    tempo: number[];
-    keyContext: string;
-    feel: Feel;
-    rangeStartIndex: number;
-    rangeEndIndex: number;
-}
-
 export enum Feel {
     Swing = "swing"
-}
-
-export interface IMusicBar {
-    chartBarIndex?: number;
-    timeSignature: number[];
-    durationInSubbeats: number;
-    chordPassages: IChordPassage[];
 }
 
 export interface IChordPassage {
@@ -83,25 +68,10 @@ export interface IStroke {
     velocity: number;
 }
 
-// export interface ISessionPassage {
-//     sessionId: string;
-//     duration: number;
-//     subbeatDuration: number;
-//     subbeatOffsetToQueueTime: number[];
-//     chartIndex: IMusicIdx;
-//     parts: {
-//         [instrument: string]: IStroke[];
-//     }
-// }
-
 export enum PlayMode {
     Improv = "improv",
     ListenAndRepeat = "listenAndRepeat"
 }
-
-/**
- * MUSIC V2 SPECIFIC
- */
 
 export interface IScoreBar {
     [subbeatIdx: number]: {
@@ -115,4 +85,10 @@ export interface IMusicBarV2 {
 
 export interface ISubbeatTimeMap { 
     [barIdx: number]: { [subbeatIdx: number]: number };
+}
+
+export interface IImprovScore {
+    notesPlayed: number;
+    notesInTime: number;
+    notesInKey: number;
 }
