@@ -11,7 +11,7 @@ class SessionManager {
 
     // The higher the index, the harder it is
     // for the user to get a high precision score
-    private _PRECISION_INDEX = 6;
+    private _PRECISION_INDEX = 4;
 
     private _audioContext: any;
     private _fontPlayer: any;
