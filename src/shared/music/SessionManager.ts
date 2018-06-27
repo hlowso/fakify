@@ -294,8 +294,6 @@ class SessionManager {
         if (record.inKey) {
             this._improveScore.notesInKey ++;
         }
-
-        console.log(record.precision, this._precisionThreshold);
     };
 
     /**
