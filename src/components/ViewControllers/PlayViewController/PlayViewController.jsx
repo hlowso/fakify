@@ -13,6 +13,7 @@ import * as MusicHelper from "../../../shared/music/MusicHelper";
 import Chart from "../../../shared/music/Chart";
 
 import "./PlayViewController.css";
+import { PlayMode } from "../../../shared/types";
 
 class PlayViewController extends Component {
     constructor(props) {

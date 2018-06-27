@@ -1,5 +1,5 @@
 import * as MusicHelper from "../music/MusicHelper";
-import { IBarBase, IChartBar, Feel, NoteName, Tempo } from "../types";
+import { IBarBase, IChartBar, Feel, NoteName, Tempo, IMusicIdx } from "../types";
 
 class Chart {
     private _barsBase: IBarBase[];
@@ -42,12 +42,36 @@ class Chart {
         }
     }
 
+    public barIdxIsInRange = (idx: number): boolean => (
+        this._rangeStartIdx <= idx &&
+        idx <= this._rangeEndIdx
+    )
+
+    public keyAtIdx = (idx: IMusicIdx) => {
+        let bar = this._bars[idx.barIdx];
+        let subbeatCount = bar.chordSegments[0].durationInSubbeats;
+        let segIdx = 0; 
+
+        while (subbeatCount < idx.subbeatIdx) {
+            segIdx ++;
+            subbeatCount += bar.chordSegments[segIdx].durationInSubbeats; 
+        }
+
+        return bar.chordSegments[segIdx].key;
+    }
+
     /**
      * GETTERS
      */
 
     get bars(): IChartBar[] {
         return this._bars;
+    }
+
+    get barsInRange(): IChartBar[] {
+        return this._bars.filter(
+            (bar: IChartBar, idx: number) => this.barIdxIsInRange(idx)
+        );
     }
 
     get context(): NoteName {

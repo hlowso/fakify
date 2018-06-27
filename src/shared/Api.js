@@ -59,7 +59,7 @@ export const getSongAsync = songId => {
             suitableFeels: ["swing"],
             barsBase: [
                 {
-                    barIndex: 0,
+                    barIdx: 0,
                     timeSignature: [8, 8],
                     chordSegments: [
                         {
@@ -71,7 +71,7 @@ export const getSongAsync = songId => {
                     ]
                 },
                 {
-                    barIndex: 1,
+                    barIdx: 1,
                     timeSignature: [8, 8],
                     chordSegments: [
                         {
@@ -83,7 +83,7 @@ export const getSongAsync = songId => {
                     ]
                 },
                 {
-                    barIndex: 2,
+                    barIdx: 2,
                     timeSignature: [8, 8],
                     chordSegments: [
                         {
@@ -95,7 +95,7 @@ export const getSongAsync = songId => {
                     ]
                 },
                 {
-                    barIndex: 3,
+                    barIdx: 3,
                     timeSignature: [8, 8],
                     chordSegments: [
                         {
@@ -107,7 +107,7 @@ export const getSongAsync = songId => {
                     ]
                 },
                 {
-                    barIndex: 4,
+                    barIdx: 4,
                     timeSignature: [8, 8],
                     chordSegments: [
                         {
@@ -119,7 +119,7 @@ export const getSongAsync = songId => {
                     ]
                 },
                 {
-                    barIndex: 5,
+                    barIdx: 5,
                     timeSignature: [8, 8],
                     chordSegments: [
                         {
@@ -131,7 +131,7 @@ export const getSongAsync = songId => {
                     ]
                 }, 
                 {
-                    barIndex: 6,
+                    barIdx: 6,
                     timeSignature: [8, 8],
                     chordSegments: [
                         {
@@ -143,7 +143,7 @@ export const getSongAsync = songId => {
                     ]
                 },
                 {
-                    barIndex: 7,
+                    barIdx: 7,
                     timeSignature: [8, 8],
                     chordSegments: [
                         {
@@ -155,7 +155,7 @@ export const getSongAsync = songId => {
                     ]
                 },
                 {
-                    barIndex: 8,
+                    barIdx: 8,
                     timeSignature: [8, 8],
                     chordSegments: [
                         {
@@ -167,7 +167,7 @@ export const getSongAsync = songId => {
                     ]
                 },
                 {
-                    barIndex: 9,
+                    barIdx: 9,
                     timeSignature: [8, 8],
                     chordSegments: [
                         {
@@ -179,7 +179,7 @@ export const getSongAsync = songId => {
                     ]
                 },
                 {
-                    barIndex: 10,
+                    barIdx: 10,
                     timeSignature: [8, 8],
                     chordSegments: [
                         {
@@ -191,7 +191,7 @@ export const getSongAsync = songId => {
                     ]
                 },
                 {
-                    barIndex: 11,
+                    barIdx: 11,
                     timeSignature: [8, 8],
                     chordSegments: [
                         {
@@ -211,7 +211,7 @@ export const getSongAsync = songId => {
             ]
             // barsV1: [
             //     {
-            //         barIndex: 1,
+            //         barIdx: 1,
             //         timeSignature: [4, 4],
             //         chordSegments: [
             //             {
@@ -224,7 +224,7 @@ export const getSongAsync = songId => {
             //         ]
             //     },
             //     {
-            //         barIndex: 2,
+            //         barIdx: 2,
             //         timeSignature: [4, 4],
             //         chordEnvelopes: [
             //             {
@@ -237,7 +237,7 @@ export const getSongAsync = songId => {
             //         ]
             //     },
             //     {
-            //         barIndex: 3,
+            //         barIdx: 3,
             //         timeSignature: [4, 4],
             //         chordEnvelopes: [
             //             {

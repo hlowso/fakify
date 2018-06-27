@@ -1,6 +1,12 @@
 import * as Util from "../Util";
 import { NoteName, RelativeNoteName, IChartBar, IChordSegment, IChordBase, IBarBase, Feel } from "../types";
 
+export * from "./composers/index"
+
+export const NUMBER_OF_KEYS = 88;
+export const LOWEST_A = 9;
+export const HIGHEST_C = LOWEST_A + NUMBER_OF_KEYS - 1;
+
 // const NOTE_REGEX = /[A-G](#|b)?/g;
 const RELATIVE_SCALE_NOTE_REGEX = /[1H2N34T5U6J7]/g;
 
@@ -25,10 +31,16 @@ export const getWordConstituents = (word: string): any => {
     };
 }
 
-export * from "./compers/index";
-
 export const RELATIVE_SCALE= ["1", "H", "2", "N", "3", "4", "T", "5", "U", "6", "J", "7"];
 export const NOTE_NAMES = ["C", "C#|Db", "D", "D#|Eb", "E", "F", "F#|Gb", "G", "G#|Ab", "A", "A#|Bb", "B|Cb"];
+
+// Temporary ugly code for getting the set of notes in a scale from 
+// a note name. TODO: create a ticket for organizing notes better. 
+// Should Note be its own class?
+export const keyTo7Notes = (key: NoteName) => {
+    let tonicIdx = NOTE_NAMES.indexOf(key);
+    return C_NOTE_NAMES_INDECES.map(note => note + tonicIdx);
+}
 
 // The chart viewer passes the key of the first chordEnvelope of the first
 // bar of the chart object to the getPresentableChord function below to 
@@ -89,8 +101,8 @@ export const adjustBarTimes = (bars: IBarBase[], feel: Feel): IChartBar[] => {
 const _adjustBarsSwingFeel = (bars: IBarBase[]): IChartBar[] => {
 
     // First we convert time signatures and beat indeces
-    let adjustedBars: IChartBar[] = bars.map((bar: IBarBase) => {
-        let { timeSignature, chordSegments } = bar;
+    let adjustedBars: IChartBar[] = bars.map(bar=> {
+        let { timeSignature, chordSegments, barIdx } = bar;
         let conversionFactor: number; 
         let adjustedTimeSignature = Util.copyObject(timeSignature);
         let subbeatsInBar = 0;
@@ -126,6 +138,7 @@ const _adjustBarsSwingFeel = (bars: IBarBase[]): IChartBar[] => {
         });
 
         return {
+            barIdx,
             timeSignature: adjustedTimeSignature,
             durationInSubbeats: subbeatsInBar,
             chordSegments: adjustedSegments
