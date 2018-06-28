@@ -87,6 +87,11 @@ export interface IScoreBar {
     }
 }
 
+export interface IPart {
+    instrument: string;
+    music: IMusicBarV2[];
+}
+
 export interface IMusicBarV2 {
     [subbeatIdx: number]: IStroke[];
 }

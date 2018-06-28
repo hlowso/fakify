@@ -1,16 +1,17 @@
 import Domain from "../../Domain";
-import { Difficulty, IMusicBarV2, IStroke } from "../../../types";
+import { Difficulty, IMusicBarV2, IStroke, IPart } from "../../../types";
 import Chart from "../../Chart";
 import * as MusicHelper from "../../MusicHelper";
 
 // We assume that the chart's time signature has a base of 4,
 // and that the subdivision is 3 subbeats per beat
-export const generateSwingExerciseV0 = (chart: Chart, difficulty = Difficulty.Easy): IMusicBarV2[] => {
+export const generateSwingExerciseV0 = (chart: Chart, instrument: string, difficulty: Difficulty): IPart => {
     switch (difficulty) {
         default:
         case Difficulty.Easy:
         case Difficulty.Hard:
-            return chart.barsInRange.map(bar => {
+            let music: IMusicBarV2[] = [];
+            chart.barsInRange.forEach(bar => {
 
                 let musicBar: IMusicBarV2 = {};
 
@@ -32,7 +33,12 @@ export const generateSwingExerciseV0 = (chart: Chart, difficulty = Difficulty.Ea
                     musicBar[subbeatIdx] = [stroke];
                 }
 
-                return musicBar;
+                music[bar.barIdx] = musicBar;
             });
+
+            return {
+                instrument,
+                music
+            }
     }
 }

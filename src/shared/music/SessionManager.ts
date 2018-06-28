@@ -1,6 +1,7 @@
 import * as Util from "../Util";
 import * as MusicHelper from "../music/MusicHelper";
 import Chart from "../music/Chart";
+import Score from "../music/Score";
 import { IScoreBar, IChartBar, NoteName, IChordSegment, IKeyStrokeRecord, IMusicIdx, ISubbeatTimeMap, IImprovScore } from "../types";
 import soundfonts from "./soundfontsIndex";
 
@@ -16,7 +17,7 @@ class SessionManager {
     private _audioContext: any;
     private _fontPlayer: any;
     private _chart: Chart;
-    private _score: IScoreBar[];
+    private _score: Score;
     private _queueTimes: ISubbeatTimeMap;
     private _startTime: number;
     private _userKeyStrokes: IKeyStrokeRecord[];
@@ -314,7 +315,7 @@ class SessionManager {
     }
 
     private get _currScoreBar(): IScoreBar {
-        return this._score[this._barIdx];
+        return this._score.barAt(this._barIdx);
     }
 
     private get _precisionThreshold(): number {
