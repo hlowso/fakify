@@ -336,6 +336,7 @@ export class ImprovSessionManager extends SessionManager {
     }
 }
 
+// TODO: fill out this class
 export class LARSessionManager extends SessionManager {
-
+    // private listenAndRepeatScore: ILARScore
 }
