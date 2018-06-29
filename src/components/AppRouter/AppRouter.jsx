@@ -7,7 +7,7 @@ import PlayViewController from "../ViewControllers/PlayViewController/PlayViewCo
 
 import * as StorageHelper from "../../shared/StorageHelper";
 import * as MusicHelper from "../../shared/music/MusicHelper";
-import SessionManager from "../../shared/music/SessionManager";
+import { SessionManager, ImprovSessionManager, LARSessionManager } from "../../shared/music/SessionManager";
 import * as Util from "../../shared/Util";
 import soundfonts from "../../shared/music/soundfontsIndex";
 
@@ -252,10 +252,16 @@ class AppRouter extends Component {
         }
     }
 
-    playRangeLoop = (chart) => {
+    playRangeLoop = (chart, playMode) => {
         this.killTake();
         let { audioContext, fontPlayer } = this.state;
-        let sessionManager = new SessionManager(
+        let Manager = (
+            playMode === "improv"
+                ? ImprovSessionManager
+                : SessionManager
+        );
+
+        let sessionManager = new Manager(
             audioContext, 
             fontPlayer, 
             chart,

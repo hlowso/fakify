@@ -5,14 +5,10 @@ import Score from "../music/Score";
 import { IScoreBar, IChartBar, NoteName, IChordSegment, IKeyStrokeRecord, IMusicIdx, ISubbeatTimeMap, IImprovScore } from "../types";
 import soundfonts from "./soundfontsIndex";
 
-class SessionManager {
+export class SessionManager {
     private _WAITTIME_FACTOR = (3 / 4) * 1000;
     private _PREP_TIME = 0.02;
     private _TIME_CHECKER_RATE = 5;
-
-    // The higher the index, the harder it is
-    // for the user to get a high precision score
-    private _PRECISION_INDEX = 6;
 
     private _audioContext: any;
     private _fontPlayer: any;
@@ -21,7 +17,6 @@ class SessionManager {
     private _queueTimes: ISubbeatTimeMap;
     private _startTime: number;
     private _userKeyStrokes: IKeyStrokeRecord[];
-    private _improveScore: IImprovScore;
 
     private _rangeLength: number;
 
@@ -31,7 +26,7 @@ class SessionManager {
     private _subbeatIdx: number;
 
     private _onUpdate: () => void;
-    
+
     constructor(audioContext: any, fontPlayer: any, chart: Chart, onUpdate: () => void) {
         this._audioContext = audioContext;
         this._fontPlayer = fontPlayer;
@@ -45,11 +40,7 @@ class SessionManager {
 
         this._startTime = NaN;
         this._userKeyStrokes = [];
-        this._improveScore = {
-            notesPlayed: 0,
-            notesInTime: 0,
-            notesInKey: 0
-        }
+
         this._onUpdate = onUpdate;
     }
 
@@ -95,10 +86,6 @@ class SessionManager {
         }
     }
 
-    get currImprovScore(): IImprovScore {
-        return this._improveScore;
-    }
-
     /**
      * PUBLIC FUNCTIONS
      */
@@ -130,7 +117,9 @@ class SessionManager {
         this._onUpdate();
     }
 
-    public recordUserKeyStroke = (note: number, time: number, velocity: number): IKeyStrokeRecord => {
+    // Had to be converted from property (arrow function) to function 
+    // in order that the sub classes could make use of it. Weird.
+    public recordUserKeyStroke(note: number, time: number, velocity: number): IKeyStrokeRecord {
         let [musicIdx, closestTime] = Util.getClosestQueueTime(this._queueTimes, time);
         musicIdx.chorusIdx = this._chorusIdx;
         musicIdx.segmentIdx = this._segmentIdx;
@@ -144,13 +133,16 @@ class SessionManager {
         }
 
         this._userKeyStrokes.push(record);
-        this._updateUserScores(record);
         return record;
     }
 
     /**
      * PRIVATE FUNCTIONS
      */
+
+    private _getMusic = () => {
+        return MusicHelper.CompV1(this._chart);
+    }
 
     private _queueCurrSegment = () => {
         let scoreBar = this._currScoreBar;
@@ -201,7 +193,7 @@ class SessionManager {
                 this._chorusIdx ++;
 
                 // Refresh the score
-                this._score = MusicHelper.CompV1(this._chart);
+                this._score = this._getMusic(); 
 
                 // Reset the queue times
                 this._resetQueueTimes();
@@ -286,19 +278,6 @@ class SessionManager {
         }
     }
 
-    private _updateUserScores = (record: IKeyStrokeRecord) => {
-        // Improve Score
-        this._improveScore.notesPlayed ++;
-        if (Math.abs(record.precision) <= this._precisionThreshold) {
-            this._improveScore.notesInTime ++;
-        }
-        if (record.inKey) {
-            this._improveScore.notesInKey ++;
-        }
-
-        console.log(record.precision, this._precisionThreshold);
-    };
-
     /**
      * PRIVATE GETTERS
      */
@@ -317,10 +296,46 @@ class SessionManager {
     private get _currScoreBar(): IScoreBar {
         return this._score.barAt(this._barIdx);
     }
+}
+
+export class ImprovSessionManager extends SessionManager {
+    // The higher the index, the harder it is
+    // for the user to get a high precision score
+    private _PRECISION_INDEX = 6;
+    private _improveScore: IImprovScore;
+
+    constructor(audioContext: any, fontPlayer: any, chart: Chart, onUpdate: () => void) {
+        super(audioContext, fontPlayer, chart, onUpdate);
+        this._improveScore = {
+            notesPlayed: 0,
+            notesInTime: 0,
+            notesInKey: 0
+        }
+    }
+
+    public recordUserKeyStroke(note: number, time: number, velocity: number): IKeyStrokeRecord {
+        let record = super.recordUserKeyStroke(note, time, velocity);
+        this._improveScore.notesPlayed ++;
+
+        if (Math.abs(record.precision) <= this._precisionThreshold) {
+            this._improveScore.notesInTime ++;
+        }
+        if (record.inKey) {
+            this._improveScore.notesInKey ++;
+        }
+
+        return record;
+    };
+
+    get currImprovScore(): IImprovScore {
+        return this._improveScore;
+    }
 
     private get _precisionThreshold(): number {
         return this.subbeatDuration / this._PRECISION_INDEX;
     }
 }
 
-export default SessionManager;
+export class LARSessionManager extends SessionManager {
+
+}

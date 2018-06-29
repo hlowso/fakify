@@ -134,8 +134,8 @@ class PlayViewController extends Component {
     **********************/
 
     startSession = () => {
-        let { chart } = this.state;
-        this.SoundActions.playRangeLoop(chart);
+        let { chart, playMode } = this.state;
+        this.SoundActions.playRangeLoop(chart, playMode);
     }
 
     stopSession = () => {

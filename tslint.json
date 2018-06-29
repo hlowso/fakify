@@ -15,7 +15,8 @@
     "curly": false,
     "no-empty": false,
     "forin": false,
-    "array-type": false
+    "array-type": false,
+    "max-classes-per-file": false
   },
   "linterOptions": {
     "exclude": [
