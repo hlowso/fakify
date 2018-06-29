@@ -255,11 +255,19 @@ class AppRouter extends Component {
     playRangeLoop = (chart, playMode) => {
         this.killTake();
         let { audioContext, fontPlayer } = this.state;
-        let Manager = (
-            playMode === "improv"
-                ? ImprovSessionManager
-                : SessionManager
-        );
+        
+        let Manager;
+        switch (playMode) {
+            case "improv":
+                Manager = ImprovSessionManager;
+                break;
+            case "listenAndRepeat":
+                Manager = LARSessionManager;
+                break;
+            default:
+                Manager = SessionManager;
+                break;
+        }
 
         let sessionManager = new Manager(
             audioContext, 
