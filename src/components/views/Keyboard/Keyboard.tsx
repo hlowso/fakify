@@ -5,12 +5,15 @@ import { NoteName, IMidiMessage } from "../../../shared/types";
 import "./Keyboard.css";
 
 export interface IKeyboardProps {
+    showKeyChanges: boolean;
     depressedKeys: number[];
     currentKey: NoteName;
     takeIsPlaying: boolean;
     playUserMidiMessage: (message: IMidiMessage) => void;
-    rangeStartNote?: number;
-    rangeEndNote?: number;
+    firstNote: number;
+    firstNoteColor: string;
+    rangeStartNote: number;
+    rangeEndNote: number;
 }
 
 export interface IKeyboardState {
@@ -42,7 +45,6 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
     }
 
     public renderKeys = (): JSX.Element => {
-        let { depressedKeys, currentKey } = this.props;
         let upperElements = [],
             lowerElements = [];
 
@@ -50,12 +52,10 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
             let noteNameIndex = note % 12;
             let noteName = MusicHelper.NOTE_NAMES[noteNameIndex];
             let isBlackKey = this._BLACK_KEY_INDICES.indexOf(noteNameIndex) !== -1;
-            let isDepressed = depressedKeys.indexOf(note) !== -1;
-            let isInKey = MusicHelper.noteIsInKey(note, currentKey);
 
-            if (isBlackKey) upperElements.push(this.getBlackKey(note, noteName, isDepressed, isInKey));
+            if (isBlackKey) upperElements.push(this.getBlackKey(note, noteName));
             else {
-                let elementPair = this.getWhiteKey(note, noteName, isDepressed, isInKey);
+                let elementPair = this.getWhiteKey(note, noteName);
                 upperElements.push(elementPair.upperElement);
                 lowerElements.push(elementPair.lowerElement);
             }
@@ -73,16 +73,7 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
         );
     }
 
-    public getWhiteKey = (note: number, noteName: NoteName, depressed: boolean, inCurrentKey: boolean) => {
-        let classNames = Cx(
-            "key", "white-key", noteName, 
-            {
-                "depressed": depressed, 
-                "in-current-key": inCurrentKey,
-                "take-playing": this.props.takeIsPlaying
-            }
-        );
-
+    public getWhiteKey = (note: number, noteName: NoteName) => {
         let upperStyle = {
             width: this._WIDER_UPPER_WHITE_KEY_WIDTH, 
             height: this._KEY_HEIGHT
@@ -110,36 +101,41 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
         }
 
         return {
-            upperElement: this.renderKey(note, noteName, classNames, upperStyle),
-            lowerElement: this.renderKey(note, noteName, classNames, lowerStyle)
+            upperElement: this.renderKey(note, noteName, false, upperStyle),
+            lowerElement: this.renderKey(note, noteName, false, lowerStyle)
         };
     }
 
-    public getBlackKey = (note: number, noteName: NoteName, depressed: boolean, inCurrentKey: boolean): JSX.Element => {
+    public getBlackKey = (note: number, noteName: NoteName): JSX.Element => {
         let blackKeyStyle = {
             width: this._BLACK_KEY_WIDTH, 
             height: this._KEY_HEIGHT
         };
 
-        let classNames = Cx(
-            "key", 
-            "black-key", 
-            `${noteName}`, 
-            { 
-                "depressed": depressed, 
-                "in-current-key": inCurrentKey,
-                "take-playing": this.props.takeIsPlaying,
-            }
-        );
-
-        return this.renderKey(note, noteName, classNames, blackKeyStyle);
+        return this.renderKey(note, noteName, true, blackKeyStyle);
     }
 
-    public renderKey = (note: number, noteName: NoteName, classNames: string, style: any): JSX.Element => {
+    public renderKey = (note: number, noteName: NoteName, isBlack = false, style: any): JSX.Element => {
+        let { showKeyChanges, depressedKeys, currentKey, firstNote, rangeStartNote, rangeEndNote, takeIsPlaying } = this.props;
+        let keyDepressed = depressedKeys.indexOf(note) !== -1;
+        let classes = Cx({
+            "key": true,
+            "depressed": keyDepressed, 
+            "in-current-key": showKeyChanges && MusicHelper.noteIsInKey(note, currentKey),
+            "take-playing": takeIsPlaying,
+            "key-out-of-range": note < rangeStartNote || rangeEndNote < note,
+            "white-key": !isBlack,
+            "black-key": isBlack
+        });
+
+        if (!keyDepressed && note === firstNote) {
+            style.backgroundColor = this.props.firstNoteColor;
+        }
+
         return (
             <div 
                 key={`${noteName}${note}`} 
-                className={classNames} 
+                className={classes} 
                 style={style} 
                 onMouseDown={() => this.onPianoKeyDown(note)} 
                 onMouseUp={() => this.onPianoKeyUp(note)} />

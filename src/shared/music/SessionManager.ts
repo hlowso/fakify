@@ -2,7 +2,7 @@ import * as Util from "../Util";
 import * as MusicHelper from "../music/MusicHelper";
 import Chart from "../music/Chart";
 import Score from "../music/Score";
-import { IScoreBar, IChartBar, NoteName, IChordSegment, IKeyStrokeRecord, IMusicIdx, ISubbeatTimeMap, IImprovScore, IListeningScore, IPart, IStroke } from "../types";
+import { IScoreBar, IChartBar, NoteName, IChordSegment, IKeyStrokeRecord, IMusicIdx, ISubbeatTimeMap, IImprovScore, IListeningScore, IStroke, IExercise } from "../types";
 import soundfonts from "./soundfontsIndex";
 
 export class SessionManager {
@@ -313,7 +313,7 @@ export class ImprovSessionManager extends SessionManager {
 }
 
 export class ListeningSessionManager extends SessionManager {
-    private _exercise: IPart;
+    private _exercise: IExercise;
     private _previousChorusExerciseNotesPassed = 0;
     private _userPlaying: boolean;
     private _listeningScore: IListeningScore;
@@ -335,7 +335,7 @@ export class ListeningSessionManager extends SessionManager {
             let idx = record.musicIdx;
             let exerciseStroke: IStroke | undefined;
 
-            let exerciseBar = this._exercise.music[idx.barIdx];
+            let exerciseBar = this._exercise.part.music[idx.barIdx];
             let exerciseSubbeat: IStroke[];
             let strokeExists = true;
 
@@ -398,10 +398,22 @@ export class ListeningSessionManager extends SessionManager {
         if (!this._userPlaying) {
             this._previousChorusExerciseNotesPassed += this._chorusExerciseNotesPassed;
             this._exercise = MusicHelper.GenerateExercise(this._chart);
-            _accompaniment.consolidate(this._exercise);
+            _accompaniment.consolidate(this._exercise.part);
         }
         
         return _accompaniment;
+    }
+
+    get firstNote(): number {
+        return this._exercise.firstNote;
+    }
+
+    get rangeStartNote(): number {
+        return this._exercise.rangeStartNote;
+    }
+
+    get rangeEndNote(): number {
+        return this._exercise.rangeEndNote;
     }
 
     get userShouldPlay(): boolean {
@@ -420,7 +432,7 @@ export class ListeningSessionManager extends SessionManager {
             let currSubbeatIdx = musicIdx.subbeatIdx;
 
             if (this._exercise) {
-                let exerciseBars = this._exercise.music;
+                let exerciseBars = this._exercise.part.music;
 
                 for (
                     let barIdx = this._chart.rangeStartIdx;

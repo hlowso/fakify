@@ -101,6 +101,13 @@ export interface IMusicBarV2 {
     [subbeatIdx: number]: IStroke[];
 }
 
+export interface IExercise {
+    firstNote: number;
+    rangeStartNote: number;
+    rangeEndNote: number;
+    part: IPart;
+}
+
 export interface ISubbeatTimeMap { 
     [barIdx: number]: { [subbeatIdx: number]: number };
 }

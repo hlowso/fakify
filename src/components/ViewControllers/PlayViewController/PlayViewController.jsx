@@ -17,6 +17,8 @@ import "./PlayViewController.css";
 import { PlayMode } from "../../../shared/types";
 
 class PlayViewController extends Component {
+    firstNoteColor = "mediumslateblue";
+
     constructor(props) {
         super(props);
         this.state = {
@@ -76,9 +78,13 @@ class PlayViewController extends Component {
         let inSession = sessionManager && sessionManager.inSession;
         let sessionIdx = inSession ? sessionManager.sessionIdx : null;
         let currKey = inSession ? sessionManager.currKey : "";
-
+        let firstNote = inSession ? sessionManager.firstNote : NaN;
+        let rangeStartNote = inSession ? sessionManager.rangeStartNote : MusicHelper.LOWEST_A;
+        let rangeEndNote = inSession ? sessionManager.rangeEndNote : MusicHelper.HIGHEST_C;
+        let showKeyChanges = true;
         let report;
         let userShouldPlay;
+
         if (inSession) {
             switch (playMode) {
                 case "improv":
@@ -87,6 +93,7 @@ class PlayViewController extends Component {
                 case "listening":
                     report = sessionManager.currListeningScore;
                     userShouldPlay = sessionManager.userShouldPlay;
+                    showKeyChanges = false;
                     break;
                 default:
                     report = null;
@@ -117,14 +124,20 @@ class PlayViewController extends Component {
                         setPlayMode={this.setPlayMode} 
                         playMode={playMode} 
                         report={report} 
-                        userShouldPlay={userShouldPlay} />
+                        userShouldPlay={userShouldPlay}
+                        firstNoteColor={this.firstNoteColor} />
                 </div>
                 <div className="bottom-row">
-                    <Keyboard 
+                    <Keyboard
+                        showKeyChanges={showKeyChanges} 
                         depressedKeys={this.StateHelper.getCurrentUserKeysDepressed()} 
                         currentKey={currKey} 
                         playUserMidiMessage={this.SoundActions.playUserMidiMessage} 
-                        takeIsPlaying={inSession} />
+                        takeIsPlaying={inSession} 
+                        firstNote={firstNote || NaN} 
+                        rangeStartNote={rangeStartNote || MusicHelper.LOWEST_A}
+                        rangeEndNote={rangeEndNote || MusicHelper.HIGHEST_C} 
+                        firstNoteColor={this.firstNoteColor} />
                 </div>
 
                 <MidSettingsModal 

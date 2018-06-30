@@ -2,7 +2,7 @@ import compSwingPianoV1 from "./swing/piano/compPianoSwingV1";
 import compBassSwingV1 from "./swing/bass/compBassSwingV1";
 import compDrumsSwingV1 from "./swing/drums/compDrumsSwingV1";
 import { generateSwingExerciseV0 } from "./swing/generateSwingExerciseV0";
-import { Feel, IChartBar, IPart, Difficulty } from "../../types";
+import { Feel, IChartBar, Difficulty, IExercise } from "../../types";
 import Chart from "../Chart";
 import Score from "../Score";
 
@@ -23,7 +23,7 @@ const _getSwingAccompaniment = (bars: IChartBar[]): Score => {
     ]);
 }
 
-export const GenerateExercise = (chart: Chart, instrument = "piano", difficulty = Difficulty.Easy): IPart => {
+export const GenerateExercise = (chart: Chart, instrument = "piano", difficulty = Difficulty.Easy): IExercise => {
     let { feel } = chart;
 
     switch (feel) {

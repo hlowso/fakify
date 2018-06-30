@@ -9,6 +9,7 @@ export interface ITrainingWindowProps {
     setPlayMode: (playMode: PlayMode) => void;
     report?: IImprovScore | IListeningScore;
     userShouldPlay?: boolean;
+    firstNoteColor: string;
 }
 
 export interface ITrainingWindowState {
@@ -24,14 +25,13 @@ class TrainingWindow extends Component<ITrainingWindowProps, ITrainingWindowStat
     }
 
     public render(): JSX.Element {
-        let { startSession, stopSession } = this.props;
         return (
             <div id="training-window">
                 <div className="menu-bar">
-                    <button onClick={startSession} >
+                    <button onClick={this.onPressPlay} >
                         Play
                     </button>
-                    <button onClick={stopSession} >
+                    <button onClick={this.onPressStop} >
                         Stop
                     </button>
                     {this.renderPlayModeSelect()}
@@ -98,7 +98,8 @@ class TrainingWindow extends Component<ITrainingWindowProps, ITrainingWindowStat
 
         if (!userShouldPlay) {
             return [
-                <span key={0}>Listen...</span>
+                <span key={0}>Listen...</span>,
+                <span key={1} style={{color: this.props.firstNoteColor}}> (first note)</span>
             ];
         }
 
@@ -112,6 +113,14 @@ class TrainingWindow extends Component<ITrainingWindowProps, ITrainingWindowStat
             <span key={0}>Repeat</span>,
             <span key={1}>score: {displayPercentage}%</span> 
         ];
+    }
+
+    private onPressPlay = (event: React.SyntheticEvent<any>) => {
+        this.props.startSession();
+    }
+
+    private onPressStop = (event: React.SyntheticEvent<any>) => {
+        this.props.stopSession();
     }
 };
 

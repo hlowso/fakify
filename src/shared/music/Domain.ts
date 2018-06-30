@@ -40,8 +40,18 @@ class Domain {
 
     public getRandomNote(a = this.lowest, b = this.highest) {
 
-        let lowIdx = Util.binarySearch(this._notes, a)[0];
-        let highIdx = Util.binarySearch(this._notes, b)[0];
+        let [lowIdx, lowNote] = Util.binarySearch(this._notes, a);
+        let [highIdx, highNote] = Util.binarySearch(this._notes, b);
+
+        while (lowNote < a) {
+            lowIdx ++;
+            lowNote = this._notes[lowIdx];
+        }
+
+        while (highNote > b) {
+            highIdx --;
+            highNote = this._notes[highIdx];
+        }
 
         let idx = Math.floor(lowIdx + (highIdx - lowIdx) * Math.random());
         return this._notes[idx];
