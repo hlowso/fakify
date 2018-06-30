@@ -250,6 +250,14 @@ export class SessionManager {
     }
 
     /**
+     * PROTECTED GETTERS
+     */
+
+    protected get _precisionThreshold(): number {
+        return this.subbeatDuration / this._PRECISION_INDEX;
+    }
+
+    /**
      * PRIVATE GETTERS
      */
 
@@ -270,10 +278,6 @@ export class SessionManager {
 
     private get _currScoreBar(): IScoreBar {
         return this._score.barAt(this._barIdx);
-    }
-
-    protected get _precisionThreshold(): number {
-        return this.subbeatDuration / this._PRECISION_INDEX;
     }
 }
 
