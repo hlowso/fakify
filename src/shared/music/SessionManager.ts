@@ -8,7 +8,7 @@ import soundfonts from "./soundfontsIndex";
 export class SessionManager {
     // The higher the index, the harder it is
     // for the user to get a high precision score
-    protected _PRECISION_INDEX = 6;
+    protected _PRECISION_INDEX = 4;
 
     protected _audioContext: any;
     protected _chart: Chart;
@@ -275,7 +275,7 @@ export class SessionManager {
             time += _subbeatDuration;
         }
     }
-    
+
     /**
      * PRIVATE GETTERS
      */
