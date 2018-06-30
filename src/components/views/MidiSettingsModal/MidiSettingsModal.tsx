@@ -4,7 +4,6 @@ import { StorageHelper } from "../../../shared/StorageHelper";
 import "./MidiSettingsModal.css";
 
 export interface ISettingsModalProps {
-    StorageHelper: StorageHelper;
     StateHelper: any;
     SoundActions: any;
     isOpen: boolean;
@@ -44,13 +43,12 @@ class MidiSettingsModal extends Component<ISettingsModalProps, ISettingsModalSta
         }
     }
 
-    componentWillMount() {
-        let { StorageHelper } = this.props;
+    public componentWillMount() {
         this.setState({ selectedMidiInputId: StorageHelper.getMidiInputId() });
     }
 
-    render() {
-        let { StorageHelper, StateHelper, isOpen, close } = this.props;
+    public render() {
+        let { StateHelper, isOpen, close } = this.props;
     
         let midiInputId = StorageHelper.getMidiInputId();
         let midiAccess = StateHelper.getMidiAccess();
@@ -117,11 +115,11 @@ class MidiSettingsModal extends Component<ISettingsModalProps, ISettingsModalSta
         ); 
     }
 
-    onMidiInputSelectionChange = (event: React.SyntheticEvent<any>) => {
+    private onMidiInputSelectionChange = (event: React.SyntheticEvent<any>) => {
         this.setState({ selectedMidiInputId: (event.target as any).value });
     }
     
-    onMidiInputsRefresh = (event: React.SyntheticEvent<any>) => {
+    private onMidiInputsRefresh = (event: React.SyntheticEvent<any>) => {
         event.preventDefault();
         let { SoundActions } = this.props;
     
@@ -132,9 +130,9 @@ class MidiSettingsModal extends Component<ISettingsModalProps, ISettingsModalSta
             });
     }
     
-    onSubmitMidiSettingsForm = (event: React.SyntheticEvent<any>) => { 
+    private onSubmitMidiSettingsForm = (event: React.SyntheticEvent<any>) => { 
         event.preventDefault();
-        let { SoundActions, StorageHelper, close } = this.props;
+        let { SoundActions, close } = this.props;
         let { selectedMidiInputId } = this.state;
     
         let connectionSuccessful = SoundActions.connectToMidiInput(selectedMidiInputId); 

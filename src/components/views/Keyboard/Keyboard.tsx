@@ -31,7 +31,7 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
         };
     }
 
-    render(): JSX.Element {
+    public render(): JSX.Element {
         return (
             <div id="keyboard">
                 {this.renderKeys()}
@@ -39,7 +39,7 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
         );
     }
 
-    renderKeys = (): JSX.Element => {
+    public renderKeys = (): JSX.Element => {
         let { depressedKeys, currentKey } = this.props;
         let upperElements = [],
             lowerElements = [];
@@ -71,7 +71,7 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
         );
     }
 
-    getWhiteKey = (note: number, noteName: NoteName, depressed: boolean, inCurrentKey: boolean) => {
+    public getWhiteKey = (note: number, noteName: NoteName, depressed: boolean, inCurrentKey: boolean) => {
         let classNames = Cx(
             "key", "white-key", noteName, 
             {
@@ -113,7 +113,7 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
         };
     }
 
-    getBlackKey = (note: number, noteName: NoteName, depressed: boolean, inCurrentKey: boolean): JSX.Element => {
+    public getBlackKey = (note: number, noteName: NoteName, depressed: boolean, inCurrentKey: boolean): JSX.Element => {
         let blackKeyStyle = {
             width: this._BLACK_KEY_WIDTH, 
             height: this._KEY_HEIGHT
@@ -133,7 +133,7 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
         return this.renderKey(note, noteName, classNames, blackKeyStyle);
     }
 
-    renderKey = (note: number, noteName: NoteName, classNames: string, style: any): JSX.Element => {
+    public renderKey = (note: number, noteName: NoteName, classNames: string, style: any): JSX.Element => {
         return (
             <div 
                 key={`${noteName}${note}`} 
@@ -144,14 +144,14 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
         );
     }
 
-    onPianoKeyDown = (note: number) => {
+    private onPianoKeyDown = (note: number) => {
         let message: IMidiMessage = { 
             data: [144, note, 127]
         };
         this.props.playUserMidiMessage(message);
     }
 
-    onPianoKeyUp = (note: number) => {
+    private onPianoKeyUp = (note: number) => {
         let message: IMidiMessage = {
             data: [128, note, 0]
         }

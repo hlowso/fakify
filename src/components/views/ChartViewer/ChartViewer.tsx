@@ -27,7 +27,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         };
     }
 
-    render(): JSX.Element {
+    public render(): JSX.Element {
         let { song, chart } = this.props;
         let loading = !Util.objectIsEmpty(song) &&
                         !Util.objectIsEmpty(chart);
@@ -46,7 +46,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             : <h2>No Song Selected</h2>;
     }
 
-    renderProgression = (): JSX.Element[] => {
+    public renderProgression = (): JSX.Element[] => {
         let { chart, sessionIdx } = this.props;
         let { bars, rangeStartIdx, rangeEndIdx } = chart;
         let baseKey = bars[0].chordSegments[0].key;
@@ -105,7 +105,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         });
     }
 
-    renderLeftHandSettings = (): JSX.Element => {
+    public renderLeftHandSettings = (): JSX.Element => {
         return (
             <div className="left-hand-settings">
                 {this.renderKeyContextSelect()}
@@ -118,7 +118,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
      * KEY SIGNATURE SELECT
      */
 
-    renderKeyContextSelect = (): JSX.Element => {
+    public renderKeyContextSelect = (): JSX.Element => {
         let { context } = this.props.chart;
         let options = MusicHelper.NOTE_NAMES.map(
             key => (
@@ -149,7 +149,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
      * TEMPO SELECT
      */
 
-    renderTempoSelect = (): JSX.Element => {
+    public renderTempoSelect = (): JSX.Element => {
         let { tempo } = this.props.chart;
         let bpms = tempo[0];
         let options = [];

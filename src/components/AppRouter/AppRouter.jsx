@@ -80,7 +80,6 @@ class AppRouter extends Component {
         let VCProps = {
             SoundActions,
             StateHelper,            
-            StorageHelper,
             sessionManager,
             improvScore: (
                 sessionManager && sessionManager.inSession 

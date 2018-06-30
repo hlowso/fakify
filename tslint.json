@@ -16,7 +16,8 @@
     "no-empty": false,
     "forin": false,
     "array-type": false,
-    "max-classes-per-file": false
+    "max-classes-per-file": false,
+    "no-empty-interface": false
   },
   "linterOptions": {
     "exclude": [

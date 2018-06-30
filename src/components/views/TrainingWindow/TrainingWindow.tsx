@@ -60,6 +60,10 @@ class TrainingWindow extends Component<ITrainingWindowProps, ITrainingWindowStat
     }
 
     public renderFeedback = (): JSX.Element => {
+        if (!this.props.report) {
+            return <div />;
+        }
+
         let feedbackSpans: JSX.Element[];
         
         switch (this.props.playMode) {

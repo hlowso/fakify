@@ -120,6 +120,7 @@ class Chart {
 
     set tempo(newTempo: Tempo) {
         this._tempo = newTempo;
+        this._onSet();
     }
 
     set feel(newFeel: Feel) {

@@ -1,16 +1,16 @@
 import { NOTE_NAMES } from "../../../MusicHelper";
-import { IChartBar, IMusicBarV2, IPart } from "../../../../types";
+import { NoteName, IChartBar, IMusicBarV2, IPart } from "../../../../types";
 
 const getBassNote = (chord: string): number => {
     let chordBase = chord.split("^")[0];
-    let index = NOTE_NAMES.indexOf(chordBase);
+    let index = NOTE_NAMES.indexOf(chordBase as NoteName);
 
     return 36 + index;
 }
 
 const getFifth = (chord: string): number => {
     let chordBase = chord.split("^")[0];
-    let index = NOTE_NAMES.indexOf(chordBase);
+    let index = NOTE_NAMES.indexOf(chordBase as NoteName);
 
     return 43 + index;
 }

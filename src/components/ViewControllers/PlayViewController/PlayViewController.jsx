@@ -10,6 +10,7 @@ import MidSettingsModal from "../../views/MidiSettingsModal/MidiSettingsModal";
 import * as Api from "../../../shared/Api";
 import * as Util from "../../../shared/Util";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
+import { StorageHelper } from "../../../shared/StorageHelper";
 import Chart from "../../../shared/music/Chart";
 
 import "./PlayViewController.css";
@@ -29,12 +30,11 @@ class PlayViewController extends Component {
     }
 
     componentWillMount() {
-        let { SoundActions, StorageHelper, StateHelper } = this.props;
+        let { SoundActions, StateHelper } = this.props;
         let midiInputId = StorageHelper.getMidiInputId();
         let selectedSongId = StorageHelper.getSelectedSongId();
 
         this.SoundActions = SoundActions;
-        this.StorageHelper = StorageHelper;
         this.StateHelper = StateHelper;
 
         if (midiInputId) {
@@ -129,7 +129,6 @@ class PlayViewController extends Component {
 
                 <MidSettingsModal 
                     SoundActions={this.SoundActions} 
-                    StorageHelper={this.StorageHelper}
                     StateHelper={this.StateHelper} 
                     isOpen={midiSettingsModalOpen} 
                     close={()=> this.setState({ midiSettingsModalOpen: false })} />
@@ -160,8 +159,8 @@ class PlayViewController extends Component {
 
     resetChart = () => {
         let { id, barsBase, originalTempo, originalContext, suitableFeels } = this.state.selectedSong;
-        let chartSettings = this.StorageHelper.getChartSettings(id);
-        let playMode = this.StorageHelper.getPlayMode();
+        let chartSettings = StorageHelper.getChartSettings(id);
+        let playMode = StorageHelper.getPlayMode();
 
         let { tempo, context, feel, rangeStartIdx, rangeEndIdx } = chartSettings;
         if (!tempo) {
@@ -226,7 +225,7 @@ class PlayViewController extends Component {
         chart.rangeStartIdx = rangeStartIdxUpdate;
         chart.rangeEndIdx = rangeEndIdxUpdate;
 
-        this.StorageHelper.updateChartSettings(selectedSong.id, {
+        StorageHelper.updateChartSettings(selectedSong.id, {
             rangeStartIdx: rangeStartIdxUpdate,
             rangeEndIdx: rangeEndIdxUpdate
         });
@@ -238,7 +237,7 @@ class PlayViewController extends Component {
 
         chart.context = newKeyContext;
         
-        this.StorageHelper.updateChartSettings(selectedSong.id, {
+        StorageHelper.updateChartSettings(selectedSong.id, {
             context: newKeyContext
         });
     }
@@ -249,7 +248,7 @@ class PlayViewController extends Component {
 
         chart.tempo = newTempo;
 
-        this.StorageHelper.updateChartSettings(selectedSong.id, {
+        StorageHelper.updateChartSettings(selectedSong.id, {
             tempo: newTempo
         });
     }
@@ -259,7 +258,7 @@ class PlayViewController extends Component {
     **********************/
 
     onSongListItemClick = selectedSongId => {
-        this.StorageHelper.setSelectedSongId(selectedSongId);
+        StorageHelper.setSelectedSongId(selectedSongId);
         
         Api.getSongAsync(selectedSongId)
             .then(selectedSong => {

@@ -18,7 +18,7 @@ class MenuBar extends Component<IMenuBarProps, IMenuBarState> {
         };
     }
 
-    render() {
+    public render() {
         let { openMIDISettingsModal } = this.props;
         return (
             <div id="menu-bar">
