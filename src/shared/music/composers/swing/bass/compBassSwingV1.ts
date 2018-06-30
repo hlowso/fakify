@@ -1,5 +1,5 @@
 import { NOTE_NAMES } from "../../../MusicHelper";
-import { IChartBar, IMusicBarV2 } from "../../../../types";
+import { IChartBar, IMusicBarV2, IPart } from "../../../../types";
 
 const getBassNote = (chord: string): number => {
     let chordBase = chord.split("^")[0];
@@ -15,9 +15,10 @@ const getFifth = (chord: string): number => {
     return 43 + index;
 }
 
-export const compBassSwingV1 = (bars: IChartBar[]): IMusicBarV2[] => {
+export const compBassSwingV1 = (bars: IChartBar[]): IPart => {
 
-    return bars.map(bar => {
+    let music: IMusicBarV2[] = [];
+    bars.forEach(bar => {
 
         let musicBar: IMusicBarV2 = {};
 
@@ -52,8 +53,10 @@ export const compBassSwingV1 = (bars: IChartBar[]): IMusicBarV2[] => {
             }
         });
         
-        return musicBar;
+        music[bar.barIdx] = musicBar;
     }); 
+
+    return {instrument: "doubleBass", music };
 };
 
 export default compBassSwingV1;

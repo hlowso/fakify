@@ -2,12 +2,14 @@ import React, { Component } from "react";
 import { Switch, Route, Redirect } from "react-router";
 import WebAudioFontPlayer from "webaudiofont";
 import uuid from "uuid";
-
 import PlayViewController from "../ViewControllers/PlayViewController/PlayViewController";
-
 import * as StorageHelper from "../../shared/StorageHelper";
 import * as MusicHelper from "../../shared/music/MusicHelper";
-import SessionManager from "../../shared/music/SessionManager";
+import { 
+    SessionManager, 
+    ImprovSessionManager, 
+    ListeningSessionManager 
+} from "../../shared/music/SessionManager";
 import * as Util from "../../shared/Util";
 import soundfonts from "../../shared/music/soundfontsIndex";
 
@@ -252,10 +254,24 @@ class AppRouter extends Component {
         }
     }
 
-    playRangeLoop = (chart) => {
+    playRangeLoop = (chart, playMode) => {
         this.killTake();
         let { audioContext, fontPlayer } = this.state;
-        let sessionManager = new SessionManager(
+        
+        let Manager;
+        switch (playMode) {
+            case "improv":
+                Manager = ImprovSessionManager;
+                break;
+            case "listening":
+                Manager = ListeningSessionManager;
+                break;
+            default:
+                Manager = SessionManager;
+                break;
+        }
+
+        let sessionManager = new Manager(
             audioContext, 
             fontPlayer, 
             chart,

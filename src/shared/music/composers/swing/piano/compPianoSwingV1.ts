@@ -1,5 +1,5 @@
 import { NOTE_NAMES } from "../../../MusicHelper";
-import { IChartBar, IMusicBarV2 } from "../../../../types";
+import { IChartBar, IMusicBarV2, IPart } from "../../../../types";
 
 const convertChordNameToNotes = (chord: string): [number, number, number] => {
     let chordBase = chord.split("^")[0];
@@ -12,8 +12,9 @@ const convertChordNameToNotes = (chord: string): [number, number, number] => {
     ];
 };
 
-export const compPianoSwingV1 = (bars: IChartBar[]): IMusicBarV2[] => {
-    return bars.map(bar => {
+export const compPianoSwingV1 = (bars: IChartBar[]): IPart => {
+    let music: IMusicBarV2[] = [];
+    bars.forEach(bar => {
 
         let musicBar: IMusicBarV2 = {};
         bar.chordSegments.forEach(segment => {
@@ -26,9 +27,13 @@ export const compPianoSwingV1 = (bars: IChartBar[]): IMusicBarV2[] => {
             ];
         });
 
-        return musicBar;
-        
+        music[bar.barIdx] = musicBar;
     }); 
+    
+    return {
+        instrument: "piano",
+        music
+    };
 };
 
 export default compPianoSwingV1;

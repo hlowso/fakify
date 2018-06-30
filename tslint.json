@@ -14,7 +14,9 @@
     "adjacent-overload-signatures": false,
     "curly": false,
     "no-empty": false,
-    "forin": false
+    "forin": false,
+    "array-type": false,
+    "max-classes-per-file": false
   },
   "linterOptions": {
     "exclude": [

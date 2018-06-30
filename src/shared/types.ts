@@ -8,6 +8,7 @@ export type NoteName = "C" | "C#|Db" | "D" | "D#|Eb" | "E" | "F" | "F#|Gb" | "G"
 export type RelativeNoteName = "1" | "H" | "2" | "N" | "3" | "4" | "T" | "5" | "U" | "6" | "J" | "7";
 
 export interface IBarBase {
+    barIdx: number;
     timeSignature: TimeSignature;
     chordSegments: IChordBase[];
 }
@@ -20,6 +21,7 @@ export interface IChordBase {
 }
 
 export interface IChartBar {
+    barIdx: number;
     timeSignature: TimeSignature;
     chordSegments: IChordSegment[];
     durationInSubbeats: number;
@@ -71,13 +73,23 @@ export interface IStroke {
 export enum PlayMode {
     None = "none",
     Improv = "improv",
-    ListenAndRepeat = "listenAndRepeat"
+    Listening = "listening"
+}
+
+export enum Difficulty {
+    Easy = "easy",
+    Hard = "hard"
 }
 
 export interface IScoreBar {
     [subbeatIdx: number]: {
         [instrument: string]: IStroke[];
     }
+}
+
+export interface IPart {
+    instrument: string;
+    music: IMusicBarV2[];
 }
 
 export interface IMusicBarV2 {
@@ -92,4 +104,14 @@ export interface IImprovScore {
     notesPlayed: number;
     notesInTime: number;
     notesInKey: number;
+}
+
+export interface IListeningScore {
+    correctNotesCount: number;
+    percentCorrect: number;
+    incorrectNotes: Array<{
+        musicIdx: IMusicIdx;
+        played: number;
+        correct: number | ""
+    }>;
 }

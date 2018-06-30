@@ -1,7 +1,7 @@
 import soundfonts from "../../../soundfontsIndex";
-import { IChartBar, IMusicBarV2 } from "../../../../types";
+import { IChartBar, IMusicBarV2, IPart } from "../../../../types";
 
-export const compDrumsSwingV1 = (bars: IChartBar[]): { rideCymbal: IMusicBarV2[]; shutHiHat: IMusicBarV2[] } => {
+export const compDrumsSwingV1 = (bars: IChartBar[]): [IPart, IPart] => {
 
     let { rideCymbal, shutHiHat } = soundfonts;
     let rideCymbalBars: IMusicBarV2[] = [];
@@ -59,14 +59,20 @@ export const compDrumsSwingV1 = (bars: IChartBar[]): { rideCymbal: IMusicBarV2[]
             }
         });
 
-        rideCymbalBars.push(rideCymbalBar);
-        shutHiHatBars.push(shutHiHatBar);
+        rideCymbalBars[bar.barIdx] = rideCymbalBar;
+        shutHiHatBars[bar.barIdx] = shutHiHatBar;
     }); 
 
-    return {
-        rideCymbal: rideCymbalBars,
-        shutHiHat: shutHiHatBars
-    };
+    return [
+        {
+            instrument: "rideCymbal",
+            music: rideCymbalBars
+        },
+        {
+            instrument: "shutHiHat",
+            music: shutHiHatBars
+        }
+    ];
 };
 
 export default compDrumsSwingV1;

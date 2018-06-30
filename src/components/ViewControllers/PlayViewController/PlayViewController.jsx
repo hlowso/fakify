@@ -13,6 +13,7 @@ import * as MusicHelper from "../../../shared/music/MusicHelper";
 import Chart from "../../../shared/music/Chart";
 
 import "./PlayViewController.css";
+import { PlayMode } from "../../../shared/types";
 
 class PlayViewController extends Component {
     constructor(props) {
@@ -62,11 +63,7 @@ class PlayViewController extends Component {
     }
 
     render() {
-        let {
-            sessionManager,
-            improvScore
-        } = this.props;
-        
+        let { sessionManager } = this.props;
         let { 
             songTitles, 
             selectedSong, 
@@ -80,7 +77,21 @@ class PlayViewController extends Component {
         let sessionIdx = inSession ? sessionManager.sessionIdx : null;
         let currKey = inSession ? sessionManager.currKey : "";
 
-        let score = playMode === "improv" ? improvScore : {};
+        let report;
+        let userShouldPlay;
+        if (inSession) {
+            switch (playMode) {
+                case "improv":
+                    report = sessionManager.currImprovScore;
+                    break;
+                case "listening":
+                    report = sessionManager.currListeningScore;
+                    userShouldPlay = sessionManager.userShouldPlay;
+                    break;
+                default:
+                    report = null;
+            }
+        }
 
         return (
             <div id="play-view">
@@ -105,7 +116,8 @@ class PlayViewController extends Component {
                         stopSession={this.stopSession} 
                         setPlayMode={this.setPlayMode} 
                         playMode={playMode} 
-                        score={score} />
+                        report={report} 
+                        userShouldPlay={userShouldPlay} />
                 </div>
                 <div className="bottom-row">
                     <Keyboard 
@@ -133,8 +145,8 @@ class PlayViewController extends Component {
     **********************/
 
     startSession = () => {
-        let { chart } = this.state;
-        this.SoundActions.playRangeLoop(chart);
+        let { chart, playMode } = this.state;
+        this.SoundActions.playRangeLoop(chart, playMode);
     }
 
     stopSession = () => {
@@ -169,7 +181,7 @@ class PlayViewController extends Component {
         }
         if (!Number.isInteger(rangeEndIdx)) {
             rangeEndIdx = (
-                (playMode === "listenAndRepeat")
+                (playMode === "listening")
                         ? 1
                         : barsBase.length - 1
             );

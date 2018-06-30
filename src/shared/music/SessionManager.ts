@@ -1,54 +1,40 @@
 import * as Util from "../Util";
 import * as MusicHelper from "../music/MusicHelper";
 import Chart from "../music/Chart";
-import { IScoreBar, IChartBar, NoteName, IChordSegment, IKeyStrokeRecord, IMusicIdx, ISubbeatTimeMap, IImprovScore } from "../types";
+import Score from "../music/Score";
+import { IScoreBar, IChartBar, NoteName, IChordSegment, IKeyStrokeRecord, IMusicIdx, ISubbeatTimeMap, IImprovScore, IListeningScore, IPart, IStroke } from "../types";
 import soundfonts from "./soundfontsIndex";
 
-class SessionManager {
+export class SessionManager {
+    // The higher the index, the harder it is
+    // for the user to get a high precision score
+    protected _PRECISION_INDEX = 6;
+
+    protected _audioContext: any;
+    protected _chart: Chart;
+    protected _score: Score;
+    protected _queueTimes: ISubbeatTimeMap;
+    protected _startTime = NaN;
+    protected _userKeyStrokes: IKeyStrokeRecord[] = [];
+    protected _rangeLength: number;
+    protected _chorusIdx = -1;
+    protected _barIdx: number;
+    protected _segmentIdx = -1;
+    protected _subbeatIdx = -1;
+
     private _WAITTIME_FACTOR = (3 / 4) * 1000;
     private _PREP_TIME = 0.02;
     private _TIME_CHECKER_RATE = 5;
-
-    // The higher the index, the harder it is
-    // for the user to get a high precision score
-    private _PRECISION_INDEX = 4;
-
-    private _audioContext: any;
     private _fontPlayer: any;
-    private _chart: Chart;
-    private _score: IScoreBar[];
-    private _queueTimes: ISubbeatTimeMap;
-    private _startTime: number;
-    private _userKeyStrokes: IKeyStrokeRecord[];
-    private _improveScore: IImprovScore;
-
-    private _rangeLength: number;
-
-    private _chorusIdx: number;
-    private _barIdx: number;
-    private _segmentIdx: number;
-    private _subbeatIdx: number;
-
     private _onUpdate: () => void;
-    
+
     constructor(audioContext: any, fontPlayer: any, chart: Chart, onUpdate: () => void) {
         this._audioContext = audioContext;
         this._fontPlayer = fontPlayer;
         this._chart = chart;
         this._rangeLength = chart.rangeEndIdx - chart.rangeStartIdx + 1;
 
-        this._chorusIdx = -1;
         this._barIdx = chart.rangeEndIdx;
-        this._segmentIdx = -1;
-        this._subbeatIdx = -1;
-
-        this._startTime = NaN;
-        this._userKeyStrokes = [];
-        this._improveScore = {
-            notesPlayed: 0,
-            notesInTime: 0,
-            notesInKey: 0
-        }
         this._onUpdate = onUpdate;
     }
 
@@ -94,10 +80,6 @@ class SessionManager {
         }
     }
 
-    get currImprovScore(): IImprovScore {
-        return this._improveScore;
-    }
-
     /**
      * PUBLIC FUNCTIONS
      */
@@ -129,7 +111,9 @@ class SessionManager {
         this._onUpdate();
     }
 
-    public recordUserKeyStroke = (note: number, time: number, velocity: number): IKeyStrokeRecord => {
+    // Had to be converted from property (arrow function) to function 
+    // in order that the sub classes could make use of it. Weird.
+    public recordUserKeyStroke(note: number, time: number, velocity: number): IKeyStrokeRecord {
         let [musicIdx, closestTime] = Util.getClosestQueueTime(this._queueTimes, time);
         musicIdx.chorusIdx = this._chorusIdx;
         musicIdx.segmentIdx = this._segmentIdx;
@@ -143,8 +127,15 @@ class SessionManager {
         }
 
         this._userKeyStrokes.push(record);
-        this._updateUserScores(record);
         return record;
+    }
+
+    /**
+     * PROTECTED FUNCTIONS
+     */
+
+    protected _compileMusic() {
+        return MusicHelper.CompV1(this._chart);
     }
 
     /**
@@ -200,7 +191,7 @@ class SessionManager {
                 this._chorusIdx ++;
 
                 // Refresh the score
-                this._score = MusicHelper.CompV1(this._chart);
+                this._score = this._compileMusic(); 
 
                 // Reset the queue times
                 this._resetQueueTimes();
@@ -284,18 +275,7 @@ class SessionManager {
             time += _subbeatDuration;
         }
     }
-
-    private _updateUserScores = (record: IKeyStrokeRecord) => {
-        // Improve Score
-        this._improveScore.notesPlayed ++;
-        if (Math.abs(record.precision) <= this._precisionThreshold) {
-            this._improveScore.notesInTime ++;
-        }
-        if (record.inKey) {
-            this._improveScore.notesInKey ++;
-        }
-    };
-
+    
     /**
      * PRIVATE GETTERS
      */
@@ -312,12 +292,175 @@ class SessionManager {
     }
 
     private get _currScoreBar(): IScoreBar {
-        return this._score[this._barIdx];
+        return this._score.barAt(this._barIdx);
     }
 
-    private get _precisionThreshold(): number {
+    protected get _precisionThreshold(): number {
         return this.subbeatDuration / this._PRECISION_INDEX;
     }
 }
 
-export default SessionManager;
+export class ImprovSessionManager extends SessionManager {
+    private _improveScore: IImprovScore;
+
+    constructor(audioContext: any, fontPlayer: any, chart: Chart, onUpdate: () => void) {
+        super(audioContext, fontPlayer, chart, onUpdate);
+        this._improveScore = {
+            notesPlayed: 0,
+            notesInTime: 0,
+            notesInKey: 0
+        };
+    }
+
+    public recordUserKeyStroke(note: number, time: number, velocity: number): IKeyStrokeRecord {
+        let record = super.recordUserKeyStroke(note, time, velocity);
+        this._improveScore.notesPlayed ++;
+
+        if (Math.abs(record.precision) <= this._precisionThreshold) {
+            this._improveScore.notesInTime ++;
+        }
+        if (record.inKey) {
+            this._improveScore.notesInKey ++;
+        }
+
+        return record;
+    };
+
+    get currImprovScore(): IImprovScore {
+        return this._improveScore;
+    }
+}
+
+export class ListeningSessionManager extends SessionManager {
+    private _exercise: IPart;
+    private _previousChorusExerciseNotesPassed = 0;
+    private _userPlaying: boolean;
+    private _listeningScore: IListeningScore;
+
+    constructor(audioContext: any, fontPlayer: any, chart: Chart, onUpdate: () => void) {
+        super(audioContext, fontPlayer, chart, onUpdate);
+        this._userPlaying = true;
+        this._listeningScore = {
+            correctNotesCount: 0,
+            percentCorrect: NaN,
+            incorrectNotes: []
+        };
+    }
+
+    public recordUserKeyStroke(note: number, time: number, velocity: number): IKeyStrokeRecord {
+        let record = super.recordUserKeyStroke(note, time, velocity);
+
+        if (this._userPlaying) {
+            let idx = record.musicIdx;
+            let exerciseStroke: IStroke | undefined;
+
+            let exerciseBar = this._exercise.music[idx.barIdx];
+            let exerciseSubbeat: IStroke[];
+            let strokeExists = true;
+
+            // Determine whether or not there was an exercise
+            // note played at the music index of the record
+            if (exerciseBar) {
+                exerciseSubbeat = exerciseBar[idx.subbeatIdx];
+                if (exerciseSubbeat) {
+                    exerciseStroke = exerciseSubbeat[0];
+                } else {
+                    strokeExists = false;
+                }
+            } else {
+                strokeExists = false;
+            }
+
+            // If there wasn't an exercise note...
+            if (!strokeExists) {
+                // Add an incorrect note to the report
+                this._listeningScore.incorrectNotes.push({
+                    musicIdx: idx,
+                    played: note,
+                    correct: ""
+                });
+            } else {
+                // If the note played was correct...
+                if (
+                    exerciseStroke &&
+                    exerciseStroke.notes[0] === note &&
+                    Math.abs(record.precision) <= this._precisionThreshold
+                ) {
+                    // Correct notes played goes up by 1
+                    this._listeningScore.correctNotesCount ++;
+                // If an incorrect note was played when 
+                // an exercise note should have been played
+                } else {
+                    // Add the incorrect note to the report
+                    this._listeningScore.incorrectNotes.push({
+                        musicIdx: idx,
+                        played: note,
+                        correct: (exerciseStroke as IStroke).notes[0]
+                    });
+                }
+
+                // Whether or not the note played was correct,
+                // update the percentage of notes played correctly
+                this._listeningScore.percentCorrect = Number(
+                    ((this._listeningScore.correctNotesCount / (this._chorusExerciseNotesPassed + this._previousChorusExerciseNotesPassed)) * 100).toFixed(1)
+                );
+            }
+        }
+        
+        return record;
+    }
+
+    protected _compileMusic(): Score {
+        let _accompaniment = super._compileMusic();
+        this._userPlaying = !this._userPlaying;
+
+        if (!this._userPlaying) {
+            this._previousChorusExerciseNotesPassed += this._chorusExerciseNotesPassed;
+            this._exercise = MusicHelper.GenerateExercise(this._chart);
+            _accompaniment.consolidate(this._exercise);
+        }
+        
+        return _accompaniment;
+    }
+
+    get userShouldPlay(): boolean {
+        return this._userPlaying;
+    }
+
+    get currListeningScore(): IListeningScore {
+        return this._listeningScore;
+    }
+
+    private get _chorusExerciseNotesPassed(): number {
+        let notesPassed = 0;
+        
+        if (this._queueTimes) {
+            let musicIdx = Util.getClosestQueueTime(this._queueTimes, this._audioContext.currentTime)[0];
+            let currSubbeatIdx = musicIdx.subbeatIdx;
+
+            if (this._exercise) {
+                let exerciseBars = this._exercise.music;
+
+                for (
+                    let barIdx = this._chart.rangeStartIdx;
+                    barIdx <= this._barIdx;
+                    barIdx ++
+                ) {
+                    let exerciseBar = exerciseBars[barIdx];
+                    if (barIdx === this._barIdx) {
+                        for (let subbeatIdx = 0; subbeatIdx <= currSubbeatIdx; subbeatIdx ++) {
+                            let strokes = (exerciseBar|| {})[subbeatIdx];
+                            if (strokes) {
+                                notesPassed ++;
+                            }
+                        }
+                    } else {
+                        notesPassed += Util.length(exerciseBar || []);
+                    }
+                }
+            }
+        }
+        
+        return notesPassed;
+    }
+}

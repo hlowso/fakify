@@ -47,25 +47,58 @@ class TrainingWindow extends Component<any, any> {
     }
 
     public renderFeedback = (): JSX.Element => {
-        if (!this.props.score) {
+        if (!this.props.report) {
             return <div />;
         }
+
+        let feedbackSpans: JSX.Element[];
+        
         switch (this.props.playMode) {
             case PlayMode.Improv:
-                return this.renderImprovFeedback();
+                feedbackSpans = this.renderImprovFeedback();
+                break;
+            case PlayMode.Listening: 
+                feedbackSpans = this.renderListeningFeedback();
+                break;
             default:
                 return <div />
         }
-    }
 
-    public renderImprovFeedback = (): JSX.Element => {
-        let { notesInKey, notesInTime, notesPlayed } = this.props.score;
         return (
             <div className="feedback">
-                <span>In Key: {notesInKey} / {notesPlayed}</span>
-                <span>In Time: {notesInTime} / {notesPlayed}</span>
+                {feedbackSpans}
             </div>
         );
+    }
+
+    public renderImprovFeedback = (): JSX.Element[] => {
+        let { notesInKey, notesInTime, notesPlayed } = this.props.report;
+        return [
+            <span key={0}>In Key: {notesInKey} / {notesPlayed}</span>,
+            <span key={1}>In Time: {notesInTime} / {notesPlayed}</span>
+        ];
+    }
+
+    public renderListeningFeedback = (): JSX.Element[] => {
+        let { userShouldPlay, report } = this.props;
+        let { percentCorrect } = report;
+
+        if (!userShouldPlay) {
+            return [
+                <span key={0}>Listen...</span>
+            ];
+        }
+
+        let displayPercentage: string = (
+            isNaN(percentCorrect) 
+                ? "--" 
+                : String(percentCorrect)
+        );
+
+        return [ 
+            <span key={0}>Repeat</span>,
+            <span key={1}>score: {displayPercentage}%</span> 
+        ];
     }
 };
 
