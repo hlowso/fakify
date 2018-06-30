@@ -112,6 +112,6 @@ export interface IListeningScore {
     incorrectNotes: Array<{
         musicIdx: IMusicIdx;
         played: number;
-        correct: number | ""
+        correct: number;
     }>;
 }

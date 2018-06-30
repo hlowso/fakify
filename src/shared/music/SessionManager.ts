@@ -358,7 +358,7 @@ export class ListeningSessionManager extends SessionManager {
                 this._listeningScore.incorrectNotes.push({
                     musicIdx: idx,
                     played: note,
-                    correct: ""
+                    correct: NaN
                 });
             } else {
                 // If the note played was correct...
