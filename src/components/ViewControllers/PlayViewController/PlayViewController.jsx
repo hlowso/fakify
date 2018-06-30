@@ -63,11 +63,7 @@ class PlayViewController extends Component {
     }
 
     render() {
-        let {
-            sessionManager,
-            improvScore
-        } = this.props;
-        
+        let { sessionManager } = this.props;
         let { 
             songTitles, 
             selectedSong, 
@@ -81,7 +77,21 @@ class PlayViewController extends Component {
         let sessionIdx = inSession ? sessionManager.sessionIdx : null;
         let currKey = inSession ? sessionManager.currKey : "";
 
-        let score = playMode === "improv" ? improvScore : {};
+        let report;
+        let userShouldPlay;
+        if (inSession) {
+            switch (playMode) {
+                case "improv":
+                    report = sessionManager.currImprovScore;
+                    break;
+                case "listening":
+                    report = sessionManager.currListeningScore;
+                    userShouldPlay = sessionManager.userShouldPlay;
+                    break;
+                default:
+                    report = null;
+            }
+        }
 
         return (
             <div id="play-view">
@@ -106,7 +116,8 @@ class PlayViewController extends Component {
                         stopSession={this.stopSession} 
                         setPlayMode={this.setPlayMode} 
                         playMode={playMode} 
-                        score={score} />
+                        report={report} 
+                        userShouldPlay={userShouldPlay} />
                 </div>
                 <div className="bottom-row">
                     <Keyboard 
@@ -170,7 +181,7 @@ class PlayViewController extends Component {
         }
         if (!Number.isInteger(rangeEndIdx)) {
             rangeEndIdx = (
-                (playMode === "listenAndRepeat")
+                (playMode === "listening")
                         ? 1
                         : barsBase.length - 1
             );

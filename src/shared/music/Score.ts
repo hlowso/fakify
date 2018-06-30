@@ -1,4 +1,4 @@
-import { IPart, IScoreBar } from "../types";
+import { IPart, IScoreBar, IMusicIdx, IStroke } from "../types";
 
 class Score {
     private _bars: IScoreBar[]; 
@@ -53,8 +53,15 @@ class Score {
         });
     }
 
-    public barAt = (idx: number) => {
+    public barAt = (idx: number): IScoreBar => {
         return this._bars[idx];
+    }
+
+    public strokesAt = (idx: IMusicIdx, instrument = ""): IStroke[] | { [instrument: string]: IStroke[] } => {
+        if (instrument) {
+            return this._bars[idx.barIdx][idx.subbeatIdx][instrument];
+        }
+        return this._bars[idx.barIdx][idx.subbeatIdx];
     }
 
     public consolidate = (otherMusic: (Score | IPart)[] | (Score | IPart)) => {

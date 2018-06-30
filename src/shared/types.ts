@@ -73,7 +73,7 @@ export interface IStroke {
 export enum PlayMode {
     None = "none",
     Improv = "improv",
-    ListenAndRepeat = "listenAndRepeat"
+    Listening = "listening"
 }
 
 export enum Difficulty {
@@ -104,4 +104,14 @@ export interface IImprovScore {
     notesPlayed: number;
     notesInTime: number;
     notesInKey: number;
+}
+
+export interface IListeningScore {
+    correctNotesCount: number;
+    percentCorrect: number;
+    incorrectNotes: Array<{
+        musicIdx: IMusicIdx;
+        played: number;
+        correct: number | ""
+    }>;
 }
