@@ -9,6 +9,8 @@ export interface IKeyboardProps {
     currentKey: NoteName;
     takeIsPlaying: boolean;
     playUserMidiMessage: (message: IMidiMessage) => void;
+    rangeStartNote?: number;
+    rangeEndNote?: number;
 }
 
 export interface IKeyboardState {
