@@ -107,7 +107,7 @@ class PlayViewController extends Component {
                     <ChartViewer
                         song={selectedSong}
                         chart={chart} 
-                        currChartIdx={sessionIdx} 
+                        sessionIdx={sessionIdx} 
                         recontextualize={this.recontextualize} 
                         resetTempo={this.resetTempo} 
                         onBarClick={this.onBarClick} />
@@ -162,7 +162,7 @@ class PlayViewController extends Component {
     ************/
 
     resetChart = () => {
-        let { id, barsBase, originalTempo, originalKeyContext, suitableFeels } = this.state.selectedSong;
+        let { id, barsBase, originalTempo, originalContext, suitableFeels } = this.state.selectedSong;
         let chartSettings = this.StorageHelper.getChartSettings(id);
         let playMode = this.StorageHelper.getPlayMode();
 
@@ -171,7 +171,7 @@ class PlayViewController extends Component {
             tempo = originalTempo;
         }
         if (!context) {
-            context = originalKeyContext;
+            context = originalContext;
         }
         if (!feel) {
             feel = suitableFeels[0];

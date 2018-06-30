@@ -1,6 +1,11 @@
-// export interface ISong {
-
-// }
+export interface ISong {
+    id: string;
+    title: string;
+    originalContext: NoteName;
+    tempo: Tempo;
+    suitableFeels: Feel[];
+    barsBase: IBarBase[];
+}
 
 export type Tempo = [number, number];
 export type TimeSignature = [number, number];

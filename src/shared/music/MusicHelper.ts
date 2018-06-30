@@ -6,6 +6,8 @@ export * from "./composers/index"
 export const NUMBER_OF_KEYS = 88;
 export const LOWEST_A = 9;
 export const HIGHEST_C = LOWEST_A + NUMBER_OF_KEYS - 1;
+export const LOWER_TEMPO_LIMIT = 40;
+export const UPPER_TEMPO_LIMIT = 210;
 
 // const NOTE_REGEX = /[A-G](#|b)?/g;
 const RELATIVE_SCALE_NOTE_REGEX = /[1H2N34T5U6J7]/g;
@@ -31,8 +33,8 @@ export const getWordConstituents = (word: string): any => {
     };
 }
 
-export const RELATIVE_SCALE= ["1", "H", "2", "N", "3", "4", "T", "5", "U", "6", "J", "7"];
-export const NOTE_NAMES = ["C", "C#|Db", "D", "D#|Eb", "E", "F", "F#|Gb", "G", "G#|Ab", "A", "A#|Bb", "B|Cb"];
+export const RELATIVE_SCALE: RelativeNoteName[] = ["1", "H", "2", "N", "3", "4", "T", "5", "U", "6", "J", "7"];
+export const NOTE_NAMES: NoteName[] = ["C", "C#|Db", "D", "D#|Eb", "E", "F", "F#|Gb", "G", "G#|Ab", "A", "A#|Bb", "B|Cb"];
 
 // Temporary ugly code for getting the set of notes in a scale from 
 // a note name. TODO: create a ticket for organizing notes better. 

@@ -1,23 +1,33 @@
 import React, { Component } from "react";
-import Cx from "classnames";
-
+import * as Cx from "classnames";
 import * as Util from "../../../shared/Util";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
-
+import Chart from "../../../shared/music/Chart";
+import { ISong, IMusicIdx, NoteName, Tempo } from "../../../shared/types";
 import "./ChartViewer.css";
 
-class ChartViewer extends Component {
-    constructor(props) {
+export interface IChartViewerProps {
+    song: ISong;
+    chart: Chart;
+    sessionIdx: IMusicIdx;
+    onBarClick: (barIdx: number) => void;
+    recontextualize: (noteName: NoteName) => void;
+    resetTempo: (tempo: Tempo) => void;
+}
+
+export interface IChartViewerState {
+
+}
+
+class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
+    constructor(props: IChartViewerProps) {
         super(props);
         this.state = {
 
         };
-
-        this.LOWER_TEMPO_LIMIT = 60;
-        this.UPPER_TEMPO_LIMIT = 180;
     }
 
-    render() {
+    render(): JSX.Element {
         let { song, chart } = this.props;
         let loading = !Util.objectIsEmpty(song) &&
                         !Util.objectIsEmpty(chart);
@@ -36,16 +46,16 @@ class ChartViewer extends Component {
             : <h2>No Song Selected</h2>;
     }
 
-    renderProgression = () => {
-        let { chart, currChartIdx } = this.props;
+    renderProgression = (): JSX.Element[] => {
+        let { chart, sessionIdx } = this.props;
         let { bars, rangeStartIdx, rangeEndIdx } = chart;
         let baseKey = bars[0].chordSegments[0].key;
-        currChartIdx = currChartIdx || {};
+        sessionIdx = sessionIdx || {};
 
         return bars.map((bar, i) => {
             let chordNames = [];
             let beats = [];
-            let isCurrentlyPlayingBar = currChartIdx.barIdx === i;
+            let isCurrentlyPlayingBar = sessionIdx.barIdx === i;
             let isWithinRange = rangeStartIdx <= i &&
                                 i <= rangeEndIdx;
 
@@ -57,15 +67,13 @@ class ChartViewer extends Component {
 
             for (let beatIdx = 0; beatIdx < bar.timeSignature[1]; beatIdx ++) {
                 let segmentIdx;
-                let chordSegment = bar.chordSegments.find((segment, i) => { 
-                    if (segment.beatIdx === beatIdx) {
-                        segmentIdx = i;
-                        return true;
-                    } 
+                let chordSegment = bar.chordSegments.find((segment, idx) => { 
+                    segmentIdx = idx;
+                    return segment.beatIdx === beatIdx;
                 });
 
                 let isCurrentChord = isCurrentlyPlayingBar && 
-                                    currChartIdx.segmentIdx === segmentIdx;
+                                    sessionIdx.segmentIdx === segmentIdx;
 
                 let chordNameClasses = Cx({
                     "chord-name": true,
@@ -97,7 +105,7 @@ class ChartViewer extends Component {
         });
     }
 
-    renderLeftHandSettings = () => {
+    renderLeftHandSettings = (): JSX.Element => {
         return (
             <div className="left-hand-settings">
                 {this.renderKeyContextSelect()}
@@ -110,7 +118,7 @@ class ChartViewer extends Component {
      * KEY SIGNATURE SELECT
      */
 
-    renderKeyContextSelect = () => {
+    renderKeyContextSelect = (): JSX.Element => {
         let { context } = this.props.chart;
         let options = MusicHelper.NOTE_NAMES.map(
             key => (
@@ -128,7 +136,7 @@ class ChartViewer extends Component {
                 <select 
                     className="left-hand-settings-right" 
                     value={context}
-                    onChange={event => this.props.recontextualize(event.target.value)}
+                    onChange={event => this.props.recontextualize((event.target.value as NoteName))}
                 >
                     {options}
                 </select> 
@@ -141,13 +149,13 @@ class ChartViewer extends Component {
      * TEMPO SELECT
      */
 
-    renderTempoSelect = () => {
+    renderTempoSelect = (): JSX.Element => {
         let { tempo } = this.props.chart;
         let bpms = tempo[0];
         let options = [];
         for (
-                let t = this.LOWER_TEMPO_LIMIT; 
-                t <= this.UPPER_TEMPO_LIMIT; 
+                let t = MusicHelper.LOWER_TEMPO_LIMIT; 
+                t <= MusicHelper.UPPER_TEMPO_LIMIT; 
                 t ++
         ) {
             options.push(

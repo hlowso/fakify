@@ -54,7 +54,7 @@ export const getSongAsync = songId => {
         resolve({
             id: songId,
             title: "C Blues",
-            originalKeyContext: "C",
+            originalContext: "C",
             originalTempo: [120, 4],
             suitableFeels: ["swing"],
             barsBase: [
