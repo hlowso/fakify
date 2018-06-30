@@ -1,9 +1,22 @@
 import React, { Component } from "react";
-import { PlayMode } from "../../../shared/types";
+import { PlayMode, IImprovScore, IListeningScore } from "../../../shared/types";
 import "./TrainingWindow.css";
 
-class TrainingWindow extends Component<any, any> {
-    constructor(props: any) {
+export interface ITrainingWindowProps {
+    startSession: () => void;
+    stopSession: () => void;
+    playMode: PlayMode;
+    setPlayMode: (playMode: PlayMode) => void;
+    report?: IImprovScore | IListeningScore;
+    userShouldPlay?: boolean;
+}
+
+export interface ITrainingWindowState {
+
+}
+
+class TrainingWindow extends Component<ITrainingWindowProps, ITrainingWindowState> {
+    constructor(props: ITrainingWindowProps) {
         super(props);
         this.state = {
 
@@ -40,17 +53,13 @@ class TrainingWindow extends Component<any, any> {
             <select
                 className="play-mode-select"
                 value={this.props.playMode} 
-                onChange={event => this.props.setPlayMode(event.target.value)} >
+                onChange={event => this.props.setPlayMode(event.target.value as PlayMode)} >
                 {options}
             </select>
         );
     }
 
     public renderFeedback = (): JSX.Element => {
-        if (!this.props.report) {
-            return <div />;
-        }
-
         let feedbackSpans: JSX.Element[];
         
         switch (this.props.playMode) {
@@ -72,7 +81,7 @@ class TrainingWindow extends Component<any, any> {
     }
 
     public renderImprovFeedback = (): JSX.Element[] => {
-        let { notesInKey, notesInTime, notesPlayed } = this.props.report;
+        let { notesInKey, notesInTime, notesPlayed } = this.props.report as IImprovScore;
         return [
             <span key={0}>In Key: {notesInKey} / {notesPlayed}</span>,
             <span key={1}>In Time: {notesInTime} / {notesPlayed}</span>
@@ -81,7 +90,7 @@ class TrainingWindow extends Component<any, any> {
 
     public renderListeningFeedback = (): JSX.Element[] => {
         let { userShouldPlay, report } = this.props;
-        let { percentCorrect } = report;
+        let { percentCorrect } = report as IListeningScore;
 
         if (!userShouldPlay) {
             return [

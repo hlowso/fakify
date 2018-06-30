@@ -1,27 +1,37 @@
 import React, { Component } from "react";
 import Cx from "classnames";
-
 import * as MusicHelper from "../../../shared/music/MusicHelper";
-
+import { NoteName, IMidiMessage } from "../../../shared/types";
 import "./Keyboard.css";
 
-class Keyboard extends Component {
-    constructor(props) {
+export interface IKeyboardProps {
+    depressedKeys: number[];
+    currentKey: NoteName;
+    takeIsPlaying: boolean;
+    playUserMidiMessage: (message: IMidiMessage) => void;
+}
+
+export interface IKeyboardState {
+
+}
+
+class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
+    private _BLACK_KEY_INDICES = [1, 3, 6, 8, 10];
+    private _KEY_HEIGHT = "70px";
+    private _KEY_WIDTH_FACTOR = 1;
+    private _WIDER_UPPER_WHITE_KEY_WIDTH = `${this._KEY_WIDTH_FACTOR * 25}px`;
+    private _NARROWER_UPPER_WHITE_KEY_WIDTH = `${this._KEY_WIDTH_FACTOR * 15}px`;
+    private _LOWER_WHITE_KEY_WIDTH = `${this._KEY_WIDTH_FACTOR * 35}px`;
+    private _BLACK_KEY_WIDTH = `${this._KEY_WIDTH_FACTOR * 20}px`;
+
+    constructor(props: IKeyboardProps) {
         super(props);
         this.state = {
 
         };
-
-        this.BLACK_KEY_INDICES = [1, 3, 6, 8, 10];
-        this.KEY_HEIGHT = "70px";
-        this.KEY_WIDTH_FACTOR = 1;
-        this.WIDER_UPPER_WHITE_KEY_WIDTH = `${this.KEY_WIDTH_FACTOR * 25}px`;
-        this.NARROWER_UPPER_WHITE_KEY_WIDTH = `${this.KEY_WIDTH_FACTOR * 15}px`;
-        this.LOWER_WHITE_KEY_WIDTH = `${this.KEY_WIDTH_FACTOR * 35}px`;
-        this.BLACK_KEY_WIDTH = `${this.KEY_WIDTH_FACTOR * 20}px`;
     }
 
-    render() {
+    render(): JSX.Element {
         return (
             <div id="keyboard">
                 {this.renderKeys()}
@@ -29,7 +39,7 @@ class Keyboard extends Component {
         );
     }
 
-    renderKeys = () => {
+    renderKeys = (): JSX.Element => {
         let { depressedKeys, currentKey } = this.props;
         let upperElements = [],
             lowerElements = [];
@@ -37,7 +47,7 @@ class Keyboard extends Component {
         for (let note = MusicHelper.LOWEST_A; note < MusicHelper.LOWEST_A + 88; note ++) {
             let noteNameIndex = note % 12;
             let noteName = MusicHelper.NOTE_NAMES[noteNameIndex];
-            let isBlackKey = this.BLACK_KEY_INDICES.indexOf(noteNameIndex) !== -1;
+            let isBlackKey = this._BLACK_KEY_INDICES.indexOf(noteNameIndex) !== -1;
             let isDepressed = depressedKeys.indexOf(note) !== -1;
             let isInKey = MusicHelper.noteIsInKey(note, currentKey);
 
@@ -61,7 +71,7 @@ class Keyboard extends Component {
         );
     }
 
-    getWhiteKey = (note, noteName, depressed, inCurrentKey) => {
+    getWhiteKey = (note: number, noteName: NoteName, depressed: boolean, inCurrentKey: boolean) => {
         let classNames = Cx(
             "key", "white-key", noteName, 
             {
@@ -72,13 +82,13 @@ class Keyboard extends Component {
         );
 
         let upperStyle = {
-            width: this.WIDER_UPPER_WHITE_KEY_WIDTH, 
-            height: this.KEY_HEIGHT
+            width: this._WIDER_UPPER_WHITE_KEY_WIDTH, 
+            height: this._KEY_HEIGHT
         };
 
         let lowerStyle = {
-            width: this.LOWER_WHITE_KEY_WIDTH, 
-            height: this.KEY_HEIGHT
+            width: this._LOWER_WHITE_KEY_WIDTH, 
+            height: this._KEY_HEIGHT
         }
 
         if ([
@@ -87,14 +97,14 @@ class Keyboard extends Component {
                 MusicHelper.NOTE_NAMES[9]
             ].indexOf(noteName) !== -1
         ) {
-            upperStyle.width = this.NARROWER_UPPER_WHITE_KEY_WIDTH;
+            upperStyle.width = this._NARROWER_UPPER_WHITE_KEY_WIDTH;
         }
 
         if (note === MusicHelper.LOWEST_A) {
-            upperStyle.width = this.WIDER_UPPER_WHITE_KEY_WIDTH;
+            upperStyle.width = this._WIDER_UPPER_WHITE_KEY_WIDTH;
         }
         if (note === MusicHelper.HIGHEST_C) {
-            upperStyle.width = this.LOWER_WHITE_KEY_WIDTH;
+            upperStyle.width = this._LOWER_WHITE_KEY_WIDTH;
         }
 
         return {
@@ -103,10 +113,10 @@ class Keyboard extends Component {
         };
     }
 
-    getBlackKey = (note, noteName, depressed, inCurrentKey) => {
+    getBlackKey = (note: number, noteName: NoteName, depressed: boolean, inCurrentKey: boolean): JSX.Element => {
         let blackKeyStyle = {
-            width: this.BLACK_KEY_WIDTH, 
-            height: this.KEY_HEIGHT
+            width: this._BLACK_KEY_WIDTH, 
+            height: this._KEY_HEIGHT
         };
 
         let classNames = Cx(
@@ -123,7 +133,7 @@ class Keyboard extends Component {
         return this.renderKey(note, noteName, classNames, blackKeyStyle);
     }
 
-    renderKey = (note, noteName, classNames, style) => {
+    renderKey = (note: number, noteName: NoteName, classNames: string, style: any): JSX.Element => {
         return (
             <div 
                 key={`${noteName}${note}`} 
@@ -134,15 +144,15 @@ class Keyboard extends Component {
         );
     }
 
-    onPianoKeyDown = note => {
-        let message = { 
+    onPianoKeyDown = (note: number) => {
+        let message: IMidiMessage = { 
             data: [144, note, 127]
         };
         this.props.playUserMidiMessage(message);
     }
 
-    onPianoKeyUp = note => {
-        let message = {
+    onPianoKeyUp = (note: number) => {
+        let message: IMidiMessage = {
             data: [128, note, 0]
         }
         this.props.playUserMidiMessage(message);

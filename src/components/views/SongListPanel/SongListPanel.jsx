@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import Cx from "classnames";
-
 import * as Util from "../../../shared/Util";
-
 import "./SongListPanel.css";
 
 class SongListPanel extends Component {

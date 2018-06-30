@@ -1,14 +1,14 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-
 import * as Api from "../../../shared/Api"; 
-
 import "./TopNav.css";
 
 class TopNav extends Component {
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            
+        };
     }
 
     render() {

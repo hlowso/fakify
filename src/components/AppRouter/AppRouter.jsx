@@ -3,7 +3,7 @@ import { Switch, Route, Redirect } from "react-router";
 import WebAudioFontPlayer from "webaudiofont";
 import uuid from "uuid";
 import PlayViewController from "../ViewControllers/PlayViewController/PlayViewController";
-import * as StorageHelper from "../../shared/StorageHelper";
+import { StorageHelper } from "../../shared/StorageHelper";
 import * as MusicHelper from "../../shared/music/MusicHelper";
 import { 
     SessionManager, 

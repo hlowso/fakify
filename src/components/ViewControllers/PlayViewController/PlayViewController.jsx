@@ -132,10 +132,7 @@ class PlayViewController extends Component {
                     StorageHelper={this.StorageHelper}
                     StateHelper={this.StateHelper} 
                     isOpen={midiSettingsModalOpen} 
-                    close={event => { 
-                        event.preventDefault(); 
-                        this.setState({ midiSettingsModalOpen: false }); 
-                    }} />
+                    close={()=> this.setState({ midiSettingsModalOpen: false })} />
             </div>
         ); 
     }

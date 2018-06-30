@@ -1,10 +1,17 @@
 import React, { Component } from "react";
 import { Button } from "react-bootstrap";
-
 import "./MenuBar.css";
 
-class MenuBar extends Component {
-    constructor(props) {
+export interface IMenuBarProps {
+    openMIDISettingsModal: () => void;
+}
+
+export interface IMenuBarState {
+
+}
+
+class MenuBar extends Component<IMenuBarProps, IMenuBarState> {
+    constructor(props: IMenuBarProps) {
         super(props);
         this.state = {
 

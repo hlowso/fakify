@@ -1,8 +1,22 @@
 import React, { Component } from "react";
-// import { button } from "react-bootstrap";
 import Modal from "react-modal";
-
+import { StorageHelper } from "../../../shared/StorageHelper";
 import "./MidiSettingsModal.css";
+
+export interface ISettingsModalProps {
+    StorageHelper: StorageHelper;
+    StateHelper: any;
+    SoundActions: any;
+    isOpen: boolean;
+    close: () => void;
+
+}
+
+export interface ISettingsModalState {
+    selectedMidiInputId: string;
+    requestingMidiAccess: boolean;
+    midiInputConnectionError: string;
+}
 
 const modalStyle={
     overlay: {
@@ -20,8 +34,8 @@ const modalStyle={
 
 Modal.setAppElement("#root");
 
-class MidiSettingsModal extends Component {
-    constructor(props) {
+class MidiSettingsModal extends Component<ISettingsModalProps, ISettingsModalState> {
+    constructor(props: ISettingsModalProps) {
         super(props);
         this.state = {
             selectedMidiInputId: "",
@@ -41,8 +55,7 @@ class MidiSettingsModal extends Component {
         let midiInputId = StorageHelper.getMidiInputId();
         let midiAccess = StateHelper.getMidiAccess();
 
-        let { 
-            selectedMidiInputId, 
+        let {
             requestingMidiAccess
         } = this.state;
     
@@ -104,11 +117,11 @@ class MidiSettingsModal extends Component {
         ); 
     }
 
-    onMidiInputSelectionChange = event => {
-        this.setState({ selectedMidiInputId: event.target.value });
+    onMidiInputSelectionChange = (event: React.SyntheticEvent<any>) => {
+        this.setState({ selectedMidiInputId: (event.target as any).value });
     }
     
-    onMidiInputsRefresh = event => {
+    onMidiInputsRefresh = (event: React.SyntheticEvent<any>) => {
         event.preventDefault();
         let { SoundActions } = this.props;
     
@@ -119,7 +132,7 @@ class MidiSettingsModal extends Component {
             });
     }
     
-    onSubmitMidiSettingsForm = event => { 
+    onSubmitMidiSettingsForm = (event: React.SyntheticEvent<any>) => { 
         event.preventDefault();
         let { SoundActions, StorageHelper, close } = this.props;
         let { selectedMidiInputId } = this.state;
@@ -128,7 +141,7 @@ class MidiSettingsModal extends Component {
     
         if (connectionSuccessful) {
             StorageHelper.setMidiInputId(selectedMidiInputId);
-            close(event); 
+            close(); 
         } else {
             StorageHelper.setMidiInputId("");
             this.setState({ midiInputConnectionError: "Connection unsuccessful" });

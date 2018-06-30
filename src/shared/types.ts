@@ -120,3 +120,19 @@ export interface IListeningScore {
         correct: number;
     }>;
 }
+
+export interface IMidiMessage {
+    // Type, Note, Velocity
+    // Must remain in tuple format to 
+    // be compatible with onmidimessage which originates
+    // from navigator.requestMIDIAccess
+    data: [number, number, number];
+}
+
+export interface IChartSettings {
+    tempo?: Tempo;
+    context?: NoteName; 
+    feel?: Feel; 
+    rangeStartIdx?: number; 
+    rangeEndIdx?: number;
+}
