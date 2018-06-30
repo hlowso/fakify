@@ -20,7 +20,6 @@ export class SessionManager {
     protected _chorusIdx = -1;
     protected _barIdx: number;
     protected _segmentIdx = -1;
-    protected _subbeatIdx = -1;
 
     private _WAITTIME_FACTOR = (3 / 4) * 1000;
     private _PREP_TIME = 0.02;
@@ -76,7 +75,7 @@ export class SessionManager {
             chorusIdx: this._chorusIdx,
             barIdx: this._barIdx,
             segmentIdx: this._segmentIdx,
-            subbeatIdx: this._subbeatIdx
+            subbeatIdx: Util.binarySearch(this._currQueueTimeBar, this._audioContext.currentTime)[0]
         }
     }
 
@@ -95,7 +94,7 @@ export class SessionManager {
                             let nextQueueTime = this._nextSegmentQueueTime;
                             let nextQueueTimeMinusPrepTime = nextQueueTime - this._PREP_TIME;
                             queueLoop(
-                                (nextQueueTime - this._currQueueTime) * this._WAITTIME_FACTOR,
+                                (nextQueueTime - this._currSegmentQueueTime) * this._WAITTIME_FACTOR,
                                 () => (this._audioContext.currentTime > nextQueueTimeMinusPrepTime)
                             );
                         }
@@ -148,9 +147,9 @@ export class SessionManager {
         let subbeatDuration = this.subbeatDuration;
         let { subbeatIdx, durationInSubbeats } = currSegment;
         let startIdx = subbeatIdx;
-        let scoreIndeces = Object.keys(scoreBar).map(s => parseInt(s, 10));
+        let scoreIndices = Object.keys(scoreBar).map(s => parseInt(s, 10));
 
-        for (let scoreIdx of scoreIndeces) {
+        for (let scoreIdx of scoreIndices) {
             if (scoreIdx === startIdx + durationInSubbeats) {
                 break;
             }
@@ -176,14 +175,11 @@ export class SessionManager {
         }
     }
 
-    private _tick = (noUpdate = false): boolean => {
-        let segmentChanged = false;
-        this._subbeatIdx = (this._subbeatIdx + 1) % this.currChartBar.durationInSubbeats;
+    private _stepBySegment = () => {
+        this._segmentIdx = (this._segmentIdx + 1) % this.currChartBar.chordSegments.length;
 
-        if (!this._subbeatIdx) {
+        if (this._segmentIdx === 0) {
             this._barIdx = this._chart.rangeStartIdx + (this._barIdx + 1 - this._chart.rangeStartIdx) % this._rangeLength;
-            this._segmentIdx = 0;
-            segmentChanged = true;
 
             if (this._barIdx === this._chart.rangeStartIdx) {
                 // If the bar index is back at the start of the range...
@@ -196,31 +192,8 @@ export class SessionManager {
                 // Reset the queue times
                 this._resetQueueTimes();
             }
-        } else {
-            // Might as well keep the segment index updated also
-            let subbeatSum = 0;
-            for (let segIdx = 0; segIdx <= this._segmentIdx; segIdx ++) {
-                subbeatSum += this.currChartBar.chordSegments[segIdx].durationInSubbeats;
-            }
-
-            if (this._subbeatIdx >= subbeatSum) {
-                this._segmentIdx ++;
-                segmentChanged = true;
-            }
         }
 
-        // noUpdate is false only when _tick is called by _stepBySegment
-        if (!noUpdate) {
-            this._onUpdate();
-        }
-
-        return segmentChanged;
-    }
-
-    private _stepBySegment = () => {
-        let segmentChanged;
-        do { segmentChanged = this._tick(true); }
-        while (!segmentChanged)
         this._onUpdate();
     }
 
@@ -280,13 +253,17 @@ export class SessionManager {
      * PRIVATE GETTERS
      */
 
-    private get _currQueueTime(): number {
-        return this._queueTimes[this._barIdx][this._subbeatIdx];
+    private get _currQueueTimeBar(): { [subbeatIdx: number]: number } {
+        return this._queueTimes[this._barIdx];
+    }
+
+    private get _currSegmentQueueTime(): number {
+        return this._currQueueTimeBar[this.currChordSegment.subbeatIdx];
     }
 
     private get _nextSegmentQueueTime(): number {
-        // Get the subbeat and bar indeces at the next segment
-        let subbeatIdx = (this._subbeatIdx + this.currChordSegment.durationInSubbeats) % this.currChartBar.durationInSubbeats;
+        // Get the subbeat and bar indices at the next segment
+        let subbeatIdx = (this.currChordSegment.subbeatIdx + this.currChordSegment.durationInSubbeats) % this.currChartBar.durationInSubbeats;
         let barIdx = subbeatIdx ? this._barIdx : this._barIdx + 1;
         return this._queueTimes[barIdx][subbeatIdx];
     }

@@ -39,7 +39,7 @@ export const NOTE_NAMES = ["C", "C#|Db", "D", "D#|Eb", "E", "F", "F#|Gb", "G", "
 // Should Note be its own class?
 export const keyTo7Notes = (key: NoteName) => {
     let tonicIdx = NOTE_NAMES.indexOf(key);
-    return C_NOTE_NAMES_INDECES.map(note => note + tonicIdx);
+    return C_NOTE_NAMES_INDICES.map(note => note + tonicIdx);
 }
 
 // The chart viewer passes the key of the first chordEnvelope of the first
@@ -62,16 +62,16 @@ export const getPresentableChord = (chord: string, keyContext = ""): string => {
     return `${getPresentableNoteName(base, keyContext)}^${shape}`;
 }
 
-export const C_NOTE_NAMES_INDECES = [0, 2, 4, 5, 7, 9, 11];
+export const C_NOTE_NAMES_INDICES = [0, 2, 4, 5, 7, 9, 11];
 
 export const noteIsInKey = (note: number, key: NoteName): boolean => {
-    return getKeyNoteNameIndeces(key).indexOf(note % 12) !== -1;
+    return getKeyNoteNameIndices(key).indexOf(note % 12) !== -1;
 }
 
-export const getKeyNoteNameIndeces = (key: NoteName): number[] => {
+export const getKeyNoteNameIndices = (key: NoteName): number[] => {
     let offset = NOTE_NAMES.indexOf(key);
     if (offset === -1) return [];
-    return C_NOTE_NAMES_INDECES.map(pitch => (pitch + offset) % 12);
+    return C_NOTE_NAMES_INDICES.map(pitch => (pitch + offset) % 12);
 }
 
 export const contextualizeBars = (barsBase: IBarBase[], newKeyContext: NoteName): IBarBase[] => {
@@ -100,7 +100,7 @@ export const adjustBarTimes = (bars: IBarBase[], feel: Feel): IChartBar[] => {
 // parts. 
 const _adjustBarsSwingFeel = (bars: IBarBase[]): IChartBar[] => {
 
-    // First we convert time signatures and beat indeces
+    // First we convert time signatures and beat indices
     let adjustedBars: IChartBar[] = bars.map(bar=> {
         let { timeSignature, chordSegments, barIdx } = bar;
         let conversionFactor: number; 
@@ -147,7 +147,7 @@ const _adjustBarsSwingFeel = (bars: IBarBase[]): IChartBar[] => {
 
     // Now we mark the places in the chart where the chords
     // change from segment to segment
-    let changeIndeces = [];
+    let changeIndices = [];
 
     for (let barIdx = 0; barIdx < adjustedBars.length; barIdx++) {
         let nextBarIdx = (barIdx + 1) % adjustedBars.length;
@@ -164,23 +164,23 @@ const _adjustBarsSwingFeel = (bars: IBarBase[]): IChartBar[] => {
             );
 
             if (segment.chord !== nextSegment.chord) {
-                changeIndeces.push({ barIdx, segmentIdx });
+                changeIndices.push({ barIdx, segmentIdx });
             }
         }
     }
 
     // If there are NO changes (for whatever reason), the subbeatsBeforeChange
     // attribute will be Infinity everywhere
-    if (!changeIndeces.length) {
+    if (!changeIndices.length) {
         return adjustedBars;
     }
 
     // Otherwise, by counting subbeats backwards from change index 
     // to change index, we properly calculate the subbeatsBeforeChange 
     // attribute for all segments
-    for (let i = 0; i < changeIndeces.length; i ++) {
-        let stretchStart = changeIndeces[i];
-        let stretchEnd = changeIndeces[Util.mod(i + 1, changeIndeces.length)];
+    for (let i = 0; i < changeIndices.length; i ++) {
+        let stretchStart = changeIndices[i];
+        let stretchEnd = changeIndices[Util.mod(i + 1, changeIndices.length)];
         let currentSubbeatSum = 0;
         let startBarReached = false;
 

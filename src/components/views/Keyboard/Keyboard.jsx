@@ -12,7 +12,7 @@ class Keyboard extends Component {
 
         };
 
-        this.BLACK_KEY_INDECES = [1, 3, 6, 8, 10];
+        this.BLACK_KEY_INDICES = [1, 3, 6, 8, 10];
         this.KEY_HEIGHT = "70px";
         this.KEY_WIDTH_FACTOR = 1;
         this.WIDER_UPPER_WHITE_KEY_WIDTH = `${this.KEY_WIDTH_FACTOR * 25}px`;
@@ -37,7 +37,7 @@ class Keyboard extends Component {
         for (let note = MusicHelper.LOWEST_A; note < MusicHelper.LOWEST_A + 88; note ++) {
             let noteNameIndex = note % 12;
             let noteName = MusicHelper.NOTE_NAMES[noteNameIndex];
-            let isBlackKey = this.BLACK_KEY_INDECES.indexOf(noteNameIndex) !== -1;
+            let isBlackKey = this.BLACK_KEY_INDICES.indexOf(noteNameIndex) !== -1;
             let isDepressed = depressedKeys.indexOf(note) !== -1;
             let isInKey = MusicHelper.noteIsInKey(note, currentKey);
 
