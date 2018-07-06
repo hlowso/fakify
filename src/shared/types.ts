@@ -17,11 +17,11 @@ export enum ChordShape {
     Min = "Minor",
     Maj7 = "Major7",
     Min7 = "Minor7",
-    Dom = "Dominant",
+    Dom7 = "Dominant7",
     Dim = "Diminished"
 }
 
-export type ChordName = [NoteName, ChordShape];
+export type ChordName = [NoteName | RelativeNoteName, ChordShape];
 
 export interface INote {
     name: NoteName;
@@ -38,6 +38,7 @@ export interface IBarBase {
 export interface IChordBase {
     beatIdx: number;
     chord: string;
+    chordName?: ChordName;
     key: RelativeNoteName | NoteName;
     durationInBeats: number;
 }
@@ -53,6 +54,7 @@ export interface IChordSegment {
     beatIdx: number;
     subbeatIdx: number;
     chord: string;
+    chordName?: ChordName;
     key: NoteName;
     durationInSubbeats: number;
     subbeatsBeforeChange: number;

@@ -65,6 +65,7 @@ export const getSongAsync = songId => {
                         {
                             beatIdx: 0,
                             chord: "1^7",
+                            chordName: [ "1", "Dominant7" ],
                             durationInBeats: 8,
                             key: "4"
                         }
@@ -77,6 +78,7 @@ export const getSongAsync = songId => {
                         {
                             beatIdx: 0,
                             chord: "4^7",
+                            chordName: [ "4", "Dominant7" ],
                             durationInBeats: 8,
                             key: "J"
                         }
@@ -89,6 +91,7 @@ export const getSongAsync = songId => {
                         {
                             beatIdx: 0,
                             chord: "1^7",
+                            chordName: [ "1", "Dominant7" ],
                             durationInBeats: 8,
                             key: "4"
                         }
@@ -101,6 +104,7 @@ export const getSongAsync = songId => {
                         {
                             beatIdx: 0,
                             chord: "1^7",
+                            chordName: [ "1", "Dominant7" ],
                             durationInBeats: 8,
                             key: "4"
                         }
@@ -113,6 +117,7 @@ export const getSongAsync = songId => {
                         {
                             beatIdx: 0,
                             chord: "4^7",
+                            chordName: [ "4", "Dominant7" ],
                             durationInBeats: 8,
                             key: "J"
                         }
@@ -125,6 +130,7 @@ export const getSongAsync = songId => {
                         {
                             beatIdx: 0,
                             chord: "4^7",
+                            chordName: [ "4", "Dominant7" ],
                             durationInBeats: 8,
                             key: "J"
                         }
@@ -137,6 +143,7 @@ export const getSongAsync = songId => {
                         {
                             beatIdx: 0,
                             chord: "1^7",
+                            chordName: [ "1", "Dominant7" ],
                             durationInBeats: 8,
                             key: "4"
                         }
@@ -149,6 +156,7 @@ export const getSongAsync = songId => {
                         {
                             beatIdx: 0,
                             chord: "1^7",
+                            chordName: [ "1", "Dominant7" ],
                             durationInBeats: 8,
                             key: "4"
                         }
@@ -161,6 +169,7 @@ export const getSongAsync = songId => {
                         {
                             beatIdx: 0,
                             chord: "5^7",
+                            chordName: [ "5", "Dominant7" ],
                             durationInBeats: 8,
                             key: "1"
                         }
@@ -173,6 +182,7 @@ export const getSongAsync = songId => {
                         {
                             beatIdx: 0,
                             chord: "4^7",
+                            chordName: [ "4", "Dominant7" ],
                             durationInBeats: 8,
                             key: "J"
                         }
@@ -185,6 +195,7 @@ export const getSongAsync = songId => {
                         {
                             beatIdx: 0,
                             chord: "1^7",
+                            chordName: [ "1", "Dominant7" ],
                             durationInBeats: 8,
                             key: "4"
                         }
@@ -197,12 +208,14 @@ export const getSongAsync = songId => {
                         {
                             beatIdx: 0,
                             chord: "2^-7",
+                            chordName: [ "2", "Minor7" ],
                             durationInBeats: 4,
                             key: "1"
                         },
                         {
                             beatIdx: 4,
                             chord: "5^7",
+                            chordName: [ "5", "Dominant7" ],
                             durationInBeats: 4,
                             key: "1"
                         }

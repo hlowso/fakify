@@ -1,5 +1,5 @@
 import * as Util from "../Util";
-import { NoteName, RelativeNoteName, IChartBar, IChordSegment, IChordBase, IBarBase, Feel } from "../types";
+import { NoteName, RelativeNoteName, IChartBar, IChordSegment, IChordBase, IBarBase, Feel, ChordName } from "../types";
 
 export * from "./composers/index"
 
@@ -82,6 +82,7 @@ export const contextualizeBars = (barsBase: IBarBase[], newKeyContext: NoteName)
         contextualizedBar.chordSegments = bar.chordSegments.map<IChordBase>((chordBase: IChordBase ) => {
             let contextualizedChordBase = Util.copyObject(chordBase);
             contextualizedChordBase.chord = contextualize(chordBase.chord, newKeyContext);
+            contextualizedChordBase.chordName = [contextualize(((chordBase.chordName as ChordName)[0] as RelativeNoteName), newKeyContext), (chordBase.chordName as ChordName)[1]]
             contextualizedChordBase.key = contextualize(chordBase.key, newKeyContext);
             return contextualizedChordBase;
         });
@@ -129,6 +130,7 @@ const _adjustBarsSwingFeel = (bars: IBarBase[]): IChartBar[] => {
                 beatIdx: chordBase.beatIdx,
                 subbeatIdx: conversionFactor * chordBase.beatIdx,
                 chord: chordBase.chord,
+                chordName: chordBase.chordName,
                 key: chordBase.key,
                 durationInSubbeats,
 

@@ -116,7 +116,7 @@ export class ChordClass extends Domain {
                     baseIntervals: [0, 3, 7, 10],
                     relativePositions: ["2", "3", "6"]
                 };
-            case ChordShape.Dom:
+            case ChordShape.Dom7:
                 return {
                     shape,
                     baseIntervals: [0, 4, 7, 10],
@@ -142,7 +142,7 @@ export class ChordClass extends Domain {
         let [ noteName, shape ] = chordName;
         let { baseIntervals, relativePositions, extend } = ChordClass.shapeToInfo(shape);
         let intervals = (extend || Util.identity)(baseIntervals);
-        let lowestPitch = Domain.getLowestPitch(noteName);
+        let lowestPitch = Domain.getLowestPitch((noteName as NoteName));
 
         super(intervals.map((pitchDiff, i) => { 
             let pitch = lowestPitch + pitchDiff;
@@ -152,34 +152,34 @@ export class ChordClass extends Domain {
                 domainIdx: 2 * i + 1
             };
         }));
-        this._suitableKeys = relativePositions.map(pos => Domain.getTonicByPosition(noteName, pos));
+        this._suitableKeys = relativePositions.map(pos => Domain.getTonicByPosition((noteName as NoteName), pos));
     }
 
-    // public voice(target: number, ref: number[] = []): number[] {
-    //     if (ref.length > 0) {
-    //         // TODO: write clever voicing algorithm here ...
-    //         return [];
-    //     }
+    public voice(target: number, ref: number[] = []): number[] {
+        if (ref.length > 0) {
+            // TODO: write clever voicing algorithm here ...
+            return [];
+        }
 
-    //     // TODO: write a better chord generating algorithm ...
+        // TODO: write a better chord generating algorithm ...
 
-    //     // let [idx, nearestNote] = Util.binarySearch(this._notes, this.createNote(target), this.compareNotes);
-    //     let [idx, targetTonic] = this.tonicBase;
+        let tonicBase = this.tonicBase;
+        let idx = tonicBase[0], targetTonic = tonicBase[1];
 
-    //     while (Math.abs(targetTonic.pitch - target) > 5) {
-    //         idx += this.setLength;
-    //         targetTonic = this._notes[idx];
-    //     }
+        while (Math.abs(targetTonic.pitch - target) > 6) {
+            idx += this.setLength;
+            targetTonic = this._notes[idx];
+        }
 
-    //     let pitches = [];
+        let pitches: number[] = [ targetTonic.pitch ];
 
-    //     for (let i = 1; i < this.setLength; i ++) {
-    //         idx ++;
-    //         pitches.push(this._notes)
-    //     }
+        for (let i = 1; i < this.setLength; i ++) {
+            idx ++;
+            pitches.push(this._notes[idx].pitch);
+        }
 
-    //     return [nearestBaseNote, ...];
-    // }
+        return pitches.sort((a, b) => a - b);
+    }
 
     get tonicBase(): [number, INote] {
         let idx = 0;
