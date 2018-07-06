@@ -59,9 +59,9 @@ class Score {
 
     public strokesAt = (idx: IMusicIdx, instrument = ""): IStroke[] | { [instrument: string]: IStroke[] } => {
         if (instrument) {
-            return this._bars[idx.barIdx][idx.subbeatIdx][instrument];
+            return this._bars[idx.barIdx][(idx.subbeatIdx as number)][instrument];
         }
-        return this._bars[idx.barIdx][idx.subbeatIdx];
+        return this._bars[idx.barIdx][(idx.subbeatIdx as number)];
     }
 
     public consolidate = (otherMusic: (Score | IPart)[] | (Score | IPart)) => {

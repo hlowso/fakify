@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { PlayMode, IImprovScore, IListeningScore } from "../../../shared/types";
+import { PlayMode, IImprovReport, IListeningReport } from "../../../shared/types";
 import "./TrainingWindow.css";
 
 export interface ITrainingWindowProps {
@@ -7,7 +7,7 @@ export interface ITrainingWindowProps {
     stopSession: () => void;
     playMode: PlayMode;
     setPlayMode: (playMode: PlayMode) => void;
-    report?: IImprovScore | IListeningScore;
+    report?: IImprovReport | IListeningReport;
     userShouldPlay?: boolean;
     firstNoteColor: string;
 }
@@ -85,7 +85,7 @@ class TrainingWindow extends Component<ITrainingWindowProps, ITrainingWindowStat
     }
 
     public renderImprovFeedback = (): JSX.Element[] => {
-        let { notesInKey, notesInTime, notesPlayed } = this.props.report as IImprovScore;
+        let { notesInKey, notesInTime, notesPlayed } = this.props.report as IImprovReport;
         return [
             <span key={0}>In Key: {notesInKey} / {notesPlayed}</span>,
             <span key={1}>In Time: {notesInTime} / {notesPlayed}</span>
@@ -94,7 +94,7 @@ class TrainingWindow extends Component<ITrainingWindowProps, ITrainingWindowStat
 
     public renderListeningFeedback = (): JSX.Element[] => {
         let { userShouldPlay, report } = this.props;
-        let { percentCorrect } = report as IListeningScore;
+        let { percentCorrect } = report as IListeningReport;
 
         if (!userShouldPlay) {
             return [

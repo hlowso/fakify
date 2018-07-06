@@ -12,6 +12,23 @@ export type TimeSignature = [number, number];
 export type NoteName = "C" | "C#|Db" | "D" | "D#|Eb" | "E" | "F" | "F#|Gb" | "G" | "G#|Ab" | "A" | "A#|Bb" | "B|Cb";
 export type RelativeNoteName = "1" | "H" | "2" | "N" | "3" | "4" | "T" | "5" | "U" | "6" | "J" | "7";
 
+export enum ChordShape { 
+    Maj = "Major",
+    Min = "Minor",
+    Maj7 = "Major7",
+    Min7 = "Minor7",
+    Dom = "Dominant",
+    Dim = "Diminished"
+}
+
+export type ChordName = [NoteName, ChordShape];
+
+export interface INote {
+    name: NoteName;
+    pitch: number;
+    domainIdx?: number;
+}
+
 export interface IBarBase {
     barIdx: number;
     timeSignature: TimeSignature;
@@ -54,7 +71,7 @@ export interface IMusicIdx {
     chorusIdx?: number;
     barIdx: number;
     segmentIdx?: number;
-    subbeatIdx: number;
+    subbeatIdx?: number;
 }
 
 export enum Feel {
@@ -105,6 +122,7 @@ export interface IExercise {
     firstNote: number;
     rangeStartNote: number;
     rangeEndNote: number;
+    numberOfNotes: number;
     part: IPart;
 }
 
@@ -112,13 +130,13 @@ export interface ISubbeatTimeMap {
     [barIdx: number]: { [subbeatIdx: number]: number };
 }
 
-export interface IImprovScore {
+export interface IImprovReport {
     notesPlayed: number;
     notesInTime: number;
     notesInKey: number;
 }
 
-export interface IListeningScore {
+export interface IListeningReport {
     correctNotesCount: number;
     percentCorrect: number;
     incorrectNotes: Array<{
@@ -142,4 +160,11 @@ export interface IChartSettings {
     feel?: Feel; 
     rangeStartIdx?: number; 
     rangeEndIdx?: number;
+}
+
+export interface IShapeInfo {
+    shape: ChordShape;
+    baseIntervals: number[];
+    relativePositions: RelativeNoteName[]; 
+    extend?: (intervals: number[]) => number[];
 }

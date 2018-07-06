@@ -52,7 +52,7 @@ class Chart {
         let subbeatCount = bar.chordSegments[0].durationInSubbeats;
         let segIdx = 0; 
 
-        while (subbeatCount < idx.subbeatIdx) {
+        while (subbeatCount < (idx.subbeatIdx as number)) {
             segIdx ++;
             subbeatCount += bar.chordSegments[segIdx].durationInSubbeats; 
         }

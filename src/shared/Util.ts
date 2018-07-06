@@ -74,3 +74,5 @@ export const mod = (m: number, n: number): number => {
     let r = m % n;
     return r >= 0 ? r : n + r;
 } 
+
+export const identity = <T>(obj: T) => obj;

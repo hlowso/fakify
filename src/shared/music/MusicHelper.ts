@@ -12,7 +12,7 @@ export const UPPER_TEMPO_LIMIT = 210;
 // const NOTE_REGEX = /[A-G](#|b)?/g;
 const RELATIVE_SCALE_NOTE_REGEX = /[1H2N34T5U6J7]/g;
 
-const _contextualize = (word: string, keyContext: NoteName): string => {
+export const contextualize = (word: string, keyContext: NoteName): string => {
     let { base, shape } = getWordConstituents(word);
     let baseIndex = NOTE_NAMES.indexOf(keyContext);
 
@@ -81,8 +81,8 @@ export const contextualizeBars = (barsBase: IBarBase[], newKeyContext: NoteName)
         let contextualizedBar: IBarBase = Util.copyObject(bar);
         contextualizedBar.chordSegments = bar.chordSegments.map<IChordBase>((chordBase: IChordBase ) => {
             let contextualizedChordBase = Util.copyObject(chordBase);
-            contextualizedChordBase.chord = _contextualize(chordBase.chord, newKeyContext);
-            contextualizedChordBase.key = _contextualize(chordBase.key, newKeyContext);
+            contextualizedChordBase.chord = contextualize(chordBase.chord, newKeyContext);
+            contextualizedChordBase.key = contextualize(chordBase.key, newKeyContext);
             return contextualizedChordBase;
         });
         return contextualizedBar;
