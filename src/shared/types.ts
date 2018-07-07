@@ -26,7 +26,7 @@ export type ChordName = [NoteName | RelativeNoteName, ChordShape];
 export interface INote {
     name: NoteName;
     pitch: number;
-    domainIdx?: number;
+    position?: number;
 }
 
 export interface IBarBase {
