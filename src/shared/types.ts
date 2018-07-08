@@ -16,10 +16,11 @@ export type RelativeNoteName = "1" | "H" | "2" | "N" | "3" | "4" | "T" | "5" | "
 
 export enum ChordShape { 
     Maj = "Major",
+    Maj7 = "Major7",    
     Min = "Minor",
-    Maj7 = "Major7",
     Min7 = "Minor7",
     Dom7 = "Dominant7",
+    Dom9 = "Dominant9",
     Dim = "Diminished"
 }
 
@@ -163,6 +164,6 @@ export interface IChartSettings {
 export interface IShapeInfo {
     shape: ChordShape;
     baseIntervals: number[];
-    relativePositions: RelativeNoteName[]; 
+    suitableRelativeKeys: RelativeNoteName[]; 
     extend?: (baseNotes: Note[]) => Note[];
 }

@@ -50,6 +50,23 @@ export class Note {
         return this._position;
     }
 
+    get scalePosition(): number {
+        if (isNaN(this._position)) {
+            return NaN;
+        }
+        return Util.mod(this._position, 8) + 1;
+    }
+
+    get chordPosition(): number {
+        if (isNaN(this._position)) {
+            return NaN;
+        }
+        if (this._position % 2 === 0) {
+            return this._position + 7;
+        }
+        return this._position;
+    }
+
     public asNoteClass(): Note {
         return new Note(this._name, this._position);
     }

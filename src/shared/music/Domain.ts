@@ -12,7 +12,7 @@ export class Domain {
         return Domain.NOTE_NAMES.indexOf(noteName);
     }
 
-    public static getTonicByPosition = (noteName: NoteName, position: RelativeNoteName) => {
+    public static getTonicNameByPosition = (noteName: NoteName, position: RelativeNoteName) => {
         let noteIdx = Domain.NOTE_NAMES.indexOf(noteName);
         return Domain.NOTE_NAMES[Util.mod(noteIdx - Domain.RELATIVE_SCALE.indexOf(position), 12)];
     }
@@ -41,7 +41,7 @@ export class Domain {
             this._noteClasses = uniquePitches.map(pitch => new Note(pitch));
         }
 
-        this.buildFromNoteClasses();
+        this._buildFromNoteClasses();
     }
 
     get length(): number {
@@ -65,7 +65,8 @@ export class Domain {
     }
 
     public mutate(mutation: (baseNotes: Note[]) => Note[]) {
-
+        this._noteClasses = mutation(this._noteClasses);
+        this._buildFromNoteClasses();
     }
 
     public getLowestNoteByPosition(position: number) {
@@ -115,7 +116,7 @@ export class Domain {
     }
 
     public getClosestNoteToTargetPitch(target: number): [number, Note] {
-        return Util.binarySearch(this._notes, new Note(target), this.compareNotes);
+        return Util.binarySearch(this._notes, new Note(target), this._compareNotes);
     }
 
     // TODO: same issue here as the one described above hasNote
@@ -149,11 +150,11 @@ export class Domain {
         return [idx, closest];
     }
 
-    protected compareNotes(a: Note, b: Note) {
+    protected _compareNotes(a: Note, b: Note) {
         return a.pitch - b.pitch;
     }
 
-    protected buildFromNoteClasses() {
+    protected _buildFromNoteClasses() {
         this._notes = [];
         let basePitches = this._noteClasses.map(noteClass => noteClass.basePitch);
         for (let n = LOWEST_A; n <= HIGHEST_C; n ++) {
@@ -168,42 +169,55 @@ export class Domain {
 
 export class ChordClass extends Domain {
     public static shapeToInfo = (shape: ChordShape): IShapeInfo => {
+        let extend: (notes: Note[]) => Note[];
         switch (shape) {
             case ChordShape.Maj:
                 return {
                     shape,
                     baseIntervals: [0, 4, 7],
-                    relativePositions: ["1", "4", "5"]
+                    suitableRelativeKeys: ["1", "4", "5"]
                 };
             case ChordShape.Min:
                 return {
                     shape,
                     baseIntervals: [0, 3, 7],
-                    relativePositions: ["2", "3", "6"]
+                    suitableRelativeKeys: ["2", "3", "6"]
                 };
             case ChordShape.Maj7:
                 return {
                     shape,
                     baseIntervals: [0, 4, 7, 11],
-                    relativePositions: ["1", "4"]
+                    suitableRelativeKeys: ["1", "4"]
                 };
             case ChordShape.Min7:
                 return {
                     shape,
                     baseIntervals: [0, 3, 7, 10],
-                    relativePositions: ["2", "3", "6"]
+                    suitableRelativeKeys: ["2", "3", "6"]
                 };
             case ChordShape.Dom7:
                 return {
                     shape,
                     baseIntervals: [0, 4, 7, 10],
-                    relativePositions: ["5"]
+                    suitableRelativeKeys: ["5"]
                 };
+            case ChordShape.Dom9:
+                let infoBase = ChordClass.shapeToInfo(ChordShape.Dom7);
+                extend = notes => {
+                    let notesCopy = Util.copyObject(notes);
+                    let tonic = notes.find(note => note.scalePosition === 1);
+                    let ninth = notes.find(note => note.scalePosition === 2);
+                    if (ninth === undefined) {
+                        notesCopy.push(new Note((tonic as Note).basePitch + 2, 9).asNoteClass());
+                    }
+                    return notesCopy;
+                };
+                return { ...infoBase, extend };
             case ChordShape.Dim:
                 return {
                     shape,
                     baseIntervals: [0, 3, 6],
-                    relativePositions: ["7"]
+                    suitableRelativeKeys: ["7"]
                 };
 
             // TODO: add cases for all chords
@@ -215,20 +229,24 @@ export class ChordClass extends Domain {
 
     private _suitableKeys: NoteName[]; 
     private _order: number;
+    private _specialNotesMutaion: (notes: Note[]) => Note[];
 
     constructor(chordName: ChordName) {
         let [ noteName, shape ] = chordName;
-        let { baseIntervals, relativePositions, extend } = ChordClass.shapeToInfo(shape);
+        let { baseIntervals, suitableRelativeKeys, extend } = ChordClass.shapeToInfo(shape);
         let lowestPitch = Domain.getLowestPitch((noteName as NoteName));
+        let specialNotesMutaion = extend || Util.identity;
+        let highestPosition = 1;
         let baseNotes = baseIntervals.map((pitchDiff, i): Note => { 
             let pitch = lowestPitch + pitchDiff;
-            let position = 2 * i + 1;
-            this._order = position;
-            return new Note(pitch, position);
+            highestPosition = 2 * i + 1;
+            return new Note(pitch, highestPosition);
         });
 
-        super((extend || Util.identity)(baseNotes));
-        this._suitableKeys = relativePositions.map(pos => Domain.getTonicByPosition((noteName as NoteName), pos));
+        super(specialNotesMutaion(baseNotes));
+        this._suitableKeys = suitableRelativeKeys.map(pos => Domain.getTonicNameByPosition((noteName as NoteName), pos));
+        this._order = highestPosition;
+        this._specialNotesMutaion = specialNotesMutaion;
     }
 
     public voice(target: number, ref: number[] = []): number[] {
@@ -290,7 +308,7 @@ export class ChordClass extends Domain {
         return [];
     }
 
-    get order(): number {
+    get order() {
         return this._order;
     }
 
@@ -303,11 +321,15 @@ export class ChordClass extends Domain {
         return [idx, currNote];
     }
 
-    get tonicName(): NoteName {
+    get tonicName() {
         return this.lowestTonic[1].name;
     }
 
-    get suitableKeys(): NoteName[] {
+    get suitableKeys() {
         return this._suitableKeys;
+    }
+
+    get specialNotesMutation() {
+        return this._specialNotesMutaion;
     }
 }
