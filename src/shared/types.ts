@@ -1,3 +1,5 @@
+import { Note } from "./music/Note";
+
 export interface ISong {
     id: string;
     title: string;
@@ -22,12 +24,6 @@ export enum ChordShape {
 }
 
 export type ChordName = [NoteName | RelativeNoteName, ChordShape];
-
-export interface INote {
-    name: NoteName;
-    pitch: number;
-    position?: number;
-}
 
 export interface IBarBase {
     barIdx: number;
@@ -168,5 +164,5 @@ export interface IShapeInfo {
     shape: ChordShape;
     baseIntervals: number[];
     relativePositions: RelativeNoteName[]; 
-    extend?: (intervals: number[]) => number[];
+    extend?: (baseNotes: Note[]) => Note[];
 }

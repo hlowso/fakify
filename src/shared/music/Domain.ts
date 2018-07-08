@@ -1,6 +1,7 @@
 import * as Util from "../Util";
+import { Note } from "./Note";
 import { LOWEST_A, HIGHEST_C } from "./MusicHelper";
-import { NoteName, ChordName, ChordShape, IShapeInfo, RelativeNoteName, INote } from "../types";
+import { NoteName, ChordName, ChordShape, IShapeInfo, RelativeNoteName } from "../types";
 
 export class Domain {
     public static NOTE_NAMES: NoteName[] = ["C", "C#|Db", "D", "D#|Eb", "E", "F", "F#|Gb", "G", "G#|Ab", "A", "A#|Bb", "B|Cb"]; 
@@ -16,42 +17,43 @@ export class Domain {
         return Domain.NOTE_NAMES[Util.mod(noteIdx - Domain.RELATIVE_SCALE.indexOf(position), 12)];
     }
 
-    protected _notes: INote[];
-    private _setLength: number;
+    protected _notes: Note[];
+    protected _noteClasses: Note[];
+  
+    constructor(notes: Note[] | number[] | NoteName[]) {
+        if (notes[0] instanceof Note) {
+            this._noteClasses = (notes as Note[]).map(note => note.asNoteClass());
+        } else {
+            let typeIsNumber = typeof notes[0] === "number";
+            let pitches = (
+                typeIsNumber 
+                    ? (notes as number[]).map(note => Util.mod(note, 12)) 
+                    : (notes as NoteName[]).map(Domain.getLowestPitch)
+            );
+            let uniquePitches: number[] = [];
 
-    // TODO: refactor the following / decide if it's not too ugly to 
-    // necessitate refactoring
-    constructor(notes: number[] | INote[]) {
-        let typeIsNumber = typeof notes[0] === "number";
-        let pitches = typeIsNumber ? (notes as number[]) : (notes as INote[]).map(note => note.pitch); 
-        let moduloPitches = pitches.map(note => Util.mod(note, 12));
-        let uniquePitches: number[] = [];
+            pitches.forEach(pitch => {
+                if (uniquePitches.indexOf(pitch) === -1) {
+                    uniquePitches.push(pitch);
+                }
+            });
 
-        this._setLength = 0;
-        this._notes = [];
-        
-        moduloPitches.forEach(note => {
-            if (uniquePitches.indexOf(note) === -1) {
-                uniquePitches.push(note);
-                this._setLength ++;
-            }
-        });
-
-        for (let n = LOWEST_A; n <= HIGHEST_C; n ++) {
-            let moduloPitch = Util.mod(n, 12);
-            if (moduloPitches.indexOf(moduloPitch) !== -1) {
-                let domIdx = !typeIsNumber ? ((notes as INote[]).find(note => Util.mod(note.pitch, 12) === moduloPitch) as INote).position : undefined;
-                this._notes.push(this.createNote(n, domIdx));
-            }
+            this._noteClasses = uniquePitches.map(pitch => new Note(pitch));
         }
+
+        this.buildFromNoteClasses();
     }
 
     get length(): number {
         return this._notes.length;
     }
 
-    get setLength(): number {
-        return this._setLength;
+    get noteClasses(): Note[] {
+        return this._noteClasses;
+    }
+
+    get numberOfNoteClasses(): number {
+        return this._noteClasses.length;
     }
 
     get lowestPitch(): number {
@@ -60,6 +62,10 @@ export class Domain {
 
     get highestPitch(): number {
         return this._notes[this._notes.length - 1].pitch;
+    }
+
+    public mutate(mutation: (baseNotes: Note[]) => Note[]) {
+
     }
 
     public getLowestNoteByPosition(position: number) {
@@ -75,15 +81,15 @@ export class Domain {
     // TODO: the following parameter "note" is a position, 
     // not a pitch if it's a number. Refactor this function 
     // to make that clear 
-    public hasNote(note: NoteName | number): boolean {
-        for (let idx = 0; idx < this.setLength; idx ++) {
+    public hasNote(nameOrPos: NoteName | number): boolean {
+        for (let idx = 0; idx < this.numberOfNoteClasses; idx ++) {
             let currNote = this._notes[idx];
-            if (typeof note === "number") {
-                if (currNote.position === note) {
+            if (typeof nameOrPos === "number") {
+                if (currNote.position === nameOrPos) {
                     return true;
                 }
             }
-            if (currNote.name === note) {
+            if (currNote.name === nameOrPos) {
                 return true;
             }
         }
@@ -108,20 +114,20 @@ export class Domain {
         return this._notes[idx].pitch;
     }
 
-    public getClosestNoteToTargetPitch(target: number): [number, INote] {
-        return Util.binarySearch(this._notes, this.createNote(target), this.compareNotes);
+    public getClosestNoteToTargetPitch(target: number): [number, Note] {
+        return Util.binarySearch(this._notes, new Note(target), this.compareNotes);
     }
 
     // TODO: same issue here as the one described above hasNote
-    public getClosestNoteInstance(target: number, noteOrPos: NoteName | number): [number, INote | null] {
-        if (!this.hasNote(noteOrPos)) {
+    public getClosestNoteInstance(target: number, nameOrPos: NoteName | number): [number, Note | null] {
+        if (!this.hasNote(nameOrPos)) {
             return [NaN, null];
         }
 
-        let position = typeof noteOrPos === "number" ? noteOrPos : undefined;
+        let position = typeof nameOrPos === "number" ? nameOrPos : undefined;
 
         let [idx, closest] = this.getClosestNoteToTargetPitch(target);
-        let lowestPitch = position ? (this.getLowestNoteByPosition(position) as INote).pitch : Domain.getLowestPitch(noteOrPos as NoteName);
+        let lowestPitch = position ? (this.getLowestNoteByPosition(position) as Note).pitch : Domain.getLowestPitch(nameOrPos as NoteName);
         let diff = lowestPitch - Util.mod(closest.pitch, 12);
         let summand = (
             Math.abs(diff) > 5
@@ -131,8 +137,8 @@ export class Domain {
 
         let conditionFunc = (
             position
-                ? (note: INote) => note.position === position
-                : (note: INote) => note.name === noteOrPos
+                ? (note: Note) => note.position === position
+                : (note: Note) => note.name === nameOrPos
         );
 
         while (!conditionFunc(closest)) {
@@ -143,15 +149,19 @@ export class Domain {
         return [idx, closest];
     }
 
-    protected compareNotes(a: INote, b: INote) {
+    protected compareNotes(a: Note, b: Note) {
         return a.pitch - b.pitch;
     }
 
-    protected createNote(pitch: number, position?: number): INote {
-        return {
-            name: Domain.NOTE_NAMES[Util.mod(pitch, 12)],
-            pitch,
-            position
+    protected buildFromNoteClasses() {
+        this._notes = [];
+        let basePitches = this._noteClasses.map(noteClass => noteClass.basePitch);
+        for (let n = LOWEST_A; n <= HIGHEST_C; n ++) {
+            let moduloPitch = Util.mod(n, 12);
+            if (basePitches.indexOf(moduloPitch) !== -1) {
+                let position = (this._noteClasses.find(noteClass => noteClass.basePitch === moduloPitch) as Note).position;
+                this._notes.push(new Note(n, position));
+            }
         }
     }
 }
@@ -209,19 +219,15 @@ export class ChordClass extends Domain {
     constructor(chordName: ChordName) {
         let [ noteName, shape ] = chordName;
         let { baseIntervals, relativePositions, extend } = ChordClass.shapeToInfo(shape);
-        let intervals = (extend || Util.identity)(baseIntervals);
         let lowestPitch = Domain.getLowestPitch((noteName as NoteName));
-
-        super(intervals.map((pitchDiff, i): INote => { 
+        let baseNotes = baseIntervals.map((pitchDiff, i): Note => { 
             let pitch = lowestPitch + pitchDiff;
             let position = 2 * i + 1;
             this._order = position;
-            return {
-                name: Domain.NOTE_NAMES[Util.mod(pitch, 12)],
-                pitch,
-                position
-            };
-        }));
+            return new Note(pitch, position);
+        });
+
+        super((extend || Util.identity)(baseNotes));
         this._suitableKeys = relativePositions.map(pos => Domain.getTonicByPosition((noteName as NoteName), pos));
     }
 
@@ -234,13 +240,13 @@ export class ChordClass extends Domain {
     }
 
     public getRandomTriad(target: number): number[] {
-        let tonic = (this.getClosestNoteInstance(target, 1)[1] as INote);
+        let tonic = (this.getClosestNoteInstance(target, 1)[1] as Note);
         let inversion = Math.floor(Math.random() * 3);
         
-        let thirdAbove = (this.getClosestNoteInstance(tonic.pitch, 3)[1] as INote);
-        let thirdBelow = (this.getClosestNoteInstance(tonic.pitch - 12, 3)[1] as INote);
-        let fifthAbove = (this.getClosestNoteInstance(tonic.pitch + 12, 5)[1] as INote);
-        let fifthBelow = (this.getClosestNoteInstance(tonic.pitch, 5)[1] as INote);
+        let thirdAbove = (this.getClosestNoteInstance(tonic.pitch, 3)[1] as Note);
+        let thirdBelow = (this.getClosestNoteInstance(tonic.pitch - 12, 3)[1] as Note);
+        let fifthAbove = (this.getClosestNoteInstance(tonic.pitch + 12, 5)[1] as Note);
+        let fifthBelow = (this.getClosestNoteInstance(tonic.pitch, 5)[1] as Note);
 
         switch (inversion) {
             default:
@@ -260,17 +266,17 @@ export class ChordClass extends Domain {
 
         // TODO: write a better chord generating algorithm ...
 
-        let tonicBase = this.tonicBase;
+        let tonicBase = this.lowestTonic;
         let idx = tonicBase[0], targetTonic = tonicBase[1];
 
         while (Math.abs(targetTonic.pitch - target) > 6) {
-            idx += this.setLength;
+            idx += this.numberOfNoteClasses;
             targetTonic = this._notes[idx];
         }
 
         let pitches: number[] = [ targetTonic.pitch ];
 
-        for (let i = 1; i < this.setLength; i ++) {
+        for (let i = 1; i < this.numberOfNoteClasses; i ++) {
             idx ++;
             pitches.push(this._notes[idx].pitch);
         }
@@ -288,7 +294,7 @@ export class ChordClass extends Domain {
         return this._order;
     }
 
-    get tonicBase(): [number, INote] {
+    get lowestTonic(): [number, Note] {
         let idx = 0;
         let currNote = this._notes[idx];
         while (currNote.position !== 1) {
@@ -298,7 +304,7 @@ export class ChordClass extends Domain {
     }
 
     get tonicName(): NoteName {
-        return this.tonicBase[1].name;
+        return this.lowestTonic[1].name;
     }
 
     get suitableKeys(): NoteName[] {
