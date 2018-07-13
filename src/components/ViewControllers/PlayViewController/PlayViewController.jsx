@@ -27,7 +27,7 @@ class PlayViewController extends Component {
             selectedSong: {},
             chart: {},
             midiSettingsModalOpen: true,
-            playMode: "improv"         
+            playMode: "none"         
         };
     }
 
