@@ -150,6 +150,7 @@ export class Domain {
         return [idx, closest];
     }
 
+    // For binary search...
     protected _compareNotes(a: Note, b: Note) {
         return a.pitch - b.pitch;
     }
@@ -252,7 +253,7 @@ export class ChordClass extends Domain {
     public voice(target: number, ref: number[] = []): number[] {
         return (
             ref.length > 0
-                ? this._voiceWithReference(target, ref)
+                ? this._voiceWithReference(ref)
                 : this._generateVoicing(target)
         );
     }
@@ -277,7 +278,7 @@ export class ChordClass extends Domain {
         }
     }
 
-    private _generateVoicing(target: number) {
+    private _generateVoicing(target: number, candidates?: Note[]) {
         if (this._order < 7) {
             return this.getRandomTriad(target);
         }
@@ -303,9 +304,32 @@ export class ChordClass extends Domain {
 
     }
 
-    private _voiceWithReference(target: number, ref: number[]): number[] {
-        // TODO:  write clever voicing algorithm here ...
-        return [];
+    private _voiceWithReference(ref: number[]) {
+        let voicingCandidates = this._getVoicingCandidates(ref);
+        let target = Math.floor((ref[0] + ref[ref.length - 1]) / 2);
+        return this._generateVoicing(target, voicingCandidates);
+    }
+
+    private _getVoicingCandidates(ref: number[] | number) {
+        if (Array.isArray(ref)) {
+            let reduction = (notes: Note[], pitch: number): Note[] => { 
+                let currNotes = this._getVoicingCandidates(pitch);
+                return notes.concat(currNotes.filter(note => notes.indexOf(note) === -1));
+            };
+            return ref.reduce(reduction, []);
+        }
+
+        ref = ref as number;
+        let canditates: Note[] = []; 
+
+        for (let p = ref - 2; p <= ref + 2; p ++) {
+            let closestNote = this.getClosestNoteToTargetPitch(p)[1];
+            if (closestNote.pitch === p) {
+                canditates.push(closestNote);
+            }
+        }
+
+        return canditates;
     }
 
     get order() {
