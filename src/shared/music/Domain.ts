@@ -8,6 +8,17 @@ export class Domain {
     public static RELATIVE_SCALE: RelativeNoteName[] = ["1", "H", "2", "N", "3", "4", "T", "5", "U", "6", "J", "7"];
     public static MAJOR_SCALE_INDECES: number[] = [0, 2, 4, 5, 7, 9, 11];
 
+    public static getPitchInstance(target: number, basePitch: number, above = true) {
+        let diff = Util.mod(target, 12) - Util.mod(basePitch, 12);
+        
+        if (diff > 0) {
+            if (above) return target - diff + 12;
+            return target - diff;
+        }
+        if (above) return target - diff;
+        return target - diff - 12;
+    }
+
     public static getLowestPitch = (noteName: NoteName) => {
         return Domain.NOTE_NAMES.indexOf(noteName);
     }
@@ -150,9 +161,9 @@ export class Domain {
         return [idx, closest];
     }
 
-    // For binary search...
+    // For binary search and sort...
     protected _compareNotes(a: Note, b: Note) {
-        return a.pitch - b.pitch;
+        return a.pitchDiff(b);
     }
 
     protected _buildFromNoteClasses() {
@@ -209,7 +220,7 @@ export class ChordClass extends Domain {
                     let tonic = notes.find(note => note.scalePosition === 1);
                     let ninth = notes.find(note => note.scalePosition === 2);
                     if (ninth === undefined) {
-                        notesCopy.push(new Note((tonic as Note).basePitch + 2, 9).asNoteClass());
+                        notesCopy.push(new Note((tonic as Note).basePitch + 2, 9, true).asNoteClass());
                     }
                     return notesCopy;
                 };
@@ -231,6 +242,7 @@ export class ChordClass extends Domain {
     private _suitableKeys: NoteName[]; 
     private _order: number;
     private _specialNotesMutaion: (notes: Note[]) => Note[];
+    private _clusterIndexOrder: [number, number, number];    
 
     constructor(chordName: ChordName) {
         let [ noteName, shape ] = chordName;
@@ -239,15 +251,34 @@ export class ChordClass extends Domain {
         let specialNotesMutaion = extend || Util.identity;
         let highestPosition = 1;
         let baseNotes = baseIntervals.map((pitchDiff, i): Note => { 
-            let pitch = lowestPitch + pitchDiff;
             highestPosition = 2 * i + 1;
-            return new Note(pitch, highestPosition);
+            let pitch = lowestPitch + pitchDiff;
+            let required = highestPosition === 3 || highestPosition === 7
+            return new Note(pitch, highestPosition, required);
         });
 
         super(specialNotesMutaion(baseNotes));
         this._suitableKeys = suitableRelativeKeys.map(pos => Domain.getTonicNameByPosition((noteName as NoteName), pos));
         this._order = highestPosition;
         this._specialNotesMutaion = specialNotesMutaion;
+        this._clusterIndexOrder = [1, 2, 0];
+    }
+
+    public getNotesInPitchRange(a: number, b: number, requiredOnly = false) {
+        let notesInRange: Note[] = [];
+        let idx = this.getClosestNoteToTargetPitch(a)[0];
+        for (let note = this._notes[idx]; note.pitch <= b; idx ++) {
+            if (note.pitch >= a) {
+                if (requiredOnly) {
+                    if (note.isRequired) {
+                        notesInRange.push(note);
+                    }
+                } else {
+                    notesInRange.push(note);
+                }
+            }
+        }
+        return notesInRange;
     }
 
     public voice(target: number, ref: number[] = []): number[] {
@@ -258,49 +289,161 @@ export class ChordClass extends Domain {
         );
     }
 
-    public getRandomTriad(target: number): number[] {
-        let tonic = (this.getClosestNoteInstance(target, 1)[1] as Note);
-        let inversion = Math.floor(Math.random() * 3);
+    // public getRandomTriad(target: number): number[] {
+    //     let tonic = (this.getClosestNoteInstance(target, 1)[1] as Note);
+    //     let inversion = Math.floor(Math.random() * 3);
         
-        let thirdAbove = (this.getClosestNoteInstance(tonic.pitch, 3)[1] as Note);
-        let thirdBelow = (this.getClosestNoteInstance(tonic.pitch - 12, 3)[1] as Note);
-        let fifthAbove = (this.getClosestNoteInstance(tonic.pitch + 12, 5)[1] as Note);
-        let fifthBelow = (this.getClosestNoteInstance(tonic.pitch, 5)[1] as Note);
+    //     let thirdAbove = (this.getClosestNoteInstance(tonic.pitch, 3)[1] as Note);
+    //     let thirdBelow = (this.getClosestNoteInstance(tonic.pitch - 12, 3)[1] as Note);
+    //     let fifthAbove = (this.getClosestNoteInstance(tonic.pitch + 12, 5)[1] as Note);
+    //     let fifthBelow = (this.getClosestNoteInstance(tonic.pitch, 5)[1] as Note);
 
-        switch (inversion) {
-            default:
-            case 0:
-                return [tonic.pitch, thirdAbove.pitch, fifthAbove.pitch];
-            case 1:
-                return [fifthBelow.pitch, tonic.pitch, thirdAbove.pitch];
-            case 3:
-                return [thirdBelow.pitch, fifthBelow.pitch, tonic.pitch];
+    //     switch (inversion) {
+    //         default:
+    //         case 0:
+    //             return [tonic.pitch, thirdAbove.pitch, fifthAbove.pitch];
+    //         case 1:
+    //             return [fifthBelow.pitch, tonic.pitch, thirdAbove.pitch];
+    //         case 3:
+    //             return [thirdBelow.pitch, fifthBelow.pitch, tonic.pitch];
+    //     }
+    // }
+
+    // private _generateVoicing(target: number, candidates?: Note[]) {
+    //     if (this._order < 7) {
+    //         return this.getRandomTriad(target);
+    //     }
+
+    //     // TODO: write a better chord generating algorithm ...
+
+    //     let tonicBase = this.lowestTonic;
+    //     let idx = tonicBase[0], targetTonic = tonicBase[1];
+
+    //     while (Math.abs(targetTonic.pitch - target) > 6) {
+    //         idx += this.numberOfNoteClasses;
+    //         targetTonic = this._notes[idx];
+    //     }
+
+    //     let pitches: number[] = [ targetTonic.pitch ];
+
+    //     for (let i = 1; i < this.numberOfNoteClasses; i ++) {
+    //         idx ++;
+    //         pitches.push(this._notes[idx].pitch);
+    //     }
+
+    //     return pitches.sort((a, b) => a - b);
+
+    // }
+
+    private _generateVoicing(target: number, closeNeighbours: Note[] = []) {
+
+        // STEP 1: Determine pitch range(s)
+        let pitchRangeSets: [number, number][] = [];
+        if (this._order < 9) {
+            // If the order of the chord class is 7 or under,
+            // there will be only one pitch range: the octave 
+            // with target at its center
+            pitchRangeSets.push([target - 6, target + 6]);
+        } else {
+            // Otherwise, the pitch ranges are the possible 9th 
+            // intervals between chord note classes (i.e 1 to 9, 
+            // 2 to 10, 3 to 11, etc...) that contain the target pitch
+            let idxLimit = this.numberOfNoteClasses;
+            for (let idx = 0; idx < idxLimit; idx ++) {
+                let note1 = this._noteClasses[idx];
+                let note2 = this._noteClasses[Util.mod(idx + 1, idxLimit)];
+                if (note2.scalePosition - Util.mod(note1.scalePosition, 7) === 1) {
+                    pitchRangeSets.push([
+                        Domain.getPitchInstance(target, note1.pitch, false),
+                        Domain.getPitchInstance(target, note2.pitch, true)
+                    ]);
+                }
+            }
         }
-    }
 
-    private _generateVoicing(target: number, candidates?: Note[]) {
-        if (this._order < 7) {
-            return this.getRandomTriad(target);
-        }
+        // For each pitch range...
+        let voicingCandidates = pitchRangeSets.map(range => {
+            
+            // STEP 2: Get required notes
+            let neighboursInRange = closeNeighbours.filter(note => range[0] <= note.pitch && note.pitch <= range[1]);
+            let nonRequiredNeighboursInRange = neighboursInRange.filter(note => !note.isRequired);
+            let notesInRange = this.getNotesInPitchRange(range[0], range[1]);
+            let requiredNotesInRange = notesInRange.filter(note => note.isRequired);
+            let firstCandidate = neighboursInRange.filter(note => note.isRequired);
+            firstCandidate = firstCandidate.concat(requiredNotesInRange.filter(note => firstCandidate.find(n => n.chordPosition === note.chordPosition) === null));
+            firstCandidate.sort(this._compareNotes);
 
-        // TODO: write a better chord generating algorithm ...
+            // STEP 3: Remove clusters
+            let cluster = this._findLowestNoteCluster(firstCandidate);
+            while (cluster) {
+                let topCandidateClusterIdx = firstCandidate.indexOf((cluster as [Note, Note, Note])[2]);
 
-        let tonicBase = this.lowestTonic;
-        let idx = tonicBase[0], targetTonic = tonicBase[1];
+                // Look for a replacement among the candidate notes
+                for (let idx of this._clusterIndexOrder) {
+                    let clusterNote = (cluster as [Note, Note, Note])[idx];
+                    let candidateClusterNoteIdx = firstCandidate.indexOf(clusterNote);
+                    
+                    let replacement = this._findOtherInstance(firstCandidate, clusterNote);
+                    if (replacement) {
+                        firstCandidate.splice(candidateClusterNoteIdx, 1);
+                        break;
+                    }
+                }
 
-        while (Math.abs(targetTonic.pitch - target) > 6) {
-            idx += this.numberOfNoteClasses;
-            targetTonic = this._notes[idx];
-        }
+                // Look for a replacement among the other required notes in the range
+                for (let idx of this._clusterIndexOrder) {
+                    let clusterNote = (cluster as [Note, Note, Note])[idx];
+                    let candidateClusterNoteIdx = firstCandidate.indexOf(clusterNote);
 
-        let pitches: number[] = [ targetTonic.pitch ];
+                    let replacement = this._findOtherInstance(requiredNotesInRange, clusterNote);
+                    if (replacement) {
+                        firstCandidate.splice(candidateClusterNoteIdx, 1);
+                        firstCandidate.push(replacement);
+                        firstCandidate.sort(this._compareNotes);
+                        break;
+                    }
+                }
+                cluster = (
+                    topCandidateClusterIdx < firstCandidate.length - 2 
+                        ? this._findLowestNoteCluster(firstCandidate.slice(topCandidateClusterIdx + 1)) 
+                        : null
+                );
+            }
 
-        for (let i = 1; i < this.numberOfNoteClasses; i ++) {
-            idx ++;
-            pitches.push(this._notes[idx].pitch);
-        }
+            // STEP 4: Remove multiple instances
+            let secondCandidate: Note[] = [];
+            firstCandidate.forEach(note => {
+                let other = this._findOtherInstance(firstCandidate, note);
+                if (other) {
+                    if (secondCandidate.indexOf(note) === -1 && secondCandidate.indexOf(other) === -1) {
+                        if (Math.random() < 0.5) {
+                            secondCandidate.push(note);
+                        } else {
+                            secondCandidate.push(other);
+                        }
+                    }
+                } else {
+                    secondCandidate.push(note);
+                }
+            });
 
-        return pitches.sort((a, b) => a - b);
+            // STEP 5: Add non-required notes
+            let remainingSpace = 5 - secondCandidate.length;
+            for (let i = 0; i < remainingSpace; i ++) {
+                if (Math.random() < 0.5) {
+                    let idx = Math.floor(Math.random() * nonRequiredNeighboursInRange.length);
+                    let note = nonRequiredNeighboursInRange[idx];
+                    if (!this._findOtherInstance(secondCandidate, note)) {
+                        secondCandidate.push(note);
+                        secondCandidate.sort(this._compareNotes);
+                    }
+                }
+            }
+            
+            return secondCandidate;
+        });
+
+        // STEP 6: Choose the best voicing
 
     }
 
@@ -330,6 +473,37 @@ export class ChordClass extends Domain {
         }
 
         return canditates;
+    }
+
+    private _findLowestNoteCluster(notes: Note[]): [Note, Note, Note] | null {
+        notes.sort(this._compareNotes);
+
+        let clusterLength = 1;
+        let idxLimit = notes.length - 1;
+
+        for (let idx = 0; idx < idxLimit; idx ++) {
+            let note1 = notes[idx];
+            let note2 = notes[idx];
+
+            if (note1.isCloseNeighboursWith(note2)) {
+                clusterLength ++;
+                if (clusterLength === 3) {
+                    return [notes[idx - 1], note1, note2];
+                }
+            } else {
+                clusterLength = 1;
+            }
+        }
+        return null;
+    }   
+
+    private _findOtherInstance(notes: Note[], instance: Note) {
+        for (let note of notes) {
+            if (note.basePitch === instance.basePitch && note.pitch !== instance.pitch) {
+                return note;
+            }
+        }
+        return null;
     }
 
     get order() {

@@ -7,8 +7,9 @@ export class Note {
     private _basePitch: number;
     private _pitch: number;
     private _position: number;
+    private _required: boolean;
 
-    constructor(note: NoteName | number, position?: number) {
+    constructor(note: NoteName | number, position?: number, required = false) {
         let noteIsName = typeof note === "string";
         if (noteIsName) {
             note = note as NoteName;
@@ -32,6 +33,7 @@ export class Note {
             position = NaN;
         }
         this._position = position;
+        this._required = required;
     }
 
     get name(): NoteName {
@@ -67,7 +69,19 @@ export class Note {
         return this._position;
     }
 
+    get isRequired() {
+        return this._required;
+    }
+
     public asNoteClass(): Note {
         return new Note(this._name, this._position);
+    }
+
+    public pitchDiff(note: Note) {
+        return this._pitch - note.pitch;
+    }
+
+    public isCloseNeighboursWith(note: Note) {
+        return Math.abs(this.pitchDiff(note)) <= 2;
     }
 }
