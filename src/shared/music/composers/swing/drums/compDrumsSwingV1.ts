@@ -1,13 +1,14 @@
 import soundfonts from "../../../soundfontsIndex";
-import { IChartBar, IMusicBarV2, IPart } from "../../../../types";
+import { IMusicBarV2, IPart } from "../../../../types";
+import Chart from "../../../Chart";
 
-export const compDrumsSwingV1 = (bars: IChartBar[]): [IPart, IPart] => {
+export const compDrumsSwingV1 = (chart: Chart): [IPart, IPart] => {
 
     let { rideCymbal, shutHiHat } = soundfonts;
     let rideCymbalBars: IMusicBarV2[] = [];
     let shutHiHatBars: IMusicBarV2[] = [];
 
-    bars.forEach(bar => {
+    chart.bars.forEach(bar => {
         let rideCymbalBar: IMusicBarV2 = {};
         let shutHiHatBar: IMusicBarV2 = {};
 

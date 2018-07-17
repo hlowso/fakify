@@ -47,13 +47,16 @@ export interface IChartBar {
     durationInSubbeats: number;
 }
 
-export interface IChordSegment {
-    beatIdx: number;
-    subbeatIdx: number;
-    chord: string;
+export interface IChordStretch {
     chordName?: ChordName;
     key: NoteName;
     durationInSubbeats: number;
+}
+
+export interface IChordSegment extends IChordStretch {
+    beatIdx: number;
+    subbeatIdx: number;
+    chord: string;
     subbeatsBeforeChange: number;
 }
 

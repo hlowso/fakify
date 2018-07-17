@@ -3,25 +3,23 @@ import compSwingPianoV2 from "./swing/piano/compPianoSwingV2"
 import compBassSwingV1 from "./swing/bass/compBassSwingV1";
 import compDrumsSwingV1 from "./swing/drums/compDrumsSwingV1";
 import { generateSwingExerciseV0 } from "./swing/generateSwingExerciseV0";
-import { Feel, IChartBar, Difficulty, IExercise } from "../../types";
+import { Feel, Difficulty, IExercise } from "../../types";
 import Chart from "../Chart";
 import Score from "../Score";
 
 export const CompV1 = (chart: Chart): Score => {
-    let { bars, feel } = chart;
-
-    switch (feel) {
+    switch (chart.feel) {
         case Feel.Swing:
-            return _getSwingAccompaniment(bars);
+            return _getSwingAccompaniment(chart);
     }
 }
 
-const _getSwingAccompaniment = (bars: IChartBar[]): Score => {
+const _getSwingAccompaniment = (chart: Chart): Score => {
     return new Score([
-        // compSwingPianoV1(bars),
-        compSwingPianoV2(bars),
-        compBassSwingV1(bars),
-        ...compDrumsSwingV1(bars)
+        // compSwingPianoV1(chart),
+        compSwingPianoV2(chart),
+        compBassSwingV1(chart),
+        ...compDrumsSwingV1(chart)
     ]);
 }
 

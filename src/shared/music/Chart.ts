@@ -1,5 +1,5 @@
 import * as MusicHelper from "../music/MusicHelper";
-import { IBarBase, IChartBar, Feel, NoteName, Tempo, IMusicIdx } from "../types";
+import { IBarBase, IChartBar, Feel, NoteName, Tempo, IMusicIdx, IChordStretch } from "../types";
 
 class Chart {
     private _barsBase: IBarBase[];
@@ -46,6 +46,27 @@ class Chart {
         this._rangeStartIdx <= idx &&
         idx <= this._rangeEndIdx
     )
+
+    public forEachChordStretch = (callback: (stretch: IChordStretch, idx: number) => void) => {
+        let currStretch: IChordStretch;
+        let stretchIdx = 0;
+        let subbeatsBeforeChange = 0;
+
+        this._bars.forEach(bar => {
+            bar.chordSegments.forEach(segment => {
+                if (subbeatsBeforeChange === 0) {
+                    subbeatsBeforeChange = segment.subbeatsBeforeChange;
+                    currStretch = {
+                        chordName: segment.chordName,
+                        key: segment.key,
+                        durationInSubbeats: subbeatsBeforeChange
+                    };
+                    callback(currStretch, stretchIdx++);
+                }
+                subbeatsBeforeChange -= segment.durationInSubbeats;
+            });
+        });
+    }
 
     public keyAtIdx = (idx: IMusicIdx) => {
         let bar = this._bars[idx.barIdx];
