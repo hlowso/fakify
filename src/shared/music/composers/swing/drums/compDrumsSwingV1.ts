@@ -14,7 +14,7 @@ export const compDrumsSwingV1 = (bars: IChartBar[]): [IPart, IPart] => {
         bar.chordSegments.forEach(segment => {
             let fullBeatCouplets = segment.durationInSubbeats / 6;
             
-            if (segment.durationInSubbeats % 6) {
+            if (!Number.isInteger(fullBeatCouplets)) {
                 rideCymbalBar[segment.subbeatIdx] = [
                     {
                         notes: [rideCymbal.pitch || 0],
@@ -25,21 +25,21 @@ export const compDrumsSwingV1 = (bars: IChartBar[]): [IPart, IPart] => {
             } else {
                 for (let i = 0; i < fullBeatCouplets; i ++) {
                     // ding, ding-gah
-                    rideCymbalBar[i * 6] = [
+                    rideCymbalBar[segment.subbeatIdx + i * 6] = [
                         {
                             notes: [rideCymbal.pitch || 0], 
                             durationInSubbeats: 3, 
                             velocity: 1
                         }
                     ];
-                    rideCymbalBar[3 + i * 6] = [
+                    rideCymbalBar[segment.subbeatIdx + 3 + i * 6] = [
                         { 
                             notes: [rideCymbal.pitch || 0], 
                             durationInSubbeats: 2, 
                             velocity: 1
                         }
                     ];
-                    rideCymbalBar[5 + i * 6] = [
+                    rideCymbalBar[segment.subbeatIdx + 5 + i * 6] = [
                         {
                             notes: [rideCymbal.pitch || 0], 
                             durationInSubbeats: 1, 
@@ -48,7 +48,7 @@ export const compDrumsSwingV1 = (bars: IChartBar[]): [IPart, IPart] => {
                     ];
 
 
-                    shutHiHatBar[i * 6 + 3] = [
+                    shutHiHatBar[segment.subbeatIdx + i * 6 + 3] = [
                         {
                             notes: [shutHiHat.pitch || 0], 
                             durationInSubbeats: 3, 

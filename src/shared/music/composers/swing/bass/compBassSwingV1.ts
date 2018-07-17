@@ -25,7 +25,7 @@ export const compBassSwingV1 = (bars: IChartBar[]): IPart => {
         bar.chordSegments.forEach(segment => {
             let fullBeatCouplets = segment.durationInSubbeats / 6;
 
-            if (segment.durationInSubbeats % 6) {
+            if (!Number.isInteger(fullBeatCouplets)) {
                 musicBar[0] = [
                     {
                         notes: [getBassNote(segment.chord)],
@@ -36,14 +36,14 @@ export const compBassSwingV1 = (bars: IChartBar[]): IPart => {
             }
 
             for (let i = 0; i < fullBeatCouplets; i ++) {
-                musicBar[i * 6] = [
+                musicBar[segment.subbeatIdx + i * 6] = [
                     {
                         notes: [getBassNote(segment.chord)],
                         durationInSubbeats: 3,
                         velocity: 1
                     }
                 ];
-                musicBar[3 + i * 6] = [
+                musicBar[segment.subbeatIdx + 3 + i * 6] = [
                     {
                         notes: [getFifth(segment.chord)],
                         durationInSubbeats: 3,

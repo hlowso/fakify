@@ -433,17 +433,15 @@ export class ChordClass extends Domain {
                     : notesInRange.filter(note => !note.isRequired)
             );
 
-            if (nonRequiredNotes.length > 0) {
-                for (let i = 0; i < remainingSpace; i ++) {
-                    if (Math.random() < 0.5) {
-                        let idx = Math.floor(Math.random() * nonRequiredNotes.length);
-                        let note = nonRequiredNotes[idx];
-                        if (!this._findOtherInstance(secondCandidate, note)) {
-                            secondCandidate.push(note);
-                            secondCandidate.sort(this._compareNotes);
-                            let nonRequiredNotesIdx = nonRequiredNotes.indexOf(note);
-                            nonRequiredNotes.splice(nonRequiredNotesIdx, 1);
-                        }
+            for (let i = 0; i < remainingSpace; i ++) {
+                if (Math.random() < 0.5 && nonRequiredNotes.length > 0) {
+                    let idx = Math.floor(Math.random() * nonRequiredNotes.length);
+                    let note = nonRequiredNotes[idx];
+                    if (!this._findOtherInstance(secondCandidate, note)) {
+                        secondCandidate.push(note);
+                        secondCandidate.sort(this._compareNotes);
+                        let nonRequiredNotesIdx = nonRequiredNotes.indexOf(note);
+                        nonRequiredNotes.splice(nonRequiredNotesIdx, 1);
                     }
                 }
             }

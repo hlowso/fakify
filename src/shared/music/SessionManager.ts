@@ -153,6 +153,9 @@ export class SessionManager {
             if (scoreIdx === startIdx + durationInSubbeats) {
                 break;
             }
+            if (scoreIdx < startIdx) {
+                continue;
+            }
             let parts = scoreBar[scoreIdx];
             for (let instrument in parts) {
                 let strokes = parts[instrument];
