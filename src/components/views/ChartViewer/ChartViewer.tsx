@@ -67,8 +67,6 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                 "current-bar": isCurrentlyPlayingBar
             });
 
-            console.log(bar.chordSegments);
-
             for (let beatIdx = 0; beatIdx < bar.timeSignature[1]; beatIdx ++) {
                 let segmentIdx;
                 let chordSegment = bar.chordSegments.find((segment, idx) => { 
