@@ -40,7 +40,9 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                         <h1 className="song-title">{song.title}</h1>
                         <div />
                     </header>
-                    <section className="chart-body">{this.renderProgression()}</section>
+                    <section className="chart-body">
+                        {this.renderProgression()}
+                    </section>
                 </div>
             )
             : <h2>No Song Selected</h2>;
@@ -65,6 +67,8 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                 "current-bar": isCurrentlyPlayingBar
             });
 
+            console.log(bar.chordSegments);
+
             for (let beatIdx = 0; beatIdx < bar.timeSignature[1]; beatIdx ++) {
                 let segmentIdx;
                 let chordSegment = bar.chordSegments.find((segment, idx) => { 
@@ -85,7 +89,12 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                         {chordSegment && MusicHelper.getPresentableChord(chordSegment.chord, baseKey)}
                     </span>
                 );
-                beats.push(<span className="beat" key={beatIdx}>{beatIdx + 1}</span>);
+                
+                beats.push(
+                    <span className="beat" key={beatIdx}>
+                        {beatIdx + 1}
+                    </span>
+                );
             }
 
             return (

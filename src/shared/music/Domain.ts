@@ -168,12 +168,10 @@ export class Domain {
 
     protected _buildFromNoteClasses() {
         this._notes = [];
-        let basePitches = this._noteClasses.map(noteClass => noteClass.basePitch);
         for (let n = LOWEST_A; n <= HIGHEST_C; n ++) {
-            let moduloPitch = Util.mod(n, 12);
-            if (basePitches.indexOf(moduloPitch) !== -1) {
-                let position = (this._noteClasses.find(noteClass => noteClass.basePitch === moduloPitch) as Note).position;
-                this._notes.push(new Note(n, position));
+            let noteClass = this._noteClasses.find(note => note.basePitch === Util.mod(n, 12)) as Note; 
+            if (noteClass) {
+                this._notes.push(new Note(n, noteClass.position, noteClass.isRequired));
             }
         }
     }
@@ -267,7 +265,7 @@ export class ChordClass extends Domain {
     public getNotesInPitchRange(a: number, b: number, requiredOnly = false) {
         let notesInRange: Note[] = [];
         let idx = this.getClosestNoteToTargetPitch(a)[0];
-        for (let note = this._notes[idx]; note.pitch <= b; idx ++) {
+        for (let note = this._notes[idx]; note.pitch <= b; note = this._notes[++idx]) {
             if (note.pitch >= a) {
                 if (requiredOnly) {
                     if (note.isRequired) {
@@ -335,7 +333,7 @@ export class ChordClass extends Domain {
 
     // }
 
-    private _generateVoicing(target: number, closeNeighbours: Note[] = []) {
+    private _generateVoicing(target: number, firstChoices: Note[] = []) {
 
         // STEP 1: Determine pitch range(s)
         let pitchRangeSets: [number, number][] = [];
@@ -363,14 +361,14 @@ export class ChordClass extends Domain {
 
         // For each pitch range...
         let voicingCandidates = pitchRangeSets.map(range => {
-            
+
             // STEP 2: Get required notes
-            let neighboursInRange = closeNeighbours.filter(note => range[0] <= note.pitch && note.pitch <= range[1]);
+            let neighboursInRange = firstChoices.filter(note => range[0] <= note.pitch && note.pitch <= range[1]);
             let nonRequiredNeighboursInRange = neighboursInRange.filter(note => !note.isRequired);
             let notesInRange = this.getNotesInPitchRange(range[0], range[1]);
             let requiredNotesInRange = notesInRange.filter(note => note.isRequired);
             let firstCandidate = neighboursInRange.filter(note => note.isRequired);
-            firstCandidate = firstCandidate.concat(requiredNotesInRange.filter(note => firstCandidate.find(n => n.chordPosition === note.chordPosition) === null));
+            firstCandidate = firstCandidate.concat(requiredNotesInRange.filter(note => !firstCandidate.find(n => n.chordPosition === note.chordPosition)));
             firstCandidate.sort(this._compareNotes);
 
             // STEP 3: Remove clusters
@@ -428,14 +426,24 @@ export class ChordClass extends Domain {
             });
 
             // STEP 5: Add non-required notes
-            let remainingSpace = 5 - secondCandidate.length;
-            for (let i = 0; i < remainingSpace; i ++) {
-                if (Math.random() < 0.5) {
-                    let idx = Math.floor(Math.random() * nonRequiredNeighboursInRange.length);
-                    let note = nonRequiredNeighboursInRange[idx];
-                    if (!this._findOtherInstance(secondCandidate, note)) {
-                        secondCandidate.push(note);
-                        secondCandidate.sort(this._compareNotes);
+            let remainingSpace = this.numberOfNoteClasses - secondCandidate.length;
+            let nonRequiredNotes = (
+                nonRequiredNeighboursInRange.length > 0
+                    ? nonRequiredNeighboursInRange
+                    : notesInRange.filter(note => !note.isRequired)
+            );
+
+            if (nonRequiredNotes.length > 0) {
+                for (let i = 0; i < remainingSpace; i ++) {
+                    if (Math.random() < 0.5) {
+                        let idx = Math.floor(Math.random() * nonRequiredNotes.length);
+                        let note = nonRequiredNotes[idx];
+                        if (!this._findOtherInstance(secondCandidate, note)) {
+                            secondCandidate.push(note);
+                            secondCandidate.sort(this._compareNotes);
+                            let nonRequiredNotesIdx = nonRequiredNotes.indexOf(note);
+                            nonRequiredNotes.splice(nonRequiredNotesIdx, 1);
+                        }
                     }
                 }
             }
@@ -443,8 +451,29 @@ export class ChordClass extends Domain {
             return secondCandidate;
         });
 
-        // STEP 6: Choose the best voicing
+        // STEP 6: Choose the best voicing (TODO)
+        let bestVoicing;
+        let greatestNumberOfFirstChoiceNotes = 0;
+        voicingCandidates.forEach(candidate => {
+            let numberOfFirstChoiceNotes = candidate.filter(note => firstChoices.indexOf(note) !== -1).length;
+            if (numberOfFirstChoiceNotes > greatestNumberOfFirstChoiceNotes) {
+                bestVoicing = candidate;
+            }
+        });
 
+        if (!bestVoicing) {
+            voicingCandidates.forEach(candidate => {
+                if (this._findLowestNoteCluster(candidate) === null) {
+                    bestVoicing = candidate;
+                }
+            });
+        }
+
+        if (!bestVoicing) {
+            bestVoicing = voicingCandidates[0];
+        }
+
+        return bestVoicing.map(note => note.pitch);
     }
 
     private _voiceWithReference(ref: number[]) {

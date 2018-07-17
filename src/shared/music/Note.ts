@@ -74,7 +74,7 @@ export class Note {
     }
 
     public asNoteClass(): Note {
-        return new Note(this._name, this._position);
+        return new Note(this._name, this._position, this._required);
     }
 
     public pitchDiff(note: Note) {

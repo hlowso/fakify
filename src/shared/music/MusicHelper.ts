@@ -127,7 +127,7 @@ const _adjustBarsSwingFeel = (bars: IBarBase[]): IChartBar[] => {
         let adjustedSegments = chordSegments.map<IChordSegment>((chordBase: IChordBase, segmentIdx: number) => {
             let durationInSubbeats = conversionFactor * chordBase.durationInBeats;
             let adjustedSegment: any = {
-                beatIdx: chordBase.beatIdx,
+                beatIdx: timeSignature[1] === 8 ? chordBase.beatIdx / 2 : chordBase.beatIdx,
                 subbeatIdx: conversionFactor * chordBase.beatIdx,
                 chord: chordBase.chord,
                 chordName: chordBase.chordName,
