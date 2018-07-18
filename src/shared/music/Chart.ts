@@ -4,6 +4,7 @@ import { IBarBase, IChartBar, Feel, NoteName, Tempo, IMusicIdx, IChordStretch } 
 class Chart {
     private _barsBase: IBarBase[];
     private _bars: IChartBar[];
+    private _chordStretches: IChordStretch[];
     private _context: NoteName;
     private _tempo: Tempo;
     private _feel: Feel;
@@ -28,12 +29,30 @@ class Chart {
             ),
             feel
         );
+        this._chordStretches = [];
         this._context = context;
         this._tempo = tempo;
         this._feel = feel;
         this._onSet = onSet;
         this._rangeStartIdx = rangeStartIdx;
         this._rangeEndIdx = rangeEndIdx;
+
+        // Build the chord stretches from the bars
+        let subbeatsBeforeChange = 0;
+
+        this._bars.forEach(bar => {
+            bar.chordSegments.forEach(segment => {
+                if (subbeatsBeforeChange === 0) {
+                    subbeatsBeforeChange = segment.subbeatsBeforeChange;
+                    this._chordStretches.push({
+                        chordName: segment.chordName,
+                        key: segment.key,
+                        durationInSubbeats: subbeatsBeforeChange
+                    });
+                }
+                subbeatsBeforeChange -= segment.durationInSubbeats;
+            });
+        });
     }
 
     public forEachBarInRange = (callback: (bar: IChartBar, idx: number) => void) => {
@@ -46,27 +65,6 @@ class Chart {
         this._rangeStartIdx <= idx &&
         idx <= this._rangeEndIdx
     )
-
-    public forEachChordStretch = (callback: (stretch: IChordStretch, idx: number) => void) => {
-        let currStretch: IChordStretch;
-        let stretchIdx = 0;
-        let subbeatsBeforeChange = 0;
-
-        this._bars.forEach(bar => {
-            bar.chordSegments.forEach(segment => {
-                if (subbeatsBeforeChange === 0) {
-                    subbeatsBeforeChange = segment.subbeatsBeforeChange;
-                    currStretch = {
-                        chordName: segment.chordName,
-                        key: segment.key,
-                        durationInSubbeats: subbeatsBeforeChange
-                    };
-                    callback(currStretch, stretchIdx++);
-                }
-                subbeatsBeforeChange -= segment.durationInSubbeats;
-            });
-        });
-    }
 
     public keyAtIdx = (idx: IMusicIdx) => {
         let bar = this._bars[idx.barIdx];

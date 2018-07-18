@@ -6,6 +6,11 @@ export const compPianoSwingV1 = (chart: Chart): IPart => {
     let music: IMusicBarV2[] = [];
     let previousVoicing: number[] = [];
 
+    // TODO ...    
+    // chart.forEachChordStretch((stretch, stretchIdx) => {
+
+    // });
+
     chart.bars.forEach(bar => {
 
         let musicBar: IMusicBarV2 = {};
