@@ -1,3 +1,4 @@
+import * as Util from "../../../../Util";
 import { ChordClass } from "../../../Domain";
 import { ChordName, IMusicBarV2, IPart } from "../../../../types";
 import Chart from "../../../Chart";

@@ -76,3 +76,22 @@ export const mod = (m: number, n: number): number => {
 } 
 
 export const identity = <T>(obj: T) => obj;
+
+// Given an array of "choices", in which each "choice" is a pairing of an element
+// and a probability, this function returns a random variable returning the element
+// choices[i][0] with probablity choices[i][1] / the sum of (choices[x][1]) 
+// from x = 0 to length of choices
+export const generateCustomRandomVariable = <T>(choices: [T, number][]) => {
+    let totalWeight = choices.reduce((total, choice) => total + choice[1], 0);
+    let variable = () => {
+        let k = Math.floor(Math.random() * totalWeight);
+        for (let choice of choices) {
+            k -= choice[1];
+            if (k < 0) {
+                return choice[0];
+            }
+        }
+        return;
+    }; 
+    return variable as () => T;
+};

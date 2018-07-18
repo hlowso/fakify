@@ -93,6 +93,10 @@ class Chart {
         );
     }
 
+    get chordStretches() {
+        return this._chordStretches;
+    }
+
     get context(): NoteName {
         return this._context;
     }
