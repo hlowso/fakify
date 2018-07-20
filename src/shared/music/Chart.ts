@@ -11,6 +11,7 @@ class Chart {
     private _onSet: () => void;
     private _rangeStartIdx: number;
     private _rangeEndIdx: number;
+    private _durationInSubbeats: number;
 
     constructor(
         bars: IBarBase[], 
@@ -36,11 +37,13 @@ class Chart {
         this._onSet = onSet;
         this._rangeStartIdx = rangeStartIdx;
         this._rangeEndIdx = rangeEndIdx;
+        this._durationInSubbeats = 0;
 
         // Build the chord stretches from the bars
         let subbeatsBeforeChange = 0;
 
         this._bars.forEach(bar => {
+            this._durationInSubbeats += bar.durationInSubbeats;
             bar.chordSegments.forEach(segment => {
                 if (subbeatsBeforeChange === 0) {
                     subbeatsBeforeChange = segment.subbeatsBeforeChange;
@@ -77,6 +80,29 @@ class Chart {
         }
 
         return bar.chordSegments[segIdx].key;
+    }
+
+    public absSubbeatIdxToMusicIdx(absIdx: number): IMusicIdx | undefined {
+        let subbeatCount = 0;
+
+        for (let barIdx = 0; barIdx < this._bars.length; barIdx ++) {
+            let bar = this._bars[barIdx];
+            for (let segmentIdx = 0; segmentIdx < bar.chordSegments.length; segmentIdx ++) {
+                let segment = bar.chordSegments[segmentIdx];
+
+                if (subbeatCount >= absIdx) {
+                    return {
+                        barIdx,
+                        segmentIdx,
+                        subbeatIdx: subbeatCount - absIdx
+                    }
+                }
+
+                subbeatCount += segment.durationInSubbeats;                
+            }
+        }
+
+        return;
     }
 
     /**
@@ -123,6 +149,10 @@ class Chart {
 
     get lastBarInRange(): IChartBar {
         return this._bars[this._rangeEndIdx];
+    }
+
+    get durationInSubbeats() {
+        return this._durationInSubbeats;
     }
 
     /**
