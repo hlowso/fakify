@@ -1,5 +1,5 @@
 import { Domain } from "../../Domain";
-import { Difficulty, IMusicBarV2, IStroke, IExercise } from "../../../types";
+import { Difficulty, IMusicBar, IStroke, IExercise } from "../../../types";
 import Chart from "../../Chart";
 import * as MusicHelper from "../../MusicHelper";
 
@@ -11,10 +11,10 @@ const rangeEndNote = 78;
 export const generateSwingExerciseV0 = (chart: Chart, instrument: string, difficulty: Difficulty): IExercise => {
     let firstNote = NaN;
     let numberOfNotes = 0;
-    let music: IMusicBarV2[] = [];
+    let music: IMusicBar[] = [];
 
     chart.barsInRange.forEach(bar => {
-        let musicBar: IMusicBarV2 = {};
+        let musicBar: IMusicBar = {};
         let beatLimit = difficulty === Difficulty.Easy ? 1 : bar.timeSignature[1];
 
         for (let beatIdx = 0; beatIdx < beatLimit; beatIdx ++) {

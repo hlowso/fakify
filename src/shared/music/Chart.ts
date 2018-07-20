@@ -69,40 +69,56 @@ class Chart {
         idx <= this._rangeEndIdx
     )
 
-    public keyAtIdx = (idx: IMusicIdx) => {
-        let bar = this._bars[idx.barIdx];
-        let subbeatCount = bar.chordSegments[0].durationInSubbeats;
-        let segIdx = 0; 
-
-        while (subbeatCount < (idx.subbeatIdx as number)) {
-            segIdx ++;
-            subbeatCount += bar.chordSegments[segIdx].durationInSubbeats; 
+    public segmentAtIdx = (idx: IMusicIdx) => {
+        let { barIdx, segmentIdx } = this._completeMusicIdx(idx);
+        return this._bars[barIdx].chordSegments[segmentIdx as number];
         }
 
-        return bar.chordSegments[segIdx].key;
+    public keyAtIdx = (idx: IMusicIdx) => {
+        return this.segmentAtIdx(idx).key;
     }
 
-    public absSubbeatIdxToMusicIdx(absIdx: number): IMusicIdx | undefined {
-        let subbeatCount = 0;
+    public absSubbeatIdxToMusicIdx = (absIdx: number): IMusicIdx | undefined => {
+        let totalSubbeatCount = 0;
 
         for (let barIdx = 0; barIdx < this._bars.length; barIdx ++) {
             let bar = this._bars[barIdx];
+            let barSubbeatCount = 0;
+            
             for (let segmentIdx = 0; segmentIdx < bar.chordSegments.length; segmentIdx ++) {
                 let segment = bar.chordSegments[segmentIdx];
 
-                if (subbeatCount >= absIdx) {
+                if (totalSubbeatCount >= absIdx) {
                     return {
                         barIdx,
                         segmentIdx,
-                        subbeatIdx: subbeatCount - absIdx
+                        subbeatIdx: barSubbeatCount + (totalSubbeatCount - absIdx)
                     }
                 }
 
-                subbeatCount += segment.durationInSubbeats;                
+                totalSubbeatCount += segment.durationInSubbeats; 
+                barSubbeatCount += segment.durationInSubbeats;               
             }
         }
 
         return;
+    }
+
+    private _completeMusicIdx = (idx: IMusicIdx) => {
+        if (idx.segmentIdx) {
+            return idx;
+        }
+
+        let bar = this._bars[idx.barIdx];
+        let subbeatCount = bar.chordSegments[0].durationInSubbeats;
+        let segmentIdx = 0; 
+
+        while (subbeatCount < (idx.subbeatIdx as number)) {
+            segmentIdx ++;
+            subbeatCount += bar.chordSegments[segmentIdx].durationInSubbeats; 
+        }
+
+        return { ...idx, segmentIdx };
     }
 
     /**

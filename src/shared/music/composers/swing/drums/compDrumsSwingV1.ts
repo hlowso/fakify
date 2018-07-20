@@ -1,16 +1,16 @@
 import soundfonts from "../../../soundfontsIndex";
-import { IMusicBarV2, IPart } from "../../../../types";
+import { IMusicBar, IPart } from "../../../../types";
 import Chart from "../../../Chart";
 
 export const compDrumsSwingV1 = (chart: Chart): [IPart, IPart] => {
 
     let { rideCymbal, shutHiHat } = soundfonts;
-    let rideCymbalBars: IMusicBarV2[] = [];
-    let shutHiHatBars: IMusicBarV2[] = [];
+    let rideCymbalBars: IMusicBar[] = [];
+    let shutHiHatBars: IMusicBar[] = [];
 
     chart.bars.forEach(bar => {
-        let rideCymbalBar: IMusicBarV2 = {};
-        let shutHiHatBar: IMusicBarV2 = {};
+        let rideCymbalBar: IMusicBar = {};
+        let shutHiHatBar: IMusicBar = {};
 
         bar.chordSegments.forEach(segment => {
             let fullBeatCouplets = segment.durationInSubbeats / 6;

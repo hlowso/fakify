@@ -1,13 +1,12 @@
 import * as Util from "../../../../Util";
 import { ChordClass } from "../../../Domain";
-import { ChordName, IMusicBarV2, IPart, IMusicIdx } from "../../../../types";
+import { ChordName, IMusicBar, IPart, IMusicIdx } from "../../../../types";
 import Chart from "../../../Chart";
 
 export const compPianoSwingV1 = (chart: Chart): IPart => {
     let { chordStretches, bars } = chart;
-    let music: IMusicBarV2[] = [];
+    let music: IMusicBar[] = [];
     let previousVoicing: number[] = [];
-
 
     let musicIdx: IMusicIdx | undefined;
     let prevMusicIdx: IMusicIdx | undefined;
@@ -72,11 +71,31 @@ export const compPianoSwingV1 = (chart: Chart): IPart => {
 
     }
 
-    // TODO: loop through maxStrokeDurationBars and build the music array
-    maxStrokeDurationBars.forEach((maxStrokeDurationBar, barIdx) => {
-        
+    bars.forEach((bar, barIdx) => {
+        let maxStrokeDurationBar = maxStrokeDurationBars[barIdx];
+        let musicBar: IMusicBar = {};
+        if (maxStrokeDurationBar) {
+            maxStrokeDurationBar.forEach((maxDuration, subbeatIdx) => {
+                let { chordName } = chart.segmentAtIdx({ barIdx, subbeatIdx });
+                let chord = new ChordClass(chordName as ChordName);
+                let voicing = chord.voice(60, previousVoicing);
+                musicBar[subbeatIdx] = [
+                    {
+                        notes: voicing,
+                        durationInSubbeats: Math.random() * maxDuration,
+                        velocity: 1
+                    }
+                ];
+            });
+        }
+
+        music[barIdx] = musicBar;
     });
 
+    return {
+        instrument: "piano",
+        music
+    };
 };
 
 export default compPianoSwingV1;

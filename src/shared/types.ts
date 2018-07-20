@@ -113,10 +113,10 @@ export interface IScoreBar {
 
 export interface IPart {
     instrument: string;
-    music: IMusicBarV2[];
+    music: IMusicBar[];
 }
 
-export interface IMusicBarV2 {
+export interface IMusicBar {
     [subbeatIdx: number]: IStroke[];
 }
 
