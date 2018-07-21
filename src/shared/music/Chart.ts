@@ -87,17 +87,19 @@ class Chart {
             
             for (let segmentIdx = 0; segmentIdx < bar.chordSegments.length; segmentIdx ++) {
                 let segment = bar.chordSegments[segmentIdx];
+                let segmentDuration = segment.durationInSubbeats
 
-                if (totalSubbeatCount >= absIdx) {
+                totalSubbeatCount += segmentDuration; 
+
+                if (totalSubbeatCount > absIdx) {
                     return {
                         barIdx,
                         segmentIdx,
-                        subbeatIdx: barSubbeatCount + (totalSubbeatCount - absIdx)
+                        subbeatIdx: barSubbeatCount + segmentDuration - (totalSubbeatCount - absIdx) 
                     }
-                }
-
-                totalSubbeatCount += segment.durationInSubbeats; 
-                barSubbeatCount += segment.durationInSubbeats;               
+                }     
+                
+                barSubbeatCount += segmentDuration;   
             }
         }
 
