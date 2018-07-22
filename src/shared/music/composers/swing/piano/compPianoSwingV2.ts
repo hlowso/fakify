@@ -40,7 +40,7 @@ export const compPianoSwingV1 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
         previousVoicing = lastStroke.notes;
     }
 
-    while (absSubbeatIdx < chart.durationInSubbeats) {        
+    while (musicIdx) {        
         currTwoBarDuration = bars[musicIdx.barIdx].durationInSubbeats + bars[Util.mod(musicIdx.barIdx + 1, bars.length)].durationInSubbeats;
         remainderOfCurrStretchPlusNextStretch = remainderOfCurrStretch + chordStretches[Util.mod(stretchIdx + 1, chordStretches.length)].durationInSubbeats;
         
@@ -49,6 +49,10 @@ export const compPianoSwingV1 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
         } else {
             maxSubbeatWait = remainderOfCurrStretchPlusNextStretch;
         }
+
+        // Subbtract 1 from the max subbeat wait, because if the stroke lands on 
+        // the last subbeat of a segment, it's chord will be that of the next segment
+        maxSubbeatWait --;
 
         waitChoices = [];
         currWeight = 1;
@@ -124,6 +128,8 @@ export const compPianoSwingV1 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
 
         music[barIdx] = musicBar;
     });
+
+    console.log(music);
 
     return {
         instrument: "piano",
