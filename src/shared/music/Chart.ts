@@ -72,7 +72,21 @@ class Chart {
     public segmentAtIdx = (idx: IMusicIdx) => {
         let { barIdx, segmentIdx } = this._completeMusicIdx(idx);
         return this._bars[barIdx].chordSegments[segmentIdx as number];
+    }
+
+    public nextSegmentAtIdx = (idx: IMusicIdx) => {
+        let { barIdx, segmentIdx } = this._completeMusicIdx(idx);
+        segmentIdx = segmentIdx as number;
+
+        let bar = this._bars[barIdx];
+        if (segmentIdx < bar.chordSegments.length - 1) {
+            return bar.chordSegments[segmentIdx + 1];
         }
+        if (barIdx < this._bars.length - 1) {
+            return this._bars[barIdx + 1].chordSegments[0];
+        }
+        return;
+    }
 
     public keyAtIdx = (idx: IMusicIdx) => {
         return this.segmentAtIdx(idx).key;

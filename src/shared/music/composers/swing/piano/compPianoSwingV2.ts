@@ -1,6 +1,6 @@
 import * as Util from "../../../../Util";
 import { ChordClass } from "../../../Domain";
-import { ChordName, IMusicBar, IPart, IMusicIdx } from "../../../../types";
+import { ChordName, IMusicBar, IPart, IMusicIdx, IChordSegment } from "../../../../types";
 import Chart from "../../../Chart";
 
 export const compPianoSwingV1 = (chart: Chart): IPart => {
@@ -17,7 +17,7 @@ export const compPianoSwingV1 = (chart: Chart): IPart => {
     let remainderOfCurrStretch = 0;
     let remainderOfCurrStretchPlusNextStretch: number;
     let stretchIdx = -1;
-    let choices: [number, number][];
+    let waitChoices: [number, number][];
     let currWeight: number;
     let randVar: () => number;
     let currIdxIsOffBeat: boolean;
@@ -42,13 +42,13 @@ export const compPianoSwingV1 = (chart: Chart): IPart => {
             maxSubbeatWait = remainderOfCurrStretchPlusNextStretch;
         }
 
-        choices = [];
+        waitChoices = [];
         currWeight = 1;
         currIdxIsOffBeat = Util.mod(absSubbeatIdx, 3) === 2;
         subbeatWait = currIdxIsOffBeat ? 1 : 2; 
 
         while (subbeatWait < maxSubbeatWait) {
-            choices.push([subbeatWait, Math.max(currWeight, 1)]);
+            waitChoices.push([subbeatWait, Math.max(currWeight, 1)]);
             currWeight += (subbeatWait < 4) ? 1 : -1;
             subbeatWait += (
                 Util.mod(subbeatWait, 3) === 0
@@ -59,9 +59,29 @@ export const compPianoSwingV1 = (chart: Chart): IPart => {
             );
         }
 
-        randVar = Util.generateCustomRandomVariable(choices); 
-        subbeatWait = randVar();
+        if (waitChoices.length === 0) {
+            if (maxSubbeatWait > 0) {
+                subbeatWait = maxSubbeatWait;
+            } else {
+                break;
+            }
+        } else {
+            randVar = Util.generateCustomRandomVariable(waitChoices); 
+            subbeatWait = randVar();
+        }
+
         absSubbeatIdx += subbeatWait;
+        
+        if (prevMusicIdx) {
+            maxStrokeDurationBars[prevMusicIdx.barIdx][prevMusicIdx.subbeatIdx as number] = Math.min(subbeatWait, remainderOfCurrStretch + 3);
+        }
+
+        remainderOfCurrStretch -= subbeatWait;
+        if (remainderOfCurrStretch < 0) {
+            stretchIdx ++;
+            remainderOfCurrStretch += chordStretches[stretchIdx].durationInSubbeats;
+        } 
+
         musicIdx = chart.absSubbeatIdxToMusicIdx(absSubbeatIdx) as IMusicIdx; 
         
         if (!musicIdx) {
@@ -72,18 +92,6 @@ export const compPianoSwingV1 = (chart: Chart): IPart => {
             maxStrokeDurationBars[musicIdx.barIdx] = [];
         }
 
-        maxStrokeDurationBars[musicIdx.barIdx][musicIdx.subbeatIdx as number] = 0;
-
-        if (prevMusicIdx) {
-            maxStrokeDurationBars[prevMusicIdx.barIdx][prevMusicIdx.subbeatIdx as number] += subbeatWait;
-        }
-
-        remainderOfCurrStretch -= subbeatWait;
-        if (remainderOfCurrStretch < 0) {
-            stretchIdx ++;
-            remainderOfCurrStretch += chordStretches[stretchIdx].durationInSubbeats;
-        } 
-
         prevMusicIdx = musicIdx;
     }
 
@@ -92,9 +100,30 @@ export const compPianoSwingV1 = (chart: Chart): IPart => {
         let musicBar: IMusicBar = {};
         if (maxStrokeDurationBar) {
             maxStrokeDurationBar.forEach((maxDuration, subbeatIdx) => {
-                let { chordName } = chart.segmentAtIdx({ barIdx, subbeatIdx });
-                let chord = new ChordClass(chordName as ChordName);
+                
+                let segment = chart.segmentAtIdx({ barIdx, subbeatIdx });
+
+                // If the subbeat index is the last in the current segment,
+                // allow for the possibility of playing the next chord
+                if (subbeatIdx === (segment.subbeatIdx + segment.durationInSubbeats - 1)) {
+                    let nextSegment = chart.nextSegmentAtIdx({ barIdx, subbeatIdx });
+                    if (nextSegment) {
+                        segment = nextSegment as IChordSegment;
+                    }
+                }
+
+                // Reset the previous voicing if it gets too high or too low
+                if (previousVoicing.length > 0) {
+                    let prevVoicingAvg = previousVoicing.reduce((sum, pitch) => sum + pitch) / previousVoicing.length;
+                    let diff = prevVoicingAvg - 60;
+                    if (diff < -18 || diff > 18) {
+                        previousVoicing = [];
+                    }
+                }
+
+                let chord = new ChordClass(segment.chordName as ChordName);
                 let voicing = chord.voice(60, previousVoicing);
+                
                 musicBar[subbeatIdx] = [
                     {
                         notes: voicing,
@@ -102,11 +131,15 @@ export const compPianoSwingV1 = (chart: Chart): IPart => {
                         velocity: 1
                     }
                 ];
+
+                previousVoicing = voicing;
             });
         }
 
         music[barIdx] = musicBar;
     });
+
+    console.log(music);
 
     return {
         instrument: "piano",
