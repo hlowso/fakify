@@ -129,8 +129,6 @@ export const compPianoSwingV1 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
         music[barIdx] = musicBar;
     });
 
-    console.log(music);
-
     return {
         instrument: "piano",
         music
