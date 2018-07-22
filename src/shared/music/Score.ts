@@ -1,4 +1,4 @@
-import { IPart, IScoreBar, IMusicIdx, IStroke } from "../types";
+import { IPart, IScoreBar, IMusicIdx, IStroke, IMusicBar } from "../types";
 
 class Score {
     private _bars: IScoreBar[]; 
@@ -77,12 +77,34 @@ class Score {
         this._bars.forEach(callback);
     }
 
+    public getPart = (instrument: string): IPart => {
+        let music = this._bars.map(bar => {
+            let musicBar: IMusicBar = {};
+            for (let subbeatIdx in bar) {
+                let strokes = bar[subbeatIdx][instrument];
+                if (strokes) {
+                    musicBar[subbeatIdx] = strokes;
+                }
+            }
+            return musicBar;
+        });
+
+        return {
+            instrument,
+            music
+        }
+    }
+
     get bars(): IScoreBar[] {
         return this._bars;
     }
 
     get length(): number {
         return this._bars.filter(String).length;
+    }
+
+    get lastBar() {
+        return this._bars[this._bars.length - 1];
     }
 }
 

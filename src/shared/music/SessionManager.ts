@@ -134,7 +134,7 @@ export class SessionManager {
      */
 
     protected _compileMusic() {
-        return MusicHelper.CompV1(this._chart);
+        return MusicHelper.CompV1(this._chart, this._score);
     }
 
     /**
