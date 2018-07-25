@@ -239,14 +239,13 @@ export class ChordClass extends Domain {
 
     private _suitableKeys: NoteName[]; 
     private _order: number;
-    private _specialNotesMutaion: (notes: Note[]) => Note[];
+    private _specialNotesMutation: (notes: Note[]) => Note[];
     private _clusterIndexOrder: [number, number, number];    
 
     constructor(chordName: ChordName) {
         let [ noteName, shape ] = chordName;
         let { baseIntervals, suitableRelativeKeys, extend } = ChordClass.shapeToInfo(shape);
         let lowestPitch = Domain.getLowestPitch((noteName as NoteName));
-        let specialNotesMutaion = extend || Util.identity;
         let highestPosition = 1;
         let baseNotes = baseIntervals.map((pitchDiff, i): Note => { 
             highestPosition = 2 * i + 1;
@@ -255,13 +254,31 @@ export class ChordClass extends Domain {
             return new Note(pitch, highestPosition, required);
         });
 
-        super(specialNotesMutaion(baseNotes));
+        let noteClasses = (extend || Util.identity)(baseNotes);
+        super(noteClasses);
+
         this._suitableKeys = suitableRelativeKeys.map(pos => Domain.getTonicNameByPosition((noteName as NoteName), pos));
         this._order = highestPosition;
-        this._specialNotesMutaion = specialNotesMutaion;
+        
+        // Build the contextualized specialNotesMutation function
+        let notesRemovedFromBase = baseNotes.filter(note => noteClasses.indexOf(note) === -1);
+        let notesAddedToBase = noteClasses.filter(note => baseNotes.indexOf(note) === -1);
+        this._specialNotesMutation = (notes: Note[]) => {
+            let notesCopy = notes.filter(note => notesRemovedFromBase.indexOf(note) === -1);
+            notesAddedToBase.forEach(note => notesCopy.push(note));
+            return notesCopy;
+        };
+
+        // Set the order in which cluster notes should be dealt with
         this._clusterIndexOrder = [1, 2, 0];
     }
 
+    public applyMutation(domain: Domain) {
+        let noteClasses = this._specialNotesMutation(domain.noteClasses);
+        return new Domain(noteClasses);
+    }
+
+    // TODO: should this be a Domain function??
     public getNotesInPitchRange(a: number, b: number, requiredOnly = false) {
         let notesInRange: Note[] = [];
         let idx = this.getClosestNoteToTargetPitch(a)[0];
@@ -286,52 +303,6 @@ export class ChordClass extends Domain {
                 : this._generateVoicing(target)
         );
     }
-
-    // public getRandomTriad(target: number): number[] {
-    //     let tonic = (this.getClosestNoteInstance(target, 1)[1] as Note);
-    //     let inversion = Math.floor(Math.random() * 3);
-        
-    //     let thirdAbove = (this.getClosestNoteInstance(tonic.pitch, 3)[1] as Note);
-    //     let thirdBelow = (this.getClosestNoteInstance(tonic.pitch - 12, 3)[1] as Note);
-    //     let fifthAbove = (this.getClosestNoteInstance(tonic.pitch + 12, 5)[1] as Note);
-    //     let fifthBelow = (this.getClosestNoteInstance(tonic.pitch, 5)[1] as Note);
-
-    //     switch (inversion) {
-    //         default:
-    //         case 0:
-    //             return [tonic.pitch, thirdAbove.pitch, fifthAbove.pitch];
-    //         case 1:
-    //             return [fifthBelow.pitch, tonic.pitch, thirdAbove.pitch];
-    //         case 3:
-    //             return [thirdBelow.pitch, fifthBelow.pitch, tonic.pitch];
-    //     }
-    // }
-
-    // private _generateVoicing(target: number, candidates?: Note[]) {
-    //     if (this._order < 7) {
-    //         return this.getRandomTriad(target);
-    //     }
-
-    //     // TODO: write a better chord generating algorithm ...
-
-    //     let tonicBase = this.lowestTonic;
-    //     let idx = tonicBase[0], targetTonic = tonicBase[1];
-
-    //     while (Math.abs(targetTonic.pitch - target) > 6) {
-    //         idx += this.numberOfNoteClasses;
-    //         targetTonic = this._notes[idx];
-    //     }
-
-    //     let pitches: number[] = [ targetTonic.pitch ];
-
-    //     for (let i = 1; i < this.numberOfNoteClasses; i ++) {
-    //         idx ++;
-    //         pitches.push(this._notes[idx].pitch);
-    //     }
-
-    //     return pitches.sort((a, b) => a - b);
-
-    // }
 
     private _generateVoicing(target: number, firstChoices: Note[] = []) {
 
@@ -362,7 +333,7 @@ export class ChordClass extends Domain {
         // For each pitch range...
         let voicingCandidates = pitchRangeSets.map(range => {
 
-            // STEP 2: Get required notes
+            // STEP 2: Create the arrays of notes that will be needed in further steps
             let neighboursInRange = firstChoices.filter(note => range[0] <= note.pitch && note.pitch <= range[1]);
             let nonRequiredNeighboursInRange = neighboursInRange.filter(note => !note.isRequired);
             let notesInRange = this.getNotesInPitchRange(range[0], range[1]);
@@ -425,7 +396,7 @@ export class ChordClass extends Domain {
                 }
             });
 
-            // STEP 5: Add non-required notes
+            // STEP 5: Create the chance for non-required notes to be added
             let remainingSpace = this.numberOfNoteClasses - secondCandidate.length;
             let nonRequiredNotes = (
                 nonRequiredNeighboursInRange.length > 0
@@ -449,7 +420,7 @@ export class ChordClass extends Domain {
             return secondCandidate;
         });
 
-        // STEP 6: Choose the best voicing (TODO)
+        // STEP 6: Choose the best voicing of all those in voicingCandidates
         let bestVoicing;
         let greatestNumberOfFirstChoiceNotes = 0;
         voicingCandidates.forEach(candidate => {
@@ -552,9 +523,5 @@ export class ChordClass extends Domain {
 
     get suitableKeys() {
         return this._suitableKeys;
-    }
-
-    get specialNotesMutation() {
-        return this._specialNotesMutaion;
     }
 }
