@@ -1,5 +1,5 @@
 import * as Util from "../../../../Util";
-import { ChordClass } from "../../../Domain";
+import { ChordClass } from "../../../domain/ChordClass";
 import { ChordName, IMusicBar, IPart, IMusicIdx, IChordSegment, IStroke } from "../../../../types";
 import Chart from "../../../Chart";
 

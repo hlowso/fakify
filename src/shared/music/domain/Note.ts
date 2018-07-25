@@ -1,6 +1,6 @@
 import { Domain } from "./Domain";
-import { NoteName } from "../types";
-import * as Util from "../Util";
+import { NoteName } from "../../types";
+import * as Util from "../../Util";
 
 export class Note {
     private _name: NoteName;
