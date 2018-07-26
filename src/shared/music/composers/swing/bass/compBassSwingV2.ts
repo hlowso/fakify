@@ -7,6 +7,23 @@ import { Domain } from "../../../domain/Domain";
  * TRANSLATION OF PYTHON "WALK" ALGORITHM TO JAVASCRIPT
  */
 
+interface IOddsSet {
+    [event: string]: [boolean, number][]
+};
+
+const odds: IOddsSet = {
+    jump:             [ [true, 1], [false, 7] ],
+    skip:             [ [true, 1], [false, 3] ],
+    changeGait:       [ [true, 1], [false, 3] ],
+    turn:             [ [true, 1], [false, 9] ],
+    chromStep:        [ [true, 3], [false, 1] ],
+    favorTonic:       [ [true, 2], [false, 1] ],
+    favorOctaveSkip:  [ [true, 3], [false, 1] ]
+}
+
+const BASS_FLOOR = 12;
+const BASS_CEILING = 60;
+
 export const compBassSwingV2 = (chart: Chart, prevMusic: IMusicBar[]): IPart => {
     let { chordStretches } = chart;
     
@@ -15,13 +32,33 @@ export const compBassSwingV2 = (chart: Chart, prevMusic: IMusicBar[]): IPart => 
     let skipPitches: number[] = [];    
 
     // Helper functions
-    let jumpRandVar = Util.generateCustomRandomVariable([[true, 1], [false, 7]]);
+    let jumpRandVar = Util.generateCustomRandomVariable(odds.jump);
     let beatsSinceJump = 0;        
     let decideToJump = () => {
         if (beatsSinceJump < 2) {
             return false;
         }
         return jumpRandVar();
+    }
+
+    let favorTonicRandVar = Util.generateCustomRandomVariable(odds.favorTonic); 
+
+    // The direction is always either 1 (ascending)
+    // or -1 (descending)
+    let direction = 1;
+    let turnRandVar = Util.generateCustomRandomVariable(odds.turn);
+    let updateDirection = (jumping = false) => {
+        let threshold = jumping ? 12 : 7;
+
+        if (pitch - BASS_FLOOR <= threshold) {
+            direction = 1;
+        } else if (BASS_CEILING - pitch <= threshold) {
+            direction = -1
+        } else {
+            direction *= turnRandVar() ? -1 : 1;
+        }
+
+        return direction;
     }
 
     // TODO: come up with a better way to get the first not from prevMusic array
@@ -37,14 +74,22 @@ export const compBassSwingV2 = (chart: Chart, prevMusic: IMusicBar[]): IPart => 
         // in subbeats of any stretch will always be 
         // divisible by 3
         let durationInBeats = durationInSubbeats / 3;
-
         
-
         for (let beat = 0; beat < durationInBeats; beat ++) {
 
             // Handle chord transition
             if (beat === durationInBeats - 1) {
 
+                // Handle a "quick" transition, which means that the chord stretch
+                // being left was only 1 beat long
+                if (beat === 0) {
+
+                }
+                
+                // Otherwise 
+                else {
+
+                }
             }
 
             // Allow for the possibility of "jumps"
