@@ -74,6 +74,51 @@ export class Domain {
         return this._notes[this._notes.length - 1].pitch;
     }
 
+    get positions(): number[] {
+        let containsNaN = false;
+        let positions = this._noteClasses.map(note => {
+            let pos = note.position;
+            if (isNaN(pos)) {
+                containsNaN = true;
+            }
+            return pos;
+        });
+
+        if (containsNaN) {
+            return [];
+        }
+        return positions.sort((a, b) => a - b);
+    }
+
+    public pitchToPosition(pitch: number) {
+        let note = this.getClosestNoteToTargetPitch(pitch)[1];
+        if (note.pitch === pitch) {
+            return note.position;
+        }
+        return NaN;
+    }
+
+    public getNextNoteByPosition(pitch: number, ascending: boolean) {
+        let [noteIdx, note] = this.getClosestNoteToTargetPitch(pitch);
+        let inc = ascending ? 1 : -1;
+
+        if (note.pitch === pitch && !isNaN(note.position)) {
+            let currIdx = this.positions.indexOf(note.position);
+            currIdx += inc;
+            currIdx = Util.mod(currIdx, this.positions.length);
+            let nextPos = this.positions[currIdx];
+            while (note.position !== nextPos) {
+                noteIdx += inc;
+                if (noteIdx < 0 || noteIdx >= this._notes.length) {
+                    return null;
+                }
+                note = this._notes[noteIdx];
+            }
+            return note;
+        }
+        return null;
+    }
+
     public mutate(mutation: (baseNotes: Note[]) => Note[]) {
         this._noteClasses = mutation(this._noteClasses);
         this._buildFromNoteClasses();

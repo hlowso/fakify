@@ -131,6 +131,16 @@ export class ChordClass extends Domain {
         );
     }
 
+    public getTonicPitch(target: number, above = true) {
+        let lowestTonic = this.getLowestNoteByPosition(1) as Note;
+        return Domain.getPitchInstance(target, lowestTonic.pitch, above);
+    }
+
+    public getFifthPitch(target: number, above = true) {
+        let lowestFifth = this.getLowestNoteByPosition(5) as Note;
+        return Domain.getPitchInstance(target, lowestFifth.pitch, above);
+    }
+
     private _generateVoicing(target: number, firstChoices: Note[] = []) {
 
         // STEP 1: Determine pitch range(s)
@@ -273,15 +283,15 @@ export class ChordClass extends Domain {
     }
 
     private _voiceWithReference(ref: number[]) {
-        let voicingCandidates = this._getVoicingCandidates(ref);
+        let voicingCandidates = this._getVoicingCandidateNotes(ref);
         let target = Math.floor((ref[0] + ref[ref.length - 1]) / 2);
         return this._generateVoicing(target, voicingCandidates);
     }
 
-    private _getVoicingCandidates(ref: number[] | number) {
+    private _getVoicingCandidateNotes(ref: number[] | number) {
         if (Array.isArray(ref)) {
             let reduction = (notes: Note[], pitch: number): Note[] => { 
-                let currNotes = this._getVoicingCandidates(pitch);
+                let currNotes = this._getVoicingCandidateNotes(pitch);
                 return notes.concat(currNotes.filter(note => notes.indexOf(note) === -1));
             };
             return ref.reduce(reduction, []);
@@ -333,19 +343,6 @@ export class ChordClass extends Domain {
 
     get order() {
         return this._order;
-    }
-
-    get lowestTonic(): [number, Note] {
-        let idx = 0;
-        let currNote = this._notes[idx];
-        while (currNote.position !== 1) {
-            currNote = this._notes[++idx];
-        }
-        return [idx, currNote];
-    }
-
-    get tonicName() {
-        return this.lowestTonic[1].name;
     }
 
     get suitableKeys() {
