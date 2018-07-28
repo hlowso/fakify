@@ -114,11 +114,14 @@ export const compPianoSwingV1 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
 
             let chord = new ChordClass(segment.chordName as ChordName);
             let voicing = chord.voice(60, previousVoicing);
+
+            let steepNess = 1.584963; // log base 2 of 3
+            let durationInSubbeats = Math.ceil( maxDuration *  Math.pow(2 * Math.random(), steepNess) / 3 );
             
             musicBar[subbeatIdx] = [
                 {
                     notes: voicing,
-                    durationInSubbeats: Math.ceil(Math.random() * maxDuration),
+                    durationInSubbeats,
                     velocity: 1
                 }
             ];
