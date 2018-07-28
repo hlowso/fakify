@@ -1,6 +1,6 @@
 import { Domain } from "./Domain";
-import { NoteName } from "../types";
-import * as Util from "../Util";
+import { NoteName } from "../../types";
+import * as Util from "../../Util";
 
 export class Note {
     private _name: NoteName;
@@ -51,24 +51,7 @@ export class Note {
     get position(): number {
         return this._position;
     }
-
-    get scalePosition(): number {
-        if (isNaN(this._position)) {
-            return NaN;
-        }
-        return Util.mod(this._position, 8) + 1;
-    }
-
-    get chordPosition(): number {
-        if (isNaN(this._position)) {
-            return NaN;
-        }
-        if (this._position % 2 === 0) {
-            return this._position + 7;
-        }
-        return this._position;
-    }
-
+    
     get isRequired() {
         return this._required;
     }

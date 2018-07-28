@@ -1,4 +1,4 @@
-import { Domain } from "../../Domain";
+import { Domain } from "../../domain/Domain";
 import { Difficulty, IMusicBar, IStroke, IExercise } from "../../../types";
 import Chart from "../../Chart";
 import * as MusicHelper from "../../MusicHelper";

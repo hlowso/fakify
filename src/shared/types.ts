@@ -1,4 +1,4 @@
-import { Note } from "./music/Note";
+import { Note } from "./music/domain/Note";
 
 export interface ISong {
     id: string;
