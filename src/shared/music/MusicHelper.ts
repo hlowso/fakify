@@ -66,12 +66,12 @@ export const getPresentableChord = (chord: string, keyContext = ""): string => {
 
 export const C_NOTE_NAMES_INDICES = [0, 2, 4, 5, 7, 9, 11];
 
-export const noteIsInKey = (note: number, key: NoteName): boolean => {
+export const noteIsInKey = (note: number, key: NoteName | ""): boolean => {
     return getKeyNoteNameIndices(key).indexOf(note % 12) !== -1;
 }
 
-export const getKeyNoteNameIndices = (key: NoteName): number[] => {
-    let offset = NOTE_NAMES.indexOf(key);
+export const getKeyNoteNameIndices = (key: NoteName | ""): number[] => {
+    let offset = NOTE_NAMES.indexOf(key as NoteName);
     if (offset === -1) return [];
     return C_NOTE_NAMES_INDICES.map(pitch => (pitch + offset) % 12);
 }

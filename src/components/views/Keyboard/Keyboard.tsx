@@ -7,7 +7,7 @@ import "./Keyboard.css";
 export interface IKeyboardProps {
     showKeyChanges: boolean;
     depressedKeys: number[];
-    currentKey: NoteName;
+    currentKey: NoteName | "";
     takeIsPlaying: boolean;
     playUserMidiMessage: (message: IMidiMessage) => void;
     firstNote: number;

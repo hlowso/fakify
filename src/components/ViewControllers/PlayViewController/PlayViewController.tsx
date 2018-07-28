@@ -8,18 +8,34 @@ import Keyboard from "../../views/Keyboard/Keyboard";
 import MidSettingsModal from "../../views/MidiSettingsModal/MidiSettingsModal";
 
 import * as Api from "../../../shared/Api";
-import * as Util from "../../../shared/Util";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
 import { StorageHelper } from "../../../shared/StorageHelper";
+import { SessionManager, ImprovSessionManager, ListeningSessionManager } from "../../../shared/music/SessionManager";
 import Chart from "../../../shared/music/Chart";
 
 import "./PlayViewController.css";
-import { PlayMode } from "../../../shared/types";
+import { ISong, NoteName, PlayMode, IImprovReport, IListeningReport, Tempo, IMusicIdx } from "../../../shared/types";
 
-class PlayViewController extends Component {
-    firstNoteColor = "mediumslateblue";
+export interface IPlayVCProps {
+    // TODO: get proper types for all this
+    SoundActions: any;
+    StateHelper: any;
+    sessionManager: SessionManager | ImprovSessionManager | ListeningSessionManager;
+}
 
-    constructor(props) {
+export interface IPlayVCState {
+    loadingSelectedSong: boolean;
+    songTitles: { [songId: string]: string }
+    selectedSong: ISong | {};
+    chart: Chart | {};
+    midiSettingsModalOpen: boolean;
+    playMode: PlayMode;
+}
+
+class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
+    private _firstNoteColor = "mediumslateblue";
+
+    constructor(props: IPlayVCProps) {
         super(props);
         this.state = {
             loadingSelectedSong: false,
@@ -27,17 +43,14 @@ class PlayViewController extends Component {
             selectedSong: {},
             chart: {},
             midiSettingsModalOpen: true,
-            playMode: "none"         
+            playMode: PlayMode.None         
         };
     }
 
-    componentWillMount() {
-        let { SoundActions, StateHelper } = this.props;
+    public componentWillMount() {
+        let { SoundActions } = this.props;
         let midiInputId = StorageHelper.getMidiInputId();
         let selectedSongId = StorageHelper.getSelectedSongId();
-
-        this.SoundActions = SoundActions;
-        this.StateHelper = StateHelper;
 
         if (midiInputId) {
             let connectionSuccessful = SoundActions.connectToMidiInput(midiInputId);
@@ -59,12 +72,12 @@ class PlayViewController extends Component {
                 if (song) {
                     this.setState({ 
                         selectedSong: song
-                    }, this.resetChart);
+                    }, this._resetChart);
                 }
             });
     }
 
-    render() {
+    public render() {
         let { sessionManager } = this.props;
         let { 
             songTitles, 
@@ -74,29 +87,29 @@ class PlayViewController extends Component {
             playMode
         } = this.state;
 
-        let selectedSongId = selectedSong ? selectedSong.songId: null;
+        let selectedSongId = selectedSong ? (selectedSong as ISong).id: null;
         let inSession = sessionManager && sessionManager.inSession;
         let sessionIdx = inSession ? sessionManager.sessionIdx : null;
-        let currKey = inSession ? sessionManager.currKey : "";
-        let firstNote = inSession ? sessionManager.firstNote : NaN;
-        let rangeStartNote = inSession ? sessionManager.rangeStartNote : MusicHelper.LOWEST_A;
-        let rangeEndNote = inSession ? sessionManager.rangeEndNote : MusicHelper.HIGHEST_C;
+        let currKey: NoteName | "" = inSession ? sessionManager.currKey : "";
+        let firstNote = inSession ? (sessionManager as ListeningSessionManager).firstNote : NaN;
+        let rangeStartNote = inSession ? (sessionManager as ListeningSessionManager).rangeStartNote : MusicHelper.LOWEST_A;
+        let rangeEndNote = inSession ? (sessionManager as ListeningSessionManager).rangeEndNote : MusicHelper.HIGHEST_C;
         let showKeyChanges = true;
-        let report;
+        let report: IImprovReport | IListeningReport | undefined;
         let userShouldPlay;
 
         if (inSession) {
             switch (playMode) {
-                case "improv":
-                    report = sessionManager.currImprovScore;
+                case PlayMode.Improv:
+                    report = (sessionManager as ImprovSessionManager).currImprovScore;
                     break;
-                case "listening":
-                    report = sessionManager.currListeningScore;
-                    userShouldPlay = sessionManager.userShouldPlay;
+                case PlayMode.Listening:
+                    report = (sessionManager as ListeningSessionManager).currListeningScore;
+                    userShouldPlay = (sessionManager as ListeningSessionManager).userShouldPlay;
                     showKeyChanges = false;
                     break;
                 default:
-                    report = null;
+                    report = undefined;
             }
         }
 
@@ -110,39 +123,39 @@ class PlayViewController extends Component {
                     <SongListPanel 
                         songTitles={songTitles}
                         selectedSongId={selectedSongId} 
-                        onSongListItemClick={this.onSongListItemClick} />
+                        onSongListItemClick={this._onSongListItemClick} />
                     <ChartViewer
-                        song={selectedSong}
-                        chart={chart} 
-                        sessionIdx={sessionIdx} 
-                        recontextualize={this.recontextualize} 
-                        resetTempo={this.resetTempo} 
-                        onBarClick={this.onBarClick} />
+                        song={selectedSong as ISong}
+                        chart={chart as Chart} 
+                        sessionIdx={sessionIdx as IMusicIdx} 
+                        recontextualize={this._recontextualize} 
+                        resetTempo={this._resetTempo} 
+                        onBarClick={this._onBarClick} />
                     <TrainingWindow  
-                        startSession={this.startSession} 
-                        stopSession={this.stopSession} 
-                        setPlayMode={this.setPlayMode} 
+                        startSession={this._startSession} 
+                        stopSession={this._stopSession} 
+                        setPlayMode={this._setPlayMode} 
                         playMode={playMode} 
                         report={report} 
                         userShouldPlay={userShouldPlay}
-                        firstNoteColor={this.firstNoteColor} />
+                        firstNoteColor={this._firstNoteColor} />
                 </div>
                 <div className="bottom-row">
                     <Keyboard
                         showKeyChanges={showKeyChanges} 
-                        depressedKeys={this.StateHelper.getCurrentUserKeysDepressed()} 
+                        depressedKeys={this.props.StateHelper.getCurrentUserKeysDepressed()} 
                         currentKey={currKey} 
-                        playUserMidiMessage={this.SoundActions.playUserMidiMessage} 
+                        playUserMidiMessage={this.props.SoundActions.playUserMidiMessage} 
                         takeIsPlaying={inSession} 
                         firstNote={firstNote || NaN} 
                         rangeStartNote={rangeStartNote || MusicHelper.LOWEST_A}
                         rangeEndNote={rangeEndNote || MusicHelper.HIGHEST_C} 
-                        firstNoteColor={this.firstNoteColor} />
+                        firstNoteColor={this._firstNoteColor} />
                 </div>
 
                 <MidSettingsModal 
-                    SoundActions={this.SoundActions} 
-                    StateHelper={this.StateHelper} 
+                    SoundActions={this.props.SoundActions} 
+                    StateHelper={this.props.StateHelper} 
                     isOpen={midiSettingsModalOpen} 
                     close={()=> this.setState({ midiSettingsModalOpen: false })} />
             </div>
@@ -153,16 +166,16 @@ class PlayViewController extends Component {
         TRAINING WINDOW
     **********************/
 
-    startSession = () => {
+    private _startSession = () => {
         let { chart, playMode } = this.state;
-        this.SoundActions.playRangeLoop(chart, playMode);
+        this.props.SoundActions.playRangeLoop(chart, playMode);
     }
 
-    stopSession = () => {
-        this.SoundActions.killTake();
+    private _stopSession = () => {
+        this.props.SoundActions.killTake();
     }
 
-    setPlayMode = playMode => {
+    private _setPlayMode = (playMode: PlayMode) => {
         this.setState({ playMode });
     }
 
@@ -170,8 +183,8 @@ class PlayViewController extends Component {
         MUSIC
     ************/
 
-    resetChart = () => {
-        let { id, barsBase, originalTempo, originalContext, suitableFeels } = this.state.selectedSong;
+    private _resetChart = () => {
+        let { id, barsBase, originalTempo, originalContext, suitableFeels } = this.state.selectedSong as ISong;
         let chartSettings = StorageHelper.getChartSettings(id);
         let playMode = StorageHelper.getPlayMode();
 
@@ -185,10 +198,10 @@ class PlayViewController extends Component {
         if (!feel) {
             feel = suitableFeels[0];
         }
-        if (!Number.isInteger(rangeStartIdx)) {
+        if (!Number.isInteger(rangeStartIdx as number)) {
             rangeStartIdx = 0;
         }
-        if (!Number.isInteger(rangeEndIdx)) {
+        if (!Number.isInteger(rangeEndIdx as number)) {
             rangeEndIdx = (
                 (playMode === "listening")
                         ? 1
@@ -210,13 +223,13 @@ class PlayViewController extends Component {
     }
 
     /*******************
-        CHART VIEWER
+        CHART VIEWER`
     *******************/
 
-    onBarClick = i => {
-        this.stopSession();
+    private _onBarClick = (i: number) => {
+        this._stopSession();
         let { selectedSong, chart } = this.state;
-        let { rangeEndIdx, rangeStartIdx } = chart;
+        let { rangeEndIdx, rangeStartIdx } = chart as Chart;
         let withinRange = rangeStartIdx <= i && 
                           i <= rangeEndIdx;
 
@@ -235,33 +248,33 @@ class PlayViewController extends Component {
                     : rangeEndIdx
         );
 
-        chart.rangeStartIdx = rangeStartIdxUpdate;
-        chart.rangeEndIdx = rangeEndIdxUpdate;
+        (chart as Chart).rangeStartIdx = rangeStartIdxUpdate;
+        (chart as Chart).rangeEndIdx = rangeEndIdxUpdate;
 
-        StorageHelper.updateChartSettings(selectedSong.id, {
+        StorageHelper.updateChartSettings((selectedSong as ISong).id, {
             rangeStartIdx: rangeStartIdxUpdate,
             rangeEndIdx: rangeEndIdxUpdate
         });
     }
 
-    recontextualize = newKeyContext => {
-        this.stopSession();
+    private _recontextualize = (newKeyContext: NoteName) => {
+        this._stopSession();
         let { selectedSong, chart } = this.state;
 
-        chart.context = newKeyContext;
+        (chart as Chart).context = newKeyContext;
         
-        StorageHelper.updateChartSettings(selectedSong.id, {
+        StorageHelper.updateChartSettings((selectedSong as ISong).id, {
             context: newKeyContext
         });
     }
 
-    resetTempo = newTempo => {
-        this.stopSession();
+    private _resetTempo = (newTempo: Tempo) => {
+        this._stopSession();
         let { selectedSong, chart } = this.state;
 
-        chart.tempo = newTempo;
+        (chart as Chart).tempo = newTempo;
 
-        StorageHelper.updateChartSettings(selectedSong.id, {
+        StorageHelper.updateChartSettings((selectedSong as ISong).id, {
             tempo: newTempo
         });
     }
@@ -270,7 +283,7 @@ class PlayViewController extends Component {
         SONG LIST PANEL   
     **********************/
 
-    onSongListItemClick = selectedSongId => {
+    private _onSongListItemClick = (selectedSongId: string) => {
         StorageHelper.setSelectedSongId(selectedSongId);
         
         Api.getSongAsync(selectedSongId)

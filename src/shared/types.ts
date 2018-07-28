@@ -4,6 +4,7 @@ export interface ISong {
     id: string;
     title: string;
     originalContext: NoteName;
+    originalTempo: Tempo;
     tempo: Tempo;
     suitableFeels: Feel[];
     barsBase: IBarBase[];
