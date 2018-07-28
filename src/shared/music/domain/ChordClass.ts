@@ -42,8 +42,8 @@ export class ChordClass extends Domain {
                 infoBase = ChordClass.shapeToInfo(ChordShape.Dom7);
                 extend = notes => {
                     let notesCopy = Util.copyObject(notes);
-                    let tonic = notes.find(note => note.scalePosition === 1);
-                    let ninth = notes.find(note => note.scalePosition === 2);
+                    let tonic = notes.find(note => note.position === 1);
+                    let ninth = notes.find(note => note.position === 2 || note.position === 9);
                     if (ninth === undefined) {
                         notesCopy.push(new Note((tonic as Note).basePitch + 2, 9, true).asNoteClass());
                     }
@@ -158,7 +158,8 @@ export class ChordClass extends Domain {
             for (let idx = 0; idx < idxLimit; idx ++) {
                 let note1 = this._noteClasses[idx];
                 let note2 = this._noteClasses[Util.mod(idx + 1, idxLimit)];
-                if (note2.scalePosition - Util.mod(note1.scalePosition, 7) === 1) {
+                let positionDiff = note2.position - Util.mod(note1.position, 7);
+                if (positionDiff === 1 || positionDiff === 8) {
                     pitchRangeSets.push([
                         Domain.getPitchInstance(target, note1.pitch, false),
                         Domain.getPitchInstance(target, note2.pitch, true)
@@ -176,7 +177,8 @@ export class ChordClass extends Domain {
             let notesInRange = this.getNotesInPitchRange(range[0], range[1]);
             let requiredNotesInRange = notesInRange.filter(note => note.isRequired);
             let firstCandidate = neighboursInRange.filter(note => note.isRequired);
-            firstCandidate = firstCandidate.concat(requiredNotesInRange.filter(note => !firstCandidate.find(n => n.chordPosition === note.chordPosition)));
+
+            firstCandidate = firstCandidate.concat(requiredNotesInRange.filter(note => !firstCandidate.find(n => n.position === note.position)));
             firstCandidate.sort(this._compareNotes);
 
             // STEP 3: Remove clusters

@@ -24,11 +24,11 @@ const Odds: IOddsSet = {
     FavorOctaveSkip:  [ [true, 3], [false, 1] ]
 }
 
-const BASS_FLOOR = 12;
+const BASS_FLOOR = 36;
 const BASS_CEILING = 60;
 
-export const compBassSwingV2 = (chart: Chart, prevMusic: IMusicBar[]): IPart => {
-    let { chordStretches } = chart;
+export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart => {
+    let { chordStretches, bars } = chart;
     
     let music: IMusicBar[] = [];
     let quarterPitches: number[] = [];
@@ -44,7 +44,7 @@ export const compBassSwingV2 = (chart: Chart, prevMusic: IMusicBar[]): IPart => 
     }
 
     let favorTonicRandVar = Util.generateCustomRandomVariable(Odds.FavorTonic); 
-    let changeGaitRandVar = Util.generateCustomRandomVariable(Odds.ChangeGait);\
+    let changeGaitRandVar = Util.generateCustomRandomVariable(Odds.ChangeGait);
 
     let maybeChangeGait = () => {
         if (changeGaitRandVar()) {
@@ -95,26 +95,76 @@ export const compBassSwingV2 = (chart: Chart, prevMusic: IMusicBar[]): IPart => 
         }
     }
 
-    let striding = false;
+    let jump = () => {
 
-    // WIP
-    let step = () => {
-        let nextNote: Note;
-        if (striding) {
-            let pos = currChord.pitchToPosition(pitch);  
-            if (pos === 1 && direction === -1) {
-                // TODO
-            } else if (pos === 7 && direction === 1) {
-                // TODO
-            } else {
-                nextNote = currChord.getNextNoteByPosition(pitch, direction === 1) as Note;
-                pitch = nextNote.pitch;
-            }
-        } else {
-            nextNote = currScale.getNextNoteByPosition(pitch, direction === 1) as Note;
-            pitch = nextNote.pitch;
+        updateDirection();
+
+        let goingUp = direction === 1;
+
+        let destinationTonic = currChord.getTonicPitch(pitch, goingUp);
+        let destinationFifth = currChord.getFifthPitch(pitch, goingUp);
+
+        if (pitch === destinationTonic) {
+            destinationTonic += goingUp ? 12 : -12;
         }
 
+        if (pitch === destinationFifth) {
+            destinationFifth += goingUp ? 12 : -12;
+        }
+
+        let distanceToTonic = Math.abs(currScale.getPitchPositionDiff(pitch, destinationTonic));
+        let distanceToFifth = Math.abs(currScale.getPitchPositionDiff(pitch, destinationFifth));
+
+        if (distanceToFifth < 3) {
+            pitch = destinationTonic;
+        } else if (distanceToTonic < 3) {
+            pitch = destinationFifth;
+        } else {
+            pitch = (
+                favorTonicRandVar()
+                    ? destinationTonic
+                    : destinationFifth
+            );
+        }
+
+        quarterPitches.push(pitch);
+        beatsSinceJump = 0;
+
+        maybeSkip();
+        maybeChangeGait();
+    }
+
+    let striding = false;
+    let step = () => {
+
+        updateDirection();
+
+        let nextNote: Note;
+        let goingUp = direction === 1;
+
+        if (pitch === 53) {
+            console.log("53 SCALE AND CHORD", currScale, currChord);
+        }
+
+        if (striding) {
+            let pos = currChord.pitchToPosition(pitch);  
+            if (pos === 1 && !goingUp) {
+                nextNote = (
+                    currChord.order === 5 
+                        ? currChord.getNextNoteByPosition(pitch, false) 
+                        : currChord.getClosestNoteInstance(pitch, pos)[1] 
+                ) as Note;
+            } else if (pos === 7 && goingUp) {
+                nextNote = currChord.getClosestNoteInstance(pitch, 1)[1] as Note;
+            } else {
+                nextNote = currChord.getNextNoteByPosition(pitch, goingUp) as Note;
+            }
+        } else {
+            nextNote = currScale.getNextNoteByPosition(pitch, goingUp) as Note;
+        }
+
+        console.log (pitch, goingUp, currChord.pitchToPosition(pitch), quarterPitches.length, striding);
+        pitch = nextNote.pitch;
         quarterPitches.push(pitch);
         beatsSinceJump ++;
 
@@ -126,11 +176,25 @@ export const compBassSwingV2 = (chart: Chart, prevMusic: IMusicBar[]): IPart => 
         }
     }
 
+    let chromStepRandVar = Util.generateCustomRandomVariable(Odds.ChromStep);
+    let chromaticTwoStep = (destinationPitch: number) => {
+        if (chromStepRandVar()) {
+            pitch += pitch < destinationPitch ? 1 : -1;
+            quarterPitches.push(pitch);
+            maybeSkip();
+            pitch = destinationPitch;
+            quarterPitches.push(pitch);
+            maybeSkip(true);
+            return true;
+        }
+        return false;
+    }
+
     let change = (quickChange: boolean, nextStretch: IChordStretch) => {
 
         updateDirection();
 
-        let nextChord = new ChordClass(nextStretch.chordName as ChordName);
+        nextChord = new ChordClass(nextStretch.chordName as ChordName);
 
         // Handle a "quick" transition, which means that the chord stretch
         // being left was only 1 beat long
@@ -187,8 +251,8 @@ export const compBassSwingV2 = (chart: Chart, prevMusic: IMusicBar[]): IPart => 
         // divisible by 3
         let durationInBeats = durationInSubbeats / 3;
         
-        let currChord = new ChordClass(chordName);
-        let currScale = new ScaleClass(key);
+        currChord = new ChordClass(chordName);
+        currScale = currChord.applyMutation(new ScaleClass(key));
 
         for (let beat = 1; beat < durationInBeats; beat ++) {
 
@@ -198,16 +262,47 @@ export const compBassSwingV2 = (chart: Chart, prevMusic: IMusicBar[]): IPart => 
                 change(beat === 0, nextStretch);
             }
 
-            // Allow for the possibility of "jumps"
+            // Allow for the possibility of a "jump"
             else if (decideToJump()) {
-
+                jump();
             }
 
-            // Otherwise we step, either by one scale note or one chord note
+            // Otherwise we step, either by one scale position or one chord position
             else {
-
+                step();
             }
         }
+    });
+
+    let absBeatIdx = 0;
+    music = bars.map((bar, barIdx) => {
+        let musicBar: IMusicBar = {};
+
+        for (let subbeatIdx = 0; subbeatIdx < bar.durationInSubbeats; subbeatIdx += 3) {
+            let quarterPitch = quarterPitches[absBeatIdx];
+            let skipPitch = skipPitches[absBeatIdx];
+            let quarterDuration = 3;
+            
+            if (skipPitch) {
+                musicBar[subbeatIdx + 2] = [{
+                    notes: [skipPitch],
+                    velocity: 0.5,
+                    durationInSubbeats: 1
+                }];
+
+                quarterDuration = 2;
+            }
+
+            musicBar[subbeatIdx] = [{
+                notes: [quarterPitch],
+                velocity: 1,
+                durationInSubbeats: quarterDuration
+            }];
+
+            absBeatIdx ++;
+        }
+
+        return musicBar;
     });
 
     return {

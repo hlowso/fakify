@@ -98,6 +98,14 @@ export class Domain {
         return NaN;
     }
 
+    public getPitchPositionDiff(pitchA: number, pitchB: number) {
+        return this.pitchToPosition(pitchA) - this.pitchToPosition(pitchB);
+    }
+
+    public getPitchIdx(pitch: number) {
+        return this._notes.findIndex(note => note.pitch === pitch);
+    }
+
     public getNextNoteByPosition(pitch: number, ascending: boolean) {
         let [noteIdx, note] = this.getClosestNoteToTargetPitch(pitch);
         let inc = ascending ? 1 : -1;
