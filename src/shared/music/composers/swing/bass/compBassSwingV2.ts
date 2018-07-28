@@ -141,20 +141,16 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
 
         let nextNote: Note;
         let goingUp = direction === 1;
-
-        if (pitch === 53) {
-            console.log("53 SCALE AND CHORD", currScale, currChord);
-        }
+        let prevChordPos = currChord.pitchToPosition(pitch);  
 
         if (striding) {
-            let pos = currChord.pitchToPosition(pitch);  
-            if (pos === 1 && !goingUp) {
+            if (prevChordPos === 1 && !goingUp) {
                 nextNote = (
                     currChord.order === 5 
                         ? currChord.getNextNoteByPosition(pitch, false) 
-                        : currChord.getClosestNoteInstance(pitch, pos)[1] 
+                        : currChord.getClosestNoteInstance(pitch, prevChordPos)[1] 
                 ) as Note;
-            } else if (pos === 7 && goingUp) {
+            } else if (prevChordPos === 7 && goingUp) {
                 nextNote = currChord.getClosestNoteInstance(pitch, 1)[1] as Note;
             } else {
                 nextNote = currChord.getNextNoteByPosition(pitch, goingUp) as Note;
@@ -163,15 +159,14 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
             nextNote = currScale.getNextNoteByPosition(pitch, goingUp) as Note;
         }
 
-        console.log (pitch, goingUp, currChord.pitchToPosition(pitch), quarterPitches.length, striding);
         pitch = nextNote.pitch;
         quarterPitches.push(pitch);
         beatsSinceJump ++;
 
         maybeSkip();
 
-        let currScalePos = currScale.pitchToPosition(pitch);
-        if (currScalePos === 1 || currScalePos === 5) {
+        let currChordPos = currChord.pitchToPosition(pitch);
+        if (currChordPos === 1 || currChordPos === 5) {
             maybeChangeGait();
         }
     }
@@ -254,12 +249,17 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
         currChord = new ChordClass(chordName);
         currScale = currChord.applyMutation(new ScaleClass(key));
 
-        for (let beat = 1; beat < durationInBeats; beat ++) {
+        for (let beat = 1; beat <= durationInBeats; beat ++) {
 
             // Handle chord transition
-            if (beat === durationInBeats - 1) {
+            if (beat >= durationInBeats - 1) {
                 let nextStretch = chordStretches[Util.mod(stretchIdx + 1, chordStretches.length)];
-                change(beat === 0, nextStretch);
+                if (beat === durationInBeats) {
+                    change(true, nextStretch);
+                } else {
+                    change(false, nextStretch);
+                    break;
+                }
             }
 
             // Allow for the possibility of a "jump"
