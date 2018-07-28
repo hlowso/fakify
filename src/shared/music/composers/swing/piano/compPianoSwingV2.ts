@@ -3,6 +3,11 @@ import { ChordClass } from "../../../domain/ChordClass";
 import { ChordName, IMusicBar, IPart, IMusicIdx, IChordSegment, IStroke } from "../../../../types";
 import Chart from "../../../Chart";
 
+const VEL_FACTOR = 0.6;
+const DURATION_SPREAD_ROOT = 3;
+const DURATION_SPREAD_FACTOR = Math.log2(DURATION_SPREAD_ROOT);
+const MAX_TEMPO = 210;
+
 export const compPianoSwingV1 = (chart: Chart, prevMusic?: IMusicBar[]): IPart => {
     let { chordStretches, bars } = chart;
     let music: IMusicBar[] = [];
@@ -23,6 +28,17 @@ export const compPianoSwingV1 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
     let currIdxIsOffBeat: boolean;
 
     let maxStrokeDurationBars: Array<number[]> = bars.map(bar => []);
+    let maxPossibleDurationToDuration = (max: number) => {
+        let durationSkewer = 0.5 * chart.tempo[0] / MAX_TEMPO; 
+
+        // base must be a number between 0 and 2
+        let base = Math.random() + (
+            Math.random() < durationSkewer
+                ? 0
+                : 1
+        );
+        return Math.ceil( max *  Math.pow(base, DURATION_SPREAD_FACTOR) / DURATION_SPREAD_ROOT );
+    }
 
     // If there is previous music, we can set the starting values of absSubbeatIdx and 
     // previousVoicing accordingly
@@ -114,17 +130,29 @@ export const compPianoSwingV1 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
 
             let chord = new ChordClass(segment.chordName as ChordName);
             let voicing = chord.voice(60, previousVoicing);
-
-            let steepNess = 1.584963; // log base 2 of 3
-            let durationInSubbeats = Math.ceil( maxDuration *  Math.pow(2 * Math.random(), steepNess) / 3 );
+            let durationInSubbeats = maxPossibleDurationToDuration(maxDuration);
             
-            musicBar[subbeatIdx] = [
-                {
-                    notes: voicing,
-                    durationInSubbeats,
-                    velocity: 1
-                }
-            ];
+            // Quiet down piano by default since it's 
+            // inherently louder than double bass and drums
+            let velocity = VEL_FACTOR;
+
+            // Even quieter if the next stroke comes immediately 
+            // after this stroke
+            if (maxDuration === 1) {
+                velocity *= 0.5;
+            }
+            
+            // Moderately quieter if the stroke is stoccato
+            // but there isn't an immediately following stroke
+            else if (durationInSubbeats === 1) {
+                velocity = 0.75 * VEL_FACTOR;
+            }
+
+            musicBar[subbeatIdx] = [{
+                notes: voicing,
+                durationInSubbeats,
+                velocity
+            }];
 
             previousVoicing = voicing;
         });
