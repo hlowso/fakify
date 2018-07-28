@@ -1,7 +1,6 @@
 import * as Util from "../../../../Util";
 import Chart from "../../../Chart";
-import { IPart, IMusicBar, ChordName, NoteName, IChordStretch } from "../../../../types";
-import { Domain } from "../../../domain/Domain";
+import { IPart, IMusicBar, ChordName, IChordStretch } from "../../../../types";
 import { ChordClass } from "../../../domain/ChordClass";
 import { ScaleClass } from "../../../domain/ScaleClass";
 import { Note } from "../../../domain/Note";
@@ -35,7 +34,65 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
     let skipPitches: number[] = [];    
 
     let jumpRandVar = Util.generateCustomRandomVariable(Odds.Jump);
-    let beatsSinceJump = 0;        
+    let favorTonicRandVar = Util.generateCustomRandomVariable(Odds.FavorTonic); 
+    let changeGaitRandVar = Util.generateCustomRandomVariable(Odds.ChangeGait);
+    let turnRandVar = Util.generateCustomRandomVariable(Odds.Turn);
+    let skipRandVar = Util.generateCustomRandomVariable(Odds.Skip);
+    let favorOctaveSkipRandVar = Util.generateCustomRandomVariable(Odds.FavorOctaveSkip);
+    let chromStepRandVar = Util.generateCustomRandomVariable(Odds.ChromStep);
+
+    // The direction is always either 1 (ascending)
+    // or -1 (descending)
+    let direction = 1;
+    let beatsSinceJump = 0;    
+    let striding = false;
+
+    let currChord: ChordClass;
+    let currScale: ScaleClass;
+    let nextChord: ChordClass;
+
+    let pitch: number;
+    let lastPitchFromPrevMusic: number;
+
+    // Get the initial pitch
+    if (prevMusic) {
+        let subbeatIdx: string | number;
+        let lastBar = prevMusic[prevMusic.length - 1];
+        let lastBeat = -1;
+
+        for (subbeatIdx in lastBar) {
+            subbeatIdx = parseInt(subbeatIdx, undefined);
+            if (Util.mod(subbeatIdx, 3) === 0) {
+                lastBeat = subbeatIdx;
+            }
+        }
+
+        lastPitchFromPrevMusic = lastBar[lastBeat][0].notes[0];
+    } else {
+        lastPitchFromPrevMusic = Math.floor( Math.random() * (BASS_CEILING - BASS_FLOOR) + BASS_FLOOR );
+    }
+
+    // Now get the closer of the closest tonic and closest fifth
+    // of the first chord of the progression
+    let firstChord = new ChordClass(chordStretches[0].chordName as ChordName);
+    let closestTonic = (firstChord.getClosestNoteInstance(lastPitchFromPrevMusic, 1)[1] as Note).pitch;
+    let closestFifth = (firstChord.getClosestNoteInstance(lastPitchFromPrevMusic, 5)[1] as Note).pitch;
+
+    let tonicDiff = Math.abs(lastPitchFromPrevMusic - closestTonic);
+    let fifthDiff = Math.abs(lastPitchFromPrevMusic - closestFifth);
+    
+    pitch = (
+        tonicDiff < fifthDiff
+            ? closestTonic
+            : closestFifth
+    );
+
+    quarterPitches.push(pitch);
+
+    /**********************
+        HELPER FUNCTIONS
+     **********************/ 
+
     let decideToJump = () => {
         if (beatsSinceJump < 2) {
             return false;
@@ -43,19 +100,12 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
         return jumpRandVar();
     }
 
-    let favorTonicRandVar = Util.generateCustomRandomVariable(Odds.FavorTonic); 
-    let changeGaitRandVar = Util.generateCustomRandomVariable(Odds.ChangeGait);
-
     let maybeChangeGait = () => {
         if (changeGaitRandVar()) {
             striding = !striding;
         }
     }
 
-    // The direction is always either 1 (ascending)
-    // or -1 (descending)
-    let direction = 1;
-    let turnRandVar = Util.generateCustomRandomVariable(Odds.Turn);
     let updateDirection = (jumping = false) => {
         let threshold = jumping ? 12 : 7;
 
@@ -68,8 +118,6 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
         }
     }
 
-    let skipRandVar = Util.generateCustomRandomVariable(Odds.Skip);
-    let favorOctaveSkipRandVar = Util.generateCustomRandomVariable(Odds.FavorOctaveSkip);
     let maybeSkip = (transitioning = false) => {
         if (skipRandVar()) {
             let chord = (
@@ -134,7 +182,6 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
         maybeChangeGait();
     }
 
-    let striding = false;
     let step = () => {
 
         updateDirection();
@@ -171,7 +218,6 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
         }
     }
 
-    let chromStepRandVar = Util.generateCustomRandomVariable(Odds.ChromStep);
     let chromaticTwoStep = (destinationPitch: number) => {
         if (chromStepRandVar()) {
             pitch += pitch < destinationPitch ? 1 : -1;
@@ -227,15 +273,9 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
         }
     }
 
-    let currChord: ChordClass;
-    let currScale: ScaleClass;
-    let nextChord: ChordClass;
-
-    // TODO: come up with a better way to get the first not from prevMusic array
-    let initialTonicNoteName = (chart.segmentAtIdx({ barIdx: 0, subbeatIdx: 0}).chordName as ChordName)[0];
-    let initialTonicBasePitch = Domain.getLowestPitch(initialTonicNoteName as NoteName);
-    let pitch = Domain.getPitchInstance(36, initialTonicBasePitch);
-    quarterPitches.push(pitch);
+    /********************
+        WALK ALGORITHM
+     ********************/
 
     chordStretches.forEach((stretch, stretchIdx) => {
         let { chordName, key, durationInSubbeats } = stretch;
@@ -273,6 +313,10 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
             }
         }
     });
+
+    /****************
+        FORMATTING
+     ****************/
 
     let absBeatIdx = 0;
     music = bars.map((bar, barIdx) => {

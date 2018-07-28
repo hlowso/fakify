@@ -1,6 +1,4 @@
-// import compSwingPianoV1 from "./swing/piano/compPianoSwingV1";
 import compSwingPianoV2 from "./swing/piano/compPianoSwingV2"
-// import compBassSwingV1 from "./swing/bass/compBassSwingV1";
 import { compBassSwingV2 } from "./swing/bass/compBassSwingV2";
 import compDrumsSwingV1 from "./swing/drums/compDrumsSwingV1";
 import { generateSwingExerciseV0 } from "./swing/generateSwingExerciseV0";
@@ -26,7 +24,6 @@ const _getSwingAccompaniment = (chart: Chart, prevScore?: Score): Score => {
 
     return new Score([
         compSwingPianoV2(chart, prevPianoMusic),
-        // compBassSwingV1(chart),
         compBassSwingV2(chart, prevBassMusic),
         ...compDrumsSwingV1(chart)
     ]);
