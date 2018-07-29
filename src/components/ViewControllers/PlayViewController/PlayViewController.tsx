@@ -42,7 +42,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             songTitles: {},
             selectedSong: {},
             chart: {},
-            midiSettingsModalOpen: true,
+            midiSettingsModalOpen: false,
             playMode: PlayMode.None         
         };
     }
