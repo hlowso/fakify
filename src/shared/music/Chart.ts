@@ -8,7 +8,7 @@ class Chart {
     private _context: NoteName;
     private _tempo: Tempo;
     private _feel: Feel;
-    private _onSet: () => void;
+    private _externalUpdate: () => void;
     private _rangeStartIdx: number;
     private _rangeEndIdx: number;
     private _durationInSubbeats: number;
@@ -18,7 +18,7 @@ class Chart {
         context: NoteName, 
         tempo: Tempo,
         feel: Feel,
-        onSet: () => void, 
+        externalUpdate: () => void, 
         rangeStartIdx = 0, 
         rangeEndIdx = bars.length
     ) {
@@ -30,32 +30,16 @@ class Chart {
             ),
             feel
         );
-        this._chordStretches = [];
         this._context = context;
         this._tempo = tempo;
         this._feel = feel;
-        this._onSet = onSet;
+        this._externalUpdate = externalUpdate;
         this._rangeStartIdx = rangeStartIdx;
         this._rangeEndIdx = rangeEndIdx;
         this._durationInSubbeats = 0;
 
         // Build the chord stretches from the bars
-        let subbeatsBeforeChange = 0;
-
-        this._bars.forEach(bar => {
-            this._durationInSubbeats += bar.durationInSubbeats;
-            bar.chordSegments.forEach(segment => {
-                if (subbeatsBeforeChange === 0) {
-                    subbeatsBeforeChange = segment.subbeatsBeforeChange;
-                    this._chordStretches.push({
-                        chordName: segment.chordName,
-                        key: segment.key,
-                        durationInSubbeats: subbeatsBeforeChange
-                    });
-                }
-                subbeatsBeforeChange -= segment.durationInSubbeats;
-            });
-        });
+        this._buildChordStretches();        
     }
 
     public forEachBarInRange = (callback: (bar: IChartBar, idx: number) => void) => {
@@ -118,6 +102,26 @@ class Chart {
         }
 
         return;
+    }
+
+    private _buildChordStretches = () => {
+        this._chordStretches = [];
+        let subbeatsBeforeChange = 0;
+
+        this._bars.forEach(bar => {
+            this._durationInSubbeats += bar.durationInSubbeats;
+            bar.chordSegments.forEach(segment => {
+                if (subbeatsBeforeChange === 0) {
+                    subbeatsBeforeChange = segment.subbeatsBeforeChange;
+                    this._chordStretches.push({
+                        chordName: segment.chordName,
+                        key: segment.key,
+                        durationInSubbeats: subbeatsBeforeChange
+                    });
+                }
+                subbeatsBeforeChange -= segment.durationInSubbeats;
+            });
+        });
     }
 
     private _completeMusicIdx = (idx: IMusicIdx) => {
@@ -200,12 +204,13 @@ class Chart {
             ),
             this._feel
         );
-        this._onSet();
+        this._buildChordStretches();
+        this._externalUpdate();
     }
 
     set tempo(newTempo: Tempo) {
         this._tempo = newTempo;
-        this._onSet();
+        this._externalUpdate();
     }
 
     set feel(newFeel: Feel) {
@@ -217,17 +222,17 @@ class Chart {
             ),
             newFeel
         );
-        this._onSet();
+        this._externalUpdate();
     }
 
     set rangeStartIdx(newIdx: number) {
         this._rangeStartIdx = newIdx;
-        this._onSet();
+        this._externalUpdate();
     }
 
     set rangeEndIdx(newIdx: number) {
         this._rangeEndIdx = newIdx;
-        this._onSet();
+        this._externalUpdate();
     }
 }
 
