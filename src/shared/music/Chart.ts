@@ -1,5 +1,6 @@
 import * as MusicHelper from "../music/MusicHelper";
-import { IBarBase, IChartBar, Feel, NoteName, Tempo, IMusicIdx, IChordStretch } from "../types";
+import { IBarBase, IChartBar, Feel, NoteName, Tempo, IMusicIdx, IChordStretch, ChordName, RelativeNoteName } from "../types";
+import { ChordClass } from "./domain/ChordClass";
 
 class Chart {
     private _barsBase: IBarBase[];
@@ -104,7 +105,18 @@ class Chart {
     }
 
     private _determineKeys = () => {
-        // TODO...
+        let possibleChordKeys: Array<RelativeNoteName[]> = [];
+        this._barsBase.forEach(barBase => {
+            barBase.chordSegments.forEach(segment => { 
+                possibleChordKeys = [ 
+                    ...possibleChordKeys, 
+                    ChordClass.getSuitableKeys(segment.chordName as ChordName) as RelativeNoteName[] 
+                ]; 
+            }); 
+        }); 
+
+        console.log("POSSIBLE KEYS", possibleChordKeys);
+
     }
 
     private _resetBars = () => {

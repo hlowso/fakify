@@ -66,6 +66,8 @@ export class ChordClass extends Domain {
 
     public static getSuitableKeys = ([noteName, shape]: ChordName): Array<RelativeNoteName | NoteName> => {
         let noteNames: Array<RelativeNoteName | NoteName>;
+        let { relativeTonicPositions } = ChordClass.shapeToInfo(shape);
+        
         if (Domain.RELATIVE_NOTE_NAMES.indexOf(noteName as RelativeNoteName) !== -1) {
             noteNames = Domain.RELATIVE_NOTE_NAMES;
         } else if (Domain.NOTE_NAMES.indexOf(noteName as NoteName) !== -1) {
@@ -73,8 +75,6 @@ export class ChordClass extends Domain {
         } else {
             return [];
         }
-
-        let { relativeTonicPositions } = ChordClass.shapeToInfo(shape);
 
         return relativeTonicPositions.map(pos => {
             let tonicIdx = noteNames.indexOf(noteName);
