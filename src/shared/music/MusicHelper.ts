@@ -83,7 +83,9 @@ export const contextualizeBars = (barsBase: IBarBase[], newKeyContext: NoteName)
             let contextualizedChordBase = Util.copyObject(chordBase);
             contextualizedChordBase.chord = contextualize(chordBase.chord, newKeyContext);
             contextualizedChordBase.chordName = [contextualize(((chordBase.chordName as ChordName)[0] as RelativeNoteName), newKeyContext), (chordBase.chordName as ChordName)[1]]
-            contextualizedChordBase.key = contextualize(chordBase.key, newKeyContext);
+            if (chordBase.key) {
+                contextualizedChordBase.key = contextualize(chordBase.key, newKeyContext);
+            }
             return contextualizedChordBase;
         });
         return contextualizedBar;

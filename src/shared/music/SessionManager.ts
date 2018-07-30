@@ -46,7 +46,7 @@ export class SessionManager {
     }
 
     get currKey(): NoteName {
-        return this.currChordSegment.key;
+        return this.currChordSegment.key as NoteName;
     }
 
     get subbeatDuration(): number {

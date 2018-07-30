@@ -50,7 +50,7 @@ export interface IChartBar {
 
 export interface IChordStretch {
     chordName?: ChordName;
-    key: NoteName;
+    key?: NoteName;
     durationInSubbeats: number;
 }
 

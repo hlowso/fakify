@@ -1,5 +1,5 @@
 import { Domain } from "../../domain/Domain";
-import { Difficulty, IMusicBar, IStroke, IExercise } from "../../../types";
+import { Difficulty, IMusicBar, IStroke, IExercise, NoteName } from "../../../types";
 import Chart from "../../Chart";
 import * as MusicHelper from "../../MusicHelper";
 
@@ -20,7 +20,7 @@ export const generateSwingExerciseV0 = (chart: Chart, instrument: string, diffic
         for (let beatIdx = 0; beatIdx < beatLimit; beatIdx ++) {
             let subbeatIdx = 3 * beatIdx; 
             let currKey = chart.keyAtIdx({ barIdx: bar.barIdx, subbeatIdx });
-            let scale = new Domain( MusicHelper.keyTo7Notes(currKey));
+            let scale = new Domain( MusicHelper.keyTo7Notes(currKey as NoteName));
             let note = scale.getRandomPitch(rangeStartNote, rangeEndNote);
             let stroke: IStroke = {
                 durationInSubbeats: 3,

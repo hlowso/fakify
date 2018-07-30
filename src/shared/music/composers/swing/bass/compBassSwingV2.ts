@@ -1,6 +1,6 @@
 import * as Util from "../../../../Util";
 import Chart from "../../../Chart";
-import { IPart, IMusicBar, ChordName, IChordStretch } from "../../../../types";
+import { IPart, IMusicBar, ChordName, IChordStretch, NoteName } from "../../../../types";
 import { ChordClass } from "../../../domain/ChordClass";
 import { ScaleClass } from "../../../domain/ScaleClass";
 import { Note } from "../../../domain/Note";
@@ -287,7 +287,7 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
         let durationInBeats = durationInSubbeats / 3;
         
         currChord = new ChordClass(chordName);
-        currScale = currChord.applyMutation(new ScaleClass(key));
+        currScale = currChord.applyMutation(new ScaleClass(key as NoteName));
 
         for (let beat = 1; beat <= durationInBeats; beat ++) {
 
