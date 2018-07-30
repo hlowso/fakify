@@ -168,6 +168,6 @@ export interface IChartSettings {
 export interface IShapeInfo {
     shape: ChordShape;
     baseIntervals: number[];
-    suitableRelativeKeys: RelativeNoteName[]; 
+    relativeTonicPositions: RelativeNoteName[]; 
     extend?: (baseNotes: Note[]) => Note[];
 }

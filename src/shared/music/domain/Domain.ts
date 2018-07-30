@@ -22,11 +22,6 @@ export class Domain {
         return Domain.NOTE_NAMES.indexOf(noteName);
     }
 
-    public static getTonicNameByPosition = (noteName: NoteName, position: RelativeNoteName) => {
-        let noteIdx = Domain.NOTE_NAMES.indexOf(noteName);
-        return Domain.NOTE_NAMES[Util.mod(noteIdx - Domain.RELATIVE_NOTE_NAMES.indexOf(position), 12)];
-    }
-
     protected _notes: Note[];
     protected _noteClasses: Note[];
   

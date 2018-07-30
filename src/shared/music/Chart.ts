@@ -23,13 +23,6 @@ class Chart {
         rangeEndIdx = bars.length
     ) {
         this._barsBase = bars;
-        this._bars = MusicHelper.adjustBarTimes(
-            MusicHelper.contextualizeBars(
-                bars,
-                context
-            ),
-            feel
-        );
         this._context = context;
         this._tempo = tempo;
         this._feel = feel;
@@ -37,6 +30,12 @@ class Chart {
         this._rangeStartIdx = rangeStartIdx;
         this._rangeEndIdx = rangeEndIdx;
         this._durationInSubbeats = 0;
+
+        // Determine keys on barsBase
+        this._determineKeys();
+
+        // Build the contextualized, time adjusted bars
+        this._resetBars();
 
         // Build the chord stretches from the bars
         this._buildChordStretches();        
@@ -102,6 +101,20 @@ class Chart {
         }
 
         return;
+    }
+
+    private _determineKeys = () => {
+        // TODO...
+    }
+
+    private _resetBars = () => {
+        this._bars = MusicHelper.adjustBarTimes(
+            MusicHelper.contextualizeBars(
+                this._barsBase,
+                this._context
+            ),
+            this._feel
+        );
     }
 
     private _buildChordStretches = () => {
@@ -197,13 +210,7 @@ class Chart {
 
     set context(newContext: NoteName) {
         this._context = newContext;
-        this._bars = MusicHelper.adjustBarTimes(
-            MusicHelper.contextualizeBars(
-                this._barsBase,
-                newContext
-            ),
-            this._feel
-        );
+        this._resetBars();
         this._buildChordStretches();
         this._externalUpdate();
     }
@@ -215,13 +222,7 @@ class Chart {
 
     set feel(newFeel: Feel) {
         this._feel = newFeel;
-        this._bars = MusicHelper.adjustBarTimes(
-            MusicHelper.contextualizeBars(
-                this._barsBase,
-                this._context
-            ),
-            newFeel
-        );
+        this._resetBars();
         this._externalUpdate();
     }
 

@@ -1,7 +1,7 @@
 import * as Util from "../../Util";
 import { Domain } from "./Domain";
 import { Note } from "./Note";
-import { NoteName, ChordName, ChordShape, IShapeInfo } from "../../types";
+import { NoteName, ChordName, ChordShape, IShapeInfo, RelativeNoteName } from "../../types";
 
 export class ChordClass extends Domain {
     public static shapeToInfo = (shape: ChordShape): IShapeInfo => {
@@ -12,31 +12,31 @@ export class ChordClass extends Domain {
                 return {
                     shape,
                     baseIntervals: [0, 4, 7],
-                    suitableRelativeKeys: ["1", "4", "5"]
+                    relativeTonicPositions: ["1", "4", "5"]
                 };
             case ChordShape.Min:
                 return {
                     shape,
                     baseIntervals: [0, 3, 7],
-                    suitableRelativeKeys: ["2", "3", "6"]
+                    relativeTonicPositions: ["2", "3", "6"]
                 };
             case ChordShape.Maj7:
                 return {
                     shape,
                     baseIntervals: [0, 4, 7, 11],
-                    suitableRelativeKeys: ["1", "4"]
+                    relativeTonicPositions: ["1", "4"]
                 };
             case ChordShape.Min7:
                 return {
                     shape,
                     baseIntervals: [0, 3, 7, 10],
-                    suitableRelativeKeys: ["2", "3", "6"]
+                    relativeTonicPositions: ["2", "3", "6"]
                 };
             case ChordShape.Dom7:
                 return {
                     shape,
                     baseIntervals: [0, 4, 7, 10],
-                    suitableRelativeKeys: ["5"]
+                    relativeTonicPositions: ["5"]
                 };
             case ChordShape.Dom9:
                 infoBase = ChordClass.shapeToInfo(ChordShape.Dom7);
@@ -54,7 +54,7 @@ export class ChordClass extends Domain {
                 return {
                     shape,
                     baseIntervals: [0, 3, 6],
-                    suitableRelativeKeys: ["7"]
+                    relativeTonicPositions: ["7"]
                 };
 
             // TODO: add cases for all chords
@@ -64,6 +64,24 @@ export class ChordClass extends Domain {
         }
     }
 
+    public static getSuitableKeys = ([noteName, shape]: ChordName): Array<RelativeNoteName | NoteName> => {
+        let noteNames: Array<RelativeNoteName | NoteName>;
+        if (Domain.RELATIVE_NOTE_NAMES.indexOf(noteName as RelativeNoteName) !== -1) {
+            noteNames = Domain.RELATIVE_NOTE_NAMES;
+        } else if (Domain.NOTE_NAMES.indexOf(noteName as NoteName) !== -1) {
+            noteNames = Domain.NOTE_NAMES;
+        } else {
+            return [];
+        }
+
+        let { relativeTonicPositions } = ChordClass.shapeToInfo(shape);
+
+        return relativeTonicPositions.map(pos => {
+            let tonicIdx = noteNames.indexOf(noteName);
+            return noteNames[Util.mod(tonicIdx - noteNames.indexOf(pos), 12)]
+        });
+    }
+
     private _suitableKeys: NoteName[]; 
     private _order: number;
     private _specialNotesMutation: (notes: Note[]) => Note[];
@@ -71,7 +89,7 @@ export class ChordClass extends Domain {
 
     constructor(chordName: ChordName) {
         let [ noteName, shape ] = chordName;
-        let { baseIntervals, suitableRelativeKeys, extend } = ChordClass.shapeToInfo(shape);
+        let { baseIntervals, extend } = ChordClass.shapeToInfo(shape);
         let lowestPitch = Domain.getLowestPitch((noteName as NoteName));
         let highestPosition = 1;
         let baseNotes = baseIntervals.map((pitchDiff, i): Note => { 
@@ -84,7 +102,7 @@ export class ChordClass extends Domain {
         let noteClasses = (extend || Util.identity)(baseNotes);
         super(noteClasses);
 
-        this._suitableKeys = suitableRelativeKeys.map(pos => Domain.getTonicNameByPosition((noteName as NoteName), pos));
+        this._suitableKeys = ChordClass.getSuitableKeys(chordName) as NoteName[];
         this._order = highestPosition;
         
         // Build the contextualized specialNotesMutation function
