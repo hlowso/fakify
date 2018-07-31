@@ -1,5 +1,7 @@
+import * as Util from "../Util";
 import * as MusicHelper from "../music/MusicHelper";
 import { IBarBase, IChartBar, Feel, NoteName, Tempo, IMusicIdx, IChordStretch, ChordName, RelativeNoteName } from "../types";
+import { Domain } from "./domain/Domain";
 import { ChordClass } from "./domain/ChordClass";
 
 class Chart {
@@ -105,7 +107,17 @@ class Chart {
     }
 
     private _determineKeys = () => {
+        interface IStretchKeyPossibilities {
+            keys: RelativeNoteName[];
+            segmentCount: number;
+        }
+
+        let keyStretches: IStretchKeyPossibilities[] = [];        
         let possibleChordKeys: Array<RelativeNoteName[]> = [];
+        let keyStretchPossibilities: IStretchKeyPossibilities[] = [];
+        let currentStretchPossibility: IStretchKeyPossibilities;
+
+        // Get the possible keys per chord segment
         this._barsBase.forEach(barBase => {
             barBase.chordSegments.forEach(segment => { 
                 possibleChordKeys = [ 
@@ -115,8 +127,75 @@ class Chart {
             }); 
         }); 
 
-        console.log("POSSIBLE KEYS", possibleChordKeys);
+        // Get the possible keys per key stretch
+        currentStretchPossibility = { keys: possibleChordKeys[0], segmentCount: 1 };
+        for (let i = 1; i < possibleChordKeys.length; i ++) {
+            let chordKeys = possibleChordKeys[i];
+            let keyOverlap = currentStretchPossibility.keys.filter(key => chordKeys.indexOf(key) !== -1);
 
+            if (keyOverlap.length === 0) {
+                keyStretchPossibilities.push(currentStretchPossibility);
+                currentStretchPossibility = { keys: chordKeys, segmentCount: 1 };
+            } else {
+                currentStretchPossibility.keys = keyOverlap;
+                currentStretchPossibility.segmentCount ++;
+            }
+        }
+
+        keyStretchPossibilities.push(currentStretchPossibility);
+
+        // Now pick the best key possibility per key stretch
+        currentStretchPossibility = keyStretchPossibilities[0];
+        let stretchIdx = 0;
+        let segmentCount = 0;
+        let tonicFound: RelativeNoteName | undefined;
+        let tonicFoundForSixth: RelativeNoteName | undefined;
+        
+        this._barsBase.forEach(barBase => {
+            barBase.chordSegments.forEach(segment => { 
+                let { chordName } = segment;
+                let base = (chordName as ChordName)[0] as RelativeNoteName;
+                let minorThirdAboveBase = Domain.RELATIVE_NOTE_NAMES[Util.mod(Domain.RELATIVE_NOTE_NAMES.indexOf(base) + 4, 12)];
+
+                if (currentStretchPossibility.keys.indexOf(base) !== -1) {
+                    tonicFound = base;
+                }
+
+                if (currentStretchPossibility.keys.indexOf(minorThirdAboveBase) !== -1) {
+                    tonicFoundForSixth = minorThirdAboveBase;
+                }
+
+                segmentCount ++;
+
+                if (segmentCount === currentStretchPossibility.segmentCount) {
+                    if (tonicFound) {
+                        keyStretches.push({ keys: [tonicFound], segmentCount });
+                    } else if (tonicFoundForSixth) {
+                        keyStretches.push({ keys: [tonicFoundForSixth], segmentCount })
+                    } else {
+                        keyStretches.push({ keys: [currentStretchPossibility.keys[0]], segmentCount });
+                    }
+                    stretchIdx ++;
+                    currentStretchPossibility = keyStretchPossibilities[stretchIdx];
+                    segmentCount = 0;
+                }
+            }); 
+        });
+
+        // Add the key attribute to each segment
+        stretchIdx = 0;
+        segmentCount = 0;
+        this._barsBase.forEach(barBase => {
+            barBase.chordSegments.forEach(segment => {
+                segment.key = keyStretches[stretchIdx].keys[0];
+                segmentCount ++;
+
+                if (segmentCount === keyStretches[stretchIdx].segmentCount) {
+                    stretchIdx ++;
+                    segmentCount = 0;
+                }
+            });
+        });
     }
 
     private _resetBars = () => {
