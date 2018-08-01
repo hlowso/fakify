@@ -28,6 +28,13 @@ export const signup = newUser => {
         });
 }
 
+export const getUserSongTitles = () => {
+    // TODO: create endpoint
+    return new Promise((resolve, reject) => {
+        resolve([]);
+    });
+}
+
 export const getSongTitlesAsync = () => {
     // hard-coded for now
     // TODO: create endpoint

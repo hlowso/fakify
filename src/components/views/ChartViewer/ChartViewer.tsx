@@ -7,12 +7,13 @@ import { ISong, IMusicIdx, NoteName, Tempo } from "../../../shared/types";
 import "./ChartViewer.css";
 
 export interface IChartViewerProps {
-    song: ISong;
-    chart: Chart;
-    sessionIdx: IMusicIdx;
-    onBarClick: (barIdx: number) => void;
-    recontextualize: (noteName: NoteName) => void;
-    resetTempo: (tempo: Tempo) => void;
+    editingMode?: boolean;
+    song?: ISong;
+    chart?: Chart;
+    sessionIdx?: IMusicIdx;
+    onBarClick?: (barIdx: number) => void;
+    recontextualize?: (noteName: NoteName) => void;
+    resetTempo?: (tempo: Tempo) => void;
 }
 
 export interface IChartViewerState {
@@ -28,7 +29,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     public render(): JSX.Element {
-        let { song, chart } = this.props;
+        let { song, chart, editingMode } = this.props;
         let loading = !Util.objectIsEmpty(song) &&
                         !Util.objectIsEmpty(chart);
 
@@ -36,9 +37,8 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             ? (
                 <div id="chart-viewer">
                     <header className="chart-header">
-                        {this.renderLeftHandSettings()}
-                        <h1 className="song-title">{song.title}</h1>
-                        <div />
+                        {!editingMode && this.renderLeftHandSettings()}
+                        <h1 className="song-title">{(song as ISong).title}</h1>
                     </header>
                     <section className="chart-body">
                         {this.renderProgression()}
@@ -50,14 +50,13 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
     public renderProgression = (): JSX.Element[] => {
         let { chart, sessionIdx } = this.props;
-        let { bars, rangeStartIdx, rangeEndIdx } = chart;
+        let { bars, rangeStartIdx, rangeEndIdx } = chart as Chart;
         let baseKey = bars[0].chordSegments[0].key;
-        sessionIdx = sessionIdx || {};
 
         return bars.map((bar, i) => {
             let chordNames = [];
             let beats = [];
-            let isCurrentlyPlayingBar = sessionIdx.barIdx === i;
+            let isCurrentlyPlayingBar = sessionIdx && sessionIdx.barIdx === i;
             let isWithinRange = rangeStartIdx <= i &&
                                 i <= rangeEndIdx;
 
@@ -74,7 +73,8 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                     return segment.beatIdx === beatIdx;
                 });
 
-                let isCurrentChord = isCurrentlyPlayingBar && 
+                let isCurrentChord = isCurrentlyPlayingBar &&
+                                    sessionIdx && 
                                     sessionIdx.segmentIdx === segmentIdx;
 
                 let chordNameClasses = Cx({
@@ -99,7 +99,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                 <div 
                     key={i}
                     className={barClasses}
-                    onClick={() => this.props.onBarClick(i)} 
+                    onClick={() => this._onBarClick(i)} 
                 >
                     <div className="bar-chord-group">
                         {chordNames}
@@ -121,12 +121,19 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         );
     }
 
+    private _onBarClick = (barIdx: number) => {
+        let { onBarClick } = this.props;
+        if (onBarClick) {
+            onBarClick(barIdx);
+        }
+    }
+
     /**
      * KEY SIGNATURE SELECT
      */
 
     public renderKeyContextSelect = (): JSX.Element => {
-        let { context } = this.props.chart;
+        let { context } = this.props.chart as Chart;
         let options = MusicHelper.NOTE_NAMES.map(
             key => (
                 <option key={key} value={key} >
@@ -143,7 +150,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                 <select 
                     className="left-hand-settings-right" 
                     value={context}
-                    onChange={event => this.props.recontextualize((event.target.value as NoteName))}
+                    onChange={event => this._recontextualize((event.target.value as NoteName))}
                 >
                     {options}
                 </select> 
@@ -152,12 +159,19 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
     }
 
+    private _recontextualize = (context: NoteName) => {
+        let { recontextualize } = this.props;
+        if (recontextualize) {
+            recontextualize(context);
+        }
+    }
+
     /**
      * TEMPO SELECT
      */
 
     public renderTempoSelect = (): JSX.Element => {
-        let { tempo } = this.props.chart;
+        let { tempo } = this.props.chart as Chart;
         let bpms = tempo[0];
         let options = [];
         for (
@@ -180,12 +194,19 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                 <select 
                     className="left-hand-settings-right" 
                     value={bpms}
-                    onChange={event => this.props.resetTempo([Number(event.target.value), 4])}
+                    onChange={event => this._resetTempo([Number(event.target.value), 4])}
                 >
                     {options}
                 </select> 
             </div>
         );
+    }
+
+    private _resetTempo = (tempo: Tempo) => {
+        let { resetTempo } = this.props;
+        if (resetTempo) {
+            resetTempo(tempo);
+        }
     }
 };
 

@@ -16,6 +16,9 @@ export const getCurrentTab = () => {
 }
 
 export const objectIsEmpty = (object: any) => {
+    if (!object) {
+        return true;
+    }
     return Object.keys(object).length === 0;
 };
 

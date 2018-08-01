@@ -125,6 +125,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                         selectedSongId={selectedSongId} 
                         onSongListItemClick={this._onSongListItemClick} />
                     <ChartViewer
+                        editingMode={false}
                         song={selectedSong as ISong}
                         chart={chart as Chart} 
                         sessionIdx={sessionIdx as IMusicIdx} 
