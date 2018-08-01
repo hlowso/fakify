@@ -3,6 +3,7 @@ import { Switch, Route, Redirect } from "react-router";
 import WebAudioFontPlayer from "webaudiofont";
 import uuid from "uuid";
 import PlayViewController from "../ViewControllers/PlayViewController/PlayViewController";
+import CreateViewController from "../ViewControllers/CreateViewController/CreateViewController";
 import { StorageHelper } from "../../shared/StorageHelper";
 import * as MusicHelper from "../../shared/music/MusicHelper";
 import { 
@@ -77,15 +78,14 @@ class AppRouter extends Component {
             subscribeToUserSessionKeyStroke: handler => this.setState({ onUserSessionKeyStroke: handler })
         };
 
-        let VCProps = {
+        let PlayVCProps = {
             SoundActions,
             StateHelper,            
-            sessionManager,
-            improvScore: (
-                sessionManager && sessionManager.inSession 
-                    ? sessionManager.currImprovScore 
-                    : null
-            )
+            sessionManager
+        };
+
+        let CreateVCProps = {
+            StateHelper
         };
 
         return loading
@@ -95,7 +95,12 @@ class AppRouter extends Component {
                         <Route 
                             exact
                             path="/play" 
-                            render={ () => <PlayViewController {...VCProps}/> }
+                            render={ () => <PlayViewController {...PlayVCProps}/> }
+                        />
+                        <Route 
+                            exact
+                            path="/create" 
+                            render={ () => <CreateViewController {...CreateVCProps}/> }
                         />
                         <Route 
                             path="/" 

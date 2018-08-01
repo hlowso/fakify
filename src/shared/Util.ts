@@ -1,8 +1,19 @@
-import { ISubbeatTimeMap, IMusicIdx } from "./types";
+import { Tabs, ISubbeatTimeMap, IMusicIdx } from "./types";
 
 export const redirect = (route: string) => {
     window.location.replace(`http://localhost:3000/${route}`);
 };
+
+export const getCurrentTab = () => {
+    let windowPathname = window.location.pathname;
+    for (let tab in Tabs) {
+        let currTab = Tabs[tab];
+        if (new RegExp(currTab).test(windowPathname)) {
+            return currTab as Tabs;
+        }
+    }
+    return Tabs.None;
+}
 
 export const objectIsEmpty = (object: any) => {
     return Object.keys(object).length === 0;

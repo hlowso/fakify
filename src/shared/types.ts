@@ -1,5 +1,13 @@
 import { Note } from "./music/domain/Note";
 
+export enum Tabs {
+    Login = "Login",
+    Signup = "Signup",
+    Play = "play",
+    Create = "create",
+    None = ""
+}
+
 export interface ISong {
     id: string;
     title: string;
