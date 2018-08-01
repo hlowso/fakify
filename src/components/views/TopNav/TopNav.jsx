@@ -23,9 +23,10 @@ class TopNav extends Component {
     }
 
     renderTabList() {
+        let { user } = this.props;
         let activeTab = Util.getCurrentTab();
         
-        return (
+        return !Util.objectIsEmpty(user) && (
             <div id="tab-list" >
                 <Link
                     to="/play"
@@ -48,7 +49,7 @@ class TopNav extends Component {
     renderUserSection = () => {
         let { user } = this.props;
 
-        return user.email && (
+        return user && user.email && (
             <div id="nav-user-section">
                 <span className="user-email" >{user.email}</span>
                 <Link
