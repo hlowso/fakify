@@ -113,11 +113,11 @@ class Chart {
     }
 
     public addBar = (idx: number, bar?: IChartBar) => {
-        //TODO
+        // TODO
     }
 
     public updateBar = (idx: number, bar?: IChartBar) => {
-        //TODO
+        // TODO
     }
 
     private _addKeysToBars = (bars: IChartBar[], contextualized = false) => {
