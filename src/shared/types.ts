@@ -1,21 +1,19 @@
 import { Note } from "./music/domain/Note";
 
 export enum Tabs {
-    Login = "Login",
-    Signup = "Signup",
+    Login = "login",
+    Signup = "signup",
     Play = "play",
     Create = "create",
     None = ""
 }
 
 export interface ISong {
-    id: string;
-    title: string;
-    originalContext: NoteName;
-    originalTempo: Tempo;
-    tempo: Tempo;
-    suitableFeels: Feel[];
-    barsBase: IChartBar[];
+    chartId?: string;
+    title?: string;
+    originalContext?: NoteName;
+    originalTempo?: Tempo;
+    barsBase?: IChartBar[];
 }
 
 export type Tempo = [number, number];

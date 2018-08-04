@@ -14,7 +14,7 @@ import { SessionManager, ImprovSessionManager, ListeningSessionManager } from ".
 import Chart from "../../../shared/music/Chart";
 
 import "./PlayViewController.css";
-import { ISong, NoteName, PlayMode, IImprovReport, IListeningReport, Tempo, IMusicIdx } from "../../../shared/types";
+import { ISong, NoteName, PlayMode, IImprovReport, IListeningReport, Tempo, IMusicIdx, IChartBar } from "../../../shared/types";
 
 export interface IPlayVCProps {
     // TODO: get proper types for all this
@@ -87,7 +87,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             playMode
         } = this.state;
 
-        let selectedSongId = selectedSong ? (selectedSong as ISong).id: null;
+        let selectedSongId = selectedSong ? (selectedSong as ISong).chartId: null;
         let inSession = sessionManager && sessionManager.inSession;
         let sessionIdx = inSession ? sessionManager.sessionIdx : null;
         let currKey: NoteName | "" = inSession ? sessionManager.currKey : "";
@@ -185,8 +185,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
     ************/
 
     private _resetChart = () => {
-        let { id, barsBase, originalTempo, originalContext, suitableFeels } = this.state.selectedSong as ISong;
-        let chartSettings = StorageHelper.getChartSettings(id);
+        let { chartId, barsBase, originalTempo, originalContext } = this.state.selectedSong as ISong;
+        let chartSettings = StorageHelper.getChartSettings(chartId as string);
         let playMode = StorageHelper.getPlayMode();
 
         let { tempo, context, feel, rangeStartIdx, rangeEndIdx } = chartSettings;
@@ -196,9 +196,6 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         if (!context) {
             context = originalContext;
         }
-        if (!feel) {
-            feel = suitableFeels[0];
-        }
         if (!Number.isInteger(rangeStartIdx as number)) {
             rangeStartIdx = 0;
         }
@@ -206,7 +203,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             rangeEndIdx = (
                 (playMode === "listening")
                         ? 1
-                        : barsBase.length - 1
+                        : (barsBase as IChartBar[]).length - 1
             );
         }
 
@@ -252,7 +249,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         (chart as Chart).rangeStartIdx = rangeStartIdxUpdate;
         (chart as Chart).rangeEndIdx = rangeEndIdxUpdate;
 
-        StorageHelper.updateChartSettings((selectedSong as ISong).id, {
+        StorageHelper.updateChartSettings((selectedSong as ISong).chartId as string, {
             rangeStartIdx: rangeStartIdxUpdate,
             rangeEndIdx: rangeEndIdxUpdate
         });
@@ -264,7 +261,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
         (chart as Chart).context = newKeyContext;
         
-        StorageHelper.updateChartSettings((selectedSong as ISong).id, {
+        StorageHelper.updateChartSettings((selectedSong as ISong).chartId as string, {
             context: newKeyContext
         });
     }
@@ -275,7 +272,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
         (chart as Chart).tempo = newTempo;
 
-        StorageHelper.updateChartSettings((selectedSong as ISong).id, {
+        StorageHelper.updateChartSettings((selectedSong as ISong).chartId as string, {
             tempo: newTempo
         });
     }

@@ -25,12 +25,18 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     }
 
     public componentWillMount() {
+        let stateUpdate: ICreateVCState = { loadingSongTitles: false };
         Api.getUserSongTitles()
             .then(titles => {
-                this.setState({ 
-                    loadingSongTitles: false,
-                    userSongTitles: titles 
-                });
+                if (titles.length === 0) {
+                    stateUpdate.editingSong = {
+                        title: "Untitled"
+                    };
+                    stateUpdate.editingChart = new Chart();
+                } else {
+                    stateUpdate.userSongTitles = titles;
+                }
+                this.setState(stateUpdate);
             });
     }
 
@@ -43,21 +49,23 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     }
 
     public renderCentralPanel() {
-        let { loadingSongTitles, userSongTitles, editingChart } = this.state;
+        let { loadingSongTitles, userSongTitles, editingSong, editingChart } = this.state;
 
         let content: JSX.Element | JSX.Element[] = (
             <div>loading songs...</div>
         );
 
         if (!loadingSongTitles) {
-            if (Array.isArray(userSongTitles) && userSongTitles.length > 0) {
-                content = userSongTitles.map(title => (
+            if (!editingChart) {
+                content = (userSongTitles as string[]).map(title => (
                         <span>{title}</span>
                     )
                 );
             } else {
                 content = (
                     <ChartViewer
+                        editingMode={true}
+                        song={editingSong}
                         chart={editingChart} 
                     />
                 );

@@ -17,7 +17,7 @@ class Chart {
     private _durationInSubbeats: number;
 
     constructor(
-        barsBase: IChartBar[], 
+        barsBase: IChartBar[] = [], 
         context?: NoteName, 
         tempo?: Tempo,
         feel?: Feel,
@@ -26,7 +26,6 @@ class Chart {
         rangeEndIdx = barsBase.length
     ) {
         this._addKeysToBars(barsBase);
-        this._feel = feel;
 
         // If a context has been provided, assume that this Chart is being
         // used in play mode
@@ -34,14 +33,17 @@ class Chart {
             this._barsBase = barsBase;
             this._context = context;
 
-            // Build the contextualized, time adjusted bars
-            this._resetBarsAndChordStretches();
-
         // Otherwise, assume this Chart is being used in create mode
         } else {
             this._bars = barsBase;
-            this._getContextAndBaseBarsFromBars();
+            this._setContextAndBaseBarsFromBars();
         }
+
+        this._feel = feel || this.suitableFeels[0];
+        
+        // Build the contextualized, time adjusted bars
+        this._resetBarsAndChordStretches();
+        
 
         this._tempo = tempo;
         this._externalUpdate = externalUpdate;
@@ -113,11 +115,44 @@ class Chart {
     }
 
     public addBar = (idx: number, bar?: IChartBar) => {
-        // TODO
+        if (bar) {
+            this._bars.splice(idx, 0, bar);
+        } else {
+            if (idx === 0) {
+                throw new Error("PRECOMP - ERROR: cannot copy bar to 0th index");
+            } else {
+                let barToExtend = this._bars[idx - 1];
+                let segmentToExtend = barToExtend.chordSegments[barToExtend.chordSegments.length - 1];
+
+                let newBar: IChartBar = {
+                    barIdx: idx,
+                    timeSignature: barToExtend.timeSignature,
+                    chordSegments: [],
+                    durationInSubbeats: barToExtend.durationInSubbeats
+                }
+
+                newBar.chordSegments.push({
+                    beatIdx: 0,
+                    chord: segmentToExtend.chord,
+                    chordName: segmentToExtend.chordName,
+                    key: segmentToExtend.key,
+                    durationInBeats: newBar.timeSignature[0]
+                });
+
+                this._bars.splice(idx, 0, newBar);
+            }
+        }
+
+        this._setContextAndBaseBarsFromBars();
+        this._resetBarsAndChordStretches();
+        this._runExternalUpdate();
     }
 
-    public updateBar = (idx: number, bar?: IChartBar) => {
-        // TODO
+    public updateBar = (idx: number, bar: IChartBar) => {
+        this._bars[idx] = bar;
+        this._setContextAndBaseBarsFromBars();
+        this._resetBarsAndChordStretches();
+        this._runExternalUpdate();
     }
 
     private _addKeysToBars = (bars: IChartBar[], contextualized = false) => {
@@ -224,17 +259,19 @@ class Chart {
     }
 
     private _resetBars = () => {
-        this._bars = MusicHelper.contextualizeOrDecontextualizeBars(
-            this._barsBase,
-            this._context
-        );
-
-        if (this._feel) {
-            this._bars = MusicHelper.adjustBarTimes(
-                this._bars,
-                this._feel
+        if (this._barsBase) {
+            this._bars = MusicHelper.contextualizeOrDecontextualizeBars(
+                this._barsBase,
+                this._context
             );
-            this._calculateChartDuration();
+    
+            if (this._feel) {
+                this._bars = MusicHelper.adjustBarTimes(
+                    this._bars,
+                    this._feel
+                );
+                this._calculateChartDuration();
+            }
         }
     }
 
@@ -252,7 +289,7 @@ class Chart {
         let subbeatsBeforeChange = 0;
 
         // TODO: shouldn't depend on bars having subbeat to get chord stretches
-        if (this._feel) {
+        if (this._feel && this._bars.length > 0) {
             this._bars.forEach(bar => {
                 bar.chordSegments.forEach(segment => {
                     if (subbeatsBeforeChange === 0) {
@@ -271,32 +308,34 @@ class Chart {
 
     // This can be used when the _bars attribute is already contextualized and its keys
     // have already been determined using _addKeysToBars
-    private _getContextAndBaseBarsFromBars = () => {
-        let firstMajorKey = this._bars[0].chordSegments[0].key as NoteName;
-        let firstMinorKey = Domain.NOTE_NAMES[ Util.mod(Domain.NOTE_NAMES.indexOf(firstMajorKey) - 5, 12 )];
+    private _setContextAndBaseBarsFromBars = () => {
+        if (this._bars.length > 0) {
+            let firstMajorKey = this._bars[0].chordSegments[0].key as NoteName;
+            let firstMinorKey = Domain.NOTE_NAMES[ Util.mod(Domain.NOTE_NAMES.indexOf(firstMajorKey) - 5, 12 )];
 
-        let context = (this._bars[0].chordSegments[0].chordName as ChordName)[0] as NoteName;
+            let context = (this._bars[0].chordSegments[0].chordName as ChordName)[0] as NoteName;
 
-        barLoop: for (let bar of this._bars) {
-            for (let segment of bar.chordSegments) {
-                if (segment.key !== firstMajorKey) {
-                    break barLoop;
-                }
+            barLoop: for (let bar of this._bars) {
+                for (let segment of bar.chordSegments) {
+                    if (segment.key !== firstMajorKey) {
+                        break barLoop;
+                    }
 
-                let currRoot = (segment.chordName as ChordName)[0] as NoteName;
+                    let currRoot = (segment.chordName as ChordName)[0] as NoteName;
 
-                if (currRoot === firstMajorKey) {
-                    context = firstMajorKey;
-                    break barLoop;
-                }
-                if (currRoot === firstMinorKey) {
-                    context = firstMinorKey;
+                    if (currRoot === firstMajorKey) {
+                        context = firstMajorKey;
+                        break barLoop;
+                    }
+                    if (currRoot === firstMinorKey) {
+                        context = firstMinorKey;
+                    }
                 }
             }
-        }
 
-        this._context = context;
-        this._barsBase = MusicHelper.contextualizeOrDecontextualizeBars(this._bars, context, true);
+            this._context = context;
+            this._barsBase = MusicHelper.contextualizeOrDecontextualizeBars(this._bars, context, true);
+        }
     }
     
     private _completeMusicIdx = (idx: IMusicIdx) => {
@@ -370,6 +409,27 @@ class Chart {
 
     get durationInSubbeats() {
         return this._durationInSubbeats;
+    }
+
+    get suitableFeels() {
+        if (!this._barsBase) {
+            return [];
+        }
+
+        let swingIsSuitableReduction = (suitableSoFar: boolean, bar: IChartBar) => { 
+            return (
+                suitableSoFar && 
+                (bar.timeSignature[1] === 4 || (bar.timeSignature[1] === 8 && bar.timeSignature[0] % 2) === 0)
+            );
+        };
+
+        let swingIsSuitable = this._barsBase.reduce(swingIsSuitableReduction, true);
+
+        return (
+            swingIsSuitable
+                ? [Feel.Swing]
+                : []
+        );
     }
 
     /**

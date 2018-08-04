@@ -63,7 +63,6 @@ export const getSongAsync = songId => {
             title: "C Blues",
             originalContext: "C",
             originalTempo: [120, 4],
-            suitableFeels: ["swing"],
             barsBase: [
                 {
                     barIdx: 0,

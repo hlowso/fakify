@@ -12,6 +12,7 @@ export interface IChartViewerProps {
     chart?: Chart;
     sessionIdx?: IMusicIdx;
     onBarClick?: (barIdx: number) => void;
+    onAddBar?: (barIdx: number) => void;
     recontextualize?: (noteName: NoteName) => void;
     resetTempo?: (tempo: Tempo) => void;
 }
@@ -30,86 +31,109 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
     public render(): JSX.Element {
         let { song, chart, editingMode } = this.props;
-        let loading = !Util.objectIsEmpty(song) &&
-                        !Util.objectIsEmpty(chart);
+        let noChartData = Util.objectIsEmpty(song) ||
+                        Util.objectIsEmpty(chart);
 
-        return loading 
-            ? (
-                <div id="chart-viewer">
-                    <header className="chart-header">
-                        {!editingMode && this.renderLeftHandSettings()}
-                        <h1 className="song-title">{(song as ISong).title}</h1>
-                    </header>
-                    <section className="chart-body">
-                        {this.renderProgression()}
-                    </section>
-                </div>
-            )
-            : <h2>No Song Selected</h2>;
+        if (noChartData) {
+            return (<h2>No chart data</h2>);
+        }
+
+        return (
+            <div id="chart-viewer">
+                <header className="chart-header">
+                    {!editingMode && this.renderLeftHandSettings()}
+                    <h1 className="song-title">{(song as ISong).title}</h1>
+                </header>
+                <section className="chart-body">
+                    {this.renderProgression()}
+                </section>
+            </div>
+        );
     }
 
     public renderProgression = (): JSX.Element[] => {
-        let { chart, sessionIdx } = this.props;
+        let { chart, sessionIdx, editingMode } = this.props;
         let { bars, rangeStartIdx, rangeEndIdx } = chart as Chart;
-        let baseKey = bars[0].chordSegments[0].key;
+        let renderBars: JSX.Element[] = [];
 
-        return bars.map((bar, i) => {
-            let chordNames = [];
-            let beats = [];
-            let isCurrentlyPlayingBar = sessionIdx && sessionIdx.barIdx === i;
-            let isWithinRange = rangeStartIdx <= i &&
-                                i <= rangeEndIdx;
+        if (bars && bars.length > 0) {
+            let baseKey = bars[0].chordSegments[0].key;
 
-            let barClasses = Cx({ 
-                "bar-container": true, 
-                "within-range": isWithinRange,
-                "current-bar": isCurrentlyPlayingBar
+            renderBars = bars.map((bar, i) => {
+                let chordNames = [];
+                let beats = [];
+                let isCurrentlyPlayingBar = sessionIdx && sessionIdx.barIdx === i;
+                let isWithinRange = rangeStartIdx <= i &&
+                                    i <= rangeEndIdx;
+
+                let barClasses = Cx({ 
+                    "bar-container": true, 
+                    "within-range": isWithinRange,
+                    "current-bar": isCurrentlyPlayingBar
+                });
+
+                for (let beatIdx = 0; beatIdx < bar.timeSignature[1]; beatIdx ++) {
+                    let segmentIdx;
+                    let chordSegment = bar.chordSegments.find((segment, idx) => { 
+                        segmentIdx = idx;
+                        return segment.beatIdx === beatIdx;
+                    });
+
+                    let isCurrentChord = isCurrentlyPlayingBar &&
+                                        sessionIdx && 
+                                        sessionIdx.segmentIdx === segmentIdx;
+
+                    let chordNameClasses = Cx({
+                        "chord-name": true,
+                        "current-chord": isCurrentChord
+                    });
+
+                    chordNames.push(
+                        <span className={chordNameClasses} key={beatIdx}>
+                            {chordSegment && MusicHelper.getPresentableChord(chordSegment.chord as string, baseKey)}
+                        </span>
+                    );
+                    
+                    beats.push(
+                        <span className="beat" key={beatIdx}>
+                            {beatIdx + 1}
+                        </span>
+                    );
+                }
+
+                return (
+                    <div 
+                        key={i}
+                        className={barClasses}
+                        onClick={() => this._onBarClick(i)} 
+                    >
+                        <div className="bar-chord-group">
+                            {chordNames}
+                        </div>
+                        <div className="bar-beat-group">
+                            {beats}
+                        </div>
+                    </div>
+                );
             });
+        }
 
-            for (let beatIdx = 0; beatIdx < bar.timeSignature[1]; beatIdx ++) {
-                let segmentIdx;
-                let chordSegment = bar.chordSegments.find((segment, idx) => { 
-                    segmentIdx = idx;
-                    return segment.beatIdx === beatIdx;
-                });
-
-                let isCurrentChord = isCurrentlyPlayingBar &&
-                                    sessionIdx && 
-                                    sessionIdx.segmentIdx === segmentIdx;
-
-                let chordNameClasses = Cx({
-                    "chord-name": true,
-                    "current-chord": isCurrentChord
-                });
-
-                chordNames.push(
-                    <span className={chordNameClasses} key={beatIdx}>
-                        {chordSegment && MusicHelper.getPresentableChord(chordSegment.chord as string, baseKey)}
-                    </span>
-                );
-                
-                beats.push(
-                    <span className="beat" key={beatIdx}>
-                        {beatIdx + 1}
-                    </span>
-                );
-            }
-
-            return (
+        if (editingMode) {
+            renderBars.push(
                 <div 
-                    key={i}
-                    className={barClasses}
-                    onClick={() => this._onBarClick(i)} 
+                    key={bars.length}
+                    className="bar-container"
+                    onClick={() => this._onAddBar(bars.length)} 
                 >
-                    <div className="bar-chord-group">
-                        {chordNames}
-                    </div>
-                    <div className="bar-beat-group">
-                        {beats}
-                    </div>
+                    <span>+</span>
                 </div>
+
             );
-        });
+        }
+        
+
+        return renderBars
+        
     }
 
     public renderLeftHandSettings = (): JSX.Element => {
@@ -125,6 +149,13 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         let { onBarClick } = this.props;
         if (onBarClick) {
             onBarClick(barIdx);
+        }
+    }
+
+    private _onAddBar = (barIdx: number) => {
+        let { onAddBar } = this.props;
+        if (onAddBar) {
+            onAddBar(barIdx);
         }
     }
 
