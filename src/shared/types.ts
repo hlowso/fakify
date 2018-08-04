@@ -15,7 +15,7 @@ export interface ISong {
     originalTempo: Tempo;
     tempo: Tempo;
     suitableFeels: Feel[];
-    barsBase: IBarBase[];
+    barsBase: IChartBar[];
 }
 
 export type Tempo = [number, number];
@@ -35,38 +35,38 @@ export enum ChordShape {
 
 export type ChordName = [NoteName | RelativeNoteName, ChordShape];
 
-export interface IBarBase {
-    barIdx: number;
-    timeSignature: TimeSignature;
-    chordSegments: IChordBase[];
-}
+// export interface IBarBase {
+//     barIdx: number;
+//     timeSignature: TimeSignature;
+//     chordSegments: IChordBase[];
+// }
 
-export interface IChordBase {
-    beatIdx: number;
-    chord: string;
-    chordName?: ChordName;
-    key: RelativeNoteName | NoteName;
-    durationInBeats: number;
-}
+// export interface IChordBase {
+//     beatIdx: number;
+//     chord: string;
+//     chordName?: ChordName;
+//     key: RelativeNoteName | NoteName;
+// }
 
 export interface IChartBar {
     barIdx: number;
     timeSignature: TimeSignature;
     chordSegments: IChordSegment[];
-    durationInSubbeats: number;
+    durationInSubbeats?: number;
 }
 
 export interface IChordStretch {
+    beatIdx?: number;
+    subbeatIdx?: number;
     chordName?: ChordName;
-    key?: NoteName;
-    durationInSubbeats: number;
+    key?: RelativeNoteName | NoteName;
+    durationInBeats?: number;
+    durationInSubbeats?: number;
 }
 
 export interface IChordSegment extends IChordStretch {
-    beatIdx: number;
-    subbeatIdx: number;
-    chord: string;
-    subbeatsBeforeChange: number;
+    chord?: string;
+    subbeatsBeforeChange?: number;
 }
 
 export interface IKeyStrokeRecord {

@@ -84,7 +84,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
                 chordNames.push(
                     <span className={chordNameClasses} key={beatIdx}>
-                        {chordSegment && MusicHelper.getPresentableChord(chordSegment.chord, baseKey)}
+                        {chordSegment && MusicHelper.getPresentableChord(chordSegment.chord as string, baseKey)}
                     </span>
                 );
                 
@@ -172,7 +172,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
     public renderTempoSelect = (): JSX.Element => {
         let { tempo } = this.props.chart as Chart;
-        let bpms = tempo[0];
+        let bpms = (tempo as Tempo)[0];
         let options = [];
         for (
                 let t = MusicHelper.LOWER_TEMPO_LIMIT; 

@@ -2,7 +2,7 @@ import * as Util from "../Util";
 import * as MusicHelper from "../music/MusicHelper";
 import Chart from "../music/Chart";
 import Score from "../music/Score";
-import { IScoreBar, IChartBar, NoteName, IChordSegment, IKeyStrokeRecord, IMusicIdx, ISubbeatTimeMap, IImprovReport, IListeningReport, IStroke, IExercise } from "../types";
+import { IScoreBar, IChartBar, NoteName, IChordSegment, IKeyStrokeRecord, IMusicIdx, ISubbeatTimeMap, IImprovReport, IListeningReport, IStroke, IExercise, Tempo } from "../types";
 import soundfonts from "./soundfontsIndex";
 
 export class SessionManager {
@@ -51,11 +51,13 @@ export class SessionManager {
 
     get subbeatDuration(): number {
         let { tempo, bars } = this._chart;
+        tempo = tempo as Tempo;
+        
         let { durationInSubbeats, timeSignature } = bars[0];
 
         // Calculate the subbeat duration based on the first bar of 
         // music. It will be the same all troughout the score
-        return 60 / ( durationInSubbeats * (tempo[0] / ( timeSignature[0] * ( tempo[1] / timeSignature[1] ))));
+        return 60 / ( (durationInSubbeats as number) * (tempo[0] / ( timeSignature[0] * ( tempo[1] / timeSignature[1] ))));
     }
 
     get currChartBar(): IChartBar {
@@ -146,11 +148,11 @@ export class SessionManager {
         let currSegment = this.currChordSegment;
         let subbeatDuration = this.subbeatDuration;
         let { subbeatIdx, durationInSubbeats } = currSegment;
-        let startIdx = subbeatIdx;
+        let startIdx = subbeatIdx as number; 
         let scoreIndices = Object.keys(scoreBar).map(s => parseInt(s, 10));
 
         for (let scoreIdx of scoreIndices) {
-            if (scoreIdx === startIdx + durationInSubbeats) {
+            if (scoreIdx === startIdx + (durationInSubbeats as number)) {
                 break;
             }
             if (scoreIdx < startIdx) {
@@ -211,8 +213,8 @@ export class SessionManager {
         }
 
         let _subbeatDuration = this.subbeatDuration;
-        let durationOfLastBarInRange = this._chart.lastBarInRange.durationInSubbeats;
-        let durationOfFirstBarInRange = this._chart.firstBarInRange.durationInSubbeats;
+        let durationOfLastBarInRange = this._chart.lastBarInRange.durationInSubbeats as number;
+        let durationOfFirstBarInRange = this._chart.firstBarInRange.durationInSubbeats as number;
         this._queueTimes = {};
 
         // Start with the last bar of the chart (for handling user spills)
@@ -231,7 +233,7 @@ export class SessionManager {
         // Now loop through all the bars in the range
         this._chart.forEachBarInRange((bar, idx) => {
             let queueTimeBar: { [subbeatIdx: number]: number } = {};
-            for (let subbeatIdx = 0; subbeatIdx < bar.durationInSubbeats; subbeatIdx ++) {
+            for (let subbeatIdx = 0; subbeatIdx < (bar.durationInSubbeats as number); subbeatIdx ++) {
                 queueTimeBar[subbeatIdx] = time;
                 time += _subbeatDuration;
             }
@@ -269,12 +271,12 @@ export class SessionManager {
     }
 
     private get _currSegmentQueueTime(): number {
-        return this._currQueueTimeBar[this.currChordSegment.subbeatIdx];
+        return this._currQueueTimeBar[this.currChordSegment.subbeatIdx as number];
     }
 
     private get _nextSegmentQueueTime(): number {
         // Get the subbeat and bar indices at the next segment
-        let subbeatIdx = (this.currChordSegment.subbeatIdx + this.currChordSegment.durationInSubbeats) % this.currChartBar.durationInSubbeats;
+        let subbeatIdx = ((this.currChordSegment.subbeatIdx as number) + (this.currChordSegment.durationInSubbeats as number)) % (this.currChartBar.durationInSubbeats as number);
         let barIdx = subbeatIdx ? this._barIdx : this._barIdx + 1;
         return this._queueTimes[barIdx][subbeatIdx];
     }

@@ -28,6 +28,7 @@ const BASS_CEILING = 60;
 
 export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart => {
     let { chordStretches, bars } = chart;
+    chordStretches = chordStretches as IChordStretch[];
     
     let music: IMusicBar[] = [];
     let quarterPitches: number[] = [];
@@ -284,7 +285,7 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
         // Because the feel is swing, we know that the duration
         // in subbeats of any stretch will always be 
         // divisible by 3
-        let durationInBeats = durationInSubbeats / 3;
+        let durationInBeats = (durationInSubbeats as number) / 3;
         
         currChord = new ChordClass(chordName);
         currScale = currChord.applyMutation(new ScaleClass(key as NoteName));
@@ -293,7 +294,7 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
 
             // Handle chord transition
             if (beat >= durationInBeats - 1) {
-                let nextStretch = chordStretches[Util.mod(stretchIdx + 1, chordStretches.length)];
+                let nextStretch = (chordStretches as IChordStretch[])[Util.mod(stretchIdx + 1, (chordStretches as IChordStretch[]).length)];
                 if (beat === durationInBeats) {
                     change(true, nextStretch);
                 } else {
@@ -322,7 +323,7 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
     music = bars.map((bar, barIdx) => {
         let musicBar: IMusicBar = {};
 
-        for (let subbeatIdx = 0; subbeatIdx < bar.durationInSubbeats; subbeatIdx += 3) {
+        for (let subbeatIdx = 0; subbeatIdx < (bar.durationInSubbeats as number); subbeatIdx += 3) {
             let quarterPitch = quarterPitches[absBeatIdx];
             let skipPitch = skipPitches[absBeatIdx];
             let quarterDuration = 3;

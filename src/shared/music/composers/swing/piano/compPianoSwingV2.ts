@@ -1,6 +1,6 @@
 import * as Util from "../../../../Util";
 import { ChordClass } from "../../../domain/ChordClass";
-import { ChordName, IMusicBar, IPart, IMusicIdx, IChordSegment, IStroke } from "../../../../types";
+import { ChordName, Tempo, IMusicBar, IPart, IMusicIdx, IChordSegment, IStroke, IChordStretch } from "../../../../types";
 import Chart from "../../../Chart";
 
 const VEL_FACTOR = 0.6;
@@ -10,6 +10,7 @@ const MAX_TEMPO = 210;
 
 export const compPianoSwingV1 = (chart: Chart, prevMusic?: IMusicBar[]): IPart => {
     let { chordStretches, bars } = chart;
+    chordStretches = chordStretches as IChordStretch[];
     let music: IMusicBar[] = [];
     let previousVoicing: number[] = [];
 
@@ -29,7 +30,7 @@ export const compPianoSwingV1 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
 
     let maxStrokeDurationBars: Array<number[]> = bars.map(bar => []);
     let maxPossibleDurationToDuration = (max: number) => {
-        let durationSkewer = 0.5 * chart.tempo[0] / MAX_TEMPO; 
+        let durationSkewer = 0.5 * (chart.tempo as Tempo)[0] / MAX_TEMPO; 
 
         // base must be a number between 0 and 2
         let base = Math.random() + (
@@ -52,13 +53,13 @@ export const compPianoSwingV1 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
 
         subbeatIdx = parseInt(subbeatIdx as string, undefined);
 
-        absSubbeatIdx = subbeatIdx + lastStroke.durationInSubbeats - bars[bars.length - 1].durationInSubbeats;
+        absSubbeatIdx = subbeatIdx + lastStroke.durationInSubbeats - (bars[bars.length - 1].durationInSubbeats as number);
         previousVoicing = lastStroke.notes;
     }
 
     while (musicIdx) {        
-        currTwoBarDuration = bars[musicIdx.barIdx].durationInSubbeats + bars[Util.mod(musicIdx.barIdx + 1, bars.length)].durationInSubbeats;
-        remainderOfCurrStretchPlusNextStretch = remainderOfCurrStretch + chordStretches[Util.mod(stretchIdx + 1, chordStretches.length)].durationInSubbeats;
+        currTwoBarDuration = (bars[musicIdx.barIdx].durationInSubbeats as number) + (bars[Util.mod(musicIdx.barIdx + 1, bars.length)].durationInSubbeats as number);
+        remainderOfCurrStretchPlusNextStretch = remainderOfCurrStretch + (chordStretches[Util.mod(stretchIdx + 1, chordStretches.length)].durationInSubbeats as number);
         
         if (currTwoBarDuration < remainderOfCurrStretchPlusNextStretch) {
             maxSubbeatWait = currTwoBarDuration;
@@ -99,7 +100,7 @@ export const compPianoSwingV1 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
         remainderOfCurrStretch -= subbeatWait;
         if (remainderOfCurrStretch < 0) {
             stretchIdx ++;
-            remainderOfCurrStretch += chordStretches[Util.mod(stretchIdx, chordStretches.length)].durationInSubbeats;
+            remainderOfCurrStretch += (chordStretches[Util.mod(stretchIdx, chordStretches.length)].durationInSubbeats as number);
         } 
 
         prevMusicIdx = musicIdx;
@@ -112,7 +113,7 @@ export const compPianoSwingV1 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
 
             // If the subbeat index is the last in the current segment,
             // allow for the possibility of playing the next chord
-            if (subbeatIdx === (segment.subbeatIdx + segment.durationInSubbeats - 1)) {
+            if (subbeatIdx === ((segment.subbeatIdx as number) + (segment.durationInSubbeats as number) - 1)) {
                 let nextSegment = chart.nextSegmentAtIdx({ barIdx, subbeatIdx });
                 if (nextSegment) {
                     segment = nextSegment as IChordSegment;

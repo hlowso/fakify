@@ -1,5 +1,5 @@
 import * as Util from "../Util";
-import { NoteName, RelativeNoteName, IChartBar, IChordSegment, IChordBase, IBarBase, Feel, ChordName } from "../types";
+import { NoteName, RelativeNoteName, IChartBar, IChordSegment, Feel, ChordName } from "../types";
 
 export * from "./composers/index"
 
@@ -9,17 +9,25 @@ export const HIGHEST_C = LOWEST_A + NUMBER_OF_KEYS - 1;
 export const LOWER_TEMPO_LIMIT = 40;
 export const UPPER_TEMPO_LIMIT = 210;
 
-// const NOTE_REGEX = /[A-G](#|b)?/g;
+const NOTE_REGEX = /[A-G](#|b)?/g;
 const RELATIVE_SCALE_NOTE_REGEX = /[1H2N34T5U6J7]/g;
 
-export const contextualize = (word: string, keyContext: NoteName): string => {
+export const contextualizeOrDecontextualize = (word: string, keyContext: NoteName, decontextualize = false): string => {
     let { base, shape } = getWordConstituents(word);
     let baseIndex = NOTE_NAMES.indexOf(keyContext);
 
-    let contextualizedBase = base.replace(
-        RELATIVE_SCALE_NOTE_REGEX, 
-        (note: RelativeNoteName) => NOTE_NAMES[(baseIndex + RELATIVE_SCALE.indexOf(note)) % 12]
+    let contextualizedBase = (
+        decontextualize
+            ? base.replace(
+                NOTE_REGEX,
+                (note: NoteName) => RELATIVE_SCALE[Util.mod(baseIndex - NOTE_NAMES.indexOf(note), 12)]
+            )
+            : base.replace(
+                RELATIVE_SCALE_NOTE_REGEX, 
+                (note: RelativeNoteName) => NOTE_NAMES[Util.mod(baseIndex + RELATIVE_SCALE.indexOf(note), 12)]
+            )
     );
+     
 
     return shape ? `${contextualizedBase}^${shape}` : contextualizedBase;
 };
@@ -76,15 +84,15 @@ export const getKeyNoteNameIndices = (key: NoteName | ""): number[] => {
     return C_NOTE_NAMES_INDICES.map(pitch => (pitch + offset) % 12);
 }
 
-export const contextualizeBars = (barsBase: IBarBase[], newKeyContext: NoteName): IBarBase[] => {
-    return barsBase.map<IBarBase>((bar: IBarBase) => {
-        let contextualizedBar: IBarBase = Util.copyObject(bar);
-        contextualizedBar.chordSegments = bar.chordSegments.map<IChordBase>((chordBase: IChordBase ) => {
+export const contextualizeOrDecontextualizeBars = (barsBase: IChartBar[], newKeyContext: NoteName, decontextualize = false): IChartBar[] => {
+    return barsBase.map<IChartBar>((bar: IChartBar) => {
+        let contextualizedBar: IChartBar = Util.copyObject(bar);
+        contextualizedBar.chordSegments = bar.chordSegments.map<IChordSegment>((chordBase: IChordSegment ) => {
             let contextualizedChordBase = Util.copyObject(chordBase);
-            contextualizedChordBase.chord = contextualize(chordBase.chord, newKeyContext);
-            contextualizedChordBase.chordName = [contextualize(((chordBase.chordName as ChordName)[0] as RelativeNoteName), newKeyContext), (chordBase.chordName as ChordName)[1]]
+            contextualizedChordBase.chord = contextualizeOrDecontextualize(chordBase.chord as string, newKeyContext, decontextualize);
+            contextualizedChordBase.chordName = [contextualizeOrDecontextualize(((chordBase.chordName as ChordName)[0] as RelativeNoteName), newKeyContext, decontextualize), (chordBase.chordName as ChordName)[1]]
             if (chordBase.key) {
-                contextualizedChordBase.key = contextualize(chordBase.key, newKeyContext);
+                contextualizedChordBase.key = contextualizeOrDecontextualize(chordBase.key, newKeyContext, decontextualize);
             }
             return contextualizedChordBase;
         });
@@ -92,7 +100,7 @@ export const contextualizeBars = (barsBase: IBarBase[], newKeyContext: NoteName)
     });
 };
 
-export const adjustBarTimes = (bars: IBarBase[], feel: Feel): IChartBar[] => {
+export const adjustBarTimes = (bars: IChartBar[], feel: Feel): IChartBar[] => {
     switch (feel) {
         case Feel.Swing: 
             return _adjustBarsSwingFeel(bars);
@@ -103,7 +111,7 @@ export const adjustBarTimes = (bars: IBarBase[], feel: Feel): IChartBar[] => {
 // the every quarter note is divided into 3 subbeats. This makes
 // it easier for the instrument-specific comp functions to write their
 // parts. 
-const _adjustBarsSwingFeel = (bars: IBarBase[]): IChartBar[] => {
+const _adjustBarsSwingFeel = (bars: IChartBar[]): IChartBar[] => {
 
     // First we convert time signatures and beat indices
     let adjustedBars: IChartBar[] = bars.map(bar=> {
@@ -126,11 +134,11 @@ const _adjustBarsSwingFeel = (bars: IBarBase[]): IChartBar[] => {
             throw new Error("PRECOMP: cannot convert to swing feel " + timeSignature);
         }
 
-        let adjustedSegments = chordSegments.map<IChordSegment>((chordBase: IChordBase, segmentIdx: number) => {
-            let durationInSubbeats = conversionFactor * chordBase.durationInBeats;
+        let adjustedSegments = chordSegments.map<IChordSegment>((chordBase: IChordSegment, segmentIdx: number) => {
+            let durationInSubbeats = conversionFactor * (chordBase.durationInBeats as number);
             let adjustedSegment: any = {
-                beatIdx: timeSignature[1] === 8 ? chordBase.beatIdx / 2 : chordBase.beatIdx,
-                subbeatIdx: conversionFactor * chordBase.beatIdx,
+                beatIdx: timeSignature[1] === 8 ? (chordBase.beatIdx as number) / 2 : chordBase.beatIdx,
+                subbeatIdx: conversionFactor * (chordBase.beatIdx as number),
                 chord: chordBase.chord,
                 chordName: chordBase.chordName,
                 key: chordBase.key,
@@ -209,7 +217,7 @@ const _adjustBarsSwingFeel = (bars: IBarBase[]): IChartBar[] => {
 
             for (let segmentIdx = segmentEndIdx; segmentIdx >= segmentStartIdx; segmentIdx --) {
                 let segment = chordSegments[segmentIdx];
-                currentSubbeatSum += segment.durationInSubbeats;
+                currentSubbeatSum += segment.durationInSubbeats as number;
                 segment.subbeatsBeforeChange = currentSubbeatSum;
             }
 

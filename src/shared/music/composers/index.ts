@@ -7,7 +7,7 @@ import Chart from "../Chart";
 import Score from "../Score";
 
 export const CompV1 = (chart: Chart, prevScore?: Score): Score => {
-    switch (chart.feel) {
+    switch (chart.feel as Feel) {
         case Feel.Swing:
             return _getSwingAccompaniment(chart, prevScore);
     }

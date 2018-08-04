@@ -18,10 +18,10 @@ export const compPianoSwingV1 = (bars: IChartBar[]): IPart => {
 
         let musicBar: IMusicBar = {};
         bar.chordSegments.forEach(segment => {
-            musicBar[segment.subbeatIdx] = [
+            musicBar[segment.subbeatIdx as number] = [
                 {
-                    notes: convertChordNameToNotes(segment.chord),
-                    durationInSubbeats: segment.durationInSubbeats / 2,
+                    notes: convertChordNameToNotes(segment.chord as string),
+                    durationInSubbeats: (segment.durationInSubbeats as number) / 2,
                     velocity: 1
                 }
             ];

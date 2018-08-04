@@ -24,29 +24,29 @@ export const compBassSwingV1 = (chart: Chart): IPart => {
         let musicBar: IMusicBar = {};
 
         bar.chordSegments.forEach(segment => {
-            let fullBeatCouplets = segment.durationInSubbeats / 6;
+            let fullBeatCouplets = (segment.durationInSubbeats as number) / 6;
 
             if (!Number.isInteger(fullBeatCouplets)) {
                 musicBar[0] = [
                     {
-                        notes: [getBassNote(segment.chord)],
-                        durationInSubbeats: segment.durationInSubbeats,
+                        notes: [getBassNote(segment.chord as string)],
+                        durationInSubbeats: segment.durationInSubbeats as number,
                         velocity: 1
                     }
                 ];
             }
 
             for (let i = 0; i < fullBeatCouplets; i ++) {
-                musicBar[segment.subbeatIdx + i * 6] = [
+                musicBar[(segment.subbeatIdx as number) + i * 6] = [
                     {
-                        notes: [getBassNote(segment.chord)],
+                        notes: [getBassNote(segment.chord as string)],
                         durationInSubbeats: 3,
                         velocity: 1
                     }
                 ];
-                musicBar[segment.subbeatIdx + 3 + i * 6] = [
+                musicBar[(segment.subbeatIdx as number) + 3 + i * 6] = [
                     {
-                        notes: [getFifth(segment.chord)],
+                        notes: [getFifth(segment.chord as string)],
                         durationInSubbeats: 3,
                         velocity: 1
                     }

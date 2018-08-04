@@ -13,34 +13,34 @@ export const compDrumsSwingV1 = (chart: Chart): [IPart, IPart] => {
         let shutHiHatBar: IMusicBar = {};
 
         bar.chordSegments.forEach(segment => {
-            let fullBeatCouplets = segment.durationInSubbeats / 6;
+            let fullBeatCouplets = (segment.durationInSubbeats as number) / 6;
             
             if (!Number.isInteger(fullBeatCouplets)) {
-                rideCymbalBar[segment.subbeatIdx] = [
+                rideCymbalBar[(segment.subbeatIdx as number)] = [
                     {
                         notes: [rideCymbal.pitch || 0],
-                        durationInSubbeats: segment.durationInSubbeats,
+                        durationInSubbeats: segment.durationInSubbeats as number,
                         velocity: 1
                     }
                 ];
             } else {
                 for (let i = 0; i < fullBeatCouplets; i ++) {
                     // ding, ding-gah
-                    rideCymbalBar[segment.subbeatIdx + i * 6] = [
+                    rideCymbalBar[(segment.subbeatIdx as number) + i * 6] = [
                         {
                             notes: [rideCymbal.pitch || 0], 
                             durationInSubbeats: 3, 
                             velocity: 1
                         }
                     ];
-                    rideCymbalBar[segment.subbeatIdx + 3 + i * 6] = [
+                    rideCymbalBar[(segment.subbeatIdx as number) + 3 + i * 6] = [
                         { 
                             notes: [rideCymbal.pitch || 0], 
                             durationInSubbeats: 2, 
                             velocity: 1
                         }
                     ];
-                    rideCymbalBar[segment.subbeatIdx + 5 + i * 6] = [
+                    rideCymbalBar[(segment.subbeatIdx as number) + 5 + i * 6] = [
                         {
                             notes: [rideCymbal.pitch || 0], 
                             durationInSubbeats: 1, 
@@ -49,7 +49,7 @@ export const compDrumsSwingV1 = (chart: Chart): [IPart, IPart] => {
                     ];
 
 
-                    shutHiHatBar[segment.subbeatIdx + i * 6 + 3] = [
+                    shutHiHatBar[(segment.subbeatIdx as number) + i * 6 + 3] = [
                         {
                             notes: [shutHiHat.pitch || 0], 
                             durationInSubbeats: 3, 
