@@ -209,11 +209,11 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
         this.setState({ 
             chart: new Chart(
+                this.forceUpdate.bind(this), 
                 barsBase, 
                 context, 
                 tempo, 
                 feel,
-                this.forceUpdate.bind(this), 
                 rangeStartIdx, 
                 rangeEndIdx
             ) 

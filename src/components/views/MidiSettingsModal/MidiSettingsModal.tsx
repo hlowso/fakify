@@ -8,9 +8,9 @@ export interface ISettingsModalProps {
     SoundActions: any;
     isOpen: boolean;
     close: () => void;
-
 }
 
+// TODO: remove selectedMidiInputId from this modal's state and move it to PlayViewController
 export interface ISettingsModalState {
     selectedMidiInputId: string;
     requestingMidiAccess: boolean;

@@ -70,9 +70,7 @@ export const getSongAsync = songId => {
                     chordSegments: [
                         {
                             beatIdx: 0,
-                            chord: "1^7",
-                            chordName: [ "1", "Dominant7" ],
-                            durationInBeats: 8
+                            chordName: [ "1", "^7" ],
                         }
                     ]
                 },
@@ -82,9 +80,7 @@ export const getSongAsync = songId => {
                     chordSegments: [
                         {
                             beatIdx: 0,
-                            chord: "4^7",
-                            chordName: [ "4", "Dominant7" ],
-                            durationInBeats: 8
+                            chordName: [ "4", "^7" ],
                         }
                     ]
                 },
@@ -94,9 +90,7 @@ export const getSongAsync = songId => {
                     chordSegments: [
                         {
                             beatIdx: 0,
-                            chord: "1^7",
-                            chordName: [ "1", "Dominant7" ],
-                            durationInBeats: 8
+                            chordName: [ "1", "^7" ],
                         }
                     ]
                 },
@@ -106,9 +100,7 @@ export const getSongAsync = songId => {
                     chordSegments: [
                         {
                             beatIdx: 0,
-                            chord: "1^7",
-                            chordName: [ "1", "Dominant7" ],
-                            durationInBeats: 8
+                            chordName: [ "1", "^7" ],
                         }
                     ]
                 },
@@ -118,9 +110,7 @@ export const getSongAsync = songId => {
                     chordSegments: [
                         {
                             beatIdx: 0,
-                            chord: "4^7",
-                            chordName: [ "4", "Dominant7" ],
-                            durationInBeats: 8
+                            chordName: [ "4", "^7" ],
                         }
                     ]
                 },
@@ -130,9 +120,7 @@ export const getSongAsync = songId => {
                     chordSegments: [
                         {
                             beatIdx: 0,
-                            chord: "4^7",
-                            chordName: [ "4", "Dominant7" ],
-                            durationInBeats: 8
+                            chordName: [ "4", "^7" ],
                         }
                     ]
                 }, 
@@ -142,9 +130,7 @@ export const getSongAsync = songId => {
                     chordSegments: [
                         {
                             beatIdx: 0,
-                            chord: "1^7",
-                            chordName: [ "1", "Dominant7" ],
-                            durationInBeats: 8
+                            chordName: [ "1", "^7" ],
                         }
                     ]
                 },
@@ -154,9 +140,7 @@ export const getSongAsync = songId => {
                     chordSegments: [
                         {
                             beatIdx: 0,
-                            chord: "1^7",
-                            chordName: [ "1", "Dominant7" ],
-                            durationInBeats: 8
+                            chordName: [ "1", "^7" ],
                         }
                     ]
                 },
@@ -166,9 +150,7 @@ export const getSongAsync = songId => {
                     chordSegments: [
                         {
                             beatIdx: 0,
-                            chord: "5^7",
-                            chordName: [ "5", "Dominant7" ],
-                            durationInBeats: 8
+                            chordName: [ "5", "^7" ],
                         }
                     ]
                 },
@@ -178,9 +160,7 @@ export const getSongAsync = songId => {
                     chordSegments: [
                         {
                             beatIdx: 0,
-                            chord: "4^7",
-                            chordName: [ "4", "Dominant7" ],
-                            durationInBeats: 8
+                            chordName: [ "4", "^7" ],
                         }
                     ]
                 },
@@ -190,9 +170,7 @@ export const getSongAsync = songId => {
                     chordSegments: [
                         {
                             beatIdx: 0,
-                            chord: "1^7",
-                            chordName: [ "1", "Dominant7" ],
-                            durationInBeats: 8
+                            chordName: [ "1", "^7" ],
                         }
                     ]
                 },
@@ -202,15 +180,11 @@ export const getSongAsync = songId => {
                     chordSegments: [
                         {
                             beatIdx: 0,
-                            chord: "2^-7",
-                            chordName: [ "2", "Minor7" ],
-                            durationInBeats: 4
+                            chordName: [ "2", "^-7" ],
                         },
                         {
                             beatIdx: 4,
-                            chord: "5^7",
-                            chordName: [ "5", "Dominant7" ],
-                            durationInBeats: 4
+                            chordName: [ "5", "^7" ],
                         }
                     ]
                 }

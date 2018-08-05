@@ -17,15 +17,15 @@ class Chart {
     private _durationInSubbeats: number;
 
     constructor(
+        externalUpdate?: () => void, 
         barsBase: IChartBar[] = [], 
         context?: NoteName, 
         tempo?: Tempo,
         feel?: Feel,
-        externalUpdate?: () => void, 
         rangeStartIdx = 0, 
         rangeEndIdx = barsBase.length
     ) {
-        this._addKeysToBars(barsBase);
+        this._addKeysToBars(barsBase, !context);
 
         // If a context has been provided, assume that this Chart is being
         // used in play mode
@@ -50,6 +50,10 @@ class Chart {
         this._rangeStartIdx = rangeStartIdx;
         this._rangeEndIdx = rangeEndIdx;
         this._durationInSubbeats = 0;
+
+        if (externalUpdate) {
+            externalUpdate();
+        }
     }
 
     public forEachBarInRange = (callback: (bar: IChartBar, idx: number) => void) => {
@@ -128,129 +132,127 @@ class Chart {
                     barIdx: idx,
                     timeSignature: barToExtend.timeSignature,
                     chordSegments: [],
-                    durationInSubbeats: barToExtend.durationInSubbeats
                 }
 
                 newBar.chordSegments.push({
                     beatIdx: 0,
-                    chord: segmentToExtend.chord,
                     chordName: segmentToExtend.chordName,
-                    key: segmentToExtend.key,
-                    durationInBeats: newBar.timeSignature[0]
+                    key: segmentToExtend.key
                 });
 
                 this._bars.splice(idx, 0, newBar);
             }
         }
 
-        this._setContextAndBaseBarsFromBars();
-        this._resetBarsAndChordStretches();
-        this._runExternalUpdate();
+        this._onDirectBarsChange();
     }
 
     public updateBar = (idx: number, bar: IChartBar) => {
         this._bars[idx] = bar;
-        this._setContextAndBaseBarsFromBars();
-        this._resetBarsAndChordStretches();
-        this._runExternalUpdate();
+        this._onDirectBarsChange();
     }
 
     private _addKeysToBars = (bars: IChartBar[], contextualized = false) => {
-        
-        let noteSet: (RelativeNoteName | NoteName)[] = Domain.RELATIVE_NOTE_NAMES;
-        if (contextualized) {
-            noteSet = Domain.NOTE_NAMES;
-        }
-
-        interface IStretchKeyPossibilities {
-            keys: (RelativeNoteName | NoteName)[];
-            segmentCount: number;
-        }
-
-        let keyStretches: IStretchKeyPossibilities[] = [];        
-        let possibleChordKeys: Array<(RelativeNoteName | NoteName)[]> = [];
-        let keyStretchPossibilities: IStretchKeyPossibilities[] = [];
-        let currentStretchPossibility: IStretchKeyPossibilities;
-
-        // Get the possible keys per chord segment
-        bars.forEach(barBase => {
-            barBase.chordSegments.forEach(segment => { 
-                possibleChordKeys = [ 
-                    ...possibleChordKeys, 
-                    ChordClass.getSuitableKeys(segment.chordName as ChordName) as (RelativeNoteName | NoteName)[] 
-                ]; 
-            }); 
-        }); 
-
-        // Get the possible keys per key stretch
-        currentStretchPossibility = { keys: possibleChordKeys[0], segmentCount: 1 };
-        for (let i = 1; i < possibleChordKeys.length; i ++) {
-            let chordKeys = possibleChordKeys[i];
-            let keyOverlap = currentStretchPossibility.keys.filter(key => chordKeys.indexOf(key) !== -1);
-
-            if (keyOverlap.length === 0) {
-                keyStretchPossibilities.push(currentStretchPossibility);
-                currentStretchPossibility = { keys: chordKeys, segmentCount: 1 };
-            } else {
-                currentStretchPossibility.keys = keyOverlap;
-                currentStretchPossibility.segmentCount ++;
+        if (bars.length > 0) {
+            let noteSet: (RelativeNoteName | NoteName)[] = Domain.RELATIVE_NOTE_NAMES;
+            if (contextualized) {
+                noteSet = Domain.NOTE_NAMES;
             }
-        }
-
-        keyStretchPossibilities.push(currentStretchPossibility);
-
-        // Now pick the best key possibility per key stretch
-        currentStretchPossibility = keyStretchPossibilities[0];
-        let stretchIdx = 0;
-        let segmentCount = 0;
-        let tonicFound: RelativeNoteName | NoteName | undefined;
-        let tonicFoundForSixth: RelativeNoteName | NoteName | undefined;
-        
-        bars.forEach(barBase => {
-            barBase.chordSegments.forEach(segment => { 
-                let { chordName } = segment;
-                let base = (chordName as ChordName)[0] as RelativeNoteName | NoteName;
-                let minorThirdAboveBase = noteSet[Util.mod(noteSet.indexOf(base) + 4, 12)];
-
-                if (currentStretchPossibility.keys.indexOf(base) !== -1) {
-                    tonicFound = base;
-                }
-
-                if (currentStretchPossibility.keys.indexOf(minorThirdAboveBase) !== -1) {
-                    tonicFoundForSixth = minorThirdAboveBase;
-                }
-
-                segmentCount ++;
-
-                if (segmentCount === currentStretchPossibility.segmentCount) {
-                    if (tonicFound) {
-                        keyStretches.push({ keys: [tonicFound], segmentCount });
-                    } else if (tonicFoundForSixth) {
-                        keyStretches.push({ keys: [tonicFoundForSixth], segmentCount })
-                    } else {
-                        keyStretches.push({ keys: [currentStretchPossibility.keys[0]], segmentCount });
-                    }
-                    stretchIdx ++;
-                    currentStretchPossibility = keyStretchPossibilities[stretchIdx];
-                    segmentCount = 0;
-                }
+    
+            interface IStretchKeyPossibilities {
+                keys: (RelativeNoteName | NoteName)[];
+                segmentCount: number;
+            }
+    
+            let keyStretches: IStretchKeyPossibilities[] = [];        
+            let possibleChordKeys: Array<(RelativeNoteName | NoteName)[]> = [];
+            let keyStretchPossibilities: IStretchKeyPossibilities[] = [];
+            let currentStretchPossibility: IStretchKeyPossibilities;
+    
+            // Get the possible keys per chord segment
+            bars.forEach(barBase => {
+                barBase.chordSegments.forEach(segment => { 
+                    possibleChordKeys = [ 
+                        ...possibleChordKeys, 
+                        ChordClass.getSuitableKeys(segment.chordName as ChordName) as (RelativeNoteName | NoteName)[] 
+                    ]; 
+                }); 
             }); 
-        });
 
-        // Add the key attribute to each segment
-        stretchIdx = 0;
-        segmentCount = 0;
-        bars.forEach(barBase => {
-            barBase.chordSegments.forEach(segment => {
-                segment.key = keyStretches[stretchIdx].keys[0];
-                segmentCount ++;
-
-                if (segmentCount === keyStretches[stretchIdx].segmentCount) {
-                    stretchIdx ++;
-                    segmentCount = 0;
+            // Get the possible keys per key stretch
+            currentStretchPossibility = { keys: possibleChordKeys[0], segmentCount: 1 };
+            for (let i = 1; i < possibleChordKeys.length; i ++) {
+                let chordKeys = possibleChordKeys[i];
+                let keyOverlap = currentStretchPossibility.keys.filter(key => chordKeys.indexOf(key) !== -1);
+    
+                if (keyOverlap.length === 0) {
+                    keyStretchPossibilities.push(currentStretchPossibility);
+                    currentStretchPossibility = { keys: chordKeys, segmentCount: 1 };
+                } else {
+                    currentStretchPossibility.keys = keyOverlap;
+                    currentStretchPossibility.segmentCount ++;
                 }
+            }
+    
+            keyStretchPossibilities.push(currentStretchPossibility);
+
+            console.log("STRETCH POSSIBILITIES", keyStretchPossibilities);
+    
+            // Now pick the best key possibility per key stretch
+            currentStretchPossibility = keyStretchPossibilities[0];
+            let stretchIdx = 0;
+            let segmentCount = 0;
+            let tonicFound: RelativeNoteName | NoteName | undefined;
+            let tonicFoundForSixth: RelativeNoteName | NoteName | undefined;
+            
+            bars.forEach(barBase => {
+                barBase.chordSegments.forEach(segment => { 
+                    let { chordName } = segment;
+                    let base = (chordName as ChordName)[0] as RelativeNoteName | NoteName;
+                    let minorThirdAboveBase = noteSet[Util.mod(noteSet.indexOf(base) + 4, 12)];
+    
+                    if (currentStretchPossibility.keys.indexOf(base) !== -1) {
+                        tonicFound = base;
+                    }
+    
+                    if (currentStretchPossibility.keys.indexOf(minorThirdAboveBase) !== -1) {
+                        tonicFoundForSixth = minorThirdAboveBase;
+                    }
+    
+                    segmentCount ++;
+    
+                    if (segmentCount === currentStretchPossibility.segmentCount) {
+                        if (tonicFound) {
+                            keyStretches.push({ keys: [tonicFound], segmentCount });
+                        } else if (tonicFoundForSixth) {
+                            keyStretches.push({ keys: [tonicFoundForSixth], segmentCount })
+                        } else {
+                            keyStretches.push({ keys: [currentStretchPossibility.keys[0]], segmentCount });
+                        }
+                        stretchIdx ++;
+                        currentStretchPossibility = keyStretchPossibilities[stretchIdx];
+                        segmentCount = 0;
+                    }
+                }); 
             });
-        });
+
+            console.log("KEY STRETCHS", keyStretches);
+    
+            // Add the key attribute to each segment
+            stretchIdx = 0;
+            segmentCount = 0;
+            bars.forEach(barBase => {
+                barBase.chordSegments.forEach(segment => {
+                    segment.key = keyStretches[stretchIdx].keys[0];
+                    segmentCount ++;
+    
+                    if (segmentCount === keyStretches[stretchIdx].segmentCount) {
+                        stretchIdx ++;
+                        segmentCount = 0;
+                    }
+                });
+            });
+        }
     }
 
     private _resetBarsAndChordStretches = () => {
@@ -306,12 +308,24 @@ class Chart {
         }
     }
 
+    private _onDirectBarsChange = () => {
+        if (this._bars.length > 0) {
+            this._addKeysToBars(this._bars, true);
+            console.log("BARS POST KEYS ADDING", this._bars);
+            this._setContextAndBaseBarsFromBars();
+            this._resetBarsAndChordStretches();
+            this._runExternalUpdate();
+        }
+    }
+
     // This can be used when the _bars attribute is already contextualized and its keys
     // have already been determined using _addKeysToBars
     private _setContextAndBaseBarsFromBars = () => {
         if (this._bars.length > 0) {
+            debugger;
+
             let firstMajorKey = this._bars[0].chordSegments[0].key as NoteName;
-            let firstMinorKey = Domain.NOTE_NAMES[ Util.mod(Domain.NOTE_NAMES.indexOf(firstMajorKey) - 5, 12 )];
+            let firstMinorKey = Domain.NOTE_NAMES[ Util.mod(Domain.NOTE_NAMES.indexOf(firstMajorKey) - 3, 12 )];
 
             let context = (this._bars[0].chordSegments[0].chordName as ChordName)[0] as NoteName;
 
@@ -359,6 +373,8 @@ class Chart {
         if (this._externalUpdate) {
             this._externalUpdate();
         }
+
+        console.log(this._context, this._barsBase, this._bars);
     }
 
     /**

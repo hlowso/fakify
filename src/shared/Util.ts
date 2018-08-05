@@ -33,7 +33,7 @@ export const waitFor = (getUpdate: () => boolean, rate: number) => {
     });
 };
 
-export const copyObject = (object: any) => JSON.parse(JSON.stringify(object));
+export const copyObject = <T>(object: T) => JSON.parse(JSON.stringify(object)) as T;
 
 export const length = (obj: any) => {
     return Array.isArray(obj) ? obj.length : Object.keys(obj).length;

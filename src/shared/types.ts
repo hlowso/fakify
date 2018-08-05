@@ -22,13 +22,13 @@ export type NoteName = "C" | "C#|Db" | "D" | "D#|Eb" | "E" | "F" | "F#|Gb" | "G"
 export type RelativeNoteName = "1" | "H" | "2" | "N" | "3" | "4" | "T" | "5" | "U" | "6" | "J" | "7";
 
 export enum ChordShape { 
-    Maj = "Major",
-    Maj7 = "Major7",    
-    Min = "Minor",
-    Min7 = "Minor7",
-    Dom7 = "Dominant7",
-    Dom9 = "Dominant9",
-    Dim = "Diminished"
+    Maj = "+",
+    Maj7 = "^ma7",    
+    Min = "-",
+    Min7 = "^-7",
+    Dom7 = "^7",
+    Dom9 = "^9",
+    Dim = "^Dim"
 }
 
 export type ChordName = [NoteName | RelativeNoteName, ChordShape];
@@ -63,7 +63,6 @@ export interface IChordStretch {
 }
 
 export interface IChordSegment extends IChordStretch {
-    chord?: string;
     subbeatsBeforeChange?: number;
 }
 

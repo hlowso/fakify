@@ -9,27 +9,24 @@ export const HIGHEST_C = LOWEST_A + NUMBER_OF_KEYS - 1;
 export const LOWER_TEMPO_LIMIT = 40;
 export const UPPER_TEMPO_LIMIT = 210;
 
-const NOTE_REGEX = /[A-G](#|b)?/g;
-const RELATIVE_SCALE_NOTE_REGEX = /[1H2N34T5U6J7]/g;
+// const NOTE_REGEX = /[A-G](#|b)?/g;
+// const RELATIVE_SCALE_NOTE_REGEX = /[1H2N34T5U6J7]/g;
 
-export const contextualizeOrDecontextualize = (word: string, keyContext: NoteName, decontextualize = false): string => {
-    let { base, shape } = getWordConstituents(word);
-    let baseIndex = NOTE_NAMES.indexOf(keyContext);
+export const contextualizeOrDecontextualize = (note: RelativeNoteName | NoteName, keyContext: NoteName, decontextualize = false): string => {
+    let targetReferenceIdx = NOTE_NAMES.indexOf(keyContext);
+    let originReferenceIdx = 0;
+    let originScale: (NoteName | RelativeNoteName)[] = RELATIVE_SCALE;
+    let targetScale: (NoteName | RelativeNoteName)[] = NOTE_NAMES;
 
-    let contextualizedBase = (
-        decontextualize
-            ? base.replace(
-                NOTE_REGEX,
-                (note: NoteName) => RELATIVE_SCALE[Util.mod(baseIndex - NOTE_NAMES.indexOf(note), 12)]
-            )
-            : base.replace(
-                RELATIVE_SCALE_NOTE_REGEX, 
-                (note: RelativeNoteName) => NOTE_NAMES[Util.mod(baseIndex + RELATIVE_SCALE.indexOf(note), 12)]
-            )
-    );
-     
+    if (decontextualize) {
+        originReferenceIdx = targetReferenceIdx;
+        targetReferenceIdx = 0;
+        originScale = NOTE_NAMES;
+        targetScale = RELATIVE_SCALE;
+    }
 
-    return shape ? `${contextualizedBase}^${shape}` : contextualizedBase;
+    let indexDiff = originScale.indexOf(note) - originReferenceIdx;
+    return targetScale[Util.mod(targetReferenceIdx + indexDiff, 12)];
 };
 
 export const getWordConstituents = (word: string): any => {
@@ -89,10 +86,9 @@ export const contextualizeOrDecontextualizeBars = (barsBase: IChartBar[], newKey
         let contextualizedBar: IChartBar = Util.copyObject(bar);
         contextualizedBar.chordSegments = bar.chordSegments.map<IChordSegment>((chordBase: IChordSegment ) => {
             let contextualizedChordBase = Util.copyObject(chordBase);
-            contextualizedChordBase.chord = contextualizeOrDecontextualize(chordBase.chord as string, newKeyContext, decontextualize);
-            contextualizedChordBase.chordName = [contextualizeOrDecontextualize(((chordBase.chordName as ChordName)[0] as RelativeNoteName), newKeyContext, decontextualize), (chordBase.chordName as ChordName)[1]]
+            contextualizedChordBase.chordName = [contextualizeOrDecontextualize(((chordBase.chordName as ChordName)[0] as RelativeNoteName), newKeyContext, decontextualize), (chordBase.chordName as ChordName)[1]] as ChordName;
             if (chordBase.key) {
-                contextualizedChordBase.key = contextualizeOrDecontextualize(chordBase.key, newKeyContext, decontextualize);
+                contextualizedChordBase.key = contextualizeOrDecontextualize(chordBase.key, newKeyContext, decontextualize) as (RelativeNoteName | NoteName);
             }
             return contextualizedChordBase;
         });
@@ -101,6 +97,22 @@ export const contextualizeOrDecontextualizeBars = (barsBase: IChartBar[], newKey
 };
 
 export const adjustBarTimes = (bars: IChartBar[], feel: Feel): IChartBar[] => {
+
+    // First add the durationInBeats to each chord segment
+    bars.forEach(bar => {
+        let { timeSignature, chordSegments } = bar;
+        let beatsLeftToOccupyInBar = timeSignature[0];
+
+        // CAREFUL!! Reversing the chordSegments in place
+        chordSegments.reverse().forEach(segment => {
+            segment.durationInBeats = beatsLeftToOccupyInBar - (segment.beatIdx as number);
+            beatsLeftToOccupyInBar -= segment.durationInBeats;
+        });
+
+        // Must reverse chordSegments back again
+        chordSegments.reverse();
+    });
+
     switch (feel) {
         case Feel.Swing: 
             return _adjustBarsSwingFeel(bars);
@@ -139,7 +151,6 @@ const _adjustBarsSwingFeel = (bars: IChartBar[]): IChartBar[] => {
             let adjustedSegment: any = {
                 beatIdx: timeSignature[1] === 8 ? (chordBase.beatIdx as number) / 2 : chordBase.beatIdx,
                 subbeatIdx: conversionFactor * (chordBase.beatIdx as number),
-                chord: chordBase.chord,
                 chordName: chordBase.chordName,
                 key: chordBase.key,
                 durationInSubbeats,
@@ -177,7 +188,7 @@ const _adjustBarsSwingFeel = (bars: IChartBar[]): IChartBar[] => {
                     : chordSegments[segmentIdx + 1]
             );
 
-            if (segment.chord !== nextSegment.chord) {
+            if (segment.chordName !== nextSegment.chordName) {
                 changeIndices.push({ barIdx, segmentIdx });
             }
         }

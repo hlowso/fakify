@@ -88,9 +88,11 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                         "current-chord": isCurrentChord
                     });
 
+                    let chordName = chordSegment ? chordSegment.chordName : null; 
+
                     chordNames.push(
                         <span className={chordNameClasses} key={beatIdx}>
-                            {chordSegment && MusicHelper.getPresentableChord(chordSegment.chord as string, baseKey)}
+                            {chordName && `${MusicHelper.getPresentableNoteName(chordName[0] as NoteName, baseKey)}${chordName[1]}`}
                         </span>
                     );
                     
