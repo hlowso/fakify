@@ -177,7 +177,10 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     }
 
     private _onSaveChart = () => {
-        // TODO: call endpoint that doesn't yet exit
+        Api.saveSong({
+            title: "HELLO BACKEND",
+            originalContext: "B|Cb"
+        });
     }
 
     private _resetChart = () => {

@@ -28,6 +28,10 @@ export const signup = newUser => {
         });
 }
 
+export const saveSong = (newSong) => {
+    return FetchHelpers.POST('/api/songs', newSong);
+}
+
 export const getUserSongTitles = () => {
     // TODO: create endpoint
     return new Promise((resolve, reject) => {
