@@ -16,9 +16,11 @@ export interface IChartViewerProps {
     onAddBar?: (barIdx: number) => void;
     recontextualize?: (noteName: NoteName) => void;
     resetTempo?: (tempo: Tempo) => void;
+    onSongTitleChange?: (updatedTitle: string) => void;
 }
 
 export interface IChartViewerState {
+    editingTitle: boolean;
     precedingInsertBarIdx?: number; 
     followingInsertBarIdx?: number;
 }
@@ -27,7 +29,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     constructor(props: IChartViewerProps) {
         super(props);
         this.state = {
-
+            editingTitle: false
         };
     }
 
@@ -44,13 +46,52 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             <div id="chart-viewer">
                 <header className="chart-header">
                     {!editingMode && this.renderLeftHandSettings()}
-                    <h1 className="song-title">{(song as ISong).title}</h1>
+                    {this.renderTitle()}
                 </header>
                 <section className="chart-body">
                     {this.renderProgression()}
                 </section>
             </div>
         );
+    }
+
+    public renderTitle = () => {
+        let { editingMode, song } = this.props;
+        let { editingTitle } = this.state;
+        return (
+            editingTitle 
+            ? (
+                <form onSubmit={this._onSubmitSongTitleForm} >
+                    <input 
+                        autoFocus={true}
+                        onFocus={(event: React.SyntheticEvent<any>) => (event.target as any).select()}
+                        onBlur={this._onSubmitSongTitleForm}
+                        value={(song as ISong).title}
+                        onChange={(event: React.SyntheticEvent<any>) => this._onSongTitleChange((event.target as any).value)} 
+                    />
+                </form>
+            )
+            : (
+                <h1 
+                    className="song-title"
+                    onClick={editingMode ? () => this.setState({ editingTitle: true }) : undefined}
+                >
+                    {(song as ISong).title}
+                </h1>
+            )
+        );
+    }
+
+    private _onSubmitSongTitleForm = (event: React.SyntheticEvent<any>) => {
+        event.preventDefault();
+        this.setState({ editingTitle: false });
+    }
+
+    private _onSongTitleChange = (updatedTitle: string) => {
+        let { onSongTitleChange } = this.props;
+        if (onSongTitleChange) {
+            onSongTitleChange(updatedTitle);
+        }
     }
 
     /**
@@ -176,7 +217,6 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         }
 
         return renderBars
-        
     }
 
     public renderAddBarBox = (barIdx: number, preceding?: boolean) => (

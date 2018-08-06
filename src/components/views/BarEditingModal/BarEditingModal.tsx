@@ -42,23 +42,19 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
     public render() {
         let { isOpen, close, editingBar } = this.props;
         
-        
-
-        
         return (
             <Modal
                 isOpen={isOpen}
                 onRequestClose={close}
                 contentLabel={"Bar Editing"} 
-                style={modalStyles} >
+                style={modalStyles} 
+            >
                 <div id="midi-settings-modal" >
                     <div className="header">
                         <span>Bar {editingBar.barIdx + 1}</span>
                     </div>
-
                     {this.renderTimeSignatureSelect()}
                     {this.renderChordsSection()}
-
                    <button style={{ marginTop: 10 }} onClick={() => this.props.onSave()} >Save</button>
                 </div>
             </Modal>
@@ -147,6 +143,14 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
                                 >
                                     {shapeOptions}
                                 </select>
+                                {
+                                    beatIdx !== 0
+                                        ? (
+                                            <button onClick={() => this._onRemoveChord(beatIdx)} >
+                                                -
+                                            </button>
+                                        ) : undefined 
+                                }
                             </div>
                         )
                         : (
@@ -188,6 +192,20 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
         } 
 
         updatedBar.chordSegments.splice(segmentIdx, 0, newSegment);
+        this.props.onEdit(updatedBar);
+    }
+
+    private _onRemoveChord = (beatIdx: number) => {
+        let { editingBar } = this.props;
+        let updatedBar = Util.copyObject(editingBar);
+        let segmentIdx = 0;
+        editingBar.chordSegments.forEach(segment => { 
+            if ((segment.beatIdx as number) < beatIdx) { 
+                segmentIdx ++;
+            } 
+        });
+
+        updatedBar.chordSegments.splice(segmentIdx, 1);
         this.props.onEdit(updatedBar);
     }
 

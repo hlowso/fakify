@@ -3,7 +3,7 @@ import ChartViewer from "../../views/ChartViewer/ChartViewer";
 import { BarEditingModal } from "../../views/BarEditingModal/BarEditingModal";
 import * as Util from "../../../shared/Util";
 import * as Api from "../../../shared/Api";
-import { ISong, IChartBar } from "../../../shared/types";
+import { ISong, IChartBar, ChordShape } from "../../../shared/types";
 import Chart from "../../../shared/music/Chart";
 import "./CreateViewController.css";
 
@@ -40,9 +40,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                     stateUpdate.editingSong = {
                         title: "Untitled"
                     };
-                    this._editingChart = new Chart(
-                        this.forceUpdate.bind(this)
-                    );
+                    this._resetChart();
                 } else {
                     stateUpdate.userSongTitles = titles;
                 }
@@ -72,16 +70,6 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
             <div>loading songs...</div>
         );
 
-        let barEditingModal = (isUpdatingBar || isAddingBar) && (
-            <BarEditingModal 
-                isOpen={true}
-                close={() => this.setState({ isAddingBar: false, isUpdatingBar: false })}
-                editingBar={editBar as IChartBar}
-                onEdit={updatedEditingBar => this.setState({ editBar: updatedEditingBar })}
-                onSave={this._onSaveBar}
-            />
-        );
-
         if (!loadingSongTitles) {
             if (!this._editingChart) {
                 content = (userSongTitles as string[]).map(title => (
@@ -96,14 +84,48 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                         chart={this._editingChart} 
                         onBarClick={this._onBarClick}
                         onAddBar={this._onAddBar}
+                        onSongTitleChange={this._onSongTitleChange}
                     />
                 );
             }
         }
 
+        let buttonStyle = {
+            width: 150,
+            height: 30,
+            fontSize: "150%"
+        };
+
+        let footerButtons = (
+            <div style={{ 
+                position: "fixed", 
+                display: "flex", 
+                width: "800px", 
+                height: "100px", 
+                justifyContent: "space-around", 
+                alignItems: "center", 
+                bottom: 0, 
+                backgroundColor: "#222"
+            }}>
+                <button style={buttonStyle} onClick={this._onSaveChart}>Save</button>
+                <button style={buttonStyle} onClick={this._resetChart}>Start Over</button>
+            </div>
+        );
+
+        let barEditingModal = (isUpdatingBar || isAddingBar) && (
+            <BarEditingModal 
+                isOpen={true}
+                close={() => this.setState({ isAddingBar: false, isUpdatingBar: false })}
+                editingBar={editBar as IChartBar}
+                onEdit={updatedEditingBar => this.setState({ editBar: updatedEditingBar })}
+                onSave={this._onSaveBar}
+            />
+        );
+
         return (
             <div className="central-container" >
                 {content}
+                {footerButtons}
                 {barEditingModal}
             </div>
         );
@@ -124,7 +146,10 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                 editBar: {
                     barIdx: 0,
                     timeSignature: [4, 4],
-                    chordSegments: []
+                    chordSegments: [{
+                        beatIdx: 0,
+                        chordName: ["C", ChordShape.Maj]
+                    }]
                 }
             });
         } else {
@@ -149,7 +174,22 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         }
 
         this.setState(stateUpdate);
-        
+    }
+
+    private _onSaveChart = () => {
+        // TODO: call endpoint that doesn't yet exit
+    }
+
+    private _resetChart = () => {
+        this._editingChart = new Chart(
+            this.forceUpdate.bind(this)
+        );
+    }
+
+    private _onSongTitleChange = (updatedTitle: string) => {
+        let songUpdate = Util.copyObject(this.state.editingSong) as ISong;
+        songUpdate.title = updatedTitle;
+        this.setState({ editingSong: songUpdate });
     }
 }
 

@@ -371,8 +371,6 @@ class Chart {
         if (this._externalUpdate) {
             this._externalUpdate();
         }
-
-        console.log(this._context, this._barsBase, this._bars);
     }
 
     /**
