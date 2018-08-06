@@ -92,6 +92,10 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
     private _onTimeSignatureChange = (timeSignatureBeats: number) => {
         let updatedBar = Util.copyObject(this.props.editingBar);
         updatedBar.timeSignature[0] = timeSignatureBeats;
+
+        // Remove chords no longer covered by time signature
+        updatedBar.chordSegments = updatedBar.chordSegments.filter(segment => (segment.beatIdx as number) < timeSignatureBeats);
+
         this.props.onEdit(updatedBar);
     }
 
