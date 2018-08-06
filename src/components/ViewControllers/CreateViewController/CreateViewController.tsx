@@ -18,6 +18,7 @@ export interface ICreateVCState {
     isUpdatingBar?: boolean;
     isAddingBar?: boolean;
     editBar?: IChartBar;
+    errorMessage?: string;
 }
 
 class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
@@ -63,7 +64,8 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
             editingSong, 
             isUpdatingBar,
             isAddingBar,
-            editBar 
+            editBar,
+            errorMessage 
         } = this.state;
 
         let content: JSX.Element | JSX.Element[] = (
@@ -73,7 +75,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         if (!loadingSongTitles) {
             if (!this._editingChart) {
                 content = (userSongTitles as string[]).map(title => (
-                        <span>{title}</span>
+                        <span onClick={() => this._onChooseEditSong("")} >{title}</span>
                     )
                 );
             } else {
@@ -108,7 +110,8 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                 backgroundColor: "#222"
             }}>
                 <button style={buttonStyle} onClick={this._onSaveChart}>Save</button>
-                <button style={buttonStyle} onClick={this._resetChart}>Start Over</button>
+                <button style={buttonStyle} onClick={this._onStartOver}>Start Over</button>
+                {errorMessage && <span style={{ color: "red" }}>{errorMessage}</span>}
             </div>
         );
 
@@ -176,11 +179,37 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         this.setState(stateUpdate);
     }
 
+    private _consolidateSong = (): ISong => {
+        let { editingSong } = this.state;
+        return {
+            title: (editingSong as ISong).title,
+            originalContext: this._editingChart.context,
+            barsBase: this._editingChart.barsBase
+        };
+    }
+
     private _onSaveChart = () => {
-        Api.saveSong({
-            title: "HELLO BACKEND",
-            originalContext: "B|Cb"
-        });
+        let newSong = this._consolidateSong();
+        Api.saveSongAsync(newSong)
+            .then((result: string) => {
+                switch (result) {
+                    case Api.SaveSongResults.Ok:
+                        Util.redirect("create");
+                        break;
+                    case Api.SaveSongResults.TitleExists:
+                        this.setState({ errorMessage: "Song title exists" });
+                        break;
+                    case Api.SaveSongResults.InvalidSong:
+                    default:
+                        this.setState({ errorMessage: "There was an error saving your song" });
+                        break;
+                }
+            });
+    }
+
+    private _onStartOver = () => {
+        this._resetChart();
+        this._onSongTitleChange("Untitled");
     }
 
     private _resetChart = () => {
@@ -192,7 +221,14 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     private _onSongTitleChange = (updatedTitle: string) => {
         let songUpdate = Util.copyObject(this.state.editingSong) as ISong;
         songUpdate.title = updatedTitle;
-        this.setState({ editingSong: songUpdate });
+        this.setState({ 
+            editingSong: songUpdate, 
+            errorMessage: ""
+        });
+    }
+
+    private _onChooseEditSong = (chartId: string) => {
+
     }
 }
 

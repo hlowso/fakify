@@ -27,12 +27,12 @@ export interface IPlayVCState {
     loadingSelectedSong: boolean;
     songTitles: { [songId: string]: string }
     selectedSong: ISong | {};
-    chart: Chart | {};
     midiSettingsModalOpen: boolean;
     playMode: PlayMode;
 }
 
 class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
+    private _chart: Chart;
     private _firstNoteColor = "mediumslateblue";
 
     constructor(props: IPlayVCProps) {
@@ -41,7 +41,6 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             loadingSelectedSong: false,
             songTitles: {},
             selectedSong: {},
-            chart: {},
             midiSettingsModalOpen: false,
             playMode: PlayMode.None         
         };
@@ -83,7 +82,6 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             songTitles, 
             selectedSong, 
             midiSettingsModalOpen, 
-            chart,
             playMode
         } = this.state;
 
@@ -127,7 +125,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                     <ChartViewer
                         editingMode={false}
                         song={selectedSong as ISong}
-                        chart={chart as Chart} 
+                        chart={this._chart as Chart} 
                         sessionIdx={sessionIdx as IMusicIdx} 
                         recontextualize={this._recontextualize} 
                         resetTempo={this._resetTempo} 
@@ -168,8 +166,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
     **********************/
 
     private _startSession = () => {
-        let { chart, playMode } = this.state;
-        this.props.SoundActions.playRangeLoop(chart, playMode);
+        let { playMode } = this.state;
+        this.props.SoundActions.playRangeLoop(this._chart, playMode);
     }
 
     private _stopSession = () => {
@@ -207,17 +205,15 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             );
         }
 
-        this.setState({ 
-            chart: new Chart(
-                this.forceUpdate.bind(this), 
-                barsBase, 
-                context, 
-                tempo, 
-                feel,
-                rangeStartIdx, 
-                rangeEndIdx
-            ) 
-        });
+        this._chart = new Chart(
+            this.forceUpdate.bind(this), 
+            barsBase, 
+            context, 
+            tempo, 
+            feel,
+            rangeStartIdx, 
+            rangeEndIdx
+        ); 
     }
 
     /*******************
@@ -226,8 +222,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
     private _onBarClick = (i: number) => {
         this._stopSession();
-        let { selectedSong, chart } = this.state;
-        let { rangeEndIdx, rangeStartIdx } = chart as Chart;
+        let { selectedSong } = this.state;
+        let { rangeEndIdx, rangeStartIdx } = this._chart as Chart;
         let withinRange = rangeStartIdx <= i && 
                           i <= rangeEndIdx;
 
@@ -246,8 +242,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                     : rangeEndIdx
         );
 
-        (chart as Chart).rangeStartIdx = rangeStartIdxUpdate;
-        (chart as Chart).rangeEndIdx = rangeEndIdxUpdate;
+        (this._chart as Chart).rangeStartIdx = rangeStartIdxUpdate;
+        (this._chart as Chart).rangeEndIdx = rangeEndIdxUpdate;
 
         StorageHelper.updateChartSettings((selectedSong as ISong).chartId as string, {
             rangeStartIdx: rangeStartIdxUpdate,
@@ -257,9 +253,9 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
     private _recontextualize = (newKeyContext: NoteName) => {
         this._stopSession();
-        let { selectedSong, chart } = this.state;
+        let { selectedSong } = this.state;
 
-        (chart as Chart).context = newKeyContext;
+        (this._chart as Chart).context = newKeyContext;
         
         StorageHelper.updateChartSettings((selectedSong as ISong).chartId as string, {
             context: newKeyContext
@@ -268,9 +264,9 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
     private _resetTempo = (newTempo: Tempo) => {
         this._stopSession();
-        let { selectedSong, chart } = this.state;
+        let { selectedSong } = this.state;
 
-        (chart as Chart).tempo = newTempo;
+        (this._chart as Chart).tempo = newTempo;
 
         StorageHelper.updateChartSettings((selectedSong as ISong).chartId as string, {
             tempo: newTempo
@@ -287,7 +283,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         Api.getSongAsync(selectedSongId)
             .then(selectedSong => {
                 if (selectedSong) {
-                    this.setState({ selectedSong });
+                    this.setState({ selectedSong }, this._resetChart);
                 }
             });
     }

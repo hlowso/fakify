@@ -5,13 +5,6 @@ let optionsBase = {
     }, 
 }
 
-const fetchWrapper = (url, options) => {
-    return fetch(url, options)
-        .catch(error => {
-            console.log("PRECOMP - FETCH GET ERROR:", error);
-        });
-}
-
 const sendRequest = (url, method, payload) => {
     let options = {
         method,
@@ -20,7 +13,7 @@ const sendRequest = (url, method, payload) => {
 
     if (payload) options.body = JSON.stringify(payload);
 
-    return fetchWrapper(url, options);
+    return fetch(url, options);
 }
 
 export const GET = (url, payload = null) => {

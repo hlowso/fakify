@@ -444,6 +444,10 @@ class Chart {
         );
     }
 
+    get barsBase() {
+        return this._barsBase;
+    }
+
     /**
      * SETTERS
      */
