@@ -9,9 +9,6 @@ export const HIGHEST_C = LOWEST_A + NUMBER_OF_KEYS - 1;
 export const LOWER_TEMPO_LIMIT = 40;
 export const UPPER_TEMPO_LIMIT = 210;
 
-// const NOTE_REGEX = /[A-G](#|b)?/g;
-// const RELATIVE_SCALE_NOTE_REGEX = /[1H2N34T5U6J7]/g;
-
 export const contextualizeOrDecontextualize = (note: RelativeNoteName | NoteName, keyContext: NoteName, decontextualize = false): string => {
     let targetReferenceIdx = NOTE_NAMES.indexOf(keyContext);
     let originReferenceIdx = 0;

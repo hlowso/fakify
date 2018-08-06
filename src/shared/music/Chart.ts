@@ -195,8 +195,6 @@ class Chart {
             }
     
             keyStretchPossibilities.push(currentStretchPossibility);
-
-            console.log("STRETCH POSSIBILITIES", keyStretchPossibilities);
     
             // Now pick the best key possibility per key stretch
             currentStretchPossibility = keyStretchPossibilities[0];
@@ -235,8 +233,6 @@ class Chart {
                     }
                 }); 
             });
-
-            console.log("KEY STRETCHS", keyStretches);
     
             // Add the key attribute to each segment
             stretchIdx = 0;
@@ -310,20 +306,22 @@ class Chart {
 
     private _onDirectBarsChange = () => {
         if (this._bars.length > 0) {
+            this._updateBarIndices();
             this._addKeysToBars(this._bars, true);
-            console.log("BARS POST KEYS ADDING", this._bars);
             this._setContextAndBaseBarsFromBars();
             this._resetBarsAndChordStretches();
             this._runExternalUpdate();
         }
     }
 
+    private _updateBarIndices = () => {
+        this._bars.forEach((bar, barIdx) => bar.barIdx = barIdx);
+    }
+
     // This can be used when the _bars attribute is already contextualized and its keys
     // have already been determined using _addKeysToBars
     private _setContextAndBaseBarsFromBars = () => {
         if (this._bars.length > 0) {
-            debugger;
-
             let firstMajorKey = this._bars[0].chordSegments[0].key as NoteName;
             let firstMinorKey = Domain.NOTE_NAMES[ Util.mod(Domain.NOTE_NAMES.indexOf(firstMajorKey) - 3, 12 )];
 

@@ -2,8 +2,9 @@ import React, { Component } from "react";
 import * as Cx from "classnames";
 import * as Util from "../../../shared/Util";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
+import { ChordClass } from "../../../shared/music/domain/ChordClass";
 import Chart from "../../../shared/music/Chart";
-import { ISong, IMusicIdx, NoteName, Tempo } from "../../../shared/types";
+import { ISong, IMusicIdx, NoteName, Tempo, ChordName } from "../../../shared/types";
 import "./ChartViewer.css";
 
 export interface IChartViewerProps {
@@ -18,7 +19,8 @@ export interface IChartViewerProps {
 }
 
 export interface IChartViewerState {
-
+    precedingInsertBarIdx?: number; 
+    followingInsertBarIdx?: number;
 }
 
 class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
@@ -51,6 +53,10 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         );
     }
 
+    /**
+     * PROGRESSION
+     */
+
     public renderProgression = (): JSX.Element[] => {
         let { chart, sessionIdx, editingMode } = this.props;
         let { bars, rangeStartIdx, rangeEndIdx } = chart as Chart;
@@ -58,18 +64,22 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
         if (bars && bars.length > 0) {
             let baseKey = bars[0].chordSegments[0].key;
+            let chordName: ChordName;
+            let prevChordName: ChordName;
 
-            renderBars = bars.map((bar, i) => {
-                let chordNames = [];
-                let beats = [];
+            bars.forEach((bar, i) => {
+                let chordNameElements = [];
+                let beatElements = [];
                 let isCurrentlyPlayingBar = sessionIdx && sessionIdx.barIdx === i;
                 let isWithinRange = rangeStartIdx <= i &&
                                     i <= rangeEndIdx;
+                let useDivisionSign = true;
 
                 let barClasses = Cx({ 
+                    "bar": true,
                     "bar-container": true, 
-                    "within-range": isWithinRange,
-                    "current-bar": isCurrentlyPlayingBar
+                    "within-range": isWithinRange && !editingMode,
+                    "current-bar": isCurrentlyPlayingBar && !editingMode
                 });
 
                 for (let beatIdx = 0; beatIdx < bar.timeSignature[1]; beatIdx ++) {
@@ -84,67 +94,108 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                                         sessionIdx.segmentIdx === segmentIdx;
 
                     let chordNameClasses = Cx({
+                        "bar": true,
                         "chord-name": true,
-                        "current-chord": isCurrentChord
+                        "current-chord": isCurrentChord && !editingMode
                     });
 
-                    let chordName = chordSegment ? chordSegment.chordName : null; 
+                    let displayedChordName;
+                    
+                    if (chordSegment) {
+                        prevChordName = chordName;
+                        chordName = chordSegment.chordName as ChordName;
+                        if (!ChordClass.chordNamesAreEqual(chordName, prevChordName)) {
+                            useDivisionSign = false;
+                            displayedChordName = `${MusicHelper.getPresentableNoteName(chordName[0] as NoteName, baseKey)}${chordName[1]}`;
+                        }
+                    }
 
-                    chordNames.push(
+                    chordNameElements.push(
                         <span className={chordNameClasses} key={beatIdx}>
-                            {chordName && `${MusicHelper.getPresentableNoteName(chordName[0] as NoteName, baseKey)}${chordName[1]}`}
+                            {displayedChordName}
                         </span>
                     );
-                    
-                    beats.push(
-                        <span className="beat" key={beatIdx}>
+
+                    beatElements.push(
+                        <span className="bar beat" key={beatIdx}>
                             {beatIdx + 1}
                         </span>
                     );
                 }
 
-                return (
+                let barElement = (
                     <div 
                         key={i}
                         className={barClasses}
-                        onClick={() => this._onBarClick(i)} 
+                        onClick={() => this._onBarClick(i)}
+                        onMouseEnter={() => this._onBarEnter(i)}
+                        onMouseLeave={this._onBarLeave}
                     >
-                        <div className="bar-chord-group">
-                            {chordNames}
+                        <div className="bar bar-chord-group">
+                            {useDivisionSign
+                                ? (
+                                    <div className="bar division-sign">
+                                        %
+                                    </div>
+                                )
+                                : chordNameElements
+                            }
                         </div>
-                        <div className="bar-beat-group">
-                            {beats}
+                        <div className="bar bar-beat-group">
+                            {beatElements}
                         </div>
                     </div>
                 );
+
+                let precedingAddBarBox = (
+                    editingMode && this.state.precedingInsertBarIdx === i
+                        ? this.renderAddBarBox(i, true)
+                        : undefined
+                );
+
+                let followingAddBarBox = (
+                    editingMode && this.state.followingInsertBarIdx === i + 1
+                        ? this.renderAddBarBox(i + 1, false)
+                        : undefined
+                );
+
+                if (precedingAddBarBox) {
+                    renderBars.push(precedingAddBarBox);
+                }
+
+                renderBars.push(barElement);
+
+                if (followingAddBarBox) {
+                    renderBars.push(followingAddBarBox)
+                }
             });
         }
 
         if (editingMode) {
-            renderBars.push(
-                <div 
-                    key={bars.length}
-                    className="bar-container"
-                    onClick={() => this._onAddBar(bars.length)} 
-                >
-                    <span>+</span>
-                </div>
-
-            );
+            renderBars.push(this.renderAddBarBox(bars.length));
         }
-        
 
         return renderBars
         
     }
 
-    public renderLeftHandSettings = (): JSX.Element => {
-        return (
-            <div className="left-hand-settings">
-                {this.renderKeyContextSelect()}
-                {this.renderTempoSelect()}
-            </div>
-        );
+    public renderAddBarBox = (barIdx: number, preceding?: boolean) => (
+        <div 
+            key={`add-${barIdx}`}
+            className="add-bar-box"
+            onClick={() => this._onAddBar(barIdx)} 
+            onMouseEnter={preceding !== undefined ? () => this._onEnterAddBarBox(barIdx, preceding) : () => this.setState({ precedingInsertBarIdx: undefined, followingInsertBarIdx: undefined }) }
+            onMouseLeave={preceding !== undefined ? this._onBarLeave : undefined }
+        >
+            <span>+</span>
+        </div>
+    )
+
+    private _onEnterAddBarBox = (barIdx: number, preceding: boolean) => {
+        this.setState({ 
+            precedingInsertBarIdx: preceding ? barIdx : undefined,
+            followingInsertBarIdx: preceding ? undefined : barIdx
+        });
     }
 
     private _onBarClick = (barIdx: number) => {
@@ -154,11 +205,41 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         }
     }
 
+    private _onBarEnter = (barIdx: number) => {
+        this.setState({ 
+            precedingInsertBarIdx: barIdx === 0 ? undefined : barIdx,
+            followingInsertBarIdx: barIdx === (this.props.chart as Chart).bars.length - 1 ? undefined : barIdx + 1
+        });
+    }
+
+    private _onBarLeave = (event: React.SyntheticEvent<any>) => {
+        let toElementClasses = (event.nativeEvent as MouseEvent).toElement.className.split(" ");
+
+        if (
+            toElementClasses.indexOf("add-bar-box") === -1 &&
+            toElementClasses.indexOf("bar") === -1
+        ) {
+            this.setState({
+                precedingInsertBarIdx: undefined,
+                followingInsertBarIdx: undefined
+            });
+        }
+    }
+
     private _onAddBar = (barIdx: number) => {
         let { onAddBar } = this.props;
         if (onAddBar) {
             onAddBar(barIdx);
         }
+    }
+
+    public renderLeftHandSettings = (): JSX.Element => {
+        return (
+            <div className="left-hand-settings">
+                {this.renderKeyContextSelect()}
+                {this.renderTempoSelect()}
+            </div>
+        );
     }
 
     /**

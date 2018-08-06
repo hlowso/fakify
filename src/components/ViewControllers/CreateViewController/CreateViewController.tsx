@@ -59,7 +59,6 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     }
 
     public renderCentralPanel() {
-        let { _editingChart } = this;
         let { 
             loadingSongTitles, 
             userSongTitles, 
@@ -84,7 +83,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         );
 
         if (!loadingSongTitles) {
-            if (!_editingChart) {
+            if (!this._editingChart) {
                 content = (userSongTitles as string[]).map(title => (
                         <span>{title}</span>
                     )
@@ -94,7 +93,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                     <ChartViewer
                         editingMode={true}
                         song={editingSong}
-                        chart={_editingChart} 
+                        chart={this._editingChart} 
                         onBarClick={this._onBarClick}
                         onAddBar={this._onAddBar}
                     />
@@ -134,7 +133,6 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     }
 
     private _onSaveBar = () => {
-        let { _editingChart } = this;
         let { editBar, isAddingBar, isUpdatingBar } = this.state;
         let stateUpdate: ICreateVCState = {
             isAddingBar: false,
@@ -143,10 +141,10 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
         if (editBar) {
             if (isAddingBar) {
-                _editingChart.addBar(editBar.barIdx, editBar);
+                this._editingChart.addBar(editBar.barIdx, editBar);
             }
             if (isUpdatingBar) {
-                _editingChart.updateBar(editBar.barIdx, editBar);
+                this._editingChart.updateBar(editBar.barIdx, editBar);
             }   
         }
 
