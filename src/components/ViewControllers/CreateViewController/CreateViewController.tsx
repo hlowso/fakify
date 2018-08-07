@@ -38,10 +38,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         Api.getUserSongTitles()
             .then(titles => {
                 if (Util.length(titles) === 0) {
-                    stateUpdate.editingSong = {
-                        title: "Untitled"
-                    };
-                    this._resetChart();
+                    this._onNewSong();
                 } else {
                     stateUpdate.userSongTitles = titles;
                 }
@@ -84,6 +81,12 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                         </div>
                     );
                 }
+
+                content.push(
+                    <button style={{ marginLeft: 20 }} onClick={ this._onNewSong }>
+                        New Song
+                    </button>
+                );
             } else {
                 content = (
                     <ChartViewer
@@ -139,6 +142,13 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                 {barEditingModal}
             </div>
         );
+    }
+
+    private _onNewSong = () => {
+        this.setState({ editingSong: {
+            title: "Untitled"
+        }});
+        this._resetChart();
     }
 
     private _onBarClick = (barIdx: number) => {
