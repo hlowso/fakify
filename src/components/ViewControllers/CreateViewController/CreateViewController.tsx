@@ -19,6 +19,7 @@ export interface ICreateVCState {
     isAddingBar?: boolean;
     editBar?: IChartBar;
     errorMessage?: string;
+    updatingChartId?: string;
 }
 
 class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
@@ -206,9 +207,16 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     }
 
     private _onSaveChart = () => {
+        let { updatingChartId } = this.state;
         let newSong = this._consolidateSong();
-        Api.saveSongAsync(newSong)
-            .then((result: string) => {
+
+        let promise = (
+            updatingChartId 
+                ? Api.updateSongAsync(updatingChartId, newSong) 
+                : Api.saveSongAsync(newSong)
+        ); 
+
+        promise.then((result: string) => {
                 switch (result) {
                     case Api.SaveSongResults.Ok:
                         Util.redirect("create");
@@ -217,6 +225,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                         this.setState({ errorMessage: "Song title exists" });
                         break;
                     case Api.SaveSongResults.InvalidSong:
+                    case Api.SaveSongResults.Error:
                     default:
                         this.setState({ errorMessage: "There was an error saving your song" });
                         break;
@@ -226,6 +235,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
     private _onCancel = () => {
         this._editingChart = undefined;
+        this.setState({ updatingChartId: "" });
         this.forceUpdate();
     }
 
@@ -256,7 +266,10 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         Api.getSongAsync(chartId)
             .then(editingSong => {
                 if (editingSong) {
-                    this.setState({ editingSong }, this._resetChart);
+                    this.setState({ 
+                        editingSong, 
+                        updatingChartId: chartId 
+                    }, this._resetChart);
                 }
             });
     }

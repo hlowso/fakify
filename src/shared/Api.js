@@ -31,7 +31,8 @@ export const signup = newUser => {
 export const SaveSongResults = {
     Ok: "ok",
     TitleExists: "titleExists",
-    InvalidSong: "invalidSong"
+    InvalidSong: "invalidSong",
+    Error: "error"
 };
 
 export async function saveSongAsync(newSong) {
@@ -41,6 +42,19 @@ export async function saveSongAsync(newSong) {
             ok
                 ? SaveSongResults.Ok
                 : SaveSongResults.TitleExists
+        );
+    } catch(error) {
+        return SaveSongResults.InvalidSong;
+    }
+}
+
+export async function updateSongAsync(chartId, newSong) {
+    try {
+        let { ok } = await FetchHelpers.PUT(`/api/songs/${chartId}`, newSong);
+        return (
+            ok
+                ? SaveSongResults.Ok
+                : SaveSongResults.Error
         );
     } catch(error) {
         return SaveSongResults.InvalidSong;

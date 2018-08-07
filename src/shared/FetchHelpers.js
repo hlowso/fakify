@@ -27,3 +27,7 @@ export const PATCH = (url, payload = null) => {
 export const POST = (url, payload = null) => {
     return sendRequest(url, "POST", payload);
 }
+
+export const PUT = (url, payload = null) => {
+    return sendRequest(url, "PUT", payload);
+}
