@@ -10,6 +10,7 @@ export enum Tabs {
 
 export interface ISong {
     chartId?: string;
+    userId?: string;
     title?: string;
     originalContext?: NoteName;
     originalTempo?: Tempo;

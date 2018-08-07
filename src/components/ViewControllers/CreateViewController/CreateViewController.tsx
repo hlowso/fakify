@@ -13,7 +13,7 @@ export interface ICreateVCProps {
 
 export interface ICreateVCState {
     loadingSongTitles?: boolean;
-    userSongTitles?: string[];
+    userSongTitles?: { [chartId: string]: string };
     editingSong?: ISong;
     isUpdatingBar?: boolean;
     isAddingBar?: boolean;
@@ -22,7 +22,7 @@ export interface ICreateVCState {
 }
 
 class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
-    private _editingChart: Chart;
+    private _editingChart?: Chart;
 
     constructor(props: ICreateVCProps) {
         super(props);
@@ -37,7 +37,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         let stateUpdate: ICreateVCState = { loadingSongTitles: false };
         Api.getUserSongTitles()
             .then(titles => {
-                if (titles.length === 0) {
+                if (Util.length(titles) === 0) {
                     stateUpdate.editingSong = {
                         title: "Untitled"
                     };
@@ -74,10 +74,16 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
         if (!loadingSongTitles) {
             if (!this._editingChart) {
-                content = (userSongTitles as string[]).map(title => (
-                        <span onClick={() => this._onChooseEditSong("")} >{title}</span>
-                    )
-                );
+                content = [];
+                userSongTitles = userSongTitles as { [chartId: string]: string };
+
+                for (let chartId in userSongTitles) {
+                    content.push(
+                        <div className="user-title" onClick={() => this._onChooseEditSong(chartId)} >
+                            {userSongTitles[chartId]}
+                        </div>
+                    );
+                }
             } else {
                 content = (
                     <ChartViewer
@@ -98,7 +104,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
             fontSize: "150%"
         };
 
-        let footerButtons = (
+        let footerButtons = this._editingChart && (
             <div style={{ 
                 position: "fixed", 
                 display: "flex", 
@@ -110,6 +116,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                 backgroundColor: "#222"
             }}>
                 <button style={buttonStyle} onClick={this._onSaveChart}>Save</button>
+                <button style={buttonStyle} onClick={this._onCancel}>Cancel</button>                
                 <button style={buttonStyle} onClick={this._onStartOver}>Start Over</button>
                 {errorMessage && <span style={{ color: "red" }}>{errorMessage}</span>}
             </div>
@@ -137,7 +144,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     private _onBarClick = (barIdx: number) => {
         let stateUpdate: ICreateVCState = { 
             isUpdatingBar: true,
-            editBar: Util.copyObject(this._editingChart.bars[barIdx]) 
+            editBar: Util.copyObject((this._editingChart as Chart).bars[barIdx]) 
         };
         this.setState(stateUpdate);
     }
@@ -156,7 +163,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                 }
             });
         } else {
-            this._editingChart.addBar(barIdx);
+            (this._editingChart as Chart).addBar(barIdx);
         }
     }
 
@@ -169,10 +176,10 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
         if (editBar) {
             if (isAddingBar) {
-                this._editingChart.addBar(editBar.barIdx, editBar);
+                (this._editingChart as Chart).addBar(editBar.barIdx, editBar);
             }
             if (isUpdatingBar) {
-                this._editingChart.updateBar(editBar.barIdx, editBar);
+                (this._editingChart as Chart).updateBar(editBar.barIdx, editBar);
             }   
         }
 
@@ -183,8 +190,8 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         let { editingSong } = this.state;
         return {
             title: (editingSong as ISong).title,
-            originalContext: this._editingChart.context,
-            barsBase: this._editingChart.barsBase
+            originalContext: (this._editingChart as Chart).context,
+            barsBase: (this._editingChart as Chart).barsBase
         };
     }
 
@@ -207,14 +214,22 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
             });
     }
 
+    private _onCancel = () => {
+        this._editingChart = undefined;
+        this.forceUpdate();
+    }
+
     private _onStartOver = () => {
         this._resetChart();
         this._onSongTitleChange("Untitled");
     }
 
     private _resetChart = () => {
+        let { editingSong } = this.state;
         this._editingChart = new Chart(
-            this.forceUpdate.bind(this)
+            this.forceUpdate.bind(this),
+            editingSong ? editingSong.barsBase : undefined,
+            editingSong ? editingSong.originalContext : undefined
         );
     }
 
@@ -228,7 +243,12 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     }
 
     private _onChooseEditSong = (chartId: string) => {
-
+        Api.getSongAsync(chartId)
+            .then(editingSong => {
+                if (editingSong) {
+                    this.setState({ editingSong }, this._resetChart);
+                }
+            });
     }
 }
 
