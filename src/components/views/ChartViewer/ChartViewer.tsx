@@ -272,22 +272,24 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     private _onBarLeave = (event: React.SyntheticEvent<any>) => {
-        let toElementClasses = (event.nativeEvent as MouseEvent).toElement.className.split(" ");
-        let stateUpdate: IChartViewerState = {};
+        if (event && event.nativeEvent && (event.nativeEvent as MouseEvent).toElement) {
+            let toElementClasses = (event.nativeEvent as MouseEvent).toElement.className.split(" ");
+            let stateUpdate: IChartViewerState = {};
 
-        if (toElementClasses.indexOf("bar") === -1) {
-            stateUpdate.hoveredBarIdx = undefined;
-            if (toElementClasses.indexOf("add-bar-box") === -1) {
-                stateUpdate = {
-                    ...stateUpdate,
-                    hoveredBarIdx: undefined,
-                    precedingInsertBarIdx: undefined,
-                    followingInsertBarIdx: undefined
+            if (toElementClasses.indexOf("bar") === -1) {
+                stateUpdate.hoveredBarIdx = undefined;
+                if (toElementClasses.indexOf("add-bar-box") === -1) {
+                    stateUpdate = {
+                        ...stateUpdate,
+                        hoveredBarIdx: undefined,
+                        precedingInsertBarIdx: undefined,
+                        followingInsertBarIdx: undefined
+                    }
                 }
             }
-        }
-            
-        this.setState(stateUpdate);
+                
+            this.setState(stateUpdate);
+        }   
     }
 
     private _onAddBar = (barIdx: number) => {
