@@ -5,6 +5,8 @@
   "proxy": "http://localhost:3001",
   "dependencies": {
     "classnames": "^2.2.5",
+    "dotenv-webpack": "^1.5.7",
+    "express": "^4.16.3",
     "react": "^16.3.2",
     "react-bootstrap": "^0.32.1",
     "react-dom": "^16.3.2",
@@ -21,10 +23,12 @@
     "start": "react-scripts-ts start",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
+    "eject": "react-scripts-ts eject",
+    "build-server": "node_modules/webpack/bin/webpack.js --config src/backend/webpack.config.ts"
   },
   "devDependencies": {
     "@types/classnames": "^2.2.4",
+    "@types/express": "^4.16.0",
     "@types/node": "^10.3.3",
     "@types/react": "^16.3.18",
     "@types/react-bootstrap": "^0.32.10",
