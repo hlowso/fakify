@@ -12,7 +12,6 @@ module.exports = {
     ]
   },
   resolve: {
-    // moduleDirectories: ['node_modules'],
     modules: [ "./node_modules/" ],
     extensions: [ '.js', '.ts' ]
   },
@@ -21,5 +20,8 @@ module.exports = {
     path: path.resolve(__dirname, '../../')
   },
   target: "node",
-  plugins: [ new Dotenv() ]
+  plugins: [ new Dotenv() ],
+  node: {
+    __dirname: false
+  }
 };
