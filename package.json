@@ -20,12 +20,12 @@
     "webaudiofont": "^2.5.0"
   },
   "scripts": {
-    "start": "react-scripts-ts start",
+    "start-dev": "react-scripts-ts start",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",
     "build-server": "node_modules/webpack/bin/webpack.js --config webpack.config.server.ts",
-    "start-server": "npm run build-server && node server.js"
+    "start": "npm run build-server && node server.js"
   },
   "devDependencies": {
     "@types/classnames": "^2.2.4",
