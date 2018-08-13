@@ -10,6 +10,9 @@ const server = express();
 
 server.use(express.static('build'));
 
-server.get(['/', '/login', '/signup'], (req, res) => res.sendFile(path.join(__dirname, "/build/index.html")));
+server.get(['/', '/login', '/signup'], (req, res) => { 
+    console.log("HIT THE ENDPOINT");
+    res.sendFile(path.join(__dirname, "/build/index.html")); 
+});
 
 server.listen(port, () => console.log(`Precomp listening on port ${port}`));
