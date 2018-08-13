@@ -1,8 +1,10 @@
 const path = require('path');
 const Dotenv = require('dotenv-webpack');
 
+console.log("WEBPACK", __dirname);
+
 module.exports = {
-  entry: './src/backend/index.ts',
+  entry: path.resolve(__dirname, './src/backend/index.ts'),
   module: {
     rules: [
       {
@@ -17,7 +19,7 @@ module.exports = {
   },
   output: {
     filename: 'server.js',
-    path: path.resolve(__dirname, '../../')
+    path: path.resolve(__dirname, './')
   },
   target: "node",
   plugins: [ new Dotenv() ],

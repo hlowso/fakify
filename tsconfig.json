@@ -28,6 +28,7 @@
     "jest",
     "src/setupTests.ts",
     "public",
-    "src/backend"
+    "src/backend",
+    "webpack.config.server.ts"
   ]
 }

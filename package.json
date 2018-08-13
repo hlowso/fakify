@@ -24,7 +24,7 @@
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",
-    "build-server": "node_modules/webpack/bin/webpack.js --config src/backend/webpack.config.ts",
+    "build-server": "node_modules/webpack/bin/webpack.js --config webpack.config.server.ts",
     "start-server": "npm run build-server && node server.js"
   },
   "devDependencies": {
