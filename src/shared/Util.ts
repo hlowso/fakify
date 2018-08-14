@@ -1,7 +1,7 @@
 import { Tabs, ISubbeatTimeMap, IMusicIdx } from "./types";
 
 export const redirect = (route: string) => {
-    window.location.replace(`http://localhost:3000/${route}`);
+    window.location.replace(`${window.location.origin}/${route}`);
 };
 
 export const getCurrentTab = () => {
