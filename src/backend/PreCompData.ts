@@ -25,7 +25,7 @@ export class PreCompData {
 
     public connectAsync = () => {
         return new Promise((resolve, reject) => {
-            Mongo.MongoClient.connect(this.connectionUrl, (err, client) => {
+            Mongo.MongoClient.connect(this.connectionUrl, { useNewUrlParser: true }, (err, client) => {
 
                 if (err !== null) {
                     reject(err);
