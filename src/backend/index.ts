@@ -1,13 +1,13 @@
 import express from "express";
-import path from "path";
+import cookieSession from "cookie-session";
+import bodyParser from "body-parser";
 import { PreCompData } from "./PreCompData";
+import { PreCompApiHelper } from "./PreCompApiHelper";
+import { AdminViewController } from "./controllers/views/AdminViewController";
+import { StandardViewController } from "./controllers/views/StandardViewController";
 
-// import fs from "fs";
-// let files = fs.readdirSync('./build/static/js');
-// /Users/hlowso/Projects/precomp/precomp-frontend/
-
-const exitHandler = (db: PreCompData, options: any, exitCode: number) => {
-    db.close();
+const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
+    data.close();
     if (options.exit) {
         process.exit();
     }
@@ -24,7 +24,8 @@ const exitHandler = (db: PreCompData, options: any, exitCode: number) => {
         MONGO_SERVER, 
         MONGO_USER, 
         MONGO_PASSWORD, 
-        MONGO_DATABASE_NAME 
+        MONGO_DATABASE_NAME,
+        SESSION_SECRET 
     } = process.env;
 
     // Create database helper
@@ -37,16 +38,23 @@ const exitHandler = (db: PreCompData, options: any, exitCode: number) => {
 
     await data.connectAsync();
 
-    console.log(await data.getChartsAsync());
+    // Create api helper
+    const api = new PreCompApiHelper(data);
 
     // Setup server
     const server = express();
 
     server.use(express.static('build'));
-
-    server.get(['/', '/login', '/signup'], (req, res) => { 
-        res.sendFile(path.join(__dirname, "/build/index.html")); 
-    });
+    server.use(cookieSession({
+        name: "PreComp Session",
+        secret: SESSION_SECRET as string,
+        maxAge: 24 * 60 * 60 * 1000 * 7 // One week
+    }));
+    server.use(bodyParser.json());
+    server.use("/", 
+        new AdminViewController(api).router, 
+        new StandardViewController(api).router
+    );
 
     server.listen(PORT, () => console.log(`Precomp listening on port ${PORT}!`));
 
@@ -55,17 +63,18 @@ const exitHandler = (db: PreCompData, options: any, exitCode: number) => {
      */
 
     //do something when app is closing
-    process.on('exit', exitHandler.bind(null, data, { cleanup:true }));
+    process.on('exit', exitHandler.bind(null, data, { cleanup: true }));
 
     //catches ctrl+c event
-    process.on('SIGINT', exitHandler.bind(null, data, { exit:true }));
+    process.on('SIGINT', exitHandler.bind(null, data, { exit: true }));
 
     // catches "kill pid" (for example: nodemon restart)
-    process.on('SIGUSR1', exitHandler.bind(null, data, { exit:true }));
-    process.on('SIGUSR2', exitHandler.bind(null, data, { exit:true }));
+    process.on('SIGUSR1', exitHandler.bind(null, data, { exit: true }));
+    process.on('SIGUSR2', exitHandler.bind(null, data, { exit: true }));
 
     //catches uncaught exceptions
-    process.on('uncaughtException', exitHandler.bind(null, data, { exit:true }));
+    process.on('uncaughtException', exitHandler.bind(null, data, { exit: true }));
+
 })();
 
 
