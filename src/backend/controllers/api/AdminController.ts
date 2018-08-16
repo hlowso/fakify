@@ -14,6 +14,9 @@ export class AdminController extends PreCompController {
          */
 
         this._router.use("/signup", async (req, res) => {
+
+            console.log("HIT LOGIN");
+
             let user = await this._api.createUserAsync(req.body as IIncomingUser);
             if (!user) {
                 res.status(403);
