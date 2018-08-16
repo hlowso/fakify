@@ -60,7 +60,7 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
         new StandardViewController(api).router
     );
 
-    server.use("/api/admin", 
+    server.use("/api/admin/", 
         new AdminController(api).router
     );
 
