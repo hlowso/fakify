@@ -3,8 +3,10 @@ import cookieSession from "cookie-session";
 import bodyParser from "body-parser";
 import { PreCompData } from "./PreCompData";
 import { PreCompApiHelper } from "./PreCompApiHelper";
+
 import { AdminViewController } from "./controllers/views/AdminViewController";
 import { StandardViewController } from "./controllers/views/StandardViewController";
+import { AdminController } from "./controllers/api/AdminController";
 
 const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
     data.close();
@@ -51,9 +53,15 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
         maxAge: 24 * 60 * 60 * 1000 * 7 // One week
     }));
     server.use(bodyParser.json());
+
+    // Set routes
     server.use("/", 
         new AdminViewController(api).router, 
         new StandardViewController(api).router
+    );
+
+    server.use("/api/admin", 
+        new AdminController(api).router
     );
 
     server.listen(PORT, () => console.log(`Precomp listening on port ${PORT}!`));

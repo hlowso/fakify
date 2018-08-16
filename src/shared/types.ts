@@ -1,5 +1,16 @@
 import { Note } from "./music/domain/Note";
 
+export interface IIncomingUser {
+    email: string;
+    password: string;
+}
+
+export interface IUser {
+    email: string;
+    passhash: string;
+    token: string;
+}
+
 export enum Tabs {
     Login = "login",
     Signup = "signup",

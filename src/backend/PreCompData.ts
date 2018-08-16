@@ -1,4 +1,5 @@
 import * as Mongo from "mongodb";
+import { IUser, ISong } from "../shared/types";
 
 export class PreCompData {
     private _mongoServer: string;
@@ -6,7 +7,9 @@ export class PreCompData {
     private _password: string;
     private _dbName: string;
     private _client: any;
-    private _db: Mongo.Db;
+
+    private _userColl: Mongo.Collection;
+    private _chartColl: Mongo.Collection;    
 
     constructor(server: string, user: string, password: string, dbName: string) {
         this._mongoServer = server;
@@ -32,7 +35,10 @@ export class PreCompData {
                 }
 
                 this._client = client;
-                this._db = client.db();
+                let db = client.db();
+
+                this._userColl = db.collection("Users");
+                this._chartColl = db.collection("Charts");                
 
                 resolve();
             });
@@ -47,15 +53,62 @@ export class PreCompData {
      * HELPER FUNCTIONS
      */
 
-    public getChartsAsync = () => {
+    public getUserByTokenAsync = (token: string): Promise<IUser> => {
         return new Promise((resolve, reject) => {
-            const coll = this._db.collection("Charts");
-            coll.find({}).toArray((err, charts) => {
+            this._userColl.findOne({ token }, (err, user) => {
                 if (err !== null) {
                     reject(err);
                 }
 
-                resolve(charts);
+                resolve(user as IUser);
+            });
+        });
+    }
+
+    public getUserByEmailAsync = (email: string): Promise<IUser> => {
+        return new Promise((resolve, reject) => {
+            this._userColl.findOne({ email }, (err, user) => {
+                if (err !== null) {
+                    reject(err);
+                }
+
+                resolve(user as IUser);
+            });
+        });
+    }
+
+    public insertUserAsync = (user: IUser): Promise<Mongo.InsertOneWriteOpResult> => {
+        return new Promise((resolve, reject) => {
+            this._userColl.insertOne(user, (err, response) => {
+                if (err !== null) {
+                    reject(err);
+                }
+
+                resolve(response);
+            });
+        });
+    }
+
+    public updateUserAsync = (user: IUser): Promise<Mongo.UpdateWriteOpResult> => {
+        return new Promise((resolve, reject) => {
+            this._userColl.updateOne({ email: user.email }, user, (err, response) => {
+                if (err != null) {
+                    reject(err);
+                }
+
+                resolve(response);
+            });
+        });
+    }
+
+    public getChartsAsync = (): Promise<ISong[]> => {
+        return new Promise((resolve, reject) => {
+            this._chartColl.find({}).toArray((err, charts) => {
+                if (err !== null) {
+                    reject(err);
+                }
+
+                resolve(charts as ISong[]);
             });
         });
     }
