@@ -84,9 +84,3 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
     process.on('uncaughtException', exitHandler.bind(null, data, { exit: true }));
 
 })();
-
-
-
-
-
-

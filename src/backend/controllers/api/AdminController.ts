@@ -13,7 +13,7 @@ export class AdminController extends PreCompController {
          * ROUTES
          */
 
-        this._router.use("/signup", async (req, res) => {
+        this._router.post("/signup", async (req, res) => {
 
             console.log("HIT LOGIN");
 
@@ -25,7 +25,7 @@ export class AdminController extends PreCompController {
             return res.send(user);
         });
 
-        this._router.use("/login", async (req, res) => {
+        this._router.patch("/login", async (req, res) => {
             let user = await this._api.loginUserAsync(req.body as IIncomingUser);
             if (!user) {
                 res.status(401);
@@ -35,7 +35,7 @@ export class AdminController extends PreCompController {
         });
 
         // TODO: remove this endpoint
-        this._router.use("/authenticate", (req, res) => { 
+        this._router.get("/authenticate", (req, res) => { 
             res.status(400);
             res.send("Deprecated endpoint");
         })
