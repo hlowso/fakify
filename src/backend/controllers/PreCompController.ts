@@ -23,9 +23,17 @@ export class PreCompController {
         this._user = null;
 
         this._router.use( async (req, res, next) => {
+            let token: string | undefined;
+
             if (req.session) {
-                this._user = await this._api.data.getUserByTokenAsync(req.session.token);
+                token = req.session.token;
             }
+            
+            if (token) {
+                this._user = await this._api.data.getUserByTokenAsync(token);
+            }
+
+            console.log(this._user);
 
             if (!this._user) {
                 switch (this._unauthorizedResponse) {
