@@ -4,9 +4,9 @@ import bodyParser from "body-parser";
 import { PreCompData } from "./PreCompData";
 import { PreCompApiHelper } from "./PreCompApiHelper";
 
+import { AdminController } from "./controllers/api/AdminController";
 import { AdminViewController } from "./controllers/views/AdminViewController";
 import { StandardViewController } from "./controllers/views/StandardViewController";
-import { AdminController } from "./controllers/api/AdminController";
 
 const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
     data.close();
@@ -55,12 +55,15 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
     server.use(bodyParser.json());
 
     // Set routes
-    server.use("/", 
-        new AdminViewController(api).router, 
-        new StandardViewController(api).router
-    );
+    let adminViewRouter = new AdminViewController(api).router;
+    let standardViewRouter = new StandardViewController(api).router;
+    
+    server.use("/login", adminViewRouter);
+    server.use("/signup", adminViewRouter);
+    server.use("/play", standardViewRouter);
+    server.use("/create", standardViewRouter);    
 
-    server.use("/api/admin/", 
+    server.use("/api/admin", 
         new AdminController(api).router
     );
 

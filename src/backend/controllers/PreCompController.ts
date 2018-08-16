@@ -38,17 +38,20 @@ export class PreCompController {
             if (!this._user) {
                 switch (this._unauthorizedResponse) {
                     case UnauthorizedResponse.GoToLogin: 
-                        res.sendFile(path.resolve(__dirname, "/build/index.html"));
-                        break;
+                        console.log("GO TO LOGIN", __dirname);
+                        return res.sendFile(path.resolve(__dirname, "build/index.html"));
                     case UnauthorizedResponse.Ignore:
-                        next();
-                        break;
+                        console.log("IGNORE");                    
+                        return next();
                     default:
                     case UnauthorizedResponse.Return403:
+                        console.log("403");
                         res.status(401);
-                        res.send("Missing authentication token");
-                        break;
+                        return res.send("Missing authentication token");
                 }
+            } else {
+                console.log("ELSE");
+                return next();
             }
         });
     }

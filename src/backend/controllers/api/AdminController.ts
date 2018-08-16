@@ -36,8 +36,9 @@ export class AdminController extends PreCompController {
 
         // TODO: remove this endpoint
         this._router.get("/authenticate", (req, res) => { 
+            console.log("hitting authenticate");
             res.status(400);
-            res.send("Deprecated endpoint");
+            return res.send("Deprecated endpoint");
         })
     }
 }

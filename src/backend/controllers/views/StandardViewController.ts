@@ -13,7 +13,7 @@ export class StandardViewController extends PreCompController {
          */
 
         this._router.get(["/", "/play", "/create"], (req, res) => {
-            res.sendFile(path.resolve(__dirname, "/build/index.html"));
+            res.sendFile(path.resolve(__dirname, "build/index.html"));
         });
     }
 }

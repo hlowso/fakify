@@ -13,7 +13,7 @@ export class AdminViewController extends PreCompController {
          */
 
         this._router.get(["/login", "/signup"], (req, res) => {
-            res.sendFile(path.resolve(__dirname, "/build/index.html"));
+            res.sendFile(path.resolve(__dirname, "build/index.html"));
         });
     }
 }
