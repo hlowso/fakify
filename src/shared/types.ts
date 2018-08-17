@@ -11,6 +11,17 @@ export interface IUser {
     token: string;
 }
 
+export const AdminRoutes = [
+    "/login",
+    "/signup"
+]
+
+export const StandardRoutes = [
+    "/",
+    "/play",
+    "/create"
+]
+
 export enum Tabs {
     Login = "login",
     Signup = "signup",
