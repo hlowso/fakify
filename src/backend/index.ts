@@ -56,6 +56,13 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
     }));
     server.use(bodyParser.json());
 
+    // Enable CORS
+    server.use((req, res, next) => {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        next();
+    });
+
     // Set routes
     server.use(AdminRoutes, new AdminViewController(api).router);
     server.use(StandardRoutes, new StandardViewController(api).router);
