@@ -1,4 +1,3 @@
-// import express from "express";
 import { UnauthorizedResponse, PreCompController } from "../PreCompController";
 import { PreCompApiHelper } from "../../PreCompApiHelper";
 import { IIncomingUser } from "../../../shared/types";
@@ -43,7 +42,19 @@ export class AdminController extends PreCompController {
             return res.send(user);
         });
 
-        // TODO: remove this endpoint
+        this._router.patch("/logout", async (req, res) => {
+            let found = false;
+            if (req.session) {
+                try {
+                    found = await this._api.data.clearUserTokenAsync(req.session.token);
+                } catch (err) {
+                    res.status(500);
+                }
+            }
+
+            res.send(found);
+        });
+
         this._router.get("/authenticate", async (req, res) => { 
             if (req.session) {
                 let user = await this._api.data.getUserByTokenAsync(req.session.token);

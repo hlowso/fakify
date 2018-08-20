@@ -6,6 +6,7 @@ export interface IIncomingUser {
 }
 
 export interface IUser {
+    userId?: string;
     email: string;
     passhash: string;
     token: string;

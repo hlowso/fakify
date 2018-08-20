@@ -89,14 +89,26 @@ export class PreCompData {
         });
     }
 
-    public updateUserAsync = (user: IUser): Promise<Mongo.UpdateWriteOpResult> => {
+    public updateUserTokenAsync = (email: string, token: string): Promise<Mongo.UpdateWriteOpResult> => {
         return new Promise((resolve, reject) => {
-            this._userColl.updateOne({ email: user.email }, user, (err, response) => {
+            this._userColl.updateOne({ email }, { $set: { token } }, (err, response) => {
                 if (err != null) {
                     reject(err);
                 }
 
                 resolve(response);
+            });
+        });
+    }
+
+    public clearUserTokenAsync = (token: string): Promise<boolean> => {
+        return new Promise((resolve, reject) => {
+            this._userColl.updateOne({ token }, { $set: { token: null } }, (err, response) => {
+                if (err != null) {
+                    reject(err);
+                }
+
+                resolve(response.modifiedCount === 1);
             });
         });
     }

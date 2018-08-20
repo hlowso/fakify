@@ -8,6 +8,8 @@ import { AdminController } from "./controllers/api/AdminController";
 import { AdminViewController } from "./controllers/views/AdminViewController";
 import { StandardViewController } from "./controllers/views/StandardViewController";
 
+import { AdminRoutes, StandardRoutes } from "../shared/types";
+
 const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
     data.close();
     if (options.exit) {
@@ -55,13 +57,8 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
     server.use(bodyParser.json());
 
     // Set routes
-    let adminViewRouter = new AdminViewController(api).router;
-    let standardViewRouter = new StandardViewController(api).router;
-    
-    server.use("/login", adminViewRouter);
-    server.use("/signup", adminViewRouter);
-    server.use("/play", standardViewRouter);
-    server.use("/create", standardViewRouter);    
+    server.use(AdminRoutes, new AdminViewController(api).router);
+    server.use(StandardRoutes, new StandardViewController(api).router);
 
     server.use("/api/admin", 
         new AdminController(api).router

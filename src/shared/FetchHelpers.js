@@ -5,7 +5,14 @@ let optionsBase = {
     }, 
 }
 
-const sendRequest = (url, method, payload) => {
+const sendRequest = (path, method, payload) => {
+    let url = (
+        // Use an environment variable that won't exist on netlify's server
+        process.env.PRECOMP_LOCAL
+            ? ""
+            : "https://precomp.herokuapp.com"
+    ) + path;
+
     let options = {
         method,
         ...optionsBase
@@ -13,21 +20,21 @@ const sendRequest = (url, method, payload) => {
 
     if (payload) options.body = JSON.stringify(payload);
 
-    return fetch(url, options);
+    return fetch(`https://precomp.herokuapp.com${path}`, options);
 }
 
-export const GET = (url, payload = null) => {
-    return sendRequest(url, "GET", payload);
+export const GET = (path, payload = null) => {
+    return sendRequest(path, "GET", payload);
 }
 
-export const PATCH = (url, payload = null) => {
-    return sendRequest(url, "PATCH", payload);
+export const PATCH = (path, payload = null) => {
+    return sendRequest(path, "PATCH", payload);
 }
 
-export const POST = (url, payload = null) => {
-    return sendRequest(url, "POST", payload);
+export const POST = (path, payload = null) => {
+    return sendRequest(path, "POST", payload);
 }
 
-export const PUT = (url, payload = null) => {
-    return sendRequest(url, "PUT", payload);
+export const PUT = (path, payload = null) => {
+    return sendRequest(path, "PUT", payload);
 }

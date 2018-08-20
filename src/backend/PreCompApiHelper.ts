@@ -34,7 +34,6 @@ export class PreCompApiHelper {
     }
 
     public loginUserAsync = async (returningUser: IIncomingUser) => {
-
         let existingUser = await this._data.getUserByEmailAsync(returningUser.email);   
 
         if (!existingUser) {
@@ -45,10 +44,10 @@ export class PreCompApiHelper {
             return null;
         }
 
-        existingUser.token = uuidv4();
+        let newToken = uuidv4();
 
-        await this._data.updateUserAsync(existingUser);
+        await this._data.updateUserTokenAsync(existingUser.email, newToken);
 
-        return existingUser;
+        return { ...existingUser, token: newToken};
     }
 }
