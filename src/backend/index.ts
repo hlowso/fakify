@@ -5,6 +5,7 @@ import { PreCompData } from "./PreCompData";
 import { PreCompApiHelper } from "./PreCompApiHelper";
 
 import { AdminController } from "./controllers/api/AdminController";
+import { ChartsController } from "./controllers/api/ChartsController";
 import { AdminViewController } from "./controllers/views/AdminViewController";
 import { StandardViewController } from "./controllers/views/StandardViewController";
 
@@ -69,6 +70,10 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
 
     server.use("/api/admin", 
         new AdminController(api).router
+    );
+
+    server.use("/api/songs",
+        new ChartsController(api).router
     );
 
     server.listen(PORT, () => console.log(`Precomp listening on port ${PORT}!`));

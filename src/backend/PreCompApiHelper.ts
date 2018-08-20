@@ -50,4 +50,12 @@ export class PreCompApiHelper {
 
         return { ...existingUser, token: newToken};
     }
+
+    public getChartTitleProjectionsAsync = async () => {
+        return (await this.data.getChartsAsync()).map(chart => {
+            let titleObj = {};
+            titleObj[chart.chartId as string] = chart.title;
+            return titleObj;
+        });
+    }
 }
