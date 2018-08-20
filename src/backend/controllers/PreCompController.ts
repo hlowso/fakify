@@ -5,7 +5,7 @@ import { IUser } from "../../shared/types";
 
 export enum UnauthorizedResponse {
     GoToLogin,
-    Return403,
+    Return401,
     Ignore
 }
 
@@ -24,26 +24,36 @@ export class PreCompController {
 
         this._router.use( async (req, res, next) => {
 
+            console.log(this.constructor.name);
+
+            console.log(req.url, "SESSION", req.session)
+
             if (req.session) {
                 this._user = await this._api.data.getUserByTokenAsync(req.session.token);
             }
+
+            console.log(req.url, "USER", this._user);
+            
             
             if (!this._user) {
+                console.log(req.url, "RESP", this._unauthorizedResponse);
+                
                 switch (this._unauthorizedResponse) {
 
                     case UnauthorizedResponse.GoToLogin: 
                         return res.sendFile(path.resolve(__dirname, "build/index.html"));
 
                     case UnauthorizedResponse.Ignore:
-                        return next();
+                        next();
+                        break;
 
                     default:
-                    case UnauthorizedResponse.Return403:
+                    case UnauthorizedResponse.Return401:
                         res.status(401);
                         return res.send("Missing authentication token");
                 }
             } else {
-                return next();
+                next();
             }
         });
     }

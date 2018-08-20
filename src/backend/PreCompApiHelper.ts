@@ -2,6 +2,7 @@ import uuidv4 from "uuid/v4";
 import bcrypt from "bcryptjs";
 import { PreCompData } from "./PreCompData";
 import { IIncomingUser } from "../shared/types";
+import * as Mongo from "mongodb";
 
 export class PreCompApiHelper {
     private _data: PreCompData;
@@ -51,11 +52,15 @@ export class PreCompApiHelper {
         return { ...existingUser, token: newToken};
     }
 
-    public getChartTitleProjectionsAsync = async () => {
-        return (await this._data.getChartsAsync()).map(chart => {
-            let titleObj = {};
-            titleObj[chart.chartId as string] = chart.title;
-            return titleObj;
+    public getChartTitleProjectionsAsync = async (userId?: Mongo.ObjectId) => {
+        let titleProjections = {};
+
+        (await this._data.getChartsAsync(userId)).forEach(chart => {
+            titleProjections[(chart._id as Mongo.ObjectId).toHexString()] = chart.title;
         });
+
+        return titleProjections;
     }
+
+
 }

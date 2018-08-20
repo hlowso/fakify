@@ -1,3 +1,4 @@
+import * as Mongo from "mongodb";
 import { Note } from "./music/domain/Note";
 
 export interface IIncomingUser {
@@ -6,6 +7,7 @@ export interface IIncomingUser {
 }
 
 export interface IUser {
+    _id?: Mongo.ObjectId;
     userId?: string;
     email: string;
     passhash: string;
@@ -18,7 +20,6 @@ export const AdminRoutes = [
 ]
 
 export const StandardRoutes = [
-    "/",
     "/play",
     "/create"
 ]
@@ -32,6 +33,7 @@ export enum Tabs {
 }
 
 export interface ISong {
+    _id?: Mongo.ObjectId;
     chartId?: string;
     userId?: string;
     title?: string;

@@ -68,13 +68,17 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
     server.use(AdminRoutes, new AdminViewController(api).router);
     server.use(StandardRoutes, new StandardViewController(api).router);
 
-    server.use("/api/admin", 
+    let apiRouter = express.Router();
+
+    apiRouter.use("/admin",
         new AdminController(api).router
     );
 
-    server.use("/api/songs",
+    apiRouter.use("/songs", 
         new ChartsController(api).router
     );
+
+    server.use("/api", apiRouter);
 
     server.listen(PORT, () => console.log(`Precomp listening on port ${PORT}!`));
 

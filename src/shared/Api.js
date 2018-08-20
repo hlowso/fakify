@@ -62,7 +62,7 @@ export async function updateSongAsync(chartId, newSong) {
 }
 
 export async function getUserSongTitles() {
-    let res = await FetchHelpers.GET('/api/songs/user_titles');
+    let res = await FetchHelpers.GET('/api/songs/user/titles');
     return res.json();
 };
 

@@ -53,6 +53,8 @@ export class PreCompData {
      * HELPER FUNCTIONS
      */
 
+    // Users
+
     public getUserByTokenAsync = (token: string): Promise<IUser> => {
         return new Promise((resolve, reject) => {
             this._userColl.findOne({ token }, (err, user) => {
@@ -113,14 +115,29 @@ export class PreCompData {
         });
     }
 
-    public getChartsAsync = (): Promise<ISong[]> => {
+    // Charts
+
+    public getChartsAsync = (userId?: Mongo.ObjectId): Promise<ISong[]> => {
+        let query = userId ? { userId } : {};
         return new Promise((resolve, reject) => {
-            this._chartColl.find({}).toArray((err, charts) => {
+            this._chartColl.find(query).toArray((err, charts) => {
                 if (err !== null) {
                     reject(err);
                 }
 
                 resolve(charts as ISong[]);
+            });
+        });
+    }
+
+    public getChartAsync = (_id: Mongo.ObjectId): Promise<ISong> => {
+        return new Promise((resolve, reject) => {
+            this._chartColl.findOne({ _id }, (err, chart) => {
+                if (err !== null) {
+                    reject(err);
+                }
+
+                resolve(chart);
             });
         });
     }

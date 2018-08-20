@@ -20,7 +20,7 @@ const sendRequest = (path, method, payload) => {
 
     if (payload) options.body = JSON.stringify(payload);
 
-    return fetch(`https://precomp.herokuapp.com${path}`, options);
+    return fetch(path, options);
 }
 
 export const GET = (path, payload = null) => {
