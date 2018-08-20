@@ -52,7 +52,7 @@ export class PreCompApiHelper {
     }
 
     public getChartTitleProjectionsAsync = async () => {
-        return (await this.data.getChartsAsync()).map(chart => {
+        return (await this._data.getChartsAsync()).map(chart => {
             let titleObj = {};
             titleObj[chart.chartId as string] = chart.title;
             return titleObj;
