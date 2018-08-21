@@ -25,7 +25,7 @@ export class PreCompController {
 
         this._router.use( async (req, res, next) => {
 
-            console.log(this.constructor.name);
+            console.log(this.constructor.name, req.method);
 
             console.log(req.url, "SESSION", req.session)
 
