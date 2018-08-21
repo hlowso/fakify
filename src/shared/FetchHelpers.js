@@ -20,7 +20,7 @@ const sendRequest = (path, method, payload) => {
 
     if (payload) options.body = JSON.stringify(payload);
 
-    return fetch(path, options);
+    return fetch(url, options);
 }
 
 export const GET = (path, payload = null) => {

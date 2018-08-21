@@ -13,7 +13,6 @@ export class AdminController extends PreCompController {
          */
 
         this._router.post("/signup", async (req, res) => {
-            console.log("ADMIN ROUTE");
             let user = await this._api.createUserAsync(req.body as IIncomingUser);
 
             if (!user) {
@@ -29,7 +28,6 @@ export class AdminController extends PreCompController {
         });
 
         this._router.patch("/login", async (req, res) => {
-            console.log("ADMIN ROUTE");
             let user = await this._api.loginUserAsync(req.body as IIncomingUser);
 
             if (!user) {
@@ -45,7 +43,6 @@ export class AdminController extends PreCompController {
         });
 
         this._router.patch("/logout", async (req, res) => {
-            console.log("ADMIN ROUTE");
             let found = false;
             if (req.session) {
                 try {
@@ -53,13 +50,13 @@ export class AdminController extends PreCompController {
                 } catch (err) {
                     res.status(500);
                 }
+                req.session = undefined;
             }
 
             res.send(found);
         });
 
         this._router.get("/authenticate", async (req, res) => { 
-            console.log("ADMIN ROUTE");
             if (req.session) {
                 let user = await this._api.data.getUserByTokenAsync(req.session.token);
                 if (user) {
