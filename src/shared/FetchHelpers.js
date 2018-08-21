@@ -1,5 +1,4 @@
 let optionsBase = {
-    credentials: "include",
     mode: "cors",    
     headers: {
         'content-type': 'application/json'
