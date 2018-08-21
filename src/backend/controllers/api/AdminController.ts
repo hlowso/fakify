@@ -21,9 +21,7 @@ export class AdminController extends PreCompController {
                 return res.send("User already exists");
             }
 
-            if (!Util.objectIsEmpty(req.session)) {
-                (req.session as any).token = user.token;
-            }
+            req.session = { token: user.token };            
 
             return res.send(user);
         });
@@ -41,9 +39,7 @@ export class AdminController extends PreCompController {
                 return res.send("Incorrect username or password");
             }
 
-            if (!Util.objectIsEmpty(req.session)) {
-                (req.session as any).token = user.token;
-            }
+            req.session = { token: user.token };
 
             return res.send(user);
         });
