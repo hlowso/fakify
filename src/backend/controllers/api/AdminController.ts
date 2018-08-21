@@ -29,7 +29,12 @@ export class AdminController extends PreCompController {
         });
 
         this._router.patch("/login", async (req, res) => {
+
+            console.log(req.body);
+
             let user = await this._api.loginUserAsync(req.body as IIncomingUser);
+
+            console.log(user);
 
             if (!user) {
                 res.status(401);
