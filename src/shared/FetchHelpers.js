@@ -15,6 +15,7 @@ const sendRequest = (path, method, payload) => {
 
     let options = {
         method,
+        mode: "cors",
         ...optionsBase
     };
 
