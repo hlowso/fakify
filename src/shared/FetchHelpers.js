@@ -1,5 +1,6 @@
 let optionsBase = {
-    credentials: "same-origin",
+    credentials: "include",
+    mode: "cors",    
     headers: {
         'content-type': 'application/json'
     }, 
@@ -15,7 +16,6 @@ const sendRequest = (path, method, payload) => {
 
     let options = {
         method,
-        mode: "cors",
         ...optionsBase
     };
 
