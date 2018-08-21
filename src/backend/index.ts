@@ -60,7 +60,7 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
     // Enable CORS
     server.use((req, res, next) => {
         res.header("Access-Control-Allow-Origin", "*");
-        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        res.header("Access-Control-Allow-Headers", "origin, x-requested-with, content-type, accept");
         res.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, OPTIONS");
         next();
     });
