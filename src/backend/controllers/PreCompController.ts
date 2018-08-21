@@ -1,4 +1,5 @@
 import path from "path";
+import * as Util from "../../shared/Util";
 import { PreCompApiHelper } from "../PreCompApiHelper";
 import { Router } from "express";
 import { IUser } from "../../shared/types";
@@ -28,8 +29,8 @@ export class PreCompController {
 
             console.log(req.url, "SESSION", req.session)
 
-            if (req.session) {
-                this._user = await this._api.data.getUserByTokenAsync(req.session.token);
+            if (!Util.objectIsEmpty(req.session)) {
+                this._user = await this._api.data.getUserByTokenAsync((req.session as any).token);
             }
 
             console.log(req.url, "USER", this._user);
