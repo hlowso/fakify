@@ -62,6 +62,7 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
         res.header("Access-Control-Allow-Origin", "https://romantic-minsky-70878f.netlify.com");
         res.header("Access-Control-Allow-Headers", "origin, x-requested-with, content-type, accept, set-cookie");
         res.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, HEAD, OPTIONS");
+        res.header("Access-Control-Allow-Credentials", "true");
 
         if (req.method === "OPTIONS") {
             res.status(204);
