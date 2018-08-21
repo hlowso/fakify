@@ -1,3 +1,4 @@
+import * as Util from "../../../shared/Util";
 import { UnauthorizedResponse, PreCompController } from "../PreCompController";
 import { PreCompApiHelper } from "../../PreCompApiHelper";
 import { IIncomingUser } from "../../../shared/types";
@@ -20,8 +21,8 @@ export class AdminController extends PreCompController {
                 return res.send("User already exists");
             }
 
-            if (req.session) {
-                req.session.token = user.token;
+            if (!Util.objectIsEmpty(req.session)) {
+                (req.session as any).token = user.token;
             }
 
             return res.send(user);
@@ -35,8 +36,8 @@ export class AdminController extends PreCompController {
                 return res.send("Incorrect username or password");
             }
 
-            if (req.session) {
-                req.session.token = user.token;
+            if (!Util.objectIsEmpty(req.session)) {
+                (req.session as any).token = user.token;
             }
 
             return res.send(user);
@@ -44,9 +45,9 @@ export class AdminController extends PreCompController {
 
         this._router.patch("/logout", async (req, res) => {
             let found = false;
-            if (req.session) {
+            if (!Util.objectIsEmpty(req.session)) {
                 try {
-                    found = await this._api.data.clearUserTokenAsync(req.session.token);
+                    found = await this._api.data.clearUserTokenAsync((req.session as any).token);
                 } catch (err) {
                     res.status(500);
                 }
@@ -57,8 +58,8 @@ export class AdminController extends PreCompController {
         });
 
         this._router.get("/authenticate", async (req, res) => { 
-            if (req.session) {
-                let user = await this._api.data.getUserByTokenAsync(req.session.token);
+            if (!Util.objectIsEmpty(req.session)) {
+                let user = await this._api.data.getUserByTokenAsync((req.session as any).token);
                 if (user) {
                     return res.send(user);
                 }
