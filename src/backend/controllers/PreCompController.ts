@@ -45,7 +45,8 @@ export class PreCompController {
                         return res.sendFile(path.resolve(__dirname, "build/index.html"));
 
                     case UnauthorizedResponse.Ignore:
-                        next();
+                        console.log("GOING INTO NEXT");
+                        await next();
                         break;
 
                     default:
@@ -54,7 +55,7 @@ export class PreCompController {
                         return res.send("Missing authentication token");
                 }
             } else {
-                next();
+                await next();
             }
         });
     }
