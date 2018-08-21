@@ -61,7 +61,8 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
     server.use((req, res, next) => {
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "origin, x-requested-with, content-type, accept");
-        // res.header("Access-Control-Allow-Methods", "*");
+        res.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, HEAD, OPTIONS");
+        
         if (req.method === "OPTIONS") {
             res.status(204);
             res.send();
