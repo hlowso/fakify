@@ -39,7 +39,9 @@ export class AdminController extends PreCompController {
                 return res.send("Incorrect username or password");
             }
 
-            req.session = { token: user.token };
+            (req.session as any).token = user.token;
+
+            console.log("NOW SESSION", req.session);
 
             return res.send(user);
         });
