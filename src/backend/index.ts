@@ -62,7 +62,12 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "origin, x-requested-with, content-type, accept");
         // res.header("Access-Control-Allow-Methods", "*");
-        next();
+        if (req.method === "OPTIONS") {
+            res.status(204);
+            res.send();
+        } else {
+            next();
+        }
     });
 
     // Set routes
