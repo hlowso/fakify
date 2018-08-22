@@ -14,13 +14,13 @@ class Authenticator extends Component {
     }
 
     componentWillMount() {
-        let { setUser } = this.props;
+        let { setUser, redirect } = this.props;
 
         Api.authenticate()
             .then(user => {
                 if (!user) {
                     console.log("PRECOMP - AUTHENTICATION FAILED; REDIRECTING");
-                    Util.redirect("login"); 
+                    redirect("login"); 
                 } else {
                     setUser(user);
                     this.setState({ authenticating: false });

@@ -1,8 +1,8 @@
 import { Tabs, ISubbeatTimeMap, IMusicIdx } from "./types";
 
-export const redirect = (route: string) => {
-    window.location.replace(`${window.location.origin}/${route}`);
-};
+// export const redirect = (route: string) => {
+//     window.location.replace(`${window.location.origin}/${route}`);
+// };
 
 export const getCurrentTab = () => {
     let windowPathname = window.location.pathname;

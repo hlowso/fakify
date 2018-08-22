@@ -37,6 +37,7 @@ class AppRouter extends Component {
             userInstrument: "piano",
             sessionManager: null,
             userEnvelopes: {},
+            redirectDestination: "",
             onUserSessionKeyStroke: (keyStrokeRecord) => {},
         };
     }
@@ -59,7 +60,7 @@ class AppRouter extends Component {
     }
 
     render() {
-        let { loading, sessionManager } = this.state;
+        let { loading, sessionManager, redirectDestination } = this.state;
 
         let SoundActions = {
             setMidiContextAsync: this.setMidiContextAsync,
@@ -81,32 +82,40 @@ class AppRouter extends Component {
         let PlayVCProps = {
             SoundActions,
             StateHelper,            
-            sessionManager
+            sessionManager,
+            redirect: this._redirect
         };
 
         let CreateVCProps = {
-            StateHelper
+            StateHelper,
+            redirect: this._redirect
         };
 
         return loading
                 ? <h1>loading...</h1> 
                 : (
-                    <Switch>
-                        <Route 
-                            exact
-                            path="/play" 
-                            render={ () => <PlayViewController {...PlayVCProps}/> }
-                        />
-                        <Route 
-                            exact
-                            path="/create" 
-                            render={ () => <CreateViewController {...CreateVCProps}/> }
-                        />
-                        <Route 
-                            path="/" 
-                            render={ () => <Redirect to="/play" /> }
-                        />
-                    </Switch>
+                    redirectDestination
+                        ? (
+                            <Redirect to={redirectDestination} />
+                        )
+                        : (
+                            <Switch>
+                                <Route 
+                                    exact
+                                    path="/play" 
+                                    render={ () => <PlayViewController {...PlayVCProps}/> }
+                                />
+                                <Route 
+                                    exact
+                                    path="/create" 
+                                    render={ () => <CreateViewController {...CreateVCProps}/> }
+                                />
+                                <Route 
+                                    path="/" 
+                                    render={ () => <Redirect to="/play" /> }
+                                />
+                            </Switch>
+                        )
                 );
     }
 
@@ -291,6 +300,14 @@ class AppRouter extends Component {
         if (sessionManager) {
             sessionManager.stop();
         }
+    }
+
+    /********************
+        MISCELLANEOUS   
+    ********************/
+
+    _redirect = tab => {
+        this.setState({ redirectDestination: `/${tab}` });
     }
 };
 

@@ -3,12 +3,13 @@ import ChartViewer from "../../views/ChartViewer/ChartViewer";
 import { BarEditingModal } from "../../views/BarEditingModal/BarEditingModal";
 import * as Util from "../../../shared/Util";
 import * as Api from "../../../shared/Api";
-import { ISong, IChartBar, ChordShape } from "../../../shared/types";
+import { ISong, IChartBar, ChordShape, Tabs } from "../../../shared/types";
 import Chart from "../../../shared/music/Chart";
 import "./CreateViewController.css";
 
 export interface ICreateVCProps {
     StateHelper: any;
+    redirect: (tab: Tabs) => void;
 }
 
 export interface ICreateVCState {
@@ -207,6 +208,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     }
 
     private _onSaveChart = () => {
+        let { redirect } = this.props;
         let { updatingChartId } = this.state;
         let newSong = this._consolidateSong();
 
@@ -219,7 +221,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         promise.then((result: string) => {
                 switch (result) {
                     case Api.SaveSongResults.Ok:
-                        Util.redirect("create");
+                        redirect(Tabs.Create);
                         break;
                     case Api.SaveSongResults.TitleExists:
                         this.setState({ errorMessage: "Song title exists" });

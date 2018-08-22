@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Switch, Route } from "react-router";
+import { Switch, Route, Redirect } from "react-router";
 
 import TopNav from "../views/TopNav/TopNav";
 import SignUpViewController from '../ViewControllers/SignUpViewController/SignUpViewController';
@@ -11,26 +11,31 @@ class AdminRouter extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            user: {}
-        }
+            user: {},
+            redirectDestination: string
+        };
     }
 
     render() {
-        let { user } = this.state;
+        let { user, redirectDestination } = this.state;
 
-        return (
-            <div id="app-router">
-                <TopNav user={user} setUser={this.setUser} />
-                {this.renderRouter()}
-            </div>
-        );
+        return redirectDestination
+            ? (
+                <Redirect to={redirectDestination} />
+            )
+            : (
+                <div id="app-router">
+                    <TopNav user={user} setUser={this.setUser} />
+                    {this.renderRouter()}
+                </div>
+            );
     }
 
     renderRouter = () => (
         <main>
             <Switch>
-                <Route exact path='/signup' render={() => <SignUpViewController setUser={this.setUser} />} />
-                <Route exact path='/login' render={() => <LoginViewController setUser={this.setUser} />} />
+                <Route exact path='/signup' render={() => <SignUpViewController setUser={this.setUser} redirect={this._redirect} />} />
+                <Route exact path='/login' render={() => <LoginViewController setUser={this.setUser} redirect={this._redirect} />} />
                 <Route path='/' render={() => <Authenticator setUser={this.setUser} />} />                    
             </Switch>
         </main>
@@ -38,6 +43,10 @@ class AdminRouter extends Component {
 
     setUser = userUpdate => {
         this.setState({ user: {...this.state.user, ...userUpdate} });
+    }
+
+    _redirect = tab => {
+        this.setState({ redirectDestination: `/${tab}` })
     }
 };
 
