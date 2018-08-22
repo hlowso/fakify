@@ -36,7 +36,7 @@ class AdminRouter extends Component {
             <Switch>
                 <Route exact path='/signup' render={() => <SignUpViewController setUser={this.setUser} redirect={this._redirect} />} />
                 <Route exact path='/login' render={() => <LoginViewController setUser={this.setUser} redirect={this._redirect} />} />
-                <Route path='/' render={() => <Authenticator setUser={this.setUser} />} />                    
+                <Route path='/' render={() => <Authenticator setUser={this.setUser} redirect={this._redirect} />} />                    
             </Switch>
         </main>
     )
