@@ -12,7 +12,7 @@ class AdminRouter extends Component {
         super(props);
         this.state = {
             user: {},
-            redirectDestination: string
+            redirectDestination: ""
         };
     }
 
