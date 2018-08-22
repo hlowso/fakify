@@ -59,6 +59,13 @@ class AppRouter extends Component {
             });
     }
 
+    componentDidUpdate() {
+        let { redirectDestination } = this.state;
+        if (redirectDestination) {
+            this.setState({ redirectDestination: "" });
+        }
+    }
+
     render() {
         let { loading, sessionManager, redirectDestination } = this.state;
 

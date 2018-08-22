@@ -16,6 +16,13 @@ class AdminRouter extends Component {
         };
     }
 
+    componentDidUpdate() {
+        let { redirectDestination } = this.state;
+        if (redirectDestination) {
+            this.setState({ redirectDestination: "" });
+        }
+    }
+
     render() {
         let { user, redirectDestination } = this.state;
 
