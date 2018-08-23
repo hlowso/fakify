@@ -27,12 +27,7 @@ export class AdminController extends PreCompController {
         });
 
         this._router.patch("/login", async (req, res) => {
-
-            console.log(req.body);
-
             let user = await this._api.loginUserAsync(req.body as IIncomingUser);
-
-            console.log(user);
 
             if (!user) {
                 res.status(401);
@@ -40,8 +35,6 @@ export class AdminController extends PreCompController {
             }
 
             (req.session as any).token = user.token;
-
-            console.log("NOW SESSION", req.session);
 
             return res.send(user);
         });

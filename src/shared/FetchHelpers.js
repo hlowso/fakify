@@ -1,6 +1,6 @@
 let optionsBase = {
-    credentials: "include",
-    mode: "cors",    
+    credentials: process.env.REACT_APP_DEPLOY_BUILD ? "include" : "same-origin",
+    mode: process.env.REACT_APP_DEPLOY_BUILD ? "cors" : undefined,    
     headers: {
         'content-type': 'application/json'
     }, 
@@ -8,10 +8,9 @@ let optionsBase = {
 
 const sendRequest = (path, method, payload) => {
     let url = (
-        // Use an environment variable that won't exist on netlify's server
-        process.env.PRECOMP_LOCAL
-            ? ""
-            : "https://precomp.herokuapp.com"
+        process.env.REACT_APP_DEPLOY_BUILD
+            ? "https://precomp.herokuapp.com"
+            : ""
     ) + path;
 
     let options = {

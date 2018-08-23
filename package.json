@@ -2,7 +2,7 @@
   "name": "precomp-frontend",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:5000",
+  "proxy": "http://localhost:5001",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
@@ -30,7 +30,7 @@
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",
     "build-server": "node_modules/webpack/bin/webpack.js --config webpack.config.server.ts",
-    "deploy-static": "npm run build && netlifyctl deploy" 
+    "deploy-static": "REACT_APP_DEPLOY_BUILD=true npm run build && netlifyctl deploy" 
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.1",
