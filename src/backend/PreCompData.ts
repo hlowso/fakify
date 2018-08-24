@@ -143,14 +143,11 @@ export class PreCompData {
     }
 
     public insertChartAsync = (chart: ISong): Promise<boolean> => {
-        console.log("inserting chart");
         return new Promise((resolve, reject) => {
             this._chartColl.insertOne(chart, (err, response) => {
                 if (err !== null) {
                     reject(err);
                 }
-
-                console.log("insert response", response);
 
                 resolve(response.insertedCount === 1);
             });
