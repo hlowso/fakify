@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import * as Mongo from "mongodb";
 
 import MenuBar from "../../views/MenuBar/MenuBar";
 import SongListPanel from "../../views/SongListPanel/SongListPanel";
@@ -85,7 +86,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             playMode
         } = this.state;
 
-        let selectedSongId = selectedSong ? (selectedSong as ISong).chartId: null;
+        let selectedSongId = selectedSong ? (selectedSong as ISong)._id: null;
         let inSession = sessionManager && sessionManager.inSession;
         let sessionIdx = inSession ? sessionManager.sessionIdx : null;
         let currKey: NoteName | "" = inSession ? sessionManager.currKey : "";
@@ -183,8 +184,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
     ************/
 
     private _resetChart = () => {
-        let { chartId, barsBase, originalTempo, originalContext } = this.state.selectedSong as ISong;
-        let chartSettings = StorageHelper.getChartSettings(chartId as string);
+        let { _id, barsBase, originalTempo, originalContext } = this.state.selectedSong as ISong;
+        let chartSettings = StorageHelper.getChartSettings((_id as Mongo.ObjectId).toHexString());
         let playMode = StorageHelper.getPlayMode();
 
         let { tempo, context, feel, rangeStartIdx, rangeEndIdx } = chartSettings;
@@ -245,7 +246,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         (this._chart as Chart).rangeStartIdx = rangeStartIdxUpdate;
         (this._chart as Chart).rangeEndIdx = rangeEndIdxUpdate;
 
-        StorageHelper.updateChartSettings((selectedSong as ISong).chartId as string, {
+        StorageHelper.updateChartSettings(((selectedSong as ISong)._id as Mongo.ObjectId).toHexString(), {
             rangeStartIdx: rangeStartIdxUpdate,
             rangeEndIdx: rangeEndIdxUpdate
         });
@@ -257,7 +258,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
         (this._chart as Chart).context = newKeyContext;
         
-        StorageHelper.updateChartSettings((selectedSong as ISong).chartId as string, {
+        StorageHelper.updateChartSettings(((selectedSong as ISong)._id as Mongo.ObjectId).toHexString(), {
             context: newKeyContext
         });
     }
@@ -268,7 +269,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
         (this._chart as Chart).tempo = newTempo;
 
-        StorageHelper.updateChartSettings((selectedSong as ISong).chartId as string, {
+        StorageHelper.updateChartSettings(((selectedSong as ISong)._id as Mongo.ObjectId).toHexString(), {
             tempo: newTempo
         });
     }

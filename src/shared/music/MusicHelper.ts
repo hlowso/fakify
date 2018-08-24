@@ -79,16 +79,23 @@ export const getKeyNoteNameIndices = (key: NoteName | ""): number[] => {
 }
 
 export const contextualizeOrDecontextualizeBars = (barsBase: IChartBar[], newKeyContext: NoteName, decontextualize = false): IChartBar[] => {
-    return barsBase.map<IChartBar>((bar: IChartBar) => {
+    return barsBase.map((bar: IChartBar) => {
+
         let contextualizedBar: IChartBar = Util.copyObject(bar);
-        contextualizedBar.chordSegments = bar.chordSegments.map<IChordSegment>((chordBase: IChordSegment ) => {
+
+        contextualizedBar.chordSegments = bar.chordSegments.map((chordBase: IChordSegment) => {
+
             let contextualizedChordBase = Util.copyObject(chordBase);
+
             contextualizedChordBase.chordName = [contextualizeOrDecontextualize(((chordBase.chordName as ChordName)[0] as RelativeNoteName), newKeyContext, decontextualize), (chordBase.chordName as ChordName)[1]] as ChordName;
+            
             if (chordBase.key) {
                 contextualizedChordBase.key = contextualizeOrDecontextualize(chordBase.key, newKeyContext, decontextualize) as (RelativeNoteName | NoteName);
             }
+
             return contextualizedChordBase;
         });
+
         return contextualizedBar;
     });
 };

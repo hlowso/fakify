@@ -203,6 +203,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         return {
             title: (editingSong as ISong).title,
             originalContext: (this._editingChart as Chart).context,
+            originalTempo: [120, 4],
             barsBase: (this._editingChart as Chart).barsBase
         };
     }

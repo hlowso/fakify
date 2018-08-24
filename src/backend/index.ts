@@ -6,8 +6,8 @@ import { PreCompApiHelper } from "./PreCompApiHelper";
 
 import { AdminController } from "./controllers/api/AdminController";
 import { ChartsController } from "./controllers/api/ChartsController";
-import { AdminViewController } from "./controllers/views/AdminViewController";
-import { StandardViewController } from "./controllers/views/StandardViewController";
+// import { AdminViewController } from "./controllers/views/AdminViewController";
+// import { StandardViewController } from "./controllers/views/StandardViewController";
 
 import { AdminRoutes, StandardRoutes } from "../shared/types";
 
@@ -73,8 +73,8 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
     });
 
     // Set routes
-    server.use(AdminRoutes, new AdminViewController(api).router);
-    server.use(StandardRoutes, new StandardViewController(api).router);
+    // server.use(AdminRoutes, new AdminViewController(api).router);
+    // server.use(StandardRoutes, new StandardViewController(api).router);
 
     let apiRouter = express.Router();
 

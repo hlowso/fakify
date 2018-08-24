@@ -141,4 +141,28 @@ export class PreCompData {
             });
         });
     }
+
+    public insertChartAsync = (chart: ISong): Promise<boolean> => {
+        return new Promise((resolve, reject) => {
+            this._chartColl.insertOne(chart, (err, response) => {
+                if (err !== null) {
+                    reject(err);
+                }
+
+                resolve(response.insertedCount === 1);
+            });
+        });
+    }
+
+    public updateChartAsync = (_id: Mongo.ObjectId, chart: ISong): Promise<ISong> => {
+        return new Promise((resolve, reject) => {
+            this._chartColl.updateOne({ _id }, chart, (err, response) => {
+                if (err !== null) {
+                    reject(err);
+                }
+
+                resolve(response.matchedCount === 1);
+            });
+        });
+    }
 };

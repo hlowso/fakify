@@ -34,8 +34,7 @@ export enum Tabs {
 
 export interface ISong {
     _id?: Mongo.ObjectId;
-    chartId?: string;
-    userId?: string;
+    userId?: Mongo.ObjectId;
     title?: string;
     originalContext?: NoteName;
     originalTempo?: Tempo;
@@ -112,12 +111,12 @@ export enum Feel {
     Swing = "swing"
 }
 
-export interface IChordPassage {
-    durationInSubbeats: number;
-    parts: {
-        [instrument: string]: IStroke[];
-    }
-}
+// export interface IChordPassage {
+//     durationInSubbeats: number;
+//     parts: {
+//         [instrument: string]: IStroke[];
+//     }
+// }
 
 export interface IStroke {
     subbeatOffset?: number;

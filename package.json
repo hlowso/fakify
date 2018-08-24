@@ -30,7 +30,7 @@
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",
     "build-server": "node_modules/webpack/bin/webpack.js --config webpack.config.server.ts",
-    "deploy-static": "REACT_APP_DEPLOY_BUILD=true npm run build && netlifyctl deploy" 
+    "deploy-static": "REACT_APP_DEPLOY_BUILD=true npm run build && netlifyctl deploy"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.1",

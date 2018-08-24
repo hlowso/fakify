@@ -1,6 +1,6 @@
 import * as Util from "../Util";
 import * as MusicHelper from "../music/MusicHelper";
-import { IChartBar, Feel, NoteName, Tempo, IMusicIdx, IChordStretch, ChordName, RelativeNoteName } from "../types";
+import { IChartBar, Feel, NoteName, Tempo, IMusicIdx, IChordStretch, IChordSegment, ChordName, ChordShape, RelativeNoteName, TimeSignature } from "../types";
 import { Domain } from "./domain/Domain";
 import { ChordClass } from "./domain/ChordClass";
 
@@ -15,6 +15,150 @@ class Chart {
     private _rangeStartIdx: number;
     private _rangeEndIdx: number;
     private _durationInSubbeats: number;
+
+    public static validTempo = (tempo: Tempo) => {
+        if (!Array.isArray(tempo) || tempo.length !== 2) {
+            return false;
+        }
+
+        if (tempo[0] < MusicHelper.LOWER_TEMPO_LIMIT) {
+            return false;
+        }
+
+        if (tempo[0] < MusicHelper.UPPER_TEMPO_LIMIT) {
+            return false;
+        }
+
+        if (tempo[1] !== 4) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static validTimeSignature = (timeSignature: TimeSignature) => {
+        if (!Array.isArray(timeSignature) || timeSignature.length !== 2) {
+            return false;
+        }
+
+        if ([3, 4, 5, 6, 7].indexOf(timeSignature[0]) === -1) {
+            return false;
+        }
+
+        if (timeSignature[1] !== 4) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static validRelativeNoteName = (noteName: RelativeNoteName) => {
+        return Domain.RELATIVE_NOTE_NAMES.indexOf(noteName) !== -1;
+    }
+
+    public static validNoteName = (noteName: NoteName) => {
+        return Domain.NOTE_NAMES.indexOf(noteName) !== -1;
+    }
+
+    public static validChordShape = (shape: ChordShape) => {
+        for (let shapeKey in ChordShape) {
+            if (shape === ChordShape[shapeKey]) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static validRelativeChordName = (chordName: ChordName) => {
+        if (!Array.isArray(chordName) || chordName.length !== 2) {
+            return false;
+        }
+
+        if (!Chart.validRelativeNoteName(chordName[0] as RelativeNoteName)) {
+            return false;
+        }
+
+        if (!Chart.validChordShape(chordName[1])) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static validChordSegments = (chordSegments: IChordSegment[], timeSignature: TimeSignature) => {
+        if (!Array.isArray(chordSegments) || chordSegments.length === 0 || chordSegments.length > timeSignature[1]) {
+            return false;
+        }
+
+        let prevBeatIdx = 0;
+
+        for (let i = 0; i < chordSegments.length; i ++) {
+            let segment = chordSegments[i];
+
+            if (typeof segment !== "object") {
+                return false;
+            }
+
+            let { beatIdx, chordName, key } = segment;
+            beatIdx = beatIdx as number;
+            chordName = chordName as ChordName;
+            key = key as RelativeNoteName;
+
+            if (!Number.isInteger(beatIdx)) {
+                return false;
+            }
+
+            if (i === 0 && beatIdx !== 0) {
+                return false;
+            } else if (beatIdx <= prevBeatIdx || beatIdx >= timeSignature[1]) {
+                return false;
+            }
+
+            prevBeatIdx = beatIdx;
+
+            if (!Chart.validRelativeChordName(chordName)) {
+                return false;
+            }
+
+            if (!Chart.validRelativeNoteName(key)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static validBaseBars = (baseBars: IChartBar[]) => {
+        if (!Array.isArray(baseBars) || baseBars.length === 0 || baseBars.length > 200) {
+            return false;
+        }
+
+        for (let i = 0; i < baseBars.length; i ++) {
+            let bar = baseBars[i];
+
+            if (typeof bar !== "object") {
+                return false;
+            }
+
+            let { barIdx, timeSignature, chordSegments } = bar;
+
+            if (!Number.isInteger(barIdx) || barIdx !== i) {
+                return false;
+            }
+
+            if (!Chart.validTimeSignature(timeSignature)) {
+                return false;
+            }
+
+
+            if (!Chart.validChordSegments(chordSegments, timeSignature)) {
+                return false;
+            }
+        }
+
+        return true;
+    } 
 
     constructor(
         externalUpdate?: () => void, 

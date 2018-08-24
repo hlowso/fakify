@@ -1,7 +1,8 @@
 import uuidv4 from "uuid/v4";
 import bcrypt from "bcryptjs";
 import { PreCompData } from "./PreCompData";
-import { IIncomingUser } from "../shared/types";
+import { IIncomingUser, ISong } from "../shared/types";
+import Chart from "../shared/music/Chart";
 import * as Mongo from "mongodb";
 
 export class PreCompApiHelper {
@@ -62,5 +63,46 @@ export class PreCompApiHelper {
         return titleProjections;
     }
 
+    public createChartAsync = async (chart: ISong) => {
+        if (!this._validSong(chart)) {
+            return false;
+        }
 
+        return await this._data.insertChartAsync(chart);
+    }
+
+    public updateChartAsync = async (chartId: Mongo.ObjectId, chart: ISong) => {
+        if (!this._validSong(chart)) {
+            return false;
+        }
+
+        return await this._data.updateChartAsync(chartId, chart);
+    }
+
+    // TODO: validSong() should live elsewhere...
+    private _validSong = (chart: ISong) => {
+        if (typeof chart !== "object") {
+            return false;
+        }
+
+        let { title, originalContext, originalTempo, barsBase } = chart;
+
+        if (typeof title !== "string" || title.length > 30) {
+            return false;
+        }
+
+        if (!Chart.validNoteName(originalContext)) {
+            return false;
+        }
+
+        if (!Chart.validTempo(originalTempo)) {
+            return false;
+        }
+
+        if (!Chart.validBaseBars(barsBase)) {
+            return false;
+        }
+
+        return true;
+    }
 }
