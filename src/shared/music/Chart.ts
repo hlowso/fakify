@@ -106,6 +106,8 @@ class Chart {
             key = key as RelativeNoteName;
 
             if (!Number.isInteger(beatIdx)) {
+                return false;
+            }
 
             if (i === 0 && beatIdx !== 0) {
                 return false;
