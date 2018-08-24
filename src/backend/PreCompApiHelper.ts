@@ -1,7 +1,7 @@
 import uuidv4 from "uuid/v4";
 import bcrypt from "bcryptjs";
 import { PreCompData } from "./PreCompData";
-import { IIncomingUser, ISong } from "../shared/types";
+import { IIncomingUser, ISong, NoteName, Tempo, IChartBar } from "../shared/types";
 import Chart from "../shared/music/Chart";
 import * as Mongo from "mongodb";
 
@@ -63,10 +63,12 @@ export class PreCompApiHelper {
         return titleProjections;
     }
 
-    public createChartAsync = async (chart: ISong) => {
+    public createChartAsync = async (chart: ISong, userId: Mongo.ObjectId) => {
         if (!this._validSong(chart)) {
             return false;
         }
+
+        chart.userId = userId;
 
         return await this._data.insertChartAsync(chart);
     }
@@ -91,15 +93,15 @@ export class PreCompApiHelper {
             return false;
         }
 
-        if (!Chart.validNoteName(originalContext)) {
+        if (!Chart.validNoteName(originalContext as NoteName)) {
             return false;
         }
 
-        if (!Chart.validTempo(originalTempo)) {
+        if (!Chart.validTempo(originalTempo as Tempo)) {
             return false;
         }
 
-        if (!Chart.validBaseBars(barsBase)) {
+        if (!Chart.validBaseBars(barsBase as IChartBar[])) {
             return false;
         }
 

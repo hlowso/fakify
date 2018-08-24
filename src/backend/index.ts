@@ -9,7 +9,7 @@ import { ChartsController } from "./controllers/api/ChartsController";
 // import { AdminViewController } from "./controllers/views/AdminViewController";
 // import { StandardViewController } from "./controllers/views/StandardViewController";
 
-import { AdminRoutes, StandardRoutes } from "../shared/types";
+// import { AdminRoutes, StandardRoutes } from "../shared/types";
 
 const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
     data.close();
@@ -41,7 +41,12 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
         MONGO_DATABASE_NAME as string
     );
 
-    await data.connectAsync();
+    try {
+        await data.connectAsync();
+    } catch(err) {
+        console.error("PRECOMP: failed to connect to mLab", err);
+        return;
+    }
 
     // Create api helper
     const api = new PreCompApiHelper(data);
@@ -49,7 +54,7 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
     // Setup server
     const server = express();
 
-    server.use(express.static('build'));
+    server.use(express.static('public'));
     server.use(cookieSession({
         name: "PreComp Session",
         secret: SESSION_SECRET as string,

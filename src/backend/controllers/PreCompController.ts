@@ -25,27 +25,17 @@ export class PreCompController {
 
         this._router.use( async (req, res, next) => {
 
-            console.log(this.constructor.name, req.method);
-
-            console.log(req.url, "SESSION", req.session)
-
             if (!Util.objectIsEmpty(req.session)) {
                 this._user = await this._api.data.getUserByTokenAsync((req.session as any).token);
             }
-
-            console.log(req.url, "USER", this._user);
-            
             
             if (!this._user) {
-                console.log(req.url, "RESP", this._unauthorizedResponse);
-                
                 switch (this._unauthorizedResponse) {
 
                     case UnauthorizedResponse.GoToLogin: 
                         return res.sendFile(path.resolve(__dirname, "build/index.html"));
 
                     case UnauthorizedResponse.Ignore:
-                        console.log("GOING INTO NEXT");
                         await next();
                         break;
 

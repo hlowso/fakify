@@ -18,7 +18,7 @@ export class ChartsController extends PreCompController {
         });
 
         this._router.get("/user/titles", async (req, res) => {
-            return res.send(await this._api.getChartTitleProjectionsAsync((this._user as IUser)._id));
+            return res.send(await this._api.getChartTitleProjectionsAsync((this._user as IUser)._id as Mongo.ObjectId));
         });
 
         this._router.get("/:chartId", async (req, res) => {
@@ -26,7 +26,7 @@ export class ChartsController extends PreCompController {
         });
 
         this._router.post("/", async (req, res) => {
-            return res.send(await this._api.createChartAsync(req.body as ISong));
+            return res.send(await this._api.createChartAsync(req.body as ISong, (this._user as IUser)._id as Mongo.ObjectId));
         });
 
         this._router.put("/:chartId", async (req, res) => {

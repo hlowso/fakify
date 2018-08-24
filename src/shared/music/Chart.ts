@@ -25,7 +25,7 @@ class Chart {
             return false;
         }
 
-        if (tempo[0] < MusicHelper.UPPER_TEMPO_LIMIT) {
+        if (tempo[0] > MusicHelper.UPPER_TEMPO_LIMIT) {
             return false;
         }
 
@@ -91,7 +91,7 @@ class Chart {
             return false;
         }
 
-        let prevBeatIdx = 0;
+        let prevBeatIdx = -1;
 
         for (let i = 0; i < chordSegments.length; i ++) {
             let segment = chordSegments[i];
@@ -106,12 +106,11 @@ class Chart {
             key = key as RelativeNoteName;
 
             if (!Number.isInteger(beatIdx)) {
-                return false;
-            }
 
             if (i === 0 && beatIdx !== 0) {
                 return false;
             } else if (beatIdx <= prevBeatIdx || beatIdx >= timeSignature[1]) {
+
                 return false;
             }
 

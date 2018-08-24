@@ -143,20 +143,26 @@ export class PreCompData {
     }
 
     public insertChartAsync = (chart: ISong): Promise<boolean> => {
+        console.log("inserting chart");
         return new Promise((resolve, reject) => {
             this._chartColl.insertOne(chart, (err, response) => {
                 if (err !== null) {
                     reject(err);
                 }
 
+                console.log("insert response", response);
+
                 resolve(response.insertedCount === 1);
             });
         });
     }
 
-    public updateChartAsync = (_id: Mongo.ObjectId, chart: ISong): Promise<ISong> => {
+    public updateChartAsync = (_id: Mongo.ObjectId, chart: ISong): Promise<boolean> => {
+        let { title, originalContext, originalTempo, barsBase } = chart;
+        let updateSet = { $set: { title, originalContext, originalTempo, barsBase } };
+
         return new Promise((resolve, reject) => {
-            this._chartColl.updateOne({ _id }, chart, (err, response) => {
+            this._chartColl.updateOne({ _id }, updateSet, (err, response) => {
                 if (err !== null) {
                     reject(err);
                 }

@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import * as Mongo from "mongodb";
 
 import MenuBar from "../../views/MenuBar/MenuBar";
 import SongListPanel from "../../views/SongListPanel/SongListPanel";
@@ -185,7 +184,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
     private _resetChart = () => {
         let { _id, barsBase, originalTempo, originalContext } = this.state.selectedSong as ISong;
-        let chartSettings = StorageHelper.getChartSettings((_id as Mongo.ObjectId).toHexString());
+
+        let chartSettings = StorageHelper.getChartSettings(_id as string);
         let playMode = StorageHelper.getPlayMode();
 
         let { tempo, context, feel, rangeStartIdx, rangeEndIdx } = chartSettings;
@@ -218,7 +218,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
     }
 
     /*******************
-        CHART VIEWER`
+        CHART VIEWER 
     *******************/
 
     private _onBarClick = (i: number) => {
@@ -246,7 +246,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         (this._chart as Chart).rangeStartIdx = rangeStartIdxUpdate;
         (this._chart as Chart).rangeEndIdx = rangeEndIdxUpdate;
 
-        StorageHelper.updateChartSettings(((selectedSong as ISong)._id as Mongo.ObjectId).toHexString(), {
+        StorageHelper.updateChartSettings((selectedSong as ISong)._id as string, {
             rangeStartIdx: rangeStartIdxUpdate,
             rangeEndIdx: rangeEndIdxUpdate
         });
@@ -258,7 +258,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
         (this._chart as Chart).context = newKeyContext;
         
-        StorageHelper.updateChartSettings(((selectedSong as ISong)._id as Mongo.ObjectId).toHexString(), {
+        StorageHelper.updateChartSettings((selectedSong as ISong)._id as string, {
             context: newKeyContext
         });
     }
@@ -269,7 +269,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
         (this._chart as Chart).tempo = newTempo;
 
-        StorageHelper.updateChartSettings(((selectedSong as ISong)._id as Mongo.ObjectId).toHexString(), {
+        StorageHelper.updateChartSettings((selectedSong as ISong)._id as string, {
             tempo: newTempo
         });
     }

@@ -7,7 +7,7 @@ export interface IIncomingUser {
 }
 
 export interface IUser {
-    _id?: Mongo.ObjectId;
+    _id?: Mongo.ObjectId | string;
     userId?: string;
     email: string;
     passhash: string;
@@ -33,8 +33,8 @@ export enum Tabs {
 }
 
 export interface ISong {
-    _id?: Mongo.ObjectId;
-    userId?: Mongo.ObjectId;
+    _id?: Mongo.ObjectId | string;
+    userId?: Mongo.ObjectId | string;
     title?: string;
     originalContext?: NoteName;
     originalTempo?: Tempo;
