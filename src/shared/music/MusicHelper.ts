@@ -134,27 +134,18 @@ const _adjustBarsSwingFeel = (bars: IChartBar[]): IChartBar[] => {
 
         let { timeSignature, chordSegments, barIdx } = bar;
         let conversionFactor: number; 
-        let adjustedTimeSignature = Util.copyObject(timeSignature);
         let subbeatsInBar = 0;
 
-        if (timeSignature[1] === 8) {
-            if (timeSignature[0] % 2 === 1) {
-                throw new Error("PRECOMP: cannot convert to swing feel " + timeSignature);
-            }
-            adjustedTimeSignature[0] /= 2;
-            adjustedTimeSignature[1] = 4;
-            conversionFactor = 3 / 2;
-
-        } else if (timeSignature[1] === 4) {
+        if (timeSignature[1] === 4) {
             conversionFactor = 3;
         } else {
             throw new Error("PRECOMP: cannot convert to swing feel " + timeSignature);
         }
 
-        let adjustedSegments = chordSegments.map<IChordSegment>((chordBase: IChordSegment, segmentIdx: number) => {
+        let adjustedSegments = chordSegments.map((chordBase: IChordSegment, segmentIdx: number) => {
             let durationInSubbeats = conversionFactor * (chordBase.durationInBeats as number);
             let adjustedSegment: any = {
-                beatIdx: timeSignature[1] === 8 ? (chordBase.beatIdx as number) / 2 : chordBase.beatIdx,
+                beatIdx: chordBase.beatIdx,
                 subbeatIdx: conversionFactor * (chordBase.beatIdx as number),
                 chordName: chordBase.chordName,
                 key: chordBase.key,
@@ -169,7 +160,7 @@ const _adjustBarsSwingFeel = (bars: IChartBar[]): IChartBar[] => {
 
         return {
             barIdx,
-            timeSignature: adjustedTimeSignature,
+            timeSignature,
             durationInSubbeats: subbeatsInBar,
             chordSegments: adjustedSegments
         };
