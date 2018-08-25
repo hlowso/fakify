@@ -53,24 +53,29 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
     let nextChord: ChordClass;
 
     let pitch: number;
-    let lastPitchFromPrevMusic: number;
+    let lastPitchFromPrevMusic = Math.floor( Math.random() * (BASS_CEILING - BASS_FLOOR) + BASS_FLOOR );
 
     // Get the initial pitch
     if (prevMusic) {
         let subbeatIdx: string | number;
-        let lastBar = prevMusic[prevMusic.length - 1];
-        let lastBeat = -1;
+        let lastBar = {};
 
-        for (subbeatIdx in lastBar) {
-            subbeatIdx = parseInt(subbeatIdx, undefined);
-            if (Util.mod(subbeatIdx, 3) === 0) {
-                lastBeat = subbeatIdx;
-            }
+        for (let barIdx = prevMusic.length - 1; barIdx > -1; barIdx --) {
+            lastBar = prevMusic[barIdx];
         }
 
-        lastPitchFromPrevMusic = lastBar[lastBeat][0].notes[0];
-    } else {
-        lastPitchFromPrevMusic = Math.floor( Math.random() * (BASS_CEILING - BASS_FLOOR) + BASS_FLOOR );
+        if (!Util.objectIsEmpty(lastBar)) {
+            let lastBeat = -1;
+
+            for (subbeatIdx in lastBar) {
+                subbeatIdx = parseInt(subbeatIdx, undefined);
+                if (Util.mod(subbeatIdx, 3) === 0) {
+                    lastBeat = subbeatIdx;
+                }
+            }
+
+            lastPitchFromPrevMusic = lastBar[lastBeat][0].notes[0];
+        }
     }
 
     // Now get the closer of the closest tonic and closest fifth

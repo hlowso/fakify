@@ -192,7 +192,7 @@ export class SessionManager {
                 this._chorusIdx ++;
 
                 // Refresh the score
-                this._score = this._compileMusic(); 
+                this._score = this._compileMusic();
 
                 // Reset the queue times
                 this._resetQueueTimes();

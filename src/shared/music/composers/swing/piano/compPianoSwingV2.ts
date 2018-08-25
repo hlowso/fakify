@@ -44,17 +44,27 @@ export const compPianoSwingV1 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
     // If there is previous music, we can set the starting values of absSubbeatIdx and 
     // previousVoicing accordingly
     if (Array.isArray(prevMusic) && prevMusic.length > 0) {
-        let lastMusicBar = prevMusic[prevMusic.length - 1];
+
         let lastStroke: IStroke = { notes: [], durationInSubbeats: NaN, velocity: NaN };
-        let subbeatIdx;
-        for (subbeatIdx in lastMusicBar) {
-            lastStroke = lastMusicBar[subbeatIdx][0];
+
+        for (let barIdx = prevMusic.length - 1; barIdx > -1; barIdx --) {
+
+            let lastMusicBar = prevMusic[barIdx];
+
+            if (!Util.objectIsEmpty(lastMusicBar)) {
+
+                let subbeatIdx;
+                for (subbeatIdx in lastMusicBar) {
+                    lastStroke = lastMusicBar[subbeatIdx][0];
+                }
+
+                subbeatIdx = parseInt(subbeatIdx as string, undefined);
+                absSubbeatIdx = subbeatIdx + lastStroke.durationInSubbeats - (bars[bars.length - 1].durationInSubbeats as number);
+                previousVoicing = lastStroke.notes;
+
+                break;
+            }
         }
-
-        subbeatIdx = parseInt(subbeatIdx as string, undefined);
-
-        absSubbeatIdx = subbeatIdx + lastStroke.durationInSubbeats - (bars[bars.length - 1].durationInSubbeats as number);
-        previousVoicing = lastStroke.notes;
     }
 
     while (musicIdx) {        
