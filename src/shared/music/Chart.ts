@@ -470,28 +470,34 @@ class Chart {
             let firstMajorKey = this._bars[0].chordSegments[0].key as NoteName;
             let firstMinorKey = Domain.NOTE_NAMES[ Util.mod(Domain.NOTE_NAMES.indexOf(firstMajorKey) - 3, 12 )];
 
-            let context = (this._bars[0].chordSegments[0].chordName as ChordName)[0] as NoteName;
+            let context; 
 
             barLoop: for (let bar of this._bars) {
                 for (let segment of bar.chordSegments) {
-                    if (segment.key !== firstMajorKey) {
-                        break barLoop;
-                    }
-
-                    let currRoot = (segment.chordName as ChordName)[0] as NoteName;
-
-                    if (currRoot === firstMajorKey) {
+                    if (segment.key === firstMajorKey && (segment.chordName as ChordName)[0] === firstMajorKey) {
                         context = firstMajorKey;
                         break barLoop;
-                    }
-                    if (currRoot === firstMinorKey) {
-                        context = firstMinorKey;
                     }
                 }
             }
 
-            this._context = context;
-            this._barsBase = MusicHelper.contextualizeOrDecontextualizeBars(this._bars, context, true);
+            if (!context) {
+                barLoop: for (let bar of this._bars) {
+                    for (let segment of bar.chordSegments) {
+                        if (segment.key === firstMinorKey && (segment.chordName as ChordName)[0] === firstMinorKey) {
+                            context = firstMajorKey;
+                            break barLoop;
+                        }
+                    }
+                }
+            }
+
+            if (!context) {
+                context = (this._bars[0].chordSegments[0].chordName as ChordName)[0] as NoteName;
+            }
+
+            this._context = context as NoteName;
+            this._barsBase = MusicHelper.contextualizeOrDecontextualizeBars(this._bars, context as NoteName, true);
         }
     }
     

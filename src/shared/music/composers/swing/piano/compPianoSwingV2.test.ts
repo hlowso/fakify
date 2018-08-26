@@ -1,4 +1,4 @@
-// import * as Util from "../../../../Util";
+import * as Util from "../../../../Util";
 import Chart from "../../../Chart";
 import barsBase from "../../../../test-data/bars-251";
 import { compPianoSwingV2 } from "./compPianoSwingV2";
@@ -10,7 +10,7 @@ const compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings = () => {
 	let { music } = compPianoSwingV2(chart) as IPart;
 	let prevBarCoveredNext: boolean;
 
-	for (let barIdx = 0; barIdx < music.length; barIdx ++) {
+	for (let barIdx = 0; barIdx < 6; barIdx ++) {
 
 		let bar = music[barIdx];
 		let currBarMissed = true;
@@ -19,7 +19,7 @@ const compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings = () => {
 		if (prevBarCoveredNext) {
 			currBarMissed = false;
 		} else {
-			for (let i = 0; i < 12; i ++) {
+			for (let i = 0; i < 11; i ++) {
 				if (bar[i]) {
 					currBarMissed = false;
 					continue;
@@ -36,7 +36,22 @@ const compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings = () => {
 		}
 	}
 
-	return true;
+	let lastBar = music["7"];
+
+	return (
+		!Util.objectIsEmpty(music["6"]) || 
+		lastBar["0"] ||
+		lastBar["1"] ||
+		lastBar["2"] ||
+		lastBar["3"] ||
+		lastBar["4"] ||
+		lastBar["5"] ||
+		lastBar["6"] ||
+		lastBar["7"] ||
+		lastBar["8"] ||
+		lastBar["9"] ||
+		lastBar["10"]
+	);
 }
 
 test("compPianoSwingV2 generates at least 1 voicing per chord stretch", () => {
