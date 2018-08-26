@@ -8,7 +8,7 @@ const DURATION_SPREAD_ROOT = 3;
 const DURATION_SPREAD_FACTOR = Math.log2(DURATION_SPREAD_ROOT);
 const MAX_TEMPO = 210;
 
-export const compPianoSwingV1 = (chart: Chart, prevMusic?: IMusicBar[]): IPart => {
+export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart => {
     let { chordStretches, bars } = chart;
     chordStretches = chordStretches as IChordStretch[];
     let music: IMusicBar[] = [];
@@ -177,4 +177,4 @@ export const compPianoSwingV1 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
     };
 };
 
-export default compPianoSwingV1;
+export default compPianoSwingV2;
