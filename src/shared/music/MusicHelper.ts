@@ -178,14 +178,24 @@ const _adjustBarsSwingFeel = (bars: IChartBar[]): IChartBar[] => {
 
         for (let segmentIdx = 0; segmentIdx < chordSegments.length; segmentIdx ++) {
             let segment = chordSegments[segmentIdx];
-            let nextSegment = (
-                segmentIdx === chordSegments.length - 1
-                    ? nextBar.chordSegments[0]
-                    : chordSegments[segmentIdx + 1]
-            );
+            let nextSegmentBar;
+            let nextSegmentIdx;
+            
+            if (segmentIdx === chordSegments.length - 1) {
+                nextSegmentBar = nextBar;
+                nextSegmentIdx = 0;
+            } else {
+                nextSegmentBar = bar;
+                nextSegmentIdx = segmentIdx + 1;
+            }
+            
+            let nextSegment = nextSegmentBar.chordSegments[nextSegmentIdx];
 
-            if (segment.chordName !== nextSegment.chordName) {
-                changeIndices.push({ barIdx, segmentIdx });
+            if (
+                (segment.chordName as ChordName)[0] !== (nextSegment.chordName as ChordName)[0] || 
+                (segment.chordName as ChordName)[1] !== (nextSegment.chordName as ChordName)[1]                 
+            ) {
+                changeIndices.push({ barIdx: nextSegmentBar.barIdx, segmentIdx: nextSegmentIdx });
             }
         }
     }
@@ -213,12 +223,12 @@ const _adjustBarsSwingFeel = (bars: IChartBar[]): IChartBar[] => {
             let { chordSegments } =  adjustedBars[barIdx];
             let segmentEndIdx = (
                 barIdx === stretchEnd.barIdx
-                    ? stretchEnd.segmentIdx
+                    ? stretchEnd.segmentIdx - 1
                     : chordSegments.length - 1
             );
             let segmentStartIdx = (
                 barIdx === stretchStart.barIdx
-                    ? Util.mod(stretchStart.segmentIdx + 1, chordSegments.length)
+                    ? stretchStart.segmentIdx
                     : 0
             );
 

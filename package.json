@@ -27,7 +27,7 @@
     "start": "npm run build-server && node server.js",
     "start-dev": "react-scripts-ts start",
     "build": "react-scripts-ts build",
-    "test": "react-scripts-ts test",
+    "test": "node_modules/jest/bin/jest.js",
     "eject": "react-scripts-ts eject",
     "build-server": "node_modules/webpack/bin/webpack.js --config webpack.config.server.ts",
     "deploy-static": "REACT_APP_DEPLOY_BUILD=true npm run build && netlifyctl deploy"

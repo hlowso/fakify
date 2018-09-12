@@ -6,6 +6,7 @@ import { IChartBar, IPart, Feel } from "../../../../types";
 
 const chart = new Chart(() => {}, barsBase as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
 
+// NOTE: This test is expecting to be run against a specific chart, namely 251
 const compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings = () => {
 	let { music } = compPianoSwingV2(chart) as IPart;
 	let prevBarCoveredNext: boolean;

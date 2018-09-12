@@ -152,7 +152,6 @@ class Chart {
                 return false;
             }
 
-
             if (!Chart.validChordSegments(chordSegments, timeSignature)) {
                 return false;
             }

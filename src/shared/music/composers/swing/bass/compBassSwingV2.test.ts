@@ -6,6 +6,7 @@ import { IChartBar, IPart, Feel } from "../../../../types";
 
 const chart = new Chart(() => {}, barsBase as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
 
+// NOTE: This test is expecting to be run against a specific chart, namely 251
 const compBassSwingV2_Generates_At_Least_One_Tonic_Or_Fifth_Per_Chord_Stretch = () => {
 
 	let { music } = compBassSwingV2(chart) as IPart;
