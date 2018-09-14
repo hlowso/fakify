@@ -46,6 +46,10 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         };
     }
 
+    /*****************
+        LIFE CYCLE  
+    ******************/
+
     public componentWillMount() {
         let { SoundActions } = this.props;
         let midiInputId = StorageHelper.getMidiInputId();
@@ -75,6 +79,14 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                 }
             });
     }
+
+    public componentWillUnmount() {
+        this._stopSession();
+    }
+
+    /**************
+        RENDERS  
+    **************/
 
     public render() {
         let { sessionManager } = this.props;
@@ -183,6 +195,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
     ************/
 
     private _resetChart = () => {
+        this._stopSession();
         let { _id, barsBase, originalTempo, originalContext } = this.state.selectedSong as ISong;
 
         let chartSettings = StorageHelper.getChartSettings(_id as string);

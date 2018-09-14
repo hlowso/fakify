@@ -15,11 +15,6 @@ import * as Util from "../../shared/Util";
 import soundfonts from "../../shared/music/soundfontsIndex";
 
 class AppRouter extends Component {
-    WAIT_TIME_FRACTION = 9 / 10;
-    WAIT_TIME_FACTOR = 1000 * this.WAIT_TIME_FRACTION;
-    TIME_CHECKER_RATE = 5;
-    PREP_TIME = 0.02;
-
     constructor(props) {
         super(props);
 
