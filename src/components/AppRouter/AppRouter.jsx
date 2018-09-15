@@ -213,16 +213,29 @@ class AppRouter extends Component {
         let { data } = message;
         let type = data[0], note = data[1], velocity = data[2] / 127;
         let userEnvelopesUpdate = Util.copyObject(userEnvelopes);
-        let existingEnvelop = userEnvelopes[note];
+        let existingEnvelope = userEnvelopes[note];
 
-        let noteOff = (existingEnvelop, userEnvelopesUpdate) => {
-            if (existingEnvelop) {
-                if (existingEnvelop.cancel) existingEnvelop.cancel();
+        let noteOff = (existingEnvelop, userEnvelopesUpdate, clearAll = false) => {
+            // note is NaN when this function is being triggered by a 
+            // mouse event
+            if (clearAll || isNaN(note)) {
+                for (let key in userEnvelopes) {
+                    let envelope = userEnvelopes[key];
+                    if (envelope.cancel) envelope.cancel();
+                    delete userEnvelopesUpdate[key];
+                }
+            } else if (existingEnvelope) {
+                if (existingEnvelope.cancel) existingEnvelope.cancel();
                 delete userEnvelopesUpdate[note];
             }
         }
 
         switch(type) {
+            case 1: 
+                // This is the case where a user drags the cursor
+                // across the keys with the mouse button held down
+                noteOff(existingEnvelope, userEnvelopesUpdate, true);
+
             case 144:
                 if (velocity) {
                     let { currentTime, destination } = audioContext;
@@ -242,12 +255,12 @@ class AppRouter extends Component {
                     );
                 }
                 else {
-                    noteOff(existingEnvelop, userEnvelopesUpdate);
+                    noteOff(existingEnvelope, userEnvelopesUpdate);
                 }
                 break;
 
             case 128:
-                noteOff(existingEnvelop, userEnvelopesUpdate);
+                noteOff(existingEnvelope, userEnvelopesUpdate);
                 break;
 
             default:

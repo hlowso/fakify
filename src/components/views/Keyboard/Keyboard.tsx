@@ -17,7 +17,7 @@ export interface IKeyboardProps {
 }
 
 export interface IKeyboardState {
-
+    mouseIsDown: boolean;
 }
 
 class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
@@ -32,7 +32,7 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
     constructor(props: IKeyboardProps) {
         super(props);
         this.state = {
-
+            mouseIsDown: false
         };
     }
 
@@ -62,7 +62,7 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
         }
 
         return (
-            <div className="keys">
+            <div className="keys" onMouseLeave={() => this.onPianoKeyUp()}>
                 <div className="upper-keys">
                     {upperElements}
                 </div>
@@ -138,22 +138,25 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
                 className={classes} 
                 style={style} 
                 onMouseDown={() => this.onPianoKeyDown(note)} 
-                onMouseUp={() => this.onPianoKeyUp(note)} />
+                onMouseEnter={() => this.onPianoKeyOver(note)}
+                onMouseUp={() => this.onPianoKeyUp()} />
         );
     }
 
     private onPianoKeyDown = (note: number) => {
-        let message: IMidiMessage = { 
-            data: [144, note, 127]
-        };
-        this.props.playUserMidiMessage(message);
+        this.props.playUserMidiMessage({ data: [144, note, 127]});
+        this.setState({ mouseIsDown: true });        
     }
 
-    private onPianoKeyUp = (note: number) => {
-        let message: IMidiMessage = {
-            data: [128, note, 0]
+    private onPianoKeyOver = (note: number) => {
+        if (this.state.mouseIsDown) {
+            this.props.playUserMidiMessage({ data: [1, note, 127]});
         }
-        this.props.playUserMidiMessage(message);
+    }
+
+    private onPianoKeyUp = () => {
+        this.props.playUserMidiMessage({ data: [128, NaN, 0]});
+        this.setState({ mouseIsDown: false });        
     }
 };
 
