@@ -446,6 +446,16 @@ class Chart {
                 });
             });
         }
+
+        // There may be only one chord stretch, in which case its 
+        // durationInSubbeats property should be the same as that 
+        // on the whole chart
+        if (this._chordStretches.length === 1) {
+            if (!Number.isInteger(this._durationInSubbeats)) {
+                this._calculateChartDuration();
+            }
+            this._chordStretches[0].durationInSubbeats = this._durationInSubbeats;
+        }
     }
 
     private _onDirectBarsChange = () => {
