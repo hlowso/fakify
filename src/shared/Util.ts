@@ -109,3 +109,26 @@ export const generateCustomRandomVariable = <T>(choices: [T, number][]) => {
     }; 
     return variable as () => T;
 };
+
+export const mean = (arr: number[]) => {
+    if (!Array.isArray(arr) || arr.length === 0 || arr.some(a => typeof a !== "number")) {
+        return NaN;
+    }
+    return arr.reduce((acc, curr) => acc + curr, 0) / arr.length;
+}
+
+export const vectorSum = (arr1: number[], arr2: number[]) => {
+    if (
+        !Array.isArray(arr1) || 
+        !Array.isArray(arr2) || 
+        arr1.length === 0 || 
+        arr2.length === 0 || 
+        arr1.length !== arr2.length ||
+        arr1.some(a => typeof a !== "number") || 
+        arr2.some(b => typeof b !== "number")
+    ) {
+        return NaN;
+    }
+
+    return arr1.map((a, i) => a + arr2[i]);
+}
