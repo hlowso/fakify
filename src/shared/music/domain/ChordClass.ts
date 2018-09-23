@@ -149,10 +149,10 @@ export class ChordClass extends Domain {
         return notesInRange;
     }
 
-    public voice(target: number, ref: number[] = []): number[] {
+    public voice(target: number, ref: number[] = [], nudgeFactor = NaN): number[] {
         return (
             ref.length > 0
-                ? this._voiceWithReference(ref)
+                ? this._voiceWithReference(ref, nudgeFactor)
                 : this._generateVoicing(target)
         );
     }
@@ -273,6 +273,7 @@ export class ChordClass extends Domain {
                 if (Math.random() < 0.5 && nonRequiredNotes.length > 0) {
                     let idx = Math.floor(Math.random() * nonRequiredNotes.length);
                     let note = nonRequiredNotes[idx];
+
                     if (!this._findOtherInstance(secondCandidate, note)) {
                         secondCandidate.push(note);
                         secondCandidate.sort(this._compareNotes);
@@ -281,7 +282,7 @@ export class ChordClass extends Domain {
                     }
                 }
             }
-            
+
             return secondCandidate;
         });
 
@@ -310,9 +311,19 @@ export class ChordClass extends Domain {
         return bestVoicing.map(note => note.pitch);
     }
 
-    private _voiceWithReference(ref: number[]) {
+    private _voiceWithReference(ref: number[], nudgeFactor = NaN) {
         let voicingCandidates = this._getVoicingCandidateNotes(ref);
-        let target = Math.floor((ref[0] + ref[ref.length - 1]) / 2);
+        let target: number;
+        let refAvg = Util.mean(ref);
+
+        if (nudgeFactor > 0) {
+            target = Math.round(refAvg + (ref[ref.length - 1] - refAvg) * nudgeFactor);
+        } else if (nudgeFactor < 0) {
+            target = Math.round(refAvg + (refAvg - ref[0]) * nudgeFactor);
+        } else {
+            target = Math.round(refAvg);
+        }
+
         return this._generateVoicing(target, voicingCandidates);
     }
 

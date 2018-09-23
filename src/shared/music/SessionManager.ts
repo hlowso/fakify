@@ -4,6 +4,7 @@ import Chart from "../music/Chart";
 import Score from "../music/Score";
 import { IScoreBar, IChartBar, NoteName, IChordSegment, IKeyStrokeRecord, IMusicIdx, ISubbeatTimeMap, IImprovReport, IListeningReport, IStroke, IExercise, Tempo } from "../types";
 import soundfonts from "./soundfontsIndex";
+import { CompV1, GenerateExercise } from "../music/composers/index";
 
 export class SessionManager {
     // The higher the index, the harder it is
@@ -136,7 +137,7 @@ export class SessionManager {
      */
 
     protected _compileMusic() {
-        return MusicHelper.CompV1(this._chart, this._score);
+        return CompV1(this._chart, this._score);
     }
 
     /**
@@ -402,7 +403,7 @@ export class ListeningSessionManager extends SessionManager {
 
         if (!this._userPlaying) {
             this._previousChorusExerciseNotesPassed += this._exercise ? this._exercise.numberOfNotes : 0;
-            this._exercise = MusicHelper.GenerateExercise(this._chart);
+            this._exercise = GenerateExercise(this._chart);
             _accompaniment.consolidate(this._exercise.part);
         }
         

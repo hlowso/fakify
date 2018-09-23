@@ -1,8 +1,6 @@
 import * as Util from "../Util";
 import { NoteName, RelativeNoteName, IChartBar, IChordSegment, Feel, ChordName } from "../types";
 
-export * from "./composers/index"
-
 export const NUMBER_OF_KEYS = 88;
 export const LOWEST_A = 9;
 export const HIGHEST_C = LOWEST_A + NUMBER_OF_KEYS - 1;

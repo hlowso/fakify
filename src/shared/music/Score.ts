@@ -1,7 +1,58 @@
 import { IPart, IScoreBar, IMusicIdx, IStroke, IMusicBar } from "../types";
+import * as Util from "../Util";
 
 class Score {
     private _bars: IScoreBar[]; 
+
+    // Returns a tuple of 3 integers in which the first is the number of times a subsequent 
+    // voicing notes average was greater than the one preceeding, the second is the number
+    // of times a subsequent voicing notes average was less than the one preceding, and
+    // the third is one less than the total number of voicings in the music array 
+    public static getAscensionRate = (music: IMusicBar[]) => {
+        let voicingAvg = -1;
+        let startingIdx = -1;
+        let rate = [0, 0, 0];
+
+        let getNoteAvgFromBarAndSubbeatIdx = (bar: IMusicBar, subbeatIdx: string) => {
+            return Util.mean(bar[subbeatIdx][0].notes);
+        }
+    
+        let updateFraction = (fraction: number[], avg: number, bar: IMusicBar, subbeatIdx: string) => {
+            let nextAvg = getNoteAvgFromBarAndSubbeatIdx(bar, subbeatIdx);
+            fraction[2] ++;
+            if (nextAvg > avg) {
+                fraction[0] ++;
+            } else if (nextAvg < avg) {
+                fraction[1] ++;
+            }
+            avg = nextAvg;
+        }
+    
+        // Get first voicing
+        for (let bar of music) {
+            startingIdx++;
+            if (!Util.objectIsEmpty(bar)) {
+                for (let subbeatIdx in bar) {
+                    if (voicingAvg > 0) {
+                        updateFraction(rate, voicingAvg, bar, subbeatIdx);
+                    } else {
+                        voicingAvg = getNoteAvgFromBarAndSubbeatIdx(bar, subbeatIdx);
+                    }
+                }
+                break;			
+            }
+        }
+    
+        // Calculate the fraction over the rest of the music array
+        for (let barIdx = startingIdx; barIdx < music.length; barIdx++) {
+            let bar = music[barIdx];
+            for (let subbeatIdx in bar) {
+                updateFraction(rate, voicingAvg, bar, subbeatIdx);
+            }
+        }
+    
+        return rate;
+    };
 
     constructor(partsOrScores: (IPart | Score)[] | (IPart | Score)) {
         this._bars = [];
