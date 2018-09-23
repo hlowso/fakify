@@ -2,13 +2,13 @@ import * as Util from "../../../../Util";
 import { ChordClass } from "../../../domain/ChordClass";
 import { ChordName, Tempo, IMusicBar, IPart, IMusicIdx, IChordSegment, IStroke, IChordStretch } from "../../../../types";
 import Chart from "../../../Chart";
-import Score from "../../../Score";
 
 const VEL_FACTOR = 0.6;
 const DURATION_SPREAD_ROOT = 3;
 const DURATION_SPREAD_FACTOR = Math.log2(DURATION_SPREAD_ROOT);
 const MAX_TEMPO = 210;
-const VOICING_TARGET = 64;
+const VOICING_TARGET = 60;
+const INITIAL_REFERRAL_TO_PREVIOUS_MUSIC_ODDS = 0.75;
 const VOICING_DEVIATION_LIMIT = 13;
 
 export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart => {
@@ -46,7 +46,7 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
 
     // If there is previous music, we can set the starting values of absSubbeatIdx and 
     // previousVoicing accordingly
-    if (Array.isArray(prevMusic) && prevMusic.length > 0) {
+    if (Array.isArray(prevMusic) && prevMusic.length > 0 && Math.random() < INITIAL_REFERRAL_TO_PREVIOUS_MUSIC_ODDS) {
 
         let lastStroke: IStroke = { notes: [], durationInSubbeats: NaN, velocity: NaN };
 
@@ -133,19 +133,25 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
                 }
             }
 
-            // Reset the previous voicing if it gets too high or too low
+            let chord = new ChordClass(segment.chordName as ChordName);
+            let nudgeFactor = NaN;           
+
             if (previousVoicing.length > 0) {
                 let prevVoicingAvg = Util.mean(previousVoicing);
-                let diff = Math.abs(prevVoicingAvg - VOICING_TARGET);
+                let diff = prevVoicingAvg - VOICING_TARGET;
+
                 if (diff > VOICING_DEVIATION_LIMIT) {
-                    previousVoicing = [];
+                    nudgeFactor = -0.5;
+                } else if (diff < -1 * VOICING_DEVIATION_LIMIT) {
+                    nudgeFactor = 0.5;
+                } else {
+                    let x = diff / VOICING_DEVIATION_LIMIT;
+                    let f = Math.pow(x, 2);
+                    if (Math.random() < f) {
+                        nudgeFactor = -x;
+                    }
                 }
             }
-
-            let chord = new ChordClass(segment.chordName as ChordName);
-            let musicHistory = prevMusic ? [ ...prevMusic, ...music ] : music;
-            let ascensionRate = Score.getAscensionRate(musicHistory);
-            let nudgeFactor = -2 * ((ascensionRate[0] / (ascensionRate[0] + ascensionRate[1])) - 0.5);
 
             let voicing = chord.voice(VOICING_TARGET, previousVoicing, nudgeFactor);
             let durationInSubbeats = maxPossibleDurationToDuration(maxDuration);

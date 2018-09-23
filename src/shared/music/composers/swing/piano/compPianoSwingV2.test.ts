@@ -20,7 +20,7 @@ test("generates at least 1 voicing per chord stretch", () => {
 	expect(successfulRuns).toBe(testRuns);
 });
 
-test("rate of chord ascension is roughly 50%", () => {
+test("rate of chord ascension and chord descension are roughly equal", () => {
 	let testRuns = 100;
 	let fraction = [0, 0, 0];
 	let chart = C_Blues_chart;
