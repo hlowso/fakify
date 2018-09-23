@@ -9,6 +9,7 @@ const DURATION_SPREAD_FACTOR = Math.log2(DURATION_SPREAD_ROOT);
 const MAX_TEMPO = 210;
 const VOICING_TARGET = 60;
 const INITIAL_REFERRAL_TO_PREVIOUS_MUSIC_ODDS = 0.75;
+const NUDGE_WITHIN_RANGE_ODDS = 0.8;
 const VOICING_DEVIATION_LIMIT = 13;
 
 export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart => {
@@ -145,10 +146,12 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
                 } else if (diff < -1 * VOICING_DEVIATION_LIMIT) {
                     nudgeFactor = 0.5;
                 } else {
-                    let x = diff / VOICING_DEVIATION_LIMIT;
-                    let f = Math.pow(x, 2);
-                    if (Math.random() < f) {
-                        nudgeFactor = -x;
+                    let diffFactor = Math.pow(diff / VOICING_DEVIATION_LIMIT, 2) * 3;
+                    diffFactor = diffFactor > 1 ? 1 : diffFactor;
+                    let diffFactorSign = diff > 0 ? -1 : 1;
+
+                    if (Math.random() < NUDGE_WITHIN_RANGE_ODDS) {
+                        nudgeFactor = diffFactorSign * diffFactor;
                     }
                 }
             }
