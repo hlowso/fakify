@@ -2,7 +2,7 @@ import * as Util from "../Util";
 import * as MusicHelper from "../music/MusicHelper";
 import { IChartBar, Feel, NoteName, Tempo, IMusicIdx, IChordStretch, IChordSegment, ChordName, ChordShape, RelativeNoteName, TimeSignature } from "../types";
 import { Domain } from "./domain/Domain";
-import { ChordClass } from "./domain/ChordClass";
+import { Chord } from "./domain/ChordClass";
 
 class Chart {
     private _barsBase: IChartBar[];
@@ -318,7 +318,7 @@ class Chart {
                 barBase.chordSegments.forEach(segment => { 
                     possibleChordKeys = [ 
                         ...possibleChordKeys, 
-                        ChordClass.getSuitableKeys(segment.chordName as ChordName) as (RelativeNoteName | NoteName)[] 
+                        Chord.getSuitableKeys(segment.chordName as ChordName) as (RelativeNoteName | NoteName)[] 
                     ]; 
                 }); 
             }); 

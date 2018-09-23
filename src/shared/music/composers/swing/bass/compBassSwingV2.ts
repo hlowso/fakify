@@ -1,7 +1,7 @@
 import * as Util from "../../../../Util";
 import Chart from "../../../Chart";
 import { IPart, IMusicBar, ChordName, IChordStretch, NoteName } from "../../../../types";
-import { ChordClass } from "../../../domain/ChordClass";
+import { Chord } from "../../../domain/ChordClass";
 import { ScaleClass } from "../../../domain/ScaleClass";
 import { Note } from "../../../domain/Note";
 
@@ -48,9 +48,9 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
     let beatsSinceJump = 0;    
     let striding = false;
 
-    let currChord: ChordClass;
+    let currChord: Chord;
     let currScale: ScaleClass;
-    let nextChord: ChordClass;
+    let nextChord: Chord;
 
     let pitch: number;
     let lastPitchFromPrevMusic = Math.floor( Math.random() * (BASS_CEILING - BASS_FLOOR) + BASS_FLOOR );
@@ -80,7 +80,7 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
 
     // Now get the closer of the closest tonic and closest fifth
     // of the first chord of the progression
-    let firstChord = new ChordClass(chordStretches[0].chordName as ChordName);
+    let firstChord = new Chord(chordStretches[0].chordName as ChordName);
     let closestTonic = (firstChord.getClosestNoteInstance(lastPitchFromPrevMusic, 1)[1] as Note).pitch;
     let closestFifth = (firstChord.getClosestNoteInstance(lastPitchFromPrevMusic, 5)[1] as Note).pitch;
 
@@ -241,7 +241,7 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
 
         updateDirection();
 
-        nextChord = new ChordClass(nextStretch.chordName as ChordName);
+        nextChord = new Chord(nextStretch.chordName as ChordName);
 
         // Handle a "quick" transition, which means that the chord stretch
         // being left was only 1 beat long
@@ -292,7 +292,7 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
         // divisible by 3
         let durationInBeats = (durationInSubbeats as number) / 3;
         
-        currChord = new ChordClass(chordName);
+        currChord = new Chord(chordName);
         currScale = currChord.applyMutation(new ScaleClass(key as NoteName));
 
         for (let beat = 1; beat <= durationInBeats; beat ++) {

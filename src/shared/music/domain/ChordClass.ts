@@ -3,7 +3,7 @@ import { Domain } from "./Domain";
 import { Note } from "./Note";
 import { NoteName, ChordName, ChordShape, IShapeInfo, RelativeNoteName } from "../../types";
 
-export class ChordClass extends Domain {
+export class Chord extends Domain {
     public static shapeToInfo = (shape: ChordShape): IShapeInfo => {
         let infoBase: IShapeInfo;
         let extend: (notes: Note[]) => Note[];
@@ -39,7 +39,7 @@ export class ChordClass extends Domain {
                     relativeTonicPositions: ["5"]
                 };
             case ChordShape.Dom9:
-                infoBase = ChordClass.shapeToInfo(ChordShape.Dom7);
+                infoBase = Chord.shapeToInfo(ChordShape.Dom7);
                 extend = notes => {
                     let notesCopy = Util.copyObject(notes);
                     let tonic = notes.find(note => note.position === 1);
@@ -66,7 +66,7 @@ export class ChordClass extends Domain {
 
     public static getSuitableKeys = ([noteName, shape]: ChordName): Array<RelativeNoteName | NoteName> => {
         let noteNames: Array<RelativeNoteName | NoteName>;
-        let { relativeTonicPositions } = ChordClass.shapeToInfo(shape);
+        let { relativeTonicPositions } = Chord.shapeToInfo(shape);
 
         if (Domain.RELATIVE_NOTE_NAMES.indexOf(noteName as RelativeNoteName) !== -1) {
             noteNames = Domain.RELATIVE_NOTE_NAMES;
@@ -97,7 +97,7 @@ export class ChordClass extends Domain {
 
     constructor(chordName: ChordName) {
         let [ noteName, shape ] = chordName;
-        let { baseIntervals, extend } = ChordClass.shapeToInfo(shape);
+        let { baseIntervals, extend } = Chord.shapeToInfo(shape);
         let lowestPitch = Domain.getLowestPitch((noteName as NoteName));
         let highestPosition = 1;
         let baseNotes = baseIntervals.map((pitchDiff, i): Note => { 
@@ -110,7 +110,7 @@ export class ChordClass extends Domain {
         let noteClasses = (extend || Util.identity)(baseNotes);
         super(noteClasses);
 
-        this._suitableKeys = ChordClass.getSuitableKeys(chordName) as NoteName[];
+        this._suitableKeys = Chord.getSuitableKeys(chordName) as NoteName[];
         this._order = highestPosition;
         
         // Build the contextualized specialNotesMutation function
@@ -157,13 +157,19 @@ export class ChordClass extends Domain {
         );
     }
 
-    public getTonicPitch(target: number, above = true) {
+    public getTonicPitch(target = NaN, above = true) {
         let lowestTonic = this.getLowestNoteByPosition(1) as Note;
+        if (isNaN(target)) {
+            return lowestTonic.pitch;
+        }
         return Domain.getPitchInstance(target, lowestTonic.pitch, above);
     }
 
-    public getFifthPitch(target: number, above = true) {
+    public getFifthPitch(target = NaN, above = true) {
         let lowestFifth = this.getLowestNoteByPosition(5) as Note;
+        if (isNaN(target)) {
+            return lowestFifth.pitch;
+        }
         return Domain.getPitchInstance(target, lowestFifth.pitch, above);
     }
 

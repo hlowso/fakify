@@ -1,5 +1,5 @@
 import * as Util from "../../../../Util";
-import { ChordClass } from "../../../domain/ChordClass";
+import { Chord } from "../../../domain/ChordClass";
 import { ChordName, Tempo, IMusicBar, IPart, IMusicIdx, IChordSegment, IStroke, IChordStretch } from "../../../../types";
 import Chart from "../../../Chart";
 
@@ -134,7 +134,7 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
                 }
             }
 
-            let chord = new ChordClass(segment.chordName as ChordName);
+            let chord = new Chord(segment.chordName as ChordName);
             let nudgeFactor = NaN;           
 
             if (previousVoicing.length > 0) {

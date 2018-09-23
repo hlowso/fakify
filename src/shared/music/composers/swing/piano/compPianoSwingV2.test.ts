@@ -35,9 +35,9 @@ test("rate of chord ascension and chord descension are roughly equal", () => {
 	let ascensionPercentage = fraction[0] / fraction[2];
 	let descensionPercentage = fraction[1] / fraction[2];
 
-	console.log("Fraction", fraction);
-	console.log("Ascension:", ascensionPercentage);
-	console.log("Descension:", descensionPercentage);	
+	// console.log("Fraction", fraction);
+	// console.log("Ascension:", ascensionPercentage);
+	// console.log("Descension:", descensionPercentage);	
 
 	expect(Math.abs(ascensionPercentage - descensionPercentage)).toBeLessThan(0.1);
 });

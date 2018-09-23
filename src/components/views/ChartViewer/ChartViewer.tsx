@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import * as Cx from "classnames";
 import * as Util from "../../../shared/Util";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
-import { ChordClass } from "../../../shared/music/domain/ChordClass";
+import { Chord } from "../../../shared/music/domain/ChordClass";
 import Chart from "../../../shared/music/Chart";
 import { ISong, IMusicIdx, NoteName, Tempo, ChordName } from "../../../shared/types";
 import "./ChartViewer.css";
@@ -140,7 +140,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                     if (chordSegment) {
                         prevChordName = chordName;
                         chordName = chordSegment.chordName as ChordName;
-                        if (!ChordClass.chordNamesAreEqual(chordName, prevChordName)) {
+                        if (!Chord.chordNamesAreEqual(chordName, prevChordName)) {
                             useDivisionSign = false;
                             displayedChordName = `${MusicHelper.getPresentableNoteName(chordName[0] as NoteName, baseKey)}${chordName[1]}`;
                         }
