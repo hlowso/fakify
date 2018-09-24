@@ -46,7 +46,6 @@ test("rate of chord ascension and chord descension are roughly equal", () => {
  * HELPERS
  */
 
-// NOTE: This test is expecting to be run against a specific chart, namely 251
 const compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings = (chart: Chart) => {
 	let { chordStretches, bars } = chart;
 	let { music } = compPianoSwingV2(chart);

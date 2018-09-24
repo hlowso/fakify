@@ -36,6 +36,10 @@ export class Note {
         this._required = required;
     }
 
+    public clone = () => {
+        return new Note(this._name, this._position, this._required);
+    }
+
     get name(): NoteName {
         return this._name;
     }

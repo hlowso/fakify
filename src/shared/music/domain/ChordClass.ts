@@ -41,7 +41,7 @@ export class Chord extends Domain {
             case ChordShape.Dom9:
                 infoBase = Chord.shapeToInfo(ChordShape.Dom7);
                 extend = notes => {
-                    let notesCopy = Util.copyObject(notes);
+                    let notesCopy = notes.map(n => n.clone());
                     let tonic = notes.find(note => note.position === 1);
                     let ninth = notes.find(note => note.position === 2 || note.position === 9);
                     if (ninth === undefined) {
@@ -160,7 +160,7 @@ export class Chord extends Domain {
     public getTonicPitch(target = NaN, above = true) {
         let lowestTonic = this.getLowestNoteByPosition(1) as Note;
         if (isNaN(target)) {
-            return lowestTonic.pitch;
+            return lowestTonic.basePitch;
         }
         return Domain.getPitchInstance(target, lowestTonic.pitch, above);
     }
@@ -168,7 +168,7 @@ export class Chord extends Domain {
     public getFifthPitch(target = NaN, above = true) {
         let lowestFifth = this.getLowestNoteByPosition(5) as Note;
         if (isNaN(target)) {
-            return lowestFifth.pitch;
+            return lowestFifth.basePitch;
         }
         return Domain.getPitchInstance(target, lowestFifth.pitch, above);
     }
