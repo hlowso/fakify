@@ -100,7 +100,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         let selectedSongId = selectedSong ? (selectedSong as ISong)._id: null;
         let inSession = sessionManager && sessionManager.inSession;
         let sessionIdx = inSession ? sessionManager.sessionIdx : null;
-        let currKey: NoteName | "" = inSession ? sessionManager.currKey : "";
+        let currNoteClasses = inSession ? sessionManager.currKeyNoteClasses : [];
         let firstNote = inSession ? (sessionManager as ListeningSessionManager).firstNote : NaN;
         let rangeStartNote = inSession ? (sessionManager as ListeningSessionManager).rangeStartNote : MusicHelper.LOWEST_A;
         let rangeEndNote = inSession ? (sessionManager as ListeningSessionManager).rangeEndNote : MusicHelper.HIGHEST_C;
@@ -155,7 +155,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                     <Keyboard
                         showKeyChanges={showKeyChanges} 
                         depressedKeys={this.props.StateHelper.getCurrentUserKeysDepressed()} 
-                        currentKey={currKey} 
+                        currentKeyBasePitches={currNoteClasses.map(n => n.basePitch)} 
                         playUserMidiMessage={this.props.SoundActions.playUserMidiMessage} 
                         takeIsPlaying={inSession} 
                         firstNote={firstNote || NaN} 

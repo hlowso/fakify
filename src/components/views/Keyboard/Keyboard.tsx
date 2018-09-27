@@ -1,13 +1,14 @@
 import React, { Component } from "react";
 import Cx from "classnames";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
+import * as Util from "../../../shared/Util";
 import { NoteName, IMidiMessage } from "../../../shared/types";
 import "./Keyboard.css";
 
 export interface IKeyboardProps {
     showKeyChanges: boolean;
     depressedKeys: number[];
-    currentKey: NoteName | "";
+    currentKeyBasePitches: number[];
     takeIsPlaying: boolean;
     playUserMidiMessage: (message: IMidiMessage) => void;
     firstNote: number;
@@ -116,12 +117,12 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
     }
 
     public renderKey = (note: number, noteName: NoteName, isBlack = false, style: any): JSX.Element => {
-        let { showKeyChanges, depressedKeys, currentKey, firstNote, rangeStartNote, rangeEndNote, takeIsPlaying } = this.props;
+        let { showKeyChanges, depressedKeys, firstNote, rangeStartNote, rangeEndNote, takeIsPlaying } = this.props;
         let keyDepressed = depressedKeys.indexOf(note) !== -1;
         let classes = Cx({
             "key": true,
             "depressed": keyDepressed, 
-            "in-current-key": showKeyChanges && MusicHelper.noteIsInKey(note, currentKey),
+            "in-current-key": showKeyChanges && this.pitchIsInKey(note),
             "take-playing": takeIsPlaying,
             "key-out-of-range": note < rangeStartNote || rangeEndNote < note,
             "white-key": !isBlack,
@@ -143,6 +144,10 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
         );
     }
 
+    /**
+     * EVENT HANDLERS
+     */
+
     private onPianoKeyDown = (note: number) => {
         this.props.playUserMidiMessage({ data: [144, note, 127]});
         this.setState({ mouseIsDown: true });        
@@ -157,6 +162,14 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
     private onPianoKeyUp = () => {
         this.props.playUserMidiMessage({ data: [128, NaN, 0]});
         this.setState({ mouseIsDown: false });        
+    }
+
+    /**
+     * HELPERS
+     */
+
+    private pitchIsInKey = (pitch: number) => {
+        return this.props.currentKeyBasePitches.indexOf(Util.mod(pitch, 12)) !== -1;
     }
 };
 

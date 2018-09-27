@@ -2,9 +2,11 @@ import * as Util from "../Util";
 import * as MusicHelper from "../music/MusicHelper";
 import Chart from "../music/Chart";
 import Score from "../music/Score";
-import { IScoreBar, IChartBar, NoteName, IChordSegment, IKeyStrokeRecord, IMusicIdx, ISubbeatTimeMap, IImprovReport, IListeningReport, IStroke, IExercise, Tempo } from "../types";
+import { ChordName, IScoreBar, IChartBar, NoteName, IChordSegment, IKeyStrokeRecord, IMusicIdx, ISubbeatTimeMap, IImprovReport, IListeningReport, IStroke, IExercise, Tempo } from "../types";
 import soundfonts from "./soundfontsIndex";
 import { CompV1, GenerateExercise } from "../music/composers/index";
+import { ScaleClass } from "./domain/ScaleClass";
+import { Chord } from "./domain/ChordClass";
 
 export class SessionManager {
     // The higher the index, the harder it is
@@ -80,6 +82,15 @@ export class SessionManager {
             segmentIdx: this._segmentIdx,
             subbeatIdx: this._queueTimes ? Util.binarySearch(this._currQueueTimeBar, this._audioContext.currentTime)[0] : undefined
         }
+    }
+
+    get currKeyNoteClasses() {
+        let scale = new ScaleClass(this.currKey);
+        let chord = new Chord(this.currChordSegment.chordName as ChordName);
+
+        chord.applyMutation(scale);
+
+        return scale.noteClasses;
     }
 
     /**
