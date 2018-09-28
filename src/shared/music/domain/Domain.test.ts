@@ -1,6 +1,10 @@
 import { NoteName } from "../../types";
 import { Domain } from "./domain";
 
+test("placeholder", () => {
+
+});
+
 /**
  * HELPERS
  */

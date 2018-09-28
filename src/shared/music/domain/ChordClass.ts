@@ -1,12 +1,14 @@
 import * as Util from "../../Util";
+import { contextualize } from '../../music/MusicHelper';
 import { Domain } from "./Domain";
 import { Note } from "./Note";
 import { NoteName, ChordName, ChordShape, IShapeInfo, RelativeNoteName } from "../../types";
+import { Scale } from "./ScaleClass";
 
 export class Chord extends Domain {
     public static shapeToInfo = (shape: ChordShape): IShapeInfo => {
         let infoBase: IShapeInfo;
-        let extend: (notes: Note[]) => Note[];
+        let extension: RelativeNoteName[];
         switch (shape) {
             case ChordShape.Maj:
                 return {
@@ -40,16 +42,9 @@ export class Chord extends Domain {
                 };
             case ChordShape.Dom9:
                 infoBase = Chord.shapeToInfo(ChordShape.Dom7);
-                extend = notes => {
-                    let notesCopy = notes.map(n => n.clone());
-                    let tonic = notes.find(note => note.position === 1);
-                    let ninth = notes.find(note => note.position === 2 || note.position === 9);
-                    if (ninth === undefined) {
-                        notesCopy.push(new Note((tonic as Note).basePitch + 2, 9, true).asNoteClass());
-                    }
-                    return notesCopy;
-                };
-                return { ...infoBase, extend };
+                extension = [];
+                extension[9] = "2";
+                return { ...infoBase, extension };
             case ChordShape.Dim:
                 return {
                     shape,
@@ -92,43 +87,66 @@ export class Chord extends Domain {
 
     private _suitableKeys: NoteName[]; 
     private _order: number;
-    private _specialNotesMutation: (notes: Note[]) => Note[];
+    // private _specialNotesMutation: (notes: Note[]) => Note[];
+    private _extension: NoteName[];
     private _clusterIndexOrder: [number, number, number];    
 
     constructor(chordName: ChordName) {
-        let [ noteName, shape ] = chordName;
-        let { baseIntervals, extend } = Chord.shapeToInfo(shape);
-        let lowestPitch = Domain.getLowestPitch((noteName as NoteName));
-        let highestPosition = 1;
-        let baseNotes = baseIntervals.map((pitchDiff, i): Note => { 
-            highestPosition = 2 * i + 1;
+        let [ baseNoteName, shape ] = chordName;
+
+        let { baseIntervals, extension } = Chord.shapeToInfo(shape);
+
+        let lowestPitch = Domain.getLowestPitch((baseNoteName as NoteName));
+
+        let pos = 1;
+
+        let baseNotes = baseIntervals.map((pitchDiff, i) => { 
+            pos = 2 * i + 1;
             let pitch = lowestPitch + pitchDiff;
-            let required = highestPosition === 3 || highestPosition === 7
-            return new Note(pitch, highestPosition, required);
+            let required = pos === 3 || pos === 7
+            return new Note(pitch, pos, required);
         });
 
-        let noteClasses = (extend || Util.identity)(baseNotes);
+        let noteClasses = (
+            extension
+                ? Domain.applyExtension(baseNotes, extension.map(name => contextualize(name, baseNoteName as NoteName)))
+                : baseNotes
+        );
         super(noteClasses);
 
         this._suitableKeys = Chord.getSuitableKeys(chordName) as NoteName[];
-        this._order = highestPosition;
-        
-        // Build the contextualized specialNotesMutation function
-        let notesRemovedFromBase = baseNotes.filter(note => noteClasses.indexOf(note) === -1);
-        let notesAddedToBase = noteClasses.filter(note => baseNotes.indexOf(note) === -1);
-        this._specialNotesMutation = (notes: Note[]) => {
-            let notesCopy = notes.filter(note => notesRemovedFromBase.indexOf(note) === -1);
-            notesAddedToBase.forEach(note => notesCopy.push(note.clone()));
-            return notesCopy.map(note => note.clone());
-        };
+        this._order = this.noteClasses.reduce((highest, note) => note.position > highest ? note.position : highest, 0);
 
         // Set the order in which cluster notes should be dealt with
         this._clusterIndexOrder = [1, 2, 0];
     }
 
-    public applyMutation(domain: Domain) {
-        let noteClasses = this._specialNotesMutation(domain.noteClasses);
-        return new Domain(noteClasses);
+    public applyExtensionToScale(scale: Scale) {
+
+        if (!this._extension) {
+            return scale;
+        }
+
+        let posDiff = scale.getPitchPositionDiff(this.getTonicPitch(), scale.getTonicPitch());
+
+        if (isNaN(posDiff)) {
+            return scale;
+        }
+
+        let scaleExtension: NoteName[] = [];      
+
+        this._extension.forEach((name, pos) => {
+            
+            if (pos > 7) {
+                pos -= 7
+            }
+
+            scaleExtension[Util.mod(pos - posDiff, 7) + 1] = name;
+        });
+
+        scale.mutate(scaleExtension);
+
+        return scale;
     }
 
     // TODO: should this be a Domain function??
@@ -155,14 +173,6 @@ export class Chord extends Domain {
                 ? this._voiceWithReference(ref, nudgeFactor)
                 : this._generateVoicing(target)
         );
-    }
-
-    public getTonicPitch(target = NaN, above = true) {
-        let lowestTonic = this.getLowestNoteByPosition(1) as Note;
-        if (isNaN(target)) {
-            return lowestTonic.basePitch;
-        }
-        return Domain.getPitchInstance(target, lowestTonic.pitch, above);
     }
 
     public getFifthPitch(target = NaN, above = true) {

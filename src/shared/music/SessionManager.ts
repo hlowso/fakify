@@ -5,7 +5,7 @@ import Score from "../music/Score";
 import { ChordName, IScoreBar, IChartBar, NoteName, IChordSegment, IKeyStrokeRecord, IMusicIdx, ISubbeatTimeMap, IImprovReport, IListeningReport, IStroke, IExercise, Tempo } from "../types";
 import soundfonts from "./soundfontsIndex";
 import { CompV1, GenerateExercise } from "../music/composers/index";
-import { ScaleClass } from "./domain/ScaleClass";
+import { Scale } from "./domain/ScaleClass";
 import { Chord } from "./domain/ChordClass";
 
 export class SessionManager {
@@ -85,10 +85,10 @@ export class SessionManager {
     }
 
     get currKeyNoteClasses() {
-        let scale = new ScaleClass(this.currKey);
+        let scale = new Scale(this.currKey);
         let chord = new Chord(this.currChordSegment.chordName as ChordName);
 
-        chord.applyMutation(scale);
+        chord.applyExtensionToScale(scale);
 
         return scale.noteClasses;
     }

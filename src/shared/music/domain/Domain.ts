@@ -22,6 +22,28 @@ export class Domain {
         return Domain.NOTE_NAMES.indexOf(noteName);
     }
 
+    public static applyExtension = (noteClasses: Note[], extension?: NoteName[]) => {
+
+        let newNoteClasses = noteClasses.map(note => note.clone());
+
+        if (!extension) {
+            return newNoteClasses;
+        }
+
+        extension.forEach((name, pos) => {
+
+            let exisitngNoteIdx = newNoteClasses.findIndex(note => note.position === pos);
+
+            if (exisitngNoteIdx !== -1) {
+                newNoteClasses.splice(exisitngNoteIdx, 1);
+            }
+
+            newNoteClasses.push(new Note(name, pos, true));            
+        });
+
+        return newNoteClasses;
+    }
+
     protected _notes: Note[];
     protected _noteClasses: Note[];
   
@@ -122,8 +144,8 @@ export class Domain {
         return null;
     }
 
-    public mutate(mutation: (baseNotes: Note[]) => Note[]) {
-        this._noteClasses = mutation(this._noteClasses);
+    public mutate(extension: NoteName[]) {
+        this._noteClasses = Domain.applyExtension(this._noteClasses, extension);
         this._buildFromNoteClasses();
     }
 
@@ -206,6 +228,14 @@ export class Domain {
         }
 
         return [idx, closest];
+    }
+
+    public getTonicPitch(target = NaN, above = true) {
+        let lowestTonic = this.getLowestNoteByPosition(1) as Note;
+        if (isNaN(target)) {
+            return lowestTonic.basePitch;
+        }
+        return Domain.getPitchInstance(target, lowestTonic.pitch, above);
     }
 
     // For binary search and sort...

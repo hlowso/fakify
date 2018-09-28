@@ -1,5 +1,4 @@
 import * as Mongo from "mongodb";
-import { Note } from "./music/domain/Note";
 
 export interface IIncomingUser {
     email: string;
@@ -199,5 +198,5 @@ export interface IShapeInfo {
     shape: ChordShape;
     baseIntervals: number[];
     relativeTonicPositions: RelativeNoteName[]; 
-    extend?: (baseNotes: Note[]) => Note[];
+    extension?: RelativeNoteName[];
 }

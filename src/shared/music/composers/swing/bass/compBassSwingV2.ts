@@ -2,7 +2,7 @@ import * as Util from "../../../../Util";
 import Chart from "../../../Chart";
 import { IPart, IMusicBar, ChordName, IChordStretch, NoteName } from "../../../../types";
 import { Chord } from "../../../domain/ChordClass";
-import { ScaleClass } from "../../../domain/ScaleClass";
+import { Scale } from "../../../domain/ScaleClass";
 import { Note } from "../../../domain/Note";
 
 /**
@@ -49,7 +49,7 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
     let striding = false;
 
     let currChord: Chord;
-    let currScale: ScaleClass;
+    let currScale: Scale;
     let nextChord: Chord;
 
     let pitch: number;
@@ -293,7 +293,7 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
         let durationInBeats = (durationInSubbeats as number) / 3;
         
         currChord = new Chord(chordName);
-        currScale = currChord.applyMutation(new ScaleClass(key as NoteName));
+        currScale = currChord.applyExtensionToScale(new Scale(key as NoteName));
 
         for (let beat = 1; beat <= durationInBeats; beat ++) {
 
