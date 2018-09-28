@@ -118,8 +118,8 @@ export class Chord extends Domain {
         let notesAddedToBase = noteClasses.filter(note => baseNotes.indexOf(note) === -1);
         this._specialNotesMutation = (notes: Note[]) => {
             let notesCopy = notes.filter(note => notesRemovedFromBase.indexOf(note) === -1);
-            notesAddedToBase.forEach(note => notesCopy.push(note));
-            return notesCopy;
+            notesAddedToBase.forEach(note => notesCopy.push(note.clone()));
+            return notesCopy.map(note => note.clone());
         };
 
         // Set the order in which cluster notes should be dealt with

@@ -3,11 +3,13 @@ import Chart from "../../../Chart";
 import Score from "../../../Score";
 import _251_bars from "../../../../test-data/bars-251";
 import C_Blues_bars from "../../../../test-data/bars-c-blues";
+import barsJustForFun from "../../../../test-data/bars-just-for-fun";
 import { compPianoSwingV2 } from "./compPianoSwingV2";
 import { IChartBar, Feel, IChordStretch } from "../../../../types";
 
 const _251_chart = new Chart(() => {}, _251_bars as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
 const C_Blues_chart = new Chart(() => {}, C_Blues_bars as IChartBar[], "C", [ 120, 4 ], Feel.Swing);
+const chartJustForFun = new Chart(() => {}, barsJustForFun as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
 
 test("generates at least 1 voicing per chord stretch", () => {
 	let testRuns = 50;
@@ -22,9 +24,17 @@ test("generates at least 1 voicing per chord stretch", () => {
 });
 
 test("rate of chord ascension and chord descension are roughly equal", () => {
-	let testRuns = 100;
+	expect(ascensionTest(_251_chart)).toBeLessThan(0.1);
+	expect(ascensionTest(C_Blues_chart)).toBeLessThan(0.1);
+	expect(ascensionTest(chartJustForFun)).toBeLessThan(0.1);
+});
+
+/**
+ * HELPERS
+ */
+
+const ascensionTest = (chart: Chart, testRuns = 100) => {
 	let fraction = [0, 0, 0];
-	let chart = C_Blues_chart;
 	let { music } = compPianoSwingV2(chart);
 
 	for (let i = 0; i < testRuns; i ++) {
@@ -37,14 +47,10 @@ test("rate of chord ascension and chord descension are roughly equal", () => {
 
 	// console.log("Fraction", fraction);
 	// console.log("Ascension:", ascensionPercentage);
-	// console.log("Descension:", descensionPercentage);	
+	// console.log("Descension:", descensionPercentage);
 
-	expect(Math.abs(ascensionPercentage - descensionPercentage)).toBeLessThan(0.1);
-});
-
-/**
- * HELPERS
- */
+	return Math.abs(ascensionPercentage - descensionPercentage);
+}
 
 const compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings = (chart: Chart) => {
 	let { chordStretches, bars } = chart;
