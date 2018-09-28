@@ -4,7 +4,7 @@ import * as Util from "../../../shared/Util";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
 import { Chord } from "../../../shared/music/domain/ChordClass";
 import Chart from "../../../shared/music/Chart";
-import { ISong, IMusicIdx, NoteName, Tempo, ChordName } from "../../../shared/types";
+import { ISong, IMusicIdx, NoteName, Tempo, ChordName, PresentableChordShape } from "../../../shared/types";
 import "./ChartViewer.css";
 
 export interface IChartViewerProps {
@@ -144,7 +144,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                         if (!Chord.chordNamesAreEqual(chordName, prevChordName)) {
                             useDivisionSign = false;
                             displayedChordBase = `${MusicHelper.getPresentableNoteName(chordName[0] as NoteName, baseKey)}`;
-                            displayedChordShape = (<sup>{chordName[1]}</sup>);
+                            displayedChordShape = (<sup>{PresentableChordShape[chordName[1]]}</sup>);
                         }
                     }
 

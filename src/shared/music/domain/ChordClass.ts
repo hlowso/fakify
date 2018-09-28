@@ -8,49 +8,239 @@ import { Scale } from "./ScaleClass";
 export class Chord extends Domain {
     public static shapeToInfo = (shape: ChordShape): IShapeInfo => {
         let infoBase: IShapeInfo;
-        let extension: RelativeNoteName[];
+        let extension: RelativeNoteName[] = [];
         switch (shape) {
+
+            /**
+             * MAJOR
+             */
+
             case ChordShape.Maj:
                 return {
                     shape,
                     baseIntervals: [0, 4, 7],
                     relativeTonicPositions: ["1", "4", "5"]
                 };
-            case ChordShape.Min:
-                return {
-                    shape,
-                    baseIntervals: [0, 3, 7],
-                    relativeTonicPositions: ["2", "3", "6"]
-                };
+
+            case ChordShape.Maj6:
+                infoBase = Chord.shapeToInfo(ChordShape.Maj);
+                extension[13] = "6";
+                return { ...infoBase, extension };
+
             case ChordShape.Maj7:
                 return {
                     shape,
                     baseIntervals: [0, 4, 7, 11],
                     relativeTonicPositions: ["1", "4"]
                 };
+
+            case ChordShape.Maj9:
+                infoBase = Chord.shapeToInfo(ChordShape.Maj7);
+                extension[9] = "2";
+                return { ...infoBase, extension };
+
+            case ChordShape.Add9:
+                infoBase = Chord.shapeToInfo(ChordShape.Maj);
+                extension[9] = "2";
+                return { ...infoBase, extension };
+
+            case ChordShape.Maj7b5:
+                infoBase = Chord.shapeToInfo(ChordShape.Maj7);
+                extension[5] = "T";
+                return { ...infoBase, extension };
+
+            case ChordShape.Maj7$5:
+                infoBase = Chord.shapeToInfo(ChordShape.Maj7);
+                extension[5] = "U";
+                return { ...infoBase, extension };
+
+            case ChordShape.Maj7b9:
+                infoBase = Chord.shapeToInfo(ChordShape.Maj7);
+                extension[9] = "H";
+                return { ...infoBase, extension };
+            
+            case ChordShape.Maj$9:
+                infoBase = Chord.shapeToInfo(ChordShape.Maj);
+                extension[9] = "N";
+                return { ...infoBase, extension };
+            
+            case ChordShape.Majb9:
+                infoBase = Chord.shapeToInfo(ChordShape.Maj);
+                extension[9] = "H";
+                return { ...infoBase, extension };
+
+            case ChordShape.Maj7$9:
+                infoBase = Chord.shapeToInfo(ChordShape.Maj7);
+                extension[9] = "N";
+                return { ...infoBase, extension };
+
+            case ChordShape.Maj7$11:
+                infoBase = Chord.shapeToInfo(ChordShape.Maj7);
+                extension[11] = "T";
+                return { ...infoBase, extension };
+
+            /**
+             * MINOR
+             */
+
+            case ChordShape.Min:
+                return {
+                    shape,
+                    baseIntervals: [0, 3, 7],
+                    relativeTonicPositions: ["2", "3", "6"]
+                };
+
+            case ChordShape.Min6: 
+                infoBase = Chord.shapeToInfo(ChordShape.Min);
+                extension[13] = "6";
+                return { ...infoBase, extension };
+
             case ChordShape.Min7:
                 return {
                     shape,
                     baseIntervals: [0, 3, 7, 10],
                     relativeTonicPositions: ["2", "3", "6"]
                 };
+
+            case ChordShape.Min9: 
+                infoBase = Chord.shapeToInfo(ChordShape.Min7);
+                extension[9] = "2";
+                return { ...infoBase, extension };
+
+            case ChordShape.Min$5: 
+                infoBase = Chord.shapeToInfo(ChordShape.Min);
+                extension[5] = "U";
+                return { ...infoBase, extension };
+
+            case ChordShape.Min7b5: 
+                infoBase = Chord.shapeToInfo(ChordShape.Min7);
+                extension[5] = "T";
+                return { ...infoBase, extension };
+
+            case ChordShape.Min7$5: 
+                infoBase = Chord.shapeToInfo(ChordShape.Min7);
+                extension[5] = "U";
+                return { ...infoBase, extension };
+
+            case ChordShape.Min7b9: 
+                infoBase = Chord.shapeToInfo(ChordShape.Min7);
+                extension[9] = "H";
+                return { ...infoBase, extension };
+
+            case ChordShape.Min7$9: 
+                infoBase = Chord.shapeToInfo(ChordShape.Min7);
+                extension[9] = "N";
+                return { ...infoBase, extension };    
+                
+            case ChordShape.Min7$11: 
+                infoBase = Chord.shapeToInfo(ChordShape.Min7);
+                extension[11] = "T";
+                return { ...infoBase, extension };
+
+            /**
+             * DOMINANT
+             */
+            
             case ChordShape.Dom7:
                 return {
                     shape,
                     baseIntervals: [0, 4, 7, 10],
                     relativeTonicPositions: ["5"]
                 };
+
             case ChordShape.Dom9:
                 infoBase = Chord.shapeToInfo(ChordShape.Dom7);
-                extension = [];
                 extension[9] = "2";
                 return { ...infoBase, extension };
+            
+            case ChordShape.Dom7b5:
+                infoBase = Chord.shapeToInfo(ChordShape.Dom7);
+                extension[5] = "T";
+                return { ...infoBase, extension };
+
+            case ChordShape.Dom7$5:
+                infoBase = Chord.shapeToInfo(ChordShape.Dom7);
+                extension[5] = "U";
+                return { ...infoBase, extension };
+
+            case ChordShape.Dom7b9:
+                infoBase = Chord.shapeToInfo(ChordShape.Dom7);
+                extension[9] = "H";
+                return { ...infoBase, extension };
+            
+            case ChordShape.Dom7$9:
+                infoBase = Chord.shapeToInfo(ChordShape.Dom7);
+                extension[9] = "N";
+                return { ...infoBase, extension };
+
+            case ChordShape.Dom7$11:
+                infoBase = Chord.shapeToInfo(ChordShape.Dom7);
+                extension[11] = "T";
+                return { ...infoBase, extension };
+
+            case ChordShape.Dom9b5:
+                infoBase = Chord.shapeToInfo(ChordShape.Dom7);
+                extension[9] = "2";
+                extension[5] = "T";
+                return { ...infoBase, extension };
+
+            case ChordShape.Dom9$5:
+                infoBase = Chord.shapeToInfo(ChordShape.Dom7);
+                extension[9] = "2";
+                extension[5] = "U";
+                return { ...infoBase, extension };
+
+            /**
+             * AUGMENTED
+             */
+
+            case ChordShape.Aug:
+                infoBase = Chord.shapeToInfo(ChordShape.Maj);
+                extension[5] = "U";
+                return { ...infoBase, extension };
+            
+            case ChordShape.Aug7:
+                infoBase = Chord.shapeToInfo(ChordShape.Maj);
+                extension[5] = "U";
+                extension[7] = "J";
+                return { ...infoBase, extension };
+
+            case ChordShape.Aug7$9:
+                infoBase = Chord.shapeToInfo(ChordShape.Maj);
+                extension[5] = "U";
+                extension[7] = "J";
+                extension[9] = "N";
+                return { ...infoBase, extension };
+
+            /**
+             * DIMINISHED
+             */
+
             case ChordShape.Dim:
                 return {
                     shape,
                     baseIntervals: [0, 3, 6],
                     relativeTonicPositions: ["7"]
                 };
+
+            case ChordShape.Dim7:
+                infoBase = Chord.shapeToInfo(ChordShape.Dim);
+                extension[7] = "6";
+                return { ...infoBase, extension };
+            
+            /**
+             * SUSPENDED
+             */
+
+            case ChordShape.Sus2:
+                infoBase = Chord.shapeToInfo(ChordShape.Maj);
+                extension[3] = "2";
+                return { ...infoBase, extension };
+
+            case ChordShape.Sus4:
+                infoBase = Chord.shapeToInfo(ChordShape.Maj);
+                extension[3] = "4";
+                return { ...infoBase, extension };
 
             // TODO: add cases for all chords
             
