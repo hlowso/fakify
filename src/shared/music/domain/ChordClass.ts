@@ -136,7 +136,7 @@ export class Chord extends Domain {
         let scaleExtension: NoteName[] = [];      
 
         this._extension.forEach((name, pos) => {
-            
+
             if (pos > 7) {
                 pos -= 7
             }
@@ -185,146 +185,97 @@ export class Chord extends Domain {
 
     private _generateVoicing(target: number, firstChoices: Note[] = []) {
 
-        // STEP 1: Determine pitch range(s)
-        let pitchRangeSets: [number, number][] = [];
-        if (this._order < 9) {
-            // If the order of the chord class is 7 or under,
-            // there will be only one pitch range: the octave 
-            // with target at its center
-            pitchRangeSets.push([target - 6, target + 6]);
-        } else {
-            // Otherwise, the pitch ranges are the possible 9th 
-            // intervals between chord note classes (i.e 1 to 9, 
-            // 2 to 10, 3 to 11, etc...) that contain the target pitch
-            let idxLimit = this.numberOfNoteClasses;
-            for (let idx = 0; idx < idxLimit; idx ++) {
-                let note1 = this._noteClasses[idx];
-                let note2 = this._noteClasses[Util.mod(idx + 1, idxLimit)];
-                let positionDiff = note2.position - Util.mod(note1.position, 7);
-                if (positionDiff === 1 || positionDiff === 8) {
-                    pitchRangeSets.push([
-                        Domain.getPitchInstance(target, note1.pitch, false),
-                        Domain.getPitchInstance(target, note2.pitch, true)
-                    ]);
+        // STEP 1: Determine pitch range
+        let halfWdith = this._order < 9 ? 6 : 9;
+        let pitchRange = [ target - halfWdith, target + halfWdith ];
+
+        // STEP 2: Create the arrays of notes that will be needed in further steps
+        let neighboursInRange = firstChoices.filter(note => pitchRange[0] <= note.pitch && note.pitch <= pitchRange[1]);
+        let nonRequiredNeighboursInRange = neighboursInRange.filter(note => !note.isRequired);
+        let notesInRange = this.getNotesInPitchRange(pitchRange[0], pitchRange[1]);
+        let requiredNotesInRange = notesInRange.filter(note => note.isRequired);
+        let firstCandidate = neighboursInRange.filter(note => note.isRequired);
+
+        firstCandidate = firstCandidate.concat(requiredNotesInRange.filter(note => !firstCandidate.find(n => n.position === note.position)));
+        firstCandidate.sort(this._compareNotes);
+
+        // STEP 3: Remove clusters
+        let cluster = this._findLowestNoteCluster(firstCandidate);
+        while (cluster) {
+            let topCandidateClusterIdx = firstCandidate.indexOf((cluster as [Note, Note, Note])[2]);
+
+            // Look for a replacement among the candidate notes
+            for (let idx of this._clusterIndexOrder) {
+                let clusterNote = (cluster as [Note, Note, Note])[idx];
+                let candidateClusterNoteIdx = firstCandidate.indexOf(clusterNote);
+                
+                let replacement = this._findOtherInstance(firstCandidate, clusterNote);
+                if (replacement) {
+                    firstCandidate.splice(candidateClusterNoteIdx, 1);
+                    break;
                 }
             }
-        }
 
-        // For each pitch range...
-        let voicingCandidates = pitchRangeSets.map(range => {
+            // Look for a replacement among the other required notes in the range
+            for (let idx of this._clusterIndexOrder) {
+                let clusterNote = (cluster as [Note, Note, Note])[idx];
+                let candidateClusterNoteIdx = firstCandidate.indexOf(clusterNote);
 
-            // STEP 2: Create the arrays of notes that will be needed in further steps
-            let neighboursInRange = firstChoices.filter(note => range[0] <= note.pitch && note.pitch <= range[1]);
-            let nonRequiredNeighboursInRange = neighboursInRange.filter(note => !note.isRequired);
-            let notesInRange = this.getNotesInPitchRange(range[0], range[1]);
-            let requiredNotesInRange = notesInRange.filter(note => note.isRequired);
-            let firstCandidate = neighboursInRange.filter(note => note.isRequired);
-
-            firstCandidate = firstCandidate.concat(requiredNotesInRange.filter(note => !firstCandidate.find(n => n.position === note.position)));
-            firstCandidate.sort(this._compareNotes);
-
-            // STEP 3: Remove clusters
-            let cluster = this._findLowestNoteCluster(firstCandidate);
-            while (cluster) {
-                let topCandidateClusterIdx = firstCandidate.indexOf((cluster as [Note, Note, Note])[2]);
-
-                // Look for a replacement among the candidate notes
-                for (let idx of this._clusterIndexOrder) {
-                    let clusterNote = (cluster as [Note, Note, Note])[idx];
-                    let candidateClusterNoteIdx = firstCandidate.indexOf(clusterNote);
-                    
-                    let replacement = this._findOtherInstance(firstCandidate, clusterNote);
-                    if (replacement) {
-                        firstCandidate.splice(candidateClusterNoteIdx, 1);
-                        break;
-                    }
+                let replacement = this._findOtherInstance(requiredNotesInRange, clusterNote);
+                if (replacement) {
+                    firstCandidate.splice(candidateClusterNoteIdx, 1);
+                    firstCandidate.push(replacement);
+                    firstCandidate.sort(this._compareNotes);
+                    break;
                 }
-
-                // Look for a replacement among the other required notes in the range
-                for (let idx of this._clusterIndexOrder) {
-                    let clusterNote = (cluster as [Note, Note, Note])[idx];
-                    let candidateClusterNoteIdx = firstCandidate.indexOf(clusterNote);
-
-                    let replacement = this._findOtherInstance(requiredNotesInRange, clusterNote);
-                    if (replacement) {
-                        firstCandidate.splice(candidateClusterNoteIdx, 1);
-                        firstCandidate.push(replacement);
-                        firstCandidate.sort(this._compareNotes);
-                        break;
-                    }
-                }
-                cluster = (
-                    topCandidateClusterIdx < firstCandidate.length - 2 
-                        ? this._findLowestNoteCluster(firstCandidate.slice(topCandidateClusterIdx + 1)) 
-                        : null
-                );
             }
-
-            // STEP 4: Remove multiple instances
-            let secondCandidate: Note[] = [];
-            firstCandidate.forEach(note => {
-                let other = this._findOtherInstance(firstCandidate, note);
-                if (other) {
-                    if (secondCandidate.indexOf(note) === -1 && secondCandidate.indexOf(other) === -1) {
-                        if (Math.random() < 0.5) {
-                            secondCandidate.push(note);
-                        } else {
-                            secondCandidate.push(other);
-                        }
-                    }
-                } else {
-                    secondCandidate.push(note);
-                }
-            });
-
-            // STEP 5: Create the chance for non-required notes to be added
-            let remainingSpace = this.numberOfNoteClasses - secondCandidate.length;
-            let nonRequiredNotes = (
-                nonRequiredNeighboursInRange.length > 0
-                    ? nonRequiredNeighboursInRange
-                    : notesInRange.filter(note => !note.isRequired)
+            cluster = (
+                topCandidateClusterIdx < firstCandidate.length - 2 
+                    ? this._findLowestNoteCluster(firstCandidate.slice(topCandidateClusterIdx + 1)) 
+                    : null
             );
+        }
 
-            for (let i = 0; i < remainingSpace; i ++) {
-                if (Math.random() < 0.5 && nonRequiredNotes.length > 0) {
-                    let idx = Math.floor(Math.random() * nonRequiredNotes.length);
-                    let note = nonRequiredNotes[idx];
-
-                    if (!this._findOtherInstance(secondCandidate, note)) {
+        // STEP 4: Remove multiple instances
+        let secondCandidate: Note[] = [];
+        firstCandidate.forEach(note => {
+            let other = this._findOtherInstance(firstCandidate, note);
+            if (other) {
+                if (secondCandidate.indexOf(note) === -1 && secondCandidate.indexOf(other) === -1) {
+                    if (Math.random() < 0.5) {
                         secondCandidate.push(note);
-                        secondCandidate.sort(this._compareNotes);
-                        let nonRequiredNotesIdx = nonRequiredNotes.indexOf(note);
-                        nonRequiredNotes.splice(nonRequiredNotesIdx, 1);
+                    } else {
+                        secondCandidate.push(other);
                     }
                 }
-            }
-
-            return secondCandidate;
-        });
-
-        // STEP 6: Choose the best voicing of all those in voicingCandidates
-        let bestVoicing;
-        let greatestNumberOfFirstChoiceNotes = 0;
-        voicingCandidates.forEach(candidate => {
-            let numberOfFirstChoiceNotes = candidate.filter(note => firstChoices.indexOf(note) !== -1).length;
-            if (numberOfFirstChoiceNotes > greatestNumberOfFirstChoiceNotes) {
-                bestVoicing = candidate;
+            } else {
+                secondCandidate.push(note);
             }
         });
 
-        if (!bestVoicing) {
-            voicingCandidates.forEach(candidate => {
-                if (this._findLowestNoteCluster(candidate) === null) {
-                    bestVoicing = candidate;
+        // STEP 5: Create the chance for non-required notes to be added
+        let remainingSpace = this.numberOfNoteClasses - secondCandidate.length;
+        let nonRequiredNotes = (
+            nonRequiredNeighboursInRange.length > 0
+                ? nonRequiredNeighboursInRange
+                : notesInRange.filter(note => !note.isRequired)
+        );
+
+        for (let i = 0; i < remainingSpace; i ++) {
+            if (Math.random() < 0.5 && nonRequiredNotes.length > 0) {
+                let idx = Math.floor(Math.random() * nonRequiredNotes.length);
+                let note = nonRequiredNotes[idx];
+
+                if (!this._findOtherInstance(secondCandidate, note)) {
+                    secondCandidate.push(note);
+                    secondCandidate.sort(this._compareNotes);
+                    let nonRequiredNotesIdx = nonRequiredNotes.indexOf(note);
+                    nonRequiredNotes.splice(nonRequiredNotesIdx, 1);
                 }
-            });
+            }
         }
 
-        if (!bestVoicing) {
-            bestVoicing = voicingCandidates[0];
-        }
-
-        return bestVoicing.map(note => note.pitch);
+        return secondCandidate.map(note => note.pitch);
     }
 
     private _voiceWithReference(ref: number[], nudgeFactor = NaN) {
