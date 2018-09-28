@@ -2,7 +2,7 @@ export const chordStretches251InBbMajor = [
     {
       "chordName": [
         "C",
-        "^-7"
+        "-7"
       ],
       "key": "A#|Bb",
       "durationInSubbeats": 12
@@ -10,7 +10,7 @@ export const chordStretches251InBbMajor = [
     {
       "chordName": [
         "F",
-        "^7"
+        "7"
       ],
       "key": "A#|Bb",
       "durationInSubbeats": 12
@@ -18,7 +18,7 @@ export const chordStretches251InBbMajor = [
     {
       "chordName": [
         "D",
-        "^-7"
+        "-7"
       ],
       "key": "A#|Bb",
       "durationInSubbeats": 12
@@ -26,7 +26,7 @@ export const chordStretches251InBbMajor = [
     {
       "chordName": [
         "G",
-        "^7"
+        "7"
       ],
       "key": "C",
       "durationInSubbeats": 12
@@ -34,7 +34,7 @@ export const chordStretches251InBbMajor = [
     {
       "chordName": [
         "C",
-        "^-7"
+        "-7"
       ],
       "key": "A#|Bb",
       "durationInSubbeats": 12
@@ -42,7 +42,7 @@ export const chordStretches251InBbMajor = [
     {
       "chordName": [
         "F",
-        "^7"
+        "7"
       ],
       "key": "A#|Bb",
       "durationInSubbeats": 12
@@ -50,7 +50,7 @@ export const chordStretches251InBbMajor = [
     {
       "chordName": [
         "A#|Bb",
-        "^ma7"
+        "ma7"
       ],
       "key": "A#|Bb",
       "durationInSubbeats": 24

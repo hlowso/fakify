@@ -135,20 +135,22 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                         "current-chord": isCurrentChord && !editingMode
                     });
 
-                    let displayedChordName;
+                    let displayedChordBase: string | undefined;
+                    let displayedChordShape: JSX.Element | undefined;
                     
                     if (chordSegment) {
                         prevChordName = chordName;
                         chordName = chordSegment.chordName as ChordName;
                         if (!Chord.chordNamesAreEqual(chordName, prevChordName)) {
                             useDivisionSign = false;
-                            displayedChordName = `${MusicHelper.getPresentableNoteName(chordName[0] as NoteName, baseKey)}${chordName[1]}`;
+                            displayedChordBase = `${MusicHelper.getPresentableNoteName(chordName[0] as NoteName, baseKey)}`;
+                            displayedChordShape = (<sup>{chordName[1]}</sup>);
                         }
                     }
 
                     chordNameElements.push(
                         <span className={chordNameClasses} key={beatIdx}>
-                            {displayedChordName}
+                            {displayedChordBase}{displayedChordShape}
                         </span>
                     );
 

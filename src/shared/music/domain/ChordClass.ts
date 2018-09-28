@@ -87,7 +87,6 @@ export class Chord extends Domain {
 
     private _suitableKeys: NoteName[]; 
     private _order: number;
-    // private _specialNotesMutation: (notes: Note[]) => Note[];
     private _extension: NoteName[];
     private _clusterIndexOrder: [number, number, number];    
 

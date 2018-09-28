@@ -46,13 +46,13 @@ export type NoteName = "C" | "C#|Db" | "D" | "D#|Eb" | "E" | "F" | "F#|Gb" | "G"
 export type RelativeNoteName = "1" | "H" | "2" | "N" | "3" | "4" | "T" | "5" | "U" | "6" | "J" | "7";
 
 export enum ChordShape { 
-    Maj = "+",
-    Maj7 = "^ma7",    
-    Min = "-",
-    Min7 = "^-7",
-    Dom7 = "^7",
-    Dom9 = "^9",
-    Dim = "^Dim"
+    Maj = "",
+    Maj7 = "ma7",    
+    Min = "min",
+    Min7 = "-7",
+    Dom7 = "7",
+    Dom9 = "9",
+    Dim = "dim"
 }
 
 export type ChordName = [NoteName | RelativeNoteName, ChordShape];

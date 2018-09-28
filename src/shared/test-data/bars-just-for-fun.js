@@ -10,7 +10,7 @@ const barsJustForFun = [
           "beatIdx": 0,
           "chordName": [
             "2",
-            "^-7"
+            "-7"
           ],
           "key": "1"
         }
@@ -27,7 +27,7 @@ const barsJustForFun = [
           "beatIdx": 0,
           "chordName": [
             "5",
-            "^7"
+            "7"
           ],
           "key": "1"
         }
@@ -44,7 +44,7 @@ const barsJustForFun = [
           "beatIdx": 0,
           "chordName": [
             "1",
-            "^ma7"
+            "ma7"
           ],
           "key": "1"
         }
@@ -61,7 +61,7 @@ const barsJustForFun = [
           "beatIdx": 0,
           "chordName": [
             "1",
-            "^ma7"
+            "ma7"
           ],
           "key": "1"
         }
@@ -78,7 +78,7 @@ const barsJustForFun = [
           "beatIdx": 0,
           "chordName": [
             "1",
-            "^-7"
+            "-7"
           ],
           "key": "J"
         }
@@ -95,7 +95,7 @@ const barsJustForFun = [
           "beatIdx": 0,
           "chordName": [
             "4",
-            "^7"
+            "7"
           ],
           "key": "J"
         }
@@ -112,7 +112,7 @@ const barsJustForFun = [
           "beatIdx": 0,
           "chordName": [
             "J",
-            "^ma7"
+            "ma7"
           ],
           "key": "J"
         }
@@ -129,7 +129,7 @@ const barsJustForFun = [
           "beatIdx": 0,
           "chordName": [
             "J",
-            "^ma7"
+            "ma7"
           ],
           "key": "J"
         }
@@ -146,7 +146,7 @@ const barsJustForFun = [
           "beatIdx": 0,
           "chordName": [
             "J",
-            "^-7"
+            "-7"
           ],
           "key": "U"
         }
@@ -163,7 +163,7 @@ const barsJustForFun = [
           "beatIdx": 0,
           "chordName": [
             "N",
-            "^7"
+            "7"
           ],
           "key": "U"
         }
@@ -180,7 +180,7 @@ const barsJustForFun = [
           "beatIdx": 0,
           "chordName": [
             "U",
-            "^ma7"
+            "ma7"
           ],
           "key": "U"
         }
@@ -197,7 +197,7 @@ const barsJustForFun = [
           "beatIdx": 0,
           "chordName": [
             "U",
-            "^ma7"
+            "ma7"
           ],
           "key": "U"
         }
@@ -214,7 +214,7 @@ const barsJustForFun = [
           "beatIdx": 0,
           "chordName": [
             "U",
-            "^-7"
+            "-7"
           ],
           "key": "T"
         }
@@ -231,7 +231,7 @@ const barsJustForFun = [
           "beatIdx": 0,
           "chordName": [
             "H",
-            "^7"
+            "7"
           ],
           "key": "T"
         }
@@ -248,7 +248,7 @@ const barsJustForFun = [
           "beatIdx": 0,
           "chordName": [
             "T",
-            "^ma7"
+            "ma7"
           ],
           "key": "T"
         }
@@ -265,7 +265,7 @@ const barsJustForFun = [
           "beatIdx": 0,
           "chordName": [
             "T",
-            "^ma7"
+            "ma7"
           ],
           "key": "T"
         }
