@@ -292,7 +292,16 @@ export class Chord extends Domain {
         let baseNotes = baseIntervals.map((pitchDiff, i) => { 
             pos = 2 * i + 1;
             let pitch = lowestPitch + pitchDiff;
-            let required = pos === 3 || pos === 7
+            let required = false;
+
+            if (pos === 3 || pos === 7) {
+                required = true;
+            }
+
+            if (baseIntervals.length < 4 && pos === 1) {
+                required = true;
+            }
+
             return new Note(pitch, pos, required);
         });
 
