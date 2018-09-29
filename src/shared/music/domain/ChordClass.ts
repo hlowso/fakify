@@ -277,7 +277,7 @@ export class Chord extends Domain {
 
     private _suitableKeys: NoteName[]; 
     private _order: number;
-    private _extension: NoteName[];
+    private _extension?: NoteName[];
     private _clusterIndexOrder: [number, number, number];    
 
     constructor(chordName: ChordName) {
@@ -296,13 +296,16 @@ export class Chord extends Domain {
             return new Note(pitch, pos, required);
         });
 
-        let noteClasses = (
+        let contextualizedExtension = (
             extension
-                ? Domain.applyExtension(baseNotes, extension.map(name => contextualize(name, baseNoteName as NoteName)))
-                : baseNotes
+                ? extension.map(name => contextualize(name, baseNoteName as NoteName))
+                : undefined
         );
+
+        let noteClasses =  Domain.applyExtension(baseNotes, contextualizedExtension);
         super(noteClasses);
 
+        this._extension = contextualizedExtension;
         this._suitableKeys = Chord.getSuitableKeys(chordName) as NoteName[];
         this._order = this.noteClasses.reduce((highest, note) => note.position > highest ? note.position : highest, 0);
 
@@ -316,7 +319,9 @@ export class Chord extends Domain {
             return scale;
         }
 
-        let posDiff = scale.getPitchPositionDiff(this.getTonicPitch(), scale.getTonicPitch());
+        let chordTonic = this.getTonicPitch();
+        let scaleTonic = scale.getTonicPitch();
+        let posDiff = scale.getPitchPositionDiff(chordTonic, scaleTonic);
 
         if (isNaN(posDiff)) {
             return scale;
@@ -330,7 +335,7 @@ export class Chord extends Domain {
                 pos -= 7
             }
 
-            scaleExtension[Util.mod(pos - posDiff, 7) + 1] = name;
+            scaleExtension[Util.mod(pos - posDiff - 1, 7) + 1] = name;
         });
 
         scale.mutate(scaleExtension);

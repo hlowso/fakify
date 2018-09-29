@@ -41,6 +41,8 @@ export class Domain {
             newNoteClasses.push(new Note(name, pos, true));            
         });
 
+        newNoteClasses.sort((a, b) => a.basePitch - b.basePitch);
+
         return newNoteClasses;
     }
 
@@ -108,11 +110,13 @@ export class Domain {
     }
 
     public pitchToPosition(pitch: number) {
-        let note = this.getClosestNoteToTargetPitch(pitch)[1];
-        if (note.pitch === pitch) {
-            return note.position;
+        let noteClass = this._noteClasses.find(n => n.basePitch === Util.mod(pitch, 12));
+
+        if (!noteClass) {
+            return NaN;
         }
-        return NaN;
+
+        return noteClass.position;
     }
 
     public getPitchPositionDiff(pitchA: number, pitchB: number) {
