@@ -294,7 +294,7 @@ export class Chord extends Domain {
             let pitch = lowestPitch + pitchDiff;
             let required = false;
 
-            if (pos === 3 || pos === 7) {
+            if (pos === 3 || pos === 7 || shape === ChordShape.Dim && pos === 5) {
                 required = true;
             }
 
@@ -356,7 +356,8 @@ export class Chord extends Domain {
     public getNotesInPitchRange(a: number, b: number, requiredOnly = false) {
         let notesInRange: Note[] = [];
         let idx = this.getClosestNoteToTargetPitch(a)[0];
-        for (let note = this._notes[idx]; note.pitch <= b; note = this._notes[++idx]) {
+
+        for (let note = this._notes[idx]; note.pitch <= b; note = this._notes[idx + 1]) {
             if (note.pitch >= a) {
                 if (requiredOnly) {
                     if (note.isRequired) {
@@ -365,6 +366,12 @@ export class Chord extends Domain {
                 } else {
                     notesInRange.push(note);
                 }
+            }
+
+            idx ++;
+
+            if (idx === this.length - 1) {
+                break;
             }
         }
         return notesInRange;

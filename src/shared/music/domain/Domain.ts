@@ -73,6 +73,10 @@ export class Domain {
         this._buildFromNoteClasses();
     }
 
+    get notes() {
+        return this._notes;
+    }
+
     get length(): number {
         return this._notes.length;
     }
