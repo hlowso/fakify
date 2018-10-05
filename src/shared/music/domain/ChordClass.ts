@@ -1,5 +1,5 @@
 import * as Util from "../../Util";
-import { contextualize } from '../../music/MusicHelper';
+import { contextualize, voicingContainsNoClusters } from '../../music/MusicHelper';
 import { Domain } from "./Domain";
 import { Note } from "./Note";
 import { NoteName, ChordName, ChordShape, IShapeInfo, RelativeNoteName } from "../../types";
@@ -275,6 +275,13 @@ export class Chord extends Domain {
         return cn1[0] === cn2[0] && cn1[1] === cn2[1];
     }
 
+    public static canAddWithoutCluster = (notes: Note[], newNote: Note) => {
+        let newNotes = [ ...notes, newNote ];
+        newNotes.sort((a, b) => a.pitch - b.pitch);
+
+        return voicingContainsNoClusters(newNotes.map(n => n.pitch));
+    }
+
     private _suitableKeys: NoteName[]; 
     private _order: number;
     private _extension?: NoteName[];
@@ -352,31 +359,6 @@ export class Chord extends Domain {
         return scale;
     }
 
-    // TODO: should this be a Domain function??
-    public getNotesInPitchRange(a: number, b: number, requiredOnly = false) {
-        let notesInRange: Note[] = [];
-        let idx = this.getClosestNoteToTargetPitch(a)[0];
-
-        for (let note = this._notes[idx]; note.pitch <= b; note = this._notes[idx + 1]) {
-            if (note.pitch >= a) {
-                if (requiredOnly) {
-                    if (note.isRequired) {
-                        notesInRange.push(note);
-                    }
-                } else {
-                    notesInRange.push(note);
-                }
-            }
-
-            idx ++;
-
-            if (idx === this.length - 1) {
-                break;
-            }
-        }
-        return notesInRange;
-    }
-
     public voice(target: number, ref: number[] = [], nudgeFactor = NaN): number[] {
         return (
             ref.length > 0
@@ -410,40 +392,52 @@ export class Chord extends Domain {
         firstCandidate.sort(this._compareNotes);
 
         // STEP 3: Remove clusters
+        let currClusterDisolved: boolean;
         let cluster = this._findLowestNoteCluster(firstCandidate);
+
         while (cluster) {
+            currClusterDisolved = false;
             let topCandidateClusterIdx = firstCandidate.indexOf((cluster as [Note, Note, Note])[2]);
 
             // Look for a replacement among the candidate notes
             for (let idx of this._clusterIndexOrder) {
                 let clusterNote = (cluster as [Note, Note, Note])[idx];
-                let candidateClusterNoteIdx = firstCandidate.indexOf(clusterNote);
+                let candidateClusterNoteIdx = firstCandidate.findIndex(n => n.pitch === clusterNote.pitch);
                 
                 let replacement = this._findOtherInstance(firstCandidate, clusterNote);
                 if (replacement) {
                     firstCandidate.splice(candidateClusterNoteIdx, 1);
+                    currClusterDisolved = true;
                     break;
                 }
             }
 
             // Look for a replacement among the other required notes in the range
-            for (let idx of this._clusterIndexOrder) {
-                let clusterNote = (cluster as [Note, Note, Note])[idx];
-                let candidateClusterNoteIdx = firstCandidate.indexOf(clusterNote);
-
-                let replacement = this._findOtherInstance(requiredNotesInRange, clusterNote);
-                if (replacement) {
-                    firstCandidate.splice(candidateClusterNoteIdx, 1);
-                    firstCandidate.push(replacement);
-                    firstCandidate.sort(this._compareNotes);
-                    break;
+            if (!currClusterDisolved) {
+                for (let idx of this._clusterIndexOrder) {
+                    let clusterNote = (cluster as [Note, Note, Note])[idx];
+                    let candidateClusterNoteIdx = firstCandidate.findIndex(n => n.pitch === clusterNote.pitch);
+    
+                    let replacement = this._findOtherInstance(requiredNotesInRange, clusterNote);
+                    if (replacement && Chord.canAddWithoutCluster(firstCandidate.filter(n => n.pitch !== clusterNote.pitch), replacement)) {
+                        firstCandidate.splice(candidateClusterNoteIdx, 1);
+                        firstCandidate.push(replacement.clone());
+                        firstCandidate.sort(this._compareNotes);
+                        currClusterDisolved = true;
+                        break;
+                    }
                 }
             }
-            cluster = (
-                topCandidateClusterIdx < firstCandidate.length - 2 
-                    ? this._findLowestNoteCluster(firstCandidate.slice(topCandidateClusterIdx + 1)) 
-                    : null
-            );
+
+            if (!currClusterDisolved) {
+                let choices = [ [0, 1], [1, 1], [2, 1] ] as [ number, number ][];
+                let randVar = Util.generateCustomRandomVariable(choices);
+
+                let clusterIdx = topCandidateClusterIdx - randVar();
+                firstCandidate.splice(clusterIdx, 1);                
+            }
+
+            cluster = this._findLowestNoteCluster(firstCandidate);
         }
 
         // STEP 4: Remove multiple instances
@@ -451,7 +445,10 @@ export class Chord extends Domain {
         firstCandidate.forEach(note => {
             let other = this._findOtherInstance(firstCandidate, note);
             if (other) {
-                if (secondCandidate.indexOf(note) === -1 && secondCandidate.indexOf(other) === -1) {
+                if (
+                    !secondCandidate.some(n => n.pitch === note.pitch) && 
+                    !secondCandidate.some(n => n.pitch === (other as Note).pitch)
+                ) {
                     if (Math.random() < 0.5) {
                         secondCandidate.push(note);
                     } else {
@@ -476,7 +473,7 @@ export class Chord extends Domain {
                 let idx = Math.floor(Math.random() * nonRequiredNotes.length);
                 let note = nonRequiredNotes[idx];
 
-                if (!this._findOtherInstance(secondCandidate, note)) {
+                if (!this._findOtherInstance(secondCandidate, note) && Chord.canAddWithoutCluster(secondCandidate, note)) {
                     secondCandidate.push(note);
                     secondCandidate.sort(this._compareNotes);
                     let nonRequiredNotesIdx = nonRequiredNotes.indexOf(note);
@@ -534,7 +531,7 @@ export class Chord extends Domain {
 
         for (let idx = 0; idx < idxLimit; idx ++) {
             let note1 = notes[idx];
-            let note2 = notes[idx];
+            let note2 = notes[idx + 1];
 
             if (note1.isCloseNeighboursWith(note2)) {
                 clusterLength ++;
@@ -551,7 +548,7 @@ export class Chord extends Domain {
     private _findOtherInstance(notes: Note[], instance: Note) {
         for (let note of notes) {
             if (note.basePitch === instance.basePitch && note.pitch !== instance.pitch) {
-                return note;
+                return note.clone();
             }
         }
         return null;

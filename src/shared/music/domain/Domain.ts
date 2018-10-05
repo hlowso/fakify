@@ -131,6 +131,33 @@ export class Domain {
         return this._notes.findIndex(note => note.pitch === pitch);
     }
 
+    public getNotesInPitchRange = (a: number, b: number, requiredOnly = false) => {
+        let notesInRange: Note[] = [];
+
+        for (
+            let idx = this.getClosestNoteToTargetPitch(a)[0]; 
+            idx < this.length; 
+            idx ++
+        ) {
+            let note = this._notes[idx];
+
+            if (note.pitch > b) {
+                break;
+            }
+
+            if (note.pitch >= a) {
+                if (requiredOnly) {
+                    if (note.isRequired) {
+                        notesInRange.push(note.clone());
+                    }
+                } else {
+                    notesInRange.push(note.clone());
+                }
+            }
+        }
+        return notesInRange;
+    }
+
     public getNextNoteByPosition(pitch: number, ascending: boolean) {
         let [noteIdx, note] = this.getClosestNoteToTargetPitch(pitch);
         let inc = ascending ? 1 : -1;

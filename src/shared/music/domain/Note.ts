@@ -37,7 +37,11 @@ export class Note {
     }
 
     public clone = () => {
-        return new Note(this._name, this._position, this._required);
+        return new Note(
+            Number.isInteger(this._pitch) ? this._pitch : this._name, 
+            this._position, 
+            this._required
+        );
     }
 
     get name(): NoteName {

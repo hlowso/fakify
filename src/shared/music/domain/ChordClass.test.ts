@@ -1,4 +1,5 @@
 import * as Util from "../../Util";
+import * as MusicHelper from "../../music/MusicHelper";
 import { Chord } from "./ChordClass";
 import { ChordShape, NoteName, ChordName } from "../../types";
 // import { verifyNoteClasses } from "./Domain.test";
@@ -71,18 +72,24 @@ test("voice generates array containing all required pitches", () => {
         let voicing: number[] = [];
 
         for (let i = 0; i < 10; i ++) {
-            voicing = chord.voice(60);
-
-            let pass = voicingPitchesTest(voicing, pair.notes);
-
-            if (!pass) {
-                console.log(voicing.map(p => Chord.NOTE_NAMES[Util.mod(p, 12)]), pair.notes, chord.noteClasses);
-            }
-
-            expect(pass).toBeTruthy();
+            voicing = voicing.length > 0 ? chord.voice(60, voicing) : chord.voice(60);
+            expect(voicingPitchesTest(voicing, pair.notes)).toBeTruthy();
         }
     });
 
+});
+
+test("voice generates array without duplicate pitches", () => {
+    testChordNames.forEach(name => {
+        let chord = new Chord(name);
+        let voicing: number[] = [];
+
+        for (let i = 0; i < 10; i ++) {
+            voicing = voicing.length > 0 ? chord.voice(60, voicing) : chord.voice(60);
+            voicing.sort((a, b) => a - b);
+            expect(voicing.some((p, i) => p === voicing[Util.mod(i + 1, voicing.length)])).toBeFalsy();
+        }
+    });
 });
 
 test("voice generates array without pitch clusters", () => {
@@ -93,7 +100,7 @@ test("voice generates array without pitch clusters", () => {
 
         for (let i = 0; i < 10; i ++) {
             voicing = voicing.length > 0 ? chord.voice(60, voicing) : chord.voice(60);
-            expect(voicingContainsNoClustersTest(voicing)).toBeTruthy();
+            expect(MusicHelper.voicingContainsNoClusters(voicing)).toBeTruthy();
         }
     });
 
@@ -112,29 +119,4 @@ function voicingPitchesTest(voicing: number[], pitches: NoteName[]) {
     let voicingMod12 = voicing.map(pitch => Util.mod(pitch, 12));
 
     return !basePitches.some(pitch => voicingMod12.indexOf(pitch) === -1);
-}
-
-/**
- * 
- * @param voicing 
- * @returns true if the voicing contains no clusters
- */
-function voicingContainsNoClustersTest(voicing: number[]) {
-    let i = 0, j = 1, k = 2;
-
-    voicing.sort((a, b) => a - b);
-
-    while (k < voicing.length) {
-        let p1 = voicing[i],
-            p2 = voicing[j],
-            p3 = voicing[k];
-
-        if (p2 - p1 <= 2 && p3 - p2 <= 2) {
-            return false;
-        }
-
-        i ++; j ++; k++;
-    }
-
-    return true;
 }

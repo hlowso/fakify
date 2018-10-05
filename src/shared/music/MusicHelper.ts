@@ -246,3 +246,28 @@ const _adjustBarsSwingFeel = (bars: IChartBar[]): IChartBar[] => {
     
     return adjustedBars;
 }
+
+/**
+ * 
+ * @param voicing 
+ * @returns true if the voicing contains no clusters
+ */
+export function voicingContainsNoClusters(voicing: number[]) {
+    let i = 0, j = 1, k = 2;
+
+    voicing.sort((a, b) => a - b);
+
+    while (k < voicing.length) {
+        let p1 = voicing[i],
+            p2 = voicing[j],
+            p3 = voicing[k];
+
+        if (p2 - p1 <= 2 && p3 - p2 <= 2) {
+            return false;
+        }
+
+        i ++; j ++; k++;
+    }
+
+    return true;
+}
