@@ -233,17 +233,19 @@ export class Chord extends Domain {
              */
 
             case ChordShape.Sus2:
-                infoBase = Chord.shapeToInfo(ChordShape.Maj);
-                extension[3] = "2";
-                return { ...infoBase, extension };
+                return {
+                    shape,
+                    baseIntervals: [0, 2, 7],
+                    relativeTonicPositions: ["1", "2", "4", "5", "6"]
+                };
 
             case ChordShape.Sus4:
-                infoBase = Chord.shapeToInfo(ChordShape.Maj);
-                extension[3] = "4";
-                return { ...infoBase, extension };
+                return {
+                    shape,
+                    baseIntervals: [0, 5, 7],
+                    relativeTonicPositions: ["1", "2", "3", "5", "6"]
+                };
 
-            // TODO: add cases for all chords
-            
             default: 
                 throw new Error(`PRECOMP - error: unkown ChordShape ${shape}`);
         }
