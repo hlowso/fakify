@@ -357,6 +357,6 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
 
     return {
         instrument: "doubleBass",
-        music
+        music: music.filter((bar, idx) => chart.rangeStartIdx <= idx && idx <= chart.rangeEndIdx)
     }
 }

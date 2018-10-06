@@ -45,7 +45,7 @@ export const compDrumsSwingV1 = (chart: Chart): [IPart, IPart] => {
         ];
     }
 
-    chart.bars.forEach(bar => {
+    chart.forEachBarInRange(bar => {
         let rideCymbalBar: IMusicBar = {};
         let shutHiHatBar: IMusicBar = {};
 

@@ -189,7 +189,7 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
 
     return {
         instrument: "piano",
-        music
+        music: music.filter((bar, idx) => chart.rangeStartIdx <= idx && idx <= chart.rangeEndIdx)
     };
 };
 
