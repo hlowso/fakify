@@ -3,6 +3,8 @@ import * as MusicHelper from "../../music/MusicHelper";
 import { Chord } from "./ChordClass";
 import { ChordShape, NoteName, ChordName } from "../../types";
 import { Note } from "./Note";
+import { Scale } from "./ScaleClass";
+import { Domain } from "./Domain";
 
 const testChordNames: ChordName[] = [ 
     [ "F", ChordShape.Min7$11 ], 
@@ -16,28 +18,52 @@ interface IChordDatum {
     chordName: ChordName;
     reqNotes: NoteName[];
     notes: NoteName[];
+    testScaleBase: NoteName;
+    testScaleNotes: NoteName[];
+    testScaleNotesPostExtension: NoteName[];
 }
 
 const chordData: IChordDatum[] = [
     {
         chordName: [ "A", ChordShape.Dim ],
         reqNotes: [ "C", "D#|Eb" ],
-        notes: [ "A", "C", "D#|Eb" ]
+        notes: [ "A", "C", "D#|Eb" ],
+        testScaleBase: "A#|Bb",
+        testScaleNotes: [ "A#|Bb", "C", "D", "D#|Eb", "F", "G", "A" ],
+        testScaleNotesPostExtension: [ "A#|Bb", "C", "D", "D#|Eb", "F", "G", "A" ]
     },
     {
         chordName: [ "G#|Ab", ChordShape.Dom7$11 ],
         reqNotes: [ "C", "F#|Gb", "D" ],
-        notes: [ "G#|Ab", "C", "D#|Eb", "F#|Gb", "D" ]       
+        notes: [ "G#|Ab", "C", "D#|Eb", "F#|Gb", "D" ],
+        testScaleBase: "C#|Db",
+        testScaleNotes: [ "C#|Db", "D#|Eb", "F", "F#|Gb", "G#|Ab", "A#|Bb", "C" ],
+        testScaleNotesPostExtension: [ "D", "D#|Eb", "F", "F#|Gb", "G#|Ab", "A#|Bb", "C" ]        
+
     },
     {
         chordName: [ "D", ChordShape.Min7b9 ],
         reqNotes: [ "F", "C", "D#|Eb" ],
-        notes: [ "D", "F", "A", "C", "D#|Eb" ]        
+        notes: [ "D", "F", "A", "C", "D#|Eb" ],
+        testScaleBase: "A#|Bb",
+        testScaleNotes: [ "A#|Bb", "C", "D", "D#|Eb", "F", "G", "A" ],
+        testScaleNotesPostExtension: [ "A#|Bb", "C", "D", "D#|Eb", "F", "G", "A" ]
     },
     {
         chordName: [ "F#|Gb", ChordShape.Maj7$9 ],
         reqNotes: [ "A#|Bb", "F", "A" ],
-        notes: [ "F#|Gb", "A#|Bb", "C#|Db", "F", "A" ]        
+        notes: [ "F#|Gb", "A#|Bb", "C#|Db", "F", "A" ],
+        testScaleBase: "C#|Db",
+        testScaleNotes: [ "C#|Db", "D#|Eb", "F", "F#|Gb", "G#|Ab", "A#|Bb", "C" ],
+        testScaleNotesPostExtension: [ "C#|Db", "D#|Eb", "F", "F#|Gb", "A", "A#|Bb", "C" ]        
+    },
+    {
+        chordName: [ "B|Cb", ChordShape.Aug7$9 ],
+        reqNotes: [ "D#|Eb", "G", "A", "D" ],
+        notes: [ "B|Cb", "D#|Eb", "G", "A", "D" ],
+        testScaleBase: "E",
+        testScaleNotes: [ "E", "F#|Gb", "G#|Ab", "A", "B|Cb", "C#|Db", "D#|Eb" ],
+        testScaleNotesPostExtension: [ "E", "G", "G#|Ab", "A", "B|Cb", "D", "D#|Eb" ]
     }
 ];
 
@@ -75,7 +101,19 @@ test("constructor generates notes array in which every value is defined", () => 
 
 });
 
-test("applyMutation gives the note classes of the objective scale the right pitches", () => {
+test("applyExtensionToScale gives the note classes of the objective scale the right pitches", () => {
+
+    chordData.forEach(datum => {
+        let chord = new Chord(datum.chordName);
+        let scale = new Scale(datum.testScaleBase);
+
+        expect(noteClassesTest(scale, datum.testScaleNotes)).toBeTruthy();
+
+        // Now apply the chord's extension to the scale
+        chord.applyExtensionToScale(scale);
+
+        expect(noteClassesTest(scale, datum.testScaleNotesPostExtension)).toBeTruthy();
+    });
 
 });
 
@@ -136,18 +174,18 @@ function voicingPitchesTest(voicing: number[], pitches: NoteName[]) {
 }
 
 /**
- * @param chord
+ * @param domain
  * @param pitches
- * @returns true if each name in pitches is represented by one of the note classes of the chords and vice versa
+ * @returns true if each name in pitches is represented by one of the note classes of the domain and vice versa
  */
-function noteClassesTest(chord: Chord, pitches: NoteName[]) {
+function noteClassesTest(domain: Domain, pitches: NoteName[]) {
 
-    let basePitches = pitches.map(name => Chord.NOTE_NAMES.indexOf(name));
+    let basePitches = pitches.map(name => Domain.NOTE_NAMES.indexOf(name));
 
     let noteFailure = (note: Note) => basePitches.indexOf(note.basePitch) === -1 || pitches.indexOf(note.name) === -1;
 
-    let correctChordNoteClasses = !chord.noteClasses.some(noteFailure);
+    let correctNoteClasses = !domain.noteClasses.some(noteFailure);
 
-    return correctChordNoteClasses && pitches.length === chord.noteClasses.length;
+    return correctNoteClasses && pitches.length === domain.noteClasses.length;
 
 }

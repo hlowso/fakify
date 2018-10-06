@@ -347,11 +347,13 @@ export class Chord extends Domain {
 
         this._extension.forEach((name, pos) => {
 
-            if (pos > 7) {
-                pos -= 7
-            }
+            let scaleChangePos = pos + posDiff;
 
-            scaleExtension[Util.mod(pos - posDiff - 1, 7) + 1] = name;
+            if (scaleChangePos > 7 || scaleChangePos < 1) {
+                scaleChangePos = Util.mod(scaleChangePos, 7);
+            } 
+
+            scaleExtension[scaleChangePos] = name;
         });
 
         scale.mutate(scaleExtension);
