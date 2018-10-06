@@ -178,11 +178,17 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
     **********************/
 
     private _startSession = () => {
+        if (!this._chart) {
+            return;
+        }
         let { playMode } = this.state;
         this.props.SoundActions.playRangeLoop(this._chart, playMode);
     }
 
     private _stopSession = () => {
+        if (!this._chart) {
+            return;
+        }    
         this.props.SoundActions.killTake();
     }
 
