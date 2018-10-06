@@ -8,54 +8,57 @@ export const compDrumsSwingV1 = (chart: Chart): [IPart, IPart] => {
     let rideCymbalBars: IMusicBar[] = [];
     let shutHiHatBars: IMusicBar[] = [];
 
+    let addDingToBar = (startSubbeatIdx: number, rideCymbalBar: IMusicBar) => {
+        rideCymbalBar[startSubbeatIdx] = [
+            {
+                notes: [rideCymbal.pitch || 0], 
+                durationInSubbeats: 3, 
+                velocity: 1
+            }
+        ];
+    }
+
+    let addDingGahToBar = (startSubbeatIdx: number, rideCymbalBar: IMusicBar) => {
+        rideCymbalBar[startSubbeatIdx] = [
+            {
+                notes: [rideCymbal.pitch || 0], 
+                durationInSubbeats: 2, 
+                velocity: 1
+            }
+        ];
+        rideCymbalBar[startSubbeatIdx + 2] = [
+            { 
+                notes: [rideCymbal.pitch || 0], 
+                durationInSubbeats: 1, 
+                velocity: 0.6
+            }
+        ];
+    }
+
+    let addShutHiHatToBar = (startSubbeatIdx: number, shutHiHatBar: IMusicBar) => {
+        shutHiHatBar[startSubbeatIdx] = [
+            {
+                notes: [shutHiHat.pitch || 0], 
+                durationInSubbeats: 3, 
+                velocity: 1
+            }
+        ];
+    }
+
     chart.bars.forEach(bar => {
         let rideCymbalBar: IMusicBar = {};
         let shutHiHatBar: IMusicBar = {};
 
         bar.chordSegments.forEach(segment => {
-            let fullBeatCouplets = (segment.durationInSubbeats as number) / 6;
+            let fullBeats = (segment.durationInSubbeats as number) / 3;  
             
-            if (!Number.isInteger(fullBeatCouplets)) {
-                rideCymbalBar[(segment.subbeatIdx as number)] = [
-                    {
-                        notes: [rideCymbal.pitch || 0],
-                        durationInSubbeats: segment.durationInSubbeats as number,
-                        velocity: 1
-                    }
-                ];
-            } else {
-                for (let i = 0; i < fullBeatCouplets; i ++) {
-                    // ding, ding-gah
-                    rideCymbalBar[(segment.subbeatIdx as number) + i * 6] = [
-                        {
-                            notes: [rideCymbal.pitch || 0], 
-                            durationInSubbeats: 3, 
-                            velocity: 1
-                        }
-                    ];
-                    rideCymbalBar[(segment.subbeatIdx as number) + 3 + i * 6] = [
-                        { 
-                            notes: [rideCymbal.pitch || 0], 
-                            durationInSubbeats: 2, 
-                            velocity: 1
-                        }
-                    ];
-                    rideCymbalBar[(segment.subbeatIdx as number) + 5 + i * 6] = [
-                        {
-                            notes: [rideCymbal.pitch || 0], 
-                            durationInSubbeats: 1, 
-                            velocity: 0.6
-                        }
-                    ];
-
-
-                    shutHiHatBar[(segment.subbeatIdx as number) + i * 6 + 3] = [
-                        {
-                            notes: [shutHiHat.pitch || 0], 
-                            durationInSubbeats: 3, 
-                            velocity: 1
-                        }
-                    ];
+            for (let i = 0; i < fullBeats; i ++) {
+                let currSubbeatIdx = (segment.subbeatIdx as number) + i * 3;
+                if (i % 2 === 0) {
+                    addDingToBar(currSubbeatIdx, rideCymbalBar);
+                } else {
+                    addDingGahToBar(currSubbeatIdx, rideCymbalBar);
+                    addShutHiHatToBar(currSubbeatIdx, shutHiHatBar);
                 }
             }
         });
