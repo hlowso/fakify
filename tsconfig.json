@@ -1,23 +1,27 @@
 {
   "compilerOptions": {
+    "module":"es2015",
+    "target": "es2015",
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "preserveConstEnums": true,
+    "allowJs": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "noImplicitReturns": false,
+    "skipLibCheck": true,
+    "moduleResolution": "Node",
     "baseUrl": ".",
     "outDir": "build/dist",
-    "module": "esnext",
-    "target": "es5",
     "lib": ["es6", "dom"],
-    "sourceMap": true,
-    "allowJs": true,
-    "jsx": "react",
-    "moduleResolution": "node",
     "rootDir": "src",
     "forceConsistentCasingInFileNames": false,
-    "noImplicitReturns": true,
     "noImplicitThis": true,
-    "noImplicitAny": true,
     "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "noUnusedLocals": true,
-    "allowSyntheticDefaultImports": true
+    "suppressImplicitAnyIndexErrors": true
   },
   "exclude": [
     "node_modules",
@@ -28,6 +32,7 @@
     "jest",
     "public",
     "src/backend",
+    "src/native",
     "webpack.config.server.ts",
     "**/*.test.ts"
   ]

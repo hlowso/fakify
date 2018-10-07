@@ -1,0 +1,41 @@
+{
+    "compilerOptions": {
+        "module":"es2015",
+        "target": "es2015",
+        "jsx": "react",
+        "rootDir": "../",
+        "outDir": "../../build-native",
+        "allowSyntheticDefaultImports": true,
+        "noImplicitAny": true,
+        "sourceMap": true,
+        "experimentalDecorators": true,
+        "preserveConstEnums": true,
+        "allowJs": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": false,
+        "noImplicitReturns": false,
+        "skipLibCheck": true,
+        "moduleResolution": "Node"
+    },
+    "filesGlob": [
+        "typings/index.d.ts",
+        "src/native/**/*.ts",
+        "src/native/**/*.tsx",
+        "node_modules/typescript/lib/lib.es6.d.ts"
+    ],
+    "types": [
+      "react",
+      "react-dom",
+      "react-native"
+    ],
+    "exclude":[
+        "build-native", 
+        "node_modules",
+        "jest.config.js",
+        "App.js",
+        "src/backend",
+        "src/index.tsx",
+        "src/registerServiceWorker.js"
+    ],
+    "compileOnSave": false
+}

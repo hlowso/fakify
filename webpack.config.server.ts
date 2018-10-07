@@ -1,5 +1,5 @@
 const path = require('path');
-const Dotenv = require('dotenv-webpack');
+const Dotenv = require('webpack-dotenv-plugin');
 
 module.exports = {
   entry: path.resolve(__dirname, './src/backend/index.ts'),
@@ -8,6 +8,11 @@ module.exports = {
       {
         test: /\.tsx?$/,
         use: 'ts-loader'
+      }
+    ],
+    loaders: [
+      {
+        exclude: [/node_modules/]
       }
     ]
   },
@@ -20,7 +25,7 @@ module.exports = {
     path: path.resolve(__dirname, './')
   },
   target: "node",
-  plugins: [ new Dotenv() ],
+  plugins: [ new Dotenv({ path: "./.env" }) ],
   node: {
     __dirname: false
   }

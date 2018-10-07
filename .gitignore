@@ -9,6 +9,11 @@
 
 # production
 /build
+/build-native
+
+# native
+.expo/*
+npm-debug.*
 
 # misc
 .DS_Store
