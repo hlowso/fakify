@@ -1,5 +1,6 @@
 {
   "name": "precomp-frontend",
+  "main": "node_modules/expo/AppEntry.js",
   "version": "0.1.0",
   "private": true,
   "proxy": "http://localhost:5001",
@@ -27,7 +28,8 @@
     "webpack-dotenv-plugin": "^2.1.0"
   },
   "scripts": {
-    "start": "npm run build-server && node server.js",
+    "start": "node server.js",
+    "start-server": "npm run build-server && node server.js",
     "start-dev": "react-scripts-ts start",
     "start-native": "concurrently \"npm run build-native -- -w\" \"expo start\"",
     "start-android": "expo start --android",
