@@ -15,7 +15,7 @@ module.exports = {
   resolve: {
     modules: [ "./node_modules/" ],
     extensions: [ '.js', '.ts' ],
-    plugins: [new TsconfigPathsPlugin({ configFile: "./src/backend/tsconfig.json" })]
+    plugins: [new TsconfigPathsPlugin({ configFile: process.env.IS_HEROKU ? "./src/backend/tsconfig.prod.json" : "./src/backend/tsconfig.json" })]
   },
   output: {
     filename: 'server.js',
