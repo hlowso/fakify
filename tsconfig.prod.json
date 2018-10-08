@@ -30,6 +30,7 @@
     "src/setupTests.ts",
     "public",
     "src/backend",
+    "src/native",
     "webpack.config.server.ts",
     "**/*.test.ts"
   ]
