@@ -25,7 +25,7 @@ module.exports = {
     path: path.resolve(__dirname, './')
   },
   target: "node",
-  plugins: [ new Dotenv({ path: "./.env" }) ],
+  plugins: process.env.IS_HEROKU ? undefined : [ new Dotenv({ path: "./.env" }) ],
   node: {
     __dirname: false
   }
