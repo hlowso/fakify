@@ -9,7 +9,7 @@ let optionsBase = {
 const sendRequest = (path, method, payload) => {
     let url = (
         process.env.REACT_APP_DEPLOY_BUILD
-            ? "https://precomp.herokuapp.com"
+            ? "https://fakify.herokuapp.com"
             : ""
     ) + path;
 
