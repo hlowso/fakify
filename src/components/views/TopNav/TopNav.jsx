@@ -15,7 +15,7 @@ class TopNav extends Component {
     render() {
         return (
             <header className="nav-container">
-                <span className="nav-brand">PreComp</span>
+                <span className="nav-brand">Fakify</span>
                 {this.renderTabList()}
                 {this.renderUserSection()}
             </header>

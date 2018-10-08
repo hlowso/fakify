@@ -28,7 +28,7 @@
   "scripts": {
     "start": "npm run build-server && node server.js",
     "start-dev": "react-scripts-ts start",
-    "start-native": "npm run build-native && expo start",
+    "start-native": "concurrently \"npm run build-native -- -w\" \"expo start\"",
     "start-android": "expo start --android",
     "start-ios": "expo start --ios",
     "eject-native": "expo eject",
