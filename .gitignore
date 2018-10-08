@@ -28,4 +28,6 @@ yarn-error.log*
 
 server.js
 .env
+.netlify/
 netlify.toml
+netlifyctl-debug.log
