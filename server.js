@@ -33559,7 +33559,7 @@ const exitHandler = (data, options, exitCode) => {
         server.use(__WEBPACK_IMPORTED_MODULE_2_body_parser___default.a.json());
         // Enable CORS
         server.use((req, res, next) => {
-            res.header("Access-Control-Allow-Origin", "https://romantic-minsky-70878f.netlify.com");
+            res.header("Access-Control-Allow-Origin", "https://fakify.netlify.com");
             res.header("Access-Control-Allow-Headers", "origin, x-requested-with, content-type, accept, set-cookie");
             res.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, HEAD, OPTIONS");
             res.header("Access-Control-Allow-Credentials", "true");
