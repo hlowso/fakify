@@ -1,5 +1,6 @@
 const path = require('path');
 const Dotenv = require('webpack-dotenv-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 module.exports = {
   entry: path.resolve(__dirname, './src/backend/index.ts'),
@@ -9,16 +10,12 @@ module.exports = {
         test: /\.tsx?$/,
         use: 'ts-loader'
       }
-    ],
-    loaders: [
-      {
-        exclude: [/node_modules/]
-      }
     ]
   },
   resolve: {
     modules: [ "./node_modules/" ],
-    extensions: [ '.js', '.ts' ]
+    extensions: [ '.js', '.ts' ],
+    plugins: [new TsconfigPathsPlugin({ configFile: "./src/backend/tsconfig.json" })]
   },
   output: {
     filename: 'server.js',

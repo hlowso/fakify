@@ -21,14 +21,15 @@
     "react-router-dom": "^4.2.2",
     "react-scripts-ts": "^2.8.0",
     "reactstrap": "^6.0.1",
+    "tsconfig-paths-webpack-plugin": "^3.2.0",
     "typescript": "^3.1.1",
     "uuid": "^3.2.1",
     "webaudiofont": "^2.5.0",
     "webpack-dotenv-plugin": "^2.1.0"
-    
   },
   "scripts": {
-    "start": "npm run build-server && node server.js",
+    "start": "node server.js",
+    "start-server": "npm run build-server && node server.js",
     "start-dev": "react-scripts-ts start",
     "start-native": "concurrently \"npm run build-native -- -w\" \"expo start\"",
     "start-android": "expo start --android",
