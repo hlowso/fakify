@@ -6,7 +6,7 @@ export default class App extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text>7 mod 3 = {Util.mod(7, 4)}</Text>
+        <Text>Now I'm Happy. 3902 mod 27 = { Util.mod(3902, 27) }</Text>
       </View>
     );
   }
