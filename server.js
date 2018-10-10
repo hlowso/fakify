@@ -33554,7 +33554,9 @@ const exitHandler = (data, options, exitCode) => {
         server.use(__WEBPACK_IMPORTED_MODULE_1_cookie_session___default()({
             name: "PreComp Session",
             secret: SESSION_SECRET,
-            maxAge: 24 * 60 * 60 * 1000 * 7 // One week
+            maxAge: 24 * 60 * 60 * 1000 * 7,
+            signed: false,
+            httpOnly: false
         }));
         server.use(__WEBPACK_IMPORTED_MODULE_2_body_parser___default.a.json());
         // Enable CORS
