@@ -14,7 +14,7 @@ const sendRequest = (path, method, payload) => {
             'content-type': 'application/json',
             'X-Session-Token': "lalala test"
         }, 
-        body: JSON.stringify(payload)
+        body: method !== "GET" ? JSON.stringify(payload) : undefined
     };
 
     return fetch(url, options);
