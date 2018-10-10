@@ -33462,6 +33462,7 @@ class PreCompController {
         this._router = Object(__WEBPACK_IMPORTED_MODULE_2_express__["Router"])();
         this._user = null;
         this._router.use((req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            console.log("HEADER:", req.get("X-Session-Token"));
             if (!__WEBPACK_IMPORTED_MODULE_1__shared_Util__["f" /* objectIsEmpty */](req.session)) {
                 this._user = yield this._api.data.getUserByTokenAsync(req.session.token);
             }

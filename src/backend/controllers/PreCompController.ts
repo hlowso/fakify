@@ -25,6 +25,8 @@ export class PreCompController {
 
         this._router.use( async (req, res, next) => {
 
+            console.log("HEADER:", req.get("X-Session-Token"));
+
             if (!Util.objectIsEmpty(req.session)) {
                 this._user = await this._api.data.getUserByTokenAsync((req.session as any).token);
             }
