@@ -1,10 +1,3 @@
-let optionsBase = {
-    credentials: process.env.REACT_APP_DEPLOY_BUILD ? "include" : "same-origin",
-    mode: process.env.REACT_APP_DEPLOY_BUILD ? "cors" : undefined,    
-    headers: {
-        'content-type': 'application/json'
-    }, 
-}
 
 const sendRequest = (path, method, payload) => {
     let url = (
@@ -15,10 +8,14 @@ const sendRequest = (path, method, payload) => {
 
     let options = {
         method,
-        ...optionsBase
+        credentials: process.env.REACT_APP_DEPLOY_BUILD ? "include" : "same-origin",
+        mode: process.env.REACT_APP_DEPLOY_BUILD ? "cors" : undefined,    
+        headers: {
+            'content-type': 'application/json',
+            'X-Session-Token': "lalala test"
+        }, 
+        body: JSON.stringify(payload)
     };
-
-    if (payload) options.body = JSON.stringify(payload);
 
     return fetch(url, options);
 }
