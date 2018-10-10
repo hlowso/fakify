@@ -33563,7 +33563,7 @@ const exitHandler = (data, options, exitCode) => {
         // Enable CORS
         server.use((req, res, next) => {
             res.header("Access-Control-Allow-Origin", "https://fakify.netlify.com");
-            res.header("Access-Control-Allow-Headers", "origin, x-requested-with, content-type, accept, set-cookie");
+            res.header("Access-Control-Allow-Headers", "origin, x-requested-with, content-type, accept, set-cookie, X-Session-Token");
             res.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, HEAD, OPTIONS");
             res.header("Access-Control-Allow-Credentials", "true");
             if (req.method === "OPTIONS") {
