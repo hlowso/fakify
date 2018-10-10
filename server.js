@@ -75327,7 +75327,7 @@ class AdminController extends __WEBPACK_IMPORTED_MODULE_1__PreCompController__["
                 res.status(401);
                 return res.send("Incorrect username or password");
             }
-            req.session.token = user.token;
+            req.session = { token: user.token };
             return res.send(user);
         }));
         this._router.patch("/logout", (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -75348,6 +75348,10 @@ class AdminController extends __WEBPACK_IMPORTED_MODULE_1__PreCompController__["
                 let user = yield this._api.data.getUserByTokenAsync(req.session.token);
                 if (user) {
                     return res.send(user);
+                }
+                else {
+                    res.status(401);
+                    return res.send("Missing or incorrect authentication token");
                 }
             }
             res.status(401);

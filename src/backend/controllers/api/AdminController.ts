@@ -34,7 +34,7 @@ export class AdminController extends PreCompController {
                 return res.send("Incorrect username or password");
             }
 
-            (req.session as any).token = user.token;
+            req.session = { token: user.token };
 
             return res.send(user);
         });
@@ -58,6 +58,9 @@ export class AdminController extends PreCompController {
                 let user = await this._api.data.getUserByTokenAsync((req.session as any).token);
                 if (user) {
                     return res.send(user);
+                } else {
+                    res.status(401);
+                    return res.send("Missing or incorrect authentication token");
                 }
             }
 
