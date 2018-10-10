@@ -75341,10 +75341,11 @@ class AdminController extends __WEBPACK_IMPORTED_MODULE_1__PreCompController__["
                 }
                 req.session = undefined;
             }
-            res.send(found);
+            return res.send(found);
         }));
         this._router.get("/authenticate", (req, res) => __awaiter(this, void 0, void 0, function* () {
             if (!__WEBPACK_IMPORTED_MODULE_0__shared_Util__["f" /* objectIsEmpty */](req.session)) {
+                console.log("HERE, session:", req.session);
                 let user = yield this._api.data.getUserByTokenAsync(req.session.token);
                 if (user) {
                     return res.send(user);
@@ -75354,6 +75355,7 @@ class AdminController extends __WEBPACK_IMPORTED_MODULE_1__PreCompController__["
                     return res.send("Missing or incorrect authentication token");
                 }
             }
+            console.log("Session is empty!", req.session);
             res.status(401);
             return res.send("Missing or incorrect authentication token");
         }));

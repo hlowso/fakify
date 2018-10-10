@@ -50,11 +50,14 @@ export class AdminController extends PreCompController {
                 req.session = undefined;
             }
 
-            res.send(found);
+            return res.send(found);
         });
 
         this._router.get("/authenticate", async (req, res) => { 
             if (!Util.objectIsEmpty(req.session)) {
+
+                console.log("HERE, session:", req.session);
+
                 let user = await this._api.data.getUserByTokenAsync((req.session as any).token);
                 if (user) {
                     return res.send(user);
@@ -63,6 +66,8 @@ export class AdminController extends PreCompController {
                     return res.send("Missing or incorrect authentication token");
                 }
             }
+
+            console.log("Session is empty!", req.session);
 
             res.status(401);
             return res.send("Missing or incorrect authentication token");
