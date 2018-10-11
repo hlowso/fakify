@@ -11,7 +11,7 @@ export const authenticate = () => {
         });
 };
 
-export async const login = returningUser => {
+export async function login(returningUser) {
     let res = await FetchHelpers.PATCH('/api/admin/login', returningUser);
     let sessionToken = res.headers.get("X-Session-Token");
 
