@@ -71159,7 +71159,7 @@ function getEncryptor(secret) {
 }
 function getDecryptor(secret) {
     const decrypt = (encryption) => {
-        if (typeof encryption !== "string" || encryption === "undefined") {
+        if (typeof encryption !== "string" || encryption === "undefined" || encryption === "null") {
             return;
         }
         let decipher = __WEBPACK_IMPORTED_MODULE_0_crypto___default.a.createDecipher('aes-128-cbc', secret);
