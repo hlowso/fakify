@@ -16,6 +16,8 @@ export async function login(returningUser) {
     let sessionToken = res.headers.get("X-Session-Token");
 
     StorageHelper.setSessionToken(sessionToken);
+
+    return res;
 };
 
 export const logout = () => {

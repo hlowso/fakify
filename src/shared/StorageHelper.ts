@@ -1,4 +1,4 @@
-import { IChartSettings, PlayMode, ISession } from "./types";
+import { IChartSettings, PlayMode } from "./types";
 
 let STORAGE_UUID = "0b48c2d5-4583-4d17-8cc7-2b3a74a43d08"; 
 

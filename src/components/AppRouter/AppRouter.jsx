@@ -176,6 +176,10 @@ class AppRouter extends Component {
 
     setMidiAccessAsync = () => {
         return new Promise((resolve, reject) => {
+            if (!navigator.requestMIDIAccess) {
+                resolve();
+            }
+
             navigator.requestMIDIAccess()
             .then(midiAccess => { 
                 this.setState({ midiAccess }, resolve);
