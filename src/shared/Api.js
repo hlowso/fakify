@@ -1,4 +1,5 @@
 import * as FetchHelpers from "./FetchHelpers";
+import { StorageHelper } from "./StorageHelper";
 
 export const authenticate = () => {
     return FetchHelpers.GET('/api/admin/authenticate')
@@ -10,8 +11,11 @@ export const authenticate = () => {
         });
 };
 
-export const login = returningUser => {
-    return FetchHelpers.PATCH('/api/admin/login', returningUser);
+export async const login = returningUser => {
+    let res = await FetchHelpers.PATCH('/api/admin/login', returningUser);
+    let sessionToken = res.headers.get("X-Session-Token");
+
+    StorageHelper.setSessionToken(sessionToken);
 };
 
 export const logout = () => {
@@ -22,6 +26,8 @@ export const signup = newUser => {
     return FetchHelpers.POST('/api/admin/signup', newUser)
         .then(res => {
             if (res.status === 200) {
+                let sessionToken = res.headers.get("X-Session-Token");
+                StorageHelper.setSessionToken(sessionToken);
                 return res.json();
             }
             return null;

@@ -1,15 +1,63 @@
+import crypto from "crypto";
 import uuidv4 from "uuid/v4";
 import bcrypt from "bcryptjs";
 import { PreCompData } from "./PreCompData";
-import { IIncomingUser, ISong, NoteName, Tempo, IChartBar } from "../shared/types";
+import { IIncomingUser, ISong, NoteName, Tempo, IChartBar, ISession } from "../shared/types";
 import Chart from "../shared/music/Chart";
 import * as Mongo from "mongodb";
+
+function getEncryptor(secret: string) {
+    const encrypt = (message?: string) => {
+        if (typeof message !== "string") {
+            return;
+        }
+        let cipher = crypto.createCipher('aes-128-cbc', secret);
+        return cipher.update(message, 'utf8', 'hex') + cipher.final('hex');
+    }
+
+    return encrypt;
+}
+
+function getDecryptor(secret: string) {
+    const decrypt = (encryption?: string) => {
+        if (typeof encryption !== "string") {
+            return;
+        }
+        let decipher = crypto.createDecipher('aes-128-cbc', secret);
+        return decipher.update(encryption, 'hex', 'utf8') + decipher.final('utf8');
+    }
+
+    return decrypt;
+}
 
 export class PreCompApiHelper {
     private _data: PreCompData;
 
-    constructor(data: PreCompData) {
+    public encryptSessionToken: (sessionToken?: ISession) => string | undefined;
+    public decryptSessionTokenEncryption: (encryption?: string) => ISession | undefined;    
+
+    constructor(data: PreCompData, secret: string) {
         this._data = data;
+
+        let encrypt = getEncryptor(secret);
+        let decrypt = getDecryptor(secret);
+        
+        this.encryptSessionToken = sessionToken => {
+            if (!sessionToken) {
+                return;
+            }
+
+            return encrypt(JSON.stringify(sessionToken));
+        };
+
+        this.decryptSessionTokenEncryption = encryption => {
+            let tokenString = decrypt(encryption);
+            if (!tokenString) {
+                return;
+            }
+
+            return JSON.parse(tokenString);
+        }
     }
 
     get data() {

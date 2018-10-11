@@ -1,5 +1,5 @@
 import express from "express";
-import cookieSession from "cookie-session";
+// import cookieSession from "cookie-session";
 import bodyParser from "body-parser";
 import { PreCompData } from "./PreCompData";
 import { PreCompApiHelper } from "./PreCompApiHelper";
@@ -49,19 +49,19 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
     }
 
     // Create api helper
-    const api = new PreCompApiHelper(data);
+    const api = new PreCompApiHelper(data, SESSION_SECRET as string);
 
     // Setup server
     const server = express();
 
     server.use(express.static('public'));
-    server.use(cookieSession({
-        name: "PreComp Session",
-        secret: SESSION_SECRET as string,
-        maxAge: 24 * 60 * 60 * 1000 * 7, // One week
-        signed: false,
-        httpOnly: false
-    }));
+    // server.use(cookieSession({
+    //     name: "PreComp Session",
+    //     secret: SESSION_SECRET as string,
+    //     maxAge: 24 * 60 * 60 * 1000 * 7, // One week
+    //     signed: false,
+    //     httpOnly: false
+    // }));
     server.use(bodyParser.json());
 
     // Enable CORS

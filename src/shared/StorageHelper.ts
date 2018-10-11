@@ -1,4 +1,4 @@
-import { IChartSettings, PlayMode } from "./types";
+import { IChartSettings, PlayMode, ISession } from "./types";
 
 let STORAGE_UUID = "0b48c2d5-4583-4d17-8cc7-2b3a74a43d08"; 
 
@@ -46,11 +46,20 @@ export class StorageHelper {
         StorageHelper._set(StorageHelper._keys.PLAY_MODE, playMode);
     }
 
+    public static getSessionToken = (): string => {
+        return StorageHelper._get(StorageHelper._keys.SESSION_TOKEN) as string;
+    }
+
+    public static setSessionToken = (token: string) => {
+        StorageHelper._set(StorageHelper._keys.SESSION_TOKEN, token);
+    }
+
     private static _keys = {
         MIDI_INPUT_ID: "MIDI_INPUT_ID",
         SELECTED_SONG_ID: "SELECTED_SONG_ID",
         CHART_SETTINGS_PREFIX: "CHART_SETTINGS_",
-        PLAY_MODE: "PLAY_MODE"
+        PLAY_MODE: "PLAY_MODE",
+        SESSION_TOKEN: "SESSION_TOKEN"
     }
 
     private static _getStorageKey = (key: string): string => {

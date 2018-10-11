@@ -1,4 +1,3 @@
-import * as Util from "../../../shared/Util";
 import { UnauthorizedResponse, PreCompController } from "../PreCompController";
 import { PreCompApiHelper } from "../../PreCompApiHelper";
 import { IIncomingUser } from "../../../shared/types";
@@ -21,7 +20,7 @@ export class AdminController extends PreCompController {
                 return res.send("User already exists");
             }
 
-            req.session = { token: user.token };            
+            res.set("X-Session-Token", this._api.encryptSessionToken({ token: user.token }));            
 
             return res.send(user);
         });
@@ -34,40 +33,30 @@ export class AdminController extends PreCompController {
                 return res.send("Incorrect username or password");
             }
 
-            req.session = { token: user.token };
+            res.set("X-Session-Token", this._api.encryptSessionToken({ token: user.token }));                        
 
             return res.send(user);
         });
 
         this._router.patch("/logout", async (req, res) => {
             let found = false;
-            if (!Util.objectIsEmpty(req.session)) {
+            if (this._user) {
                 try {
-                    found = await this._api.data.clearUserTokenAsync((req.session as any).token);
+                    found = await this._api.data.clearUserTokenAsync(this._user.token);
                 } catch (err) {
                     res.status(500);
                 }
-                req.session = undefined;
+                
+                res.set("X-Session-Token", undefined);
             }
 
             return res.send(found);
         });
 
         this._router.get("/authenticate", async (req, res) => { 
-            if (!Util.objectIsEmpty(req.session)) {
-
-                console.log("HERE, session:", req.session);
-
-                let user = await this._api.data.getUserByTokenAsync((req.session as any).token);
-                if (user) {
-                    return res.send(user);
-                } else {
-                    res.status(401);
-                    return res.send("Missing or incorrect authentication token");
-                }
+            if (this._user) {
+                return res.send(this._user);
             }
-
-            console.log("Session is empty!", req.session);
 
             res.status(401);
             return res.send("Missing or incorrect authentication token");

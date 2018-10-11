@@ -1,5 +1,9 @@
 import * as Mongo from "mongodb";
 
+export interface ISession {
+    token: string;
+}
+
 export interface IIncomingUser {
     email: string;
     password: string;

@@ -2,7 +2,7 @@ import path from "path";
 import * as Util from "../../shared/Util";
 import { PreCompApiHelper } from "../PreCompApiHelper";
 import { Router } from "express";
-import { IUser } from "../../shared/types";
+import { IUser, ISessionToken } from "../../shared/types";
 
 export enum UnauthorizedResponse {
     GoToLogin,
@@ -16,6 +16,7 @@ export class PreCompController {
     protected _router: Router;    
     protected _unauthorizedResponse: UnauthorizedResponse;
     protected _user: IUser | null;
+    protected _sessionToken?: ISessionToken;
 
     constructor(api: PreCompApiHelper) {
 
@@ -25,12 +26,12 @@ export class PreCompController {
 
         this._router.use( async (req, res, next) => {
 
-            console.log("HEADER:", req.get("X-Session-Token"));
+            this._sessionToken = api.decryptSessionTokenEncryption(req.get("X-Session-Token"));
 
-            if (!Util.objectIsEmpty(req.session)) {
-                this._user = await this._api.data.getUserByTokenAsync((req.session as any).token);
+            if (this._sessionToken) {
+                this._user = await this._api.data.getUserByTokenAsync((this._sessionToken as ISessionToken).token);
             }
-            
+
             if (!this._user) {
                 switch (this._unauthorizedResponse) {
 

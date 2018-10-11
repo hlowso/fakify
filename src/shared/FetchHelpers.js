@@ -1,3 +1,4 @@
+import { StorageHelper } from "./StorageHelper";
 
 const sendRequest = (path, method, payload) => {
     let url = (
@@ -12,7 +13,7 @@ const sendRequest = (path, method, payload) => {
         mode: process.env.REACT_APP_DEPLOY_BUILD ? "cors" : undefined,    
         headers: {
             'content-type': 'application/json',
-            'X-Session-Token': "lalala test"
+            'X-Session-Token': StorageHelper.getSessionToken()
         }, 
         body: method !== "GET" ? JSON.stringify(payload) : undefined
     };
