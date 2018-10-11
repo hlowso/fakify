@@ -20,7 +20,7 @@ function getEncryptor(secret: string) {
 
 function getDecryptor(secret: string) {
     const decrypt = (encryption?: string) => {
-        if (typeof encryption !== "string" || encryption === "undefined") {
+        if (typeof encryption !== "string" || encryption.length !== 32) {
             return;
         }
         let decipher = crypto.createDecipher('aes-128-cbc', secret);
