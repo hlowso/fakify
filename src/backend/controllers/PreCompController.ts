@@ -25,7 +25,11 @@ export class PreCompController {
 
         this._router.use( async (req, res, next) => {
 
+            console.log("TOKEN", req.get("X-Session-Token"));
+
             this._sessionToken = api.decryptSessionTokenEncryption(req.get("X-Session-Token"));
+
+            console.log("SESSION", this._sessionToken)
 
             if (this._sessionToken) {
                 this._user = await this._api.data.getUserByTokenAsync((this._sessionToken as ISession).token);

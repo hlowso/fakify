@@ -4827,7 +4827,7 @@ function isignored (namespace) {
     return true
   }
 
-  var str = process.env.NO_DEPRECATION || ''
+  var str = Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).NO_DEPRECATION || ''
 
   // namespace ignored
   return containsNamespace(str, namespace)
@@ -4844,7 +4844,7 @@ function istraced (namespace) {
     return true
   }
 
-  var str = process.env.TRACE_DEPRECATION || ''
+  var str = Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).TRACE_DEPRECATION || ''
 
   // namespace traced
   return containsNamespace(str, namespace)
@@ -33223,7 +33223,9 @@ class PreCompController {
         this._router = Object(__WEBPACK_IMPORTED_MODULE_1_express__["Router"])();
         this._user = null;
         this._router.use((req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            console.log("TOKEN", req.get("X-Session-Token"));
             this._sessionToken = api.decryptSessionTokenEncryption(req.get("X-Session-Token"));
+            console.log("SESSION", this._sessionToken);
             if (this._sessionToken) {
                 this._user = yield this._api.data.getUserByTokenAsync(this._sessionToken.token);
             }
@@ -33296,7 +33298,7 @@ const exitHandler = (data, options, exitCode) => {
         /**
          * SETUP
          */
-        const { PORT, MONGO_SERVER, MONGO_USER, MONGO_PASSWORD, MONGO_DATABASE_NAME, SESSION_SECRET } = process.env;
+        const { PORT, MONGO_SERVER, MONGO_USER, MONGO_PASSWORD, MONGO_DATABASE_NAME, SESSION_SECRET } = Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"});
         // Create database helper
         const data = new __WEBPACK_IMPORTED_MODULE_2__PreCompData__["a" /* PreCompData */](MONGO_SERVER, MONGO_USER, MONGO_PASSWORD, MONGO_DATABASE_NAME);
         try {
@@ -34214,7 +34216,7 @@ function load() {
 
   // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
   if (!r && typeof process !== 'undefined' && 'env' in process) {
-    r = process.env.DEBUG;
+    r = Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).DEBUG;
   }
 
   return r;
@@ -34281,7 +34283,7 @@ exports.colors = [6, 2, 3, 4, 5, 1];
  *   $ DEBUG_COLORS=no DEBUG_DEPTH=10 DEBUG_SHOW_HIDDEN=enabled node script.js
  */
 
-exports.inspectOpts = Object.keys(process.env).filter(function (key) {
+exports.inspectOpts = Object.keys(Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"})).filter(function (key) {
   return /^debug_/i.test(key);
 }).reduce(function (obj, key) {
   // camel-case
@@ -34291,7 +34293,7 @@ exports.inspectOpts = Object.keys(process.env).filter(function (key) {
     .replace(/_([a-z])/g, function (_, k) { return k.toUpperCase() });
 
   // coerce string value into JS value
-  var val = process.env[key];
+  var val = Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"})[key];
   if (/^(yes|on|true|enabled)$/i.test(val)) val = true;
   else if (/^(no|off|false|disabled)$/i.test(val)) val = false;
   else if (val === 'null') val = null;
@@ -34308,7 +34310,7 @@ exports.inspectOpts = Object.keys(process.env).filter(function (key) {
  *   $ DEBUG_FD=3 node script.js 3>debug.log
  */
 
-var fd = parseInt(process.env.DEBUG_FD, 10) || 2;
+var fd = parseInt(Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).DEBUG_FD, 10) || 2;
 
 if (1 !== fd && 2 !== fd) {
   util.deprecate(function(){}, 'except for stderr(2) and stdout(1), any other usage of DEBUG_FD is deprecated. Override debug.log if you want to use a different log function (https://git.io/debug_fd)')()
@@ -34390,9 +34392,9 @@ function save(namespaces) {
   if (null == namespaces) {
     // If you set a process.env field to null or undefined, it gets cast to the
     // string 'null' or 'undefined'. Just delete instead.
-    delete process.env.DEBUG;
+    delete Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).DEBUG;
   } else {
-    process.env.DEBUG = namespaces;
+    Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).DEBUG = namespaces;
   }
 }
 
@@ -34404,7 +34406,7 @@ function save(namespaces) {
  */
 
 function load() {
-  return process.env.DEBUG;
+  return Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).DEBUG;
 }
 
 /**
@@ -35210,7 +35212,7 @@ function isignored (namespace) {
     return true
   }
 
-  var str = process.env.NO_DEPRECATION || ''
+  var str = Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).NO_DEPRECATION || ''
 
   // namespace ignored
   return containsNamespace(str, namespace)
@@ -35227,7 +35229,7 @@ function istraced (namespace) {
     return true
   }
 
-  var str = process.env.TRACE_DEPRECATION || ''
+  var str = Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).TRACE_DEPRECATION || ''
 
   // namespace traced
   return containsNamespace(str, namespace)
@@ -39820,7 +39822,7 @@ app.init = function init() {
  */
 
 app.defaultConfiguration = function defaultConfiguration() {
-  var env = process.env.NODE_ENV || 'development';
+  var env = Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).NODE_ENV || 'development';
 
   // default settings
   this.enable('x-powered-by');
@@ -40481,7 +40483,7 @@ function finalhandler (req, res, options) {
   var opts = options || {}
 
   // get environment
-  var env = opts.env || process.env.NODE_ENV || 'development'
+  var env = opts.env || Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).NODE_ENV || 'development'
 
   // get error callback
   var onerror = opts.onerror
@@ -41230,7 +41232,7 @@ Mime.prototype.define = function (map) {
   for (var type in map) {
     var exts = map[type];
     for (var i = 0; i < exts.length; i++) {
-      if (process.env.DEBUG_MIME && this.types[exts[i]]) {
+      if (Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).DEBUG_MIME && this.types[exts[i]]) {
         console.warn((this._loading || "define()").replace(/.*\//, ''), 'changes "' + exts[i] + '" extension type from ' +
           this.types[exts[i]] + ' to ' + type);
       }
@@ -55686,16 +55688,16 @@ module.exports = require("module");
 
 /***/ }),
 /* 254 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = SemVer;
 
 // The debug function is excluded entirely from the minified version.
 /* nomin */ var debug;
 /* nomin */ if (typeof process === 'object' &&
-    /* nomin */ process.env &&
-    /* nomin */ process.env.NODE_DEBUG &&
-    /* nomin */ /\bsemver\b/i.test(process.env.NODE_DEBUG))
+    /* nomin */ Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}) &&
+    /* nomin */ Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).NODE_DEBUG &&
+    /* nomin */ /\bsemver\b/i.test(Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).NODE_DEBUG))
   /* nomin */ debug = function() {
     /* nomin */ var args = Array.prototype.slice.call(arguments, 0);
     /* nomin */ args.unshift('SEMVER');
@@ -71157,7 +71159,7 @@ function getEncryptor(secret) {
 }
 function getDecryptor(secret) {
     const decrypt = (encryption) => {
-        if (typeof encryption !== "string" || encryption.length !== 32) {
+        if (typeof encryption !== "string" || encryption === "undefined") {
             return;
         }
         let decipher = __WEBPACK_IMPORTED_MODULE_0_crypto___default.a.createDecipher('aes-128-cbc', secret);
