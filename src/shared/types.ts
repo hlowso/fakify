@@ -17,6 +17,8 @@ export interface IUser {
     token: string;
 }
 
+export type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+
 export const AdminRoutes = [
     "/login",
     "/signup"
