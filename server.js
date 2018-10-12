@@ -33322,7 +33322,8 @@ const exitHandler = (data, options, exitCode) => {
         // Enable CORS
         server.use((req, res, next) => {
             res.header("Access-Control-Allow-Origin", "https://fakify.netlify.com");
-            res.header("Access-Control-Allow-Headers", "origin, x-requested-with, content-type, accept, set-cookie, X-Session-Token");
+            res.header("Access-Control-Allow-Headers", "origin, x-requested-with, content-type, accept, set-cookie, x-session-token");
+            res.header("Access-Control-Expose-Headers", "x-session-token");
             res.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, HEAD, OPTIONS");
             res.header("Access-Control-Allow-Credentials", "true");
             if (req.method === "OPTIONS") {
@@ -71157,7 +71158,7 @@ function getEncryptor(secret) {
 }
 function getDecryptor(secret) {
     const decrypt = (encryption) => {
-        if (typeof encryption !== "string" || encryption.length !== 32) {
+        if (typeof encryption !== "string" || encryption === "undefined" || encryption === "null") {
             return;
         }
         let decipher = __WEBPACK_IMPORTED_MODULE_0_crypto___default.a.createDecipher('aes-128-cbc', secret);
