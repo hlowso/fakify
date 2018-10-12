@@ -49,7 +49,7 @@ class AdminRouter extends Component {
     )
 
     setUser = userUpdate => {
-        this.setState({ user: {...this.state.user, ...userUpdate} });
+        this.setState({ user: userUpdate ? {...this.state.user, ...userUpdate} : null });
     }
 
     _redirect = tab => {
