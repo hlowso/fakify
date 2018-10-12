@@ -64,7 +64,7 @@ class TopNav extends Component {
     }
 
     onClickLogout = async event => {
-        this.props.setUser({ email: null })
+        this.props.setUser(null);
         await Api.logout();
     }
 }
