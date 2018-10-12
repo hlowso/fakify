@@ -50,6 +50,9 @@ export class AdminController extends PreCompController {
                 res.set("X-Session-Token", undefined);
             }
 
+            this._sessionToken = undefined;
+            this._user = null;
+
             return res.send(found);
         });
 
