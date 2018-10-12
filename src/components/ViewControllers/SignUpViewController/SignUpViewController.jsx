@@ -148,7 +148,6 @@ class SignUpViewController extends Component {
                 .then(user => {
                     if (user) {
                         stateUpdate.signupSuccessful = true;
-                        this.props.setUser(user);
                     } else {
                         stateUpdate.errorMessage = "a user already exists with that email";
                     }

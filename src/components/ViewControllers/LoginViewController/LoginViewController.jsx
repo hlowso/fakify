@@ -122,7 +122,6 @@ class LoginViewController extends Component {
                     let stateUpdate = {};
                     if (res.status === 200) {
                         stateUpdate.accessGranted = true;
-                        this.props.setUser({ email });
                     } else {
                         stateUpdate.errorMessage = "email or password incorrect";
                     }
