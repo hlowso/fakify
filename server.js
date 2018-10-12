@@ -73781,6 +73781,8 @@ class AdminController extends __WEBPACK_IMPORTED_MODULE_0__PreCompController__["
                 }
                 res.set("X-Session-Token", undefined);
             }
+            this._sessionToken = undefined;
+            this._user = null;
             return res.send(found);
         }));
         this._router.get("/authenticate", (req, res) => __awaiter(this, void 0, void 0, function* () {
