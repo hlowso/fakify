@@ -63,6 +63,6 @@ export class AdminController extends PreCompController {
 
             res.status(401);
             return res.send("Missing or incorrect authentication token");
-        })
+        });
     }
 }
