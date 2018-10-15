@@ -52758,6 +52758,7 @@ class PreCompData {
     constructor(server, user, password, dbName) {
         this.connectAsync = () => {
             return new Promise((resolve, reject) => {
+                console.log(this.connectionUrl);
                 __WEBPACK_IMPORTED_MODULE_0_mongodb__["MongoClient"].connect(this.connectionUrl, { useNewUrlParser: true }, (err, client) => {
                     if (err !== null) {
                         reject(err);

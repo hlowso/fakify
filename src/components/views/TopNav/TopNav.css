@@ -44,22 +44,19 @@
 #tab-list button {
     margin-top: 10px;
     margin-right: 5px;
-    background-color: #ddd;
-    border-left: solid grey 2px;
-    border-right: solid grey 2px;
-    border-bottom: solid grey 2px;
-    border-top: 0px;
-    
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px; 
+    background-color: #444;  
+    color: #ddd; 
+
+    border: solid grey 2px;
+    border-radius: 15px;
     height: 60px;
     width: 100px;
 
     font-size: 150%;
-    pointer-events: none;
+    text-align: center;
 }
 
 #tab-list .active {
-    background-color: #222;  
-    color: #ddd; 
+    background-color: #ddd;
+    color: #222;
 }

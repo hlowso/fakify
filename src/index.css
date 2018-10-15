@@ -3,7 +3,6 @@ body {
     padding: 0;
     font-family: Georgia, 'Times New Roman', Times, serif;
     background-color: rgb(240, 230, 199);
-    height: 700px;
 }
 
 #root, #admin-router, #app-router, main {

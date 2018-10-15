@@ -31,19 +31,14 @@ class AdminRouter extends Component {
             )
             : (
                 <div id="app-router">
-                    <TopNav user={user} setUser={this.setUser} />
+                    <TopNav user={user} {...this.getChildProps()} />
                     {this.renderRouter()}
                 </div>
             );
     }
 
     renderRouter = () => {
-
-        let VCProps = {
-            setUser: this.setUser,
-            redirect: this._redirect,
-            isMobile: this.props.isMobile
-        };
+        let VCProps = this.getChildProps();
 
         return (
             <main>
@@ -54,6 +49,14 @@ class AdminRouter extends Component {
                 </Switch>
             </main>
         );
+    }
+
+    getChildProps = () => {
+        return {
+            setUser: this.setUser,
+            redirect: this._redirect,
+            isMobile: this.props.isMobile
+        };
     }
 
     setUser = userUpdate => {
