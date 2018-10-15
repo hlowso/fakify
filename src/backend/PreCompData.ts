@@ -55,6 +55,10 @@ export class PreCompData {
 
     // Users
 
+    public countUsersAsync = (): Promise<number> => {
+        return this._userColl.count();
+    }
+
     public getUserByTokenAsync = (token: string): Promise<IUser> => {
         return new Promise((resolve, reject) => {
             this._userColl.findOne({ token }, (err, user) => {
@@ -116,6 +120,10 @@ export class PreCompData {
     }
 
     // Charts
+
+    public countChartsAsync = (userId?: Mongo.ObjectId): Promise<number> => {
+        return this._chartColl.count( userId ? { userId } : undefined );
+    }
 
     public getChartsAsync = (userId?: Mongo.ObjectId): Promise<ISong[]> => {
         let query = userId ? { userId } : {};

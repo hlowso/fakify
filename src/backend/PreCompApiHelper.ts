@@ -72,6 +72,12 @@ export class PreCompApiHelper {
             return null;
         }
 
+        let userCount = await this._data.countUsersAsync();
+
+        if (userCount >= 5000) {
+            return null;
+        }
+
         let user = { 
             email: newUser.email, 
             passhash: bcrypt.hashSync(newUser.password, 10), 
@@ -113,6 +119,18 @@ export class PreCompApiHelper {
 
     public createChartAsync = async (chart: ISong, userId: Mongo.ObjectId) => {
         if (!this._validSong(chart)) {
+            return false;
+        }
+
+        let chartCount = await this._data.countChartsAsync();
+
+        if (chartCount >= 5000) {
+            return false;
+        }
+
+        chartCount = await this._data.countChartsAsync(userId);
+
+        if (chartCount >= 100) {
             return false;
         }
 
