@@ -1,3 +1,6 @@
+// TODO: continue to monitor react native / ios's support of AudioContext.
+// If at some point it is supported, a react native app could be made
+
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import * as Util from "../shared/Util";

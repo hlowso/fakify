@@ -6,7 +6,6 @@ import SignUpViewController from '../ViewControllers/SignUpViewController/SignUp
 import LoginViewController from '../ViewControllers/LoginViewController/LoginViewController';
 import Authenticator from "../Authenticator/Authenticator";
 
-
 class AdminRouter extends Component {
     constructor(props) {
         super(props);
@@ -38,15 +37,24 @@ class AdminRouter extends Component {
             );
     }
 
-    renderRouter = () => (
-        <main>
-            <Switch>
-                <Route exact path='/signup' render={() => <SignUpViewController setUser={this.setUser} redirect={this._redirect} />} />
-                <Route exact path='/login' render={() => <LoginViewController setUser={this.setUser} redirect={this._redirect} />} />
-                <Route path='/' render={() => <Authenticator setUser={this.setUser} redirect={this._redirect} />} />                    
-            </Switch>
-        </main>
-    )
+    renderRouter = () => {
+
+        let VCProps = {
+            setUser: this.setUser,
+            redirect: this._redirect,
+            isMobile: this.props.isMobile
+        };
+
+        return (
+            <main>
+                <Switch>
+                    <Route exact path='/signup' render={() => <SignUpViewController {...VCProps} />} />
+                    <Route exact path='/login' render={() => <LoginViewController {...VCProps} />} />
+                    <Route path='/' render={() => <Authenticator {...VCProps} />} />                    
+                </Switch>
+            </main>
+        );
+    }
 
     setUser = userUpdate => {
         this.setState({ user: userUpdate ? {...this.state.user, ...userUpdate} : null });

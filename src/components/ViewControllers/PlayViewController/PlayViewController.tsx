@@ -50,7 +50,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         LIFE CYCLE  
     ******************/
 
-    public componentWillMount() {
+    public componentDidMount() {
         let { SoundActions } = this.props;
         let midiInputId = StorageHelper.getMidiInputId();
         let selectedSongId = StorageHelper.getSelectedSongId();
@@ -78,6 +78,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                     }, this._resetChart);
                 }
             });
+
+        this._onSongListItemClick("5baf1e6da031ab4224a88a56");
     }
 
     public componentWillUnmount() {
@@ -113,13 +115,16 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                 case PlayMode.Improv:
                     report = (sessionManager as ImprovSessionManager).currImprovScore;
                     break;
+
                 case PlayMode.Listening:
                     report = (sessionManager as ListeningSessionManager).currListeningScore;
                     userShouldPlay = (sessionManager as ListeningSessionManager).userShouldPlay;
                     showKeyChanges = false;
                     break;
+
                 default:
                     report = undefined;
+                    break;
             }
         }
 

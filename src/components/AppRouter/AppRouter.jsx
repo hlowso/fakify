@@ -165,6 +165,7 @@ class AppRouter extends Component {
             userPlayer.loader.startLoad(audioContext, font.url, font.variable);
             fontPlayer.loader.startLoad(audioContext, font.url, font.variable);
             
+            // TODO: fix this...
             userPlayer.loader.waitLoad(resolve);
             fontPlayer.loader.waitLoad(resolve);
         });
