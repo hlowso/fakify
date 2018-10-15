@@ -52777,6 +52777,9 @@ class PreCompData {
          * HELPER FUNCTIONS
          */
         // Users
+        this.countUsersAsync = () => {
+            return this._userColl.count();
+        };
         this.getUserByTokenAsync = (token) => {
             return new Promise((resolve, reject) => {
                 this._userColl.findOne({ token }, (err, user) => {
@@ -52828,6 +52831,9 @@ class PreCompData {
             });
         };
         // Charts
+        this.countChartsAsync = (userId) => {
+            return this._chartColl.count(userId ? { userId } : undefined);
+        };
         this.getChartsAsync = (userId) => {
             let query = userId ? { userId } : {};
             return new Promise((resolve, reject) => {
@@ -71173,6 +71179,10 @@ class PreCompApiHelper {
             if (existingUser) {
                 return null;
             }
+            let userCount = yield this._data.countUsersAsync();
+            if (userCount >= 5000) {
+                return null;
+            }
             let user = {
                 email: newUser.email,
                 passhash: __WEBPACK_IMPORTED_MODULE_2_bcryptjs___default.a.hashSync(newUser.password, 10),
@@ -71202,6 +71212,14 @@ class PreCompApiHelper {
         });
         this.createChartAsync = (chart, userId) => __awaiter(this, void 0, void 0, function* () {
             if (!this._validSong(chart)) {
+                return false;
+            }
+            let chartCount = yield this._data.countChartsAsync();
+            if (chartCount >= 5000) {
+                return false;
+            }
+            chartCount = yield this._data.countChartsAsync(userId);
+            if (chartCount >= 100) {
                 return false;
             }
             chart.userId = userId;
