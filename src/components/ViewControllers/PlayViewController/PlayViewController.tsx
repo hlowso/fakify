@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 import MenuBar from "../../views/MenuBar/MenuBar";
-import SongListPanel from "../../views/SongListPanel/SongListPanel";
+// import SongListPanel from "../../views/SongListPanel/SongListPanel";
 import ChartViewer from "../../views/ChartViewer/ChartViewer";
 import TrainingWindow from "../../views/TrainingWindow/TrainingWindow"
 import Keyboard from "../../views/Keyboard/Keyboard";
@@ -78,8 +78,6 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                     }, this._resetChart);
                 }
             });
-
-        this._onSongListItemClick("5baf1e6da031ab4224a88a56");
     }
 
     public componentWillUnmount() {
@@ -99,7 +97,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             playMode
         } = this.state;
 
-        let selectedSongId = selectedSong ? (selectedSong as ISong)._id: null;
+        // let selectedSongId = selectedSong ? (selectedSong as ISong)._id: null;
         let inSession = sessionManager && sessionManager.inSession;
         let sessionIdx = inSession ? sessionManager.sessionIdx : null;
         let currNoteClasses = inSession ? sessionManager.currKeyNoteClasses : [];
@@ -132,13 +130,15 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             <div id="play-view">
                 <div>
                     <MenuBar 
-                        openMIDISettingsModal={() => this.setState({ midiSettingsModalOpen: true })} />
+                        openMIDISettingsModal={() => this.setState({ midiSettingsModalOpen: true })} 
+                        songTitles={songTitles} 
+                        onSongTitleClick={this.onSongListItemClick} />
                 </div>
                 <div className="top-row">
-                    <SongListPanel 
+                    {/* <SongListPanel 
                         songTitles={songTitles}
                         selectedSongId={selectedSongId} 
-                        onSongListItemClick={this._onSongListItemClick} />
+                        onSongListItemClick={this._onSongListItemClick} /> */}
                     <ChartViewer
                         editingMode={false}
                         song={selectedSong as ISong}
@@ -302,7 +302,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         SONG LIST PANEL   
     **********************/
 
-    private _onSongListItemClick = (selectedSongId: string) => {
+    public onSongListItemClick = (selectedSongId: string) => {
         StorageHelper.setSelectedSongId(selectedSongId);
         
         Api.getSongAsync(selectedSongId)

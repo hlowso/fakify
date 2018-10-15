@@ -1,9 +1,12 @@
 import React, { Component } from "react";
-import { Button } from "react-bootstrap";
+import { Button, Glyphicon } from "react-bootstrap";
+import { Search } from "../Search/Search";
 import "./MenuBar.css";
 
 export interface IMenuBarProps {
     openMIDISettingsModal: () => void;
+    songTitles: { [songId: string]: string };
+    onSongTitleClick: (songId: string) => void;
 }
 
 export interface IMenuBarState {
@@ -22,7 +25,11 @@ class MenuBar extends Component<IMenuBarProps, IMenuBarState> {
         let { openMIDISettingsModal } = this.props;
         return (
             <div id="menu-bar">
-                <Button onClick={openMIDISettingsModal} >Midi Settings</Button>
+                <div />
+                <Search songTitles={this.props.songTitles} onSongTitleClick={this.props.onSongTitleClick} />
+                <Button style={{ padding: "3px 6px" }} onClick={openMIDISettingsModal} >
+                    <Glyphicon glyph="cog"  />
+                </Button>
             </div>
         );
     }

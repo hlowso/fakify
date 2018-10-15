@@ -46,6 +46,11 @@ export interface ISong {
     barsBase?: IChartBar[];
 }
 
+export interface ISongTitle {
+    songId: Mongo.ObjectId | string;
+    title: string;
+}
+
 export type Tempo = [number, number];
 export type TimeSignature = [number, number];
 export type NoteName = "C" | "C#|Db" | "D" | "D#|Eb" | "E" | "F" | "F#|Gb" | "G" | "G#|Ab" | "A" | "A#|Bb" | "B|Cb";

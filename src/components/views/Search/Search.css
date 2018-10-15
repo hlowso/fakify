@@ -1,0 +1,21 @@
+#search .matches { 
+    display: flex; 
+    flex-direction: column; 
+    width: 100%;
+    background-color: white;
+    z-index: 1;
+
+    border-left: solid black 1px;
+    border-right: solid black 1px;
+    border-bottom: solid black 1px;
+} 
+
+#search .match {
+    width: 100%; 
+    padding: 5px;
+}
+
+#search .match:hover {
+    background-color: #ddd;
+    cursor: pointer;
+}
