@@ -40,13 +40,17 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                         Util.objectIsEmpty(chart);
 
         if (noChartData) {
-            return (<h2>No chart data</h2>);
+            return (
+                <div id="chart-viewer">
+                    <h2 style={{ textAlign: "center" }}>No chart loaded</h2>
+                </div>
+            );
         }
 
         return (
             <div id="chart-viewer">
                 <header className="chart-header">
-                    {!editingMode && this.renderLeftHandSettings()}
+                    {editingMode && this.renderLeftHandSettings()}
                     {this.renderTitle()}
                 </header>
                 <section className="chart-body">

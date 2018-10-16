@@ -3,7 +3,6 @@ import React, { Component } from "react";
 import MenuBar from "../../views/MenuBar/MenuBar";
 // import SongListPanel from "../../views/SongListPanel/SongListPanel";
 import ChartViewer from "../../views/ChartViewer/ChartViewer";
-import TrainingWindow from "../../views/TrainingWindow/TrainingWindow"
 import Keyboard from "../../views/Keyboard/Keyboard";
 import MidSettingsModal from "../../views/MidiSettingsModal/MidiSettingsModal";
 
@@ -14,7 +13,8 @@ import { SessionManager, ImprovSessionManager, ListeningSessionManager } from ".
 import Chart from "../../../shared/music/Chart";
 
 import "./PlayViewController.css";
-import { ISong, NoteName, PlayMode, IImprovReport, IListeningReport, Tempo, IMusicIdx, IChartBar } from "../../../shared/types";
+import { ISong, NoteName, PlayMode, Tempo, IMusicIdx, IChartBar } from "../../../shared/types";
+import { Dashboard } from "../../views/Dashboard/Dashboard";
 
 export interface IPlayVCProps {
     // TODO: get proper types for all this
@@ -94,10 +94,10 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             songTitles, 
             selectedSong, 
             midiSettingsModalOpen, 
-            playMode
         } = this.state;
 
         // let selectedSongId = selectedSong ? (selectedSong as ISong)._id: null;
+        let chartIsLoaded = !!this._chart;
         let inSession = sessionManager && sessionManager.inSession;
         let sessionIdx = inSession ? sessionManager.sessionIdx : null;
         let currNoteClasses = inSession ? sessionManager.currKeyNoteClasses : [];
@@ -105,26 +105,6 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         let rangeStartNote = inSession ? (sessionManager as ListeningSessionManager).rangeStartNote : MusicHelper.LOWEST_A;
         let rangeEndNote = inSession ? (sessionManager as ListeningSessionManager).rangeEndNote : MusicHelper.HIGHEST_C;
         let showKeyChanges = true;
-        let report: IImprovReport | IListeningReport | undefined;
-        let userShouldPlay;
-
-        if (inSession) {
-            switch (playMode) {
-                case PlayMode.Improv:
-                    report = (sessionManager as ImprovSessionManager).currImprovScore;
-                    break;
-
-                case PlayMode.Listening:
-                    report = (sessionManager as ListeningSessionManager).currListeningScore;
-                    userShouldPlay = (sessionManager as ListeningSessionManager).userShouldPlay;
-                    showKeyChanges = false;
-                    break;
-
-                default:
-                    report = undefined;
-                    break;
-            }
-        }
 
         return (
             <div id="play-view">
@@ -134,11 +114,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                         songTitles={songTitles} 
                         onSongTitleClick={this.onSongListItemClick} />
                 </div>
-                <div className="top-row">
-                    {/* <SongListPanel 
-                        songTitles={songTitles}
-                        selectedSongId={selectedSongId} 
-                        onSongListItemClick={this._onSongListItemClick} /> */}
+                <div className="chart-container" >
                     <ChartViewer
                         editingMode={false}
                         song={selectedSong as ISong}
@@ -147,27 +123,35 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                         recontextualize={this._recontextualize} 
                         resetTempo={this._resetTempo} 
                         onBarClick={this._onBarClick} />
-                    <TrainingWindow  
+                    <Dashboard 
+                        inSession={inSession}
+                        chartIsLoaded={chartIsLoaded}
+                        context={chartIsLoaded ? this._chart.context : undefined}
+                        onKeyChange={this._recontextualize}
+                        tempo={chartIsLoaded ? this._chart.tempo : undefined}
+                        onTempoChange={this._resetTempo}
+                        start={this._startSession}
+                        stop={this._stopSession} />
+                </div>
+                
+                    {/* <TrainingWindow  
                         startSession={this._startSession} 
                         stopSession={this._stopSession} 
                         setPlayMode={this._setPlayMode} 
                         playMode={playMode} 
                         report={report} 
                         userShouldPlay={userShouldPlay}
-                        firstNoteColor={this._firstNoteColor} />
-                </div>
-                <div className="bottom-row">
-                    <Keyboard
-                        showKeyChanges={showKeyChanges} 
-                        depressedKeys={this.props.StateHelper.getCurrentUserKeysDepressed()} 
-                        currentKeyBasePitches={currNoteClasses.map(n => n.basePitch)} 
-                        playUserMidiMessage={this.props.SoundActions.playUserMidiMessage} 
-                        takeIsPlaying={inSession} 
-                        firstNote={firstNote || NaN} 
-                        rangeStartNote={rangeStartNote || MusicHelper.LOWEST_A}
-                        rangeEndNote={rangeEndNote || MusicHelper.HIGHEST_C} 
-                        firstNoteColor={this._firstNoteColor} />
-                </div>
+                        firstNoteColor={this._firstNoteColor} /> */}
+                <Keyboard
+                    showKeyChanges={showKeyChanges} 
+                    depressedKeys={this.props.StateHelper.getCurrentUserKeysDepressed()} 
+                    currentKeyBasePitches={currNoteClasses.map(n => n.basePitch)} 
+                    playUserMidiMessage={this.props.SoundActions.playUserMidiMessage} 
+                    takeIsPlaying={inSession} 
+                    firstNote={firstNote || NaN} 
+                    rangeStartNote={rangeStartNote || MusicHelper.LOWEST_A}
+                    rangeEndNote={rangeEndNote || MusicHelper.HIGHEST_C} 
+                    firstNoteColor={this._firstNoteColor} />
 
                 <MidSettingsModal 
                     SoundActions={this.props.SoundActions} 
@@ -197,9 +181,9 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         this.props.SoundActions.killTake();
     }
 
-    private _setPlayMode = (playMode: PlayMode) => {
-        this.setState({ playMode });
-    }
+    // private _setPlayMode = (playMode: PlayMode) => {
+    //     this.setState({ playMode });
+    // }
 
     /************
         MUSIC

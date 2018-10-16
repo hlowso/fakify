@@ -1,0 +1,20 @@
+#dashboard {
+    display: flex;
+    justify-content: space-around;
+    position: fixed;
+    bottom: 160px;
+    background-color: #ddd;
+    min-width: 760px;
+
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-top: solid #222 1px;
+    border-left: solid #222 1px;
+    border-right: solid #222 1px;
+}
+
+#dashboard .play-button {
+    margin-top: auto;
+    margin-bottom: auto;
+    height: 30px;
+}

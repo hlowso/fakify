@@ -4,10 +4,15 @@
     height: 100%;
 }
 
-.top-row {
-    display: flex;
-}
+#play-view .chart-container { 
+    display: flex; 
+    width: 740px; 
+    min-height: 385px;
+    background-color: #ddd;
+    flex-direction: column; 
+    align-self: center; 
+    align-items: center; 
 
-.bottom-row {
-    justify-self: flex-end;
+    border-right: solid #222 1px;
+    border-left: solid #222 1px;
 }
