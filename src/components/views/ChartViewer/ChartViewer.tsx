@@ -49,8 +49,8 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
         return (
             <div id="chart-viewer">
-                <header className="chart-header">
-                    {editingMode && this.renderLeftHandSettings()}
+                <header className="chart-header" style={{ justifyContent: editingMode ? "space-between" : "center" }} >
+                    {false && this.renderLeftHandSettings()}
                     {this.renderTitle()}
                 </header>
                 <section className="chart-body">
@@ -77,12 +77,12 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                 </form>
             )
             : (
-                <h1 
+                <span 
                     className="song-title"
                     onClick={editingMode ? () => this.setState({ editingTitle: true }) : undefined}
                 >
                     {(song as ISong).title}
-                </h1>
+                </span>
             )
         );
     }
@@ -116,7 +116,6 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
             bars.forEach((bar, i) => {
                 let chordNameElements = [];
-                let beatElements = [];
                 let isCurrentlyPlayingBar = sessionIdx && sessionIdx.barIdx === i;
                 let isWithinRange = rangeStartIdx <= i &&
                                     i <= rangeEndIdx;
@@ -157,12 +156,6 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                             {displayedChordBase}{displayedChordShape}
                         </span>
                     );
-
-                    beatElements.push(
-                        <span className="bar beat" key={beatIdx}>
-                            {beatIdx + 1}
-                        </span>
-                    );
                 }
 
                 let precedingAddBarBox = (
@@ -194,22 +187,26 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                                 Edit Bar
                             </div>
                         )
-                        : [
-                            <div className="bar bar-chord-group" key={0}>
-                                {useDivisionSign
-                                    ? (
-                                        <div className="bar division-sign">
-                                            %
-                                        </div>
-                                    )
-                                    : chordNameElements
-                                }
-                            </div>,
-                            <div className="bar bar-beat-group" key={1}>
-                                {beatElements}
-                            </div>
-                        ]
-                );  
+                        : 
+                        <div className="bar bar-chord-group" key={0}>
+                            {useDivisionSign
+                                ? (
+                                    <div className="bar division-sign">
+                                        %
+                                    </div>
+                                )
+                                : chordNameElements
+                            }
+                        </div>
+                );
+                
+                let doubleLineStart = (
+                    <div style={{ height: "100%", left: 0, width: 5, borderRight: "solid black 1px" }} />
+                );
+
+                let doubleLineEnd = (
+                    <div style={{ height: "100%", right: 0, width: 5, borderLeft: "solid black 1px" }} />
+                );
 
                 let barElement = (
                     <div 
@@ -219,7 +216,9 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                         onMouseEnter={() => this._onBarEnter(i)}
                         onMouseLeave={this._onBarLeave}
                     >
+                        {i === 0 && doubleLineStart}
                         {barElementContent}
+                        {i === bars.length - 1 && doubleLineEnd}
                     </div>
                 );
                 
