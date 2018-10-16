@@ -56,7 +56,7 @@ export class PreCompData {
     // Users
 
     public countUsersAsync = (): Promise<number> => {
-        return this._userColl.count();
+        return this._userColl.countDocuments();
     }
 
     public getUserByTokenAsync = (token: string): Promise<IUser> => {
@@ -122,7 +122,7 @@ export class PreCompData {
     // Charts
 
     public countChartsAsync = (userId?: Mongo.ObjectId): Promise<number> => {
-        return this._chartColl.count( userId ? { userId } : undefined );
+        return this._chartColl.countDocuments( userId ? { userId } : undefined );
     }
 
     public getChartsAsync = (userId?: Mongo.ObjectId): Promise<ISong[]> => {
