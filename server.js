@@ -52758,6 +52758,7 @@ class PreCompData {
     constructor(server, user, password, dbName) {
         this.connectAsync = () => {
             return new Promise((resolve, reject) => {
+                console.log(this.connectionUrl);
                 __WEBPACK_IMPORTED_MODULE_0_mongodb__["MongoClient"].connect(this.connectionUrl, { useNewUrlParser: true }, (err, client) => {
                     if (err !== null) {
                         reject(err);
@@ -52778,7 +52779,7 @@ class PreCompData {
          */
         // Users
         this.countUsersAsync = () => {
-            return this._userColl.count();
+            return this._userColl.countDocuments();
         };
         this.getUserByTokenAsync = (token) => {
             return new Promise((resolve, reject) => {
@@ -52832,7 +52833,7 @@ class PreCompData {
         };
         // Charts
         this.countChartsAsync = (userId) => {
-            return this._chartColl.count(userId ? { userId } : undefined);
+            return this._chartColl.countDocuments(userId ? { userId } : undefined);
         };
         this.getChartsAsync = (userId) => {
             let query = userId ? { userId } : {};

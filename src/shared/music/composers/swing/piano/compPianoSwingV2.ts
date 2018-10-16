@@ -49,9 +49,9 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
     // previousVoicing accordingly
     if (Array.isArray(prevMusic) && prevMusic.length > 0 && Math.random() < INITIAL_REFERRAL_TO_PREVIOUS_MUSIC_ODDS) {
 
-        let lastStroke: IStroke = { notes: [], durationInSubbeats: NaN, velocity: NaN };
+        let lastStroke: IStroke | undefined;
 
-        for (let barIdx = prevMusic.length - 1; barIdx > -1; barIdx --) {
+        for (let barIdx = chart.rangeEndIdx; barIdx >= chart.rangeStartIdx; barIdx --) {
 
             let lastMusicBar = prevMusic[barIdx];
 
@@ -62,9 +62,11 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
                     lastStroke = lastMusicBar[subbeatIdx][0];
                 }
 
-                subbeatIdx = parseInt(subbeatIdx as string, undefined);
-                absSubbeatIdx = subbeatIdx + lastStroke.durationInSubbeats - (bars[bars.length - 1].durationInSubbeats as number);
-                previousVoicing = lastStroke.notes;
+                if (lastStroke) {
+                    subbeatIdx = parseInt(subbeatIdx as string, undefined);
+                    absSubbeatIdx = subbeatIdx + lastStroke.durationInSubbeats - (bars[bars.length - 1].durationInSubbeats as number);
+                    previousVoicing = lastStroke.notes;
+                }
 
                 break;
             }
@@ -90,7 +92,7 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
         currIdxIsOffBeat = Util.mod(absSubbeatIdx, 3) === 2;
         subbeatWait = currIdxIsOffBeat ? 1 : 2; 
 
-        while (subbeatWait < maxSubbeatWait) {
+        while (subbeatWait <= maxSubbeatWait) {
             waitChoices.push([subbeatWait, Math.max(currWeight, 1)]);
             currWeight += (subbeatWait < 4) ? 1 : -1;
             subbeatWait += (
@@ -189,7 +191,7 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
 
     return {
         instrument: "piano",
-        music: music.filter((bar, idx) => chart.rangeStartIdx <= idx && idx <= chart.rangeEndIdx)
+        music
     };
 };
 

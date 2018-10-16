@@ -60,7 +60,7 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
         let subbeatIdx: string | number;
         let lastBar = {};
 
-        for (let barIdx = prevMusic.length - 1; barIdx > -1; barIdx --) {
+        for (let barIdx = chart.rangeEndIdx; barIdx >= chart.rangeStartIdx; barIdx --) {
             lastBar = prevMusic[barIdx];
         }
 
@@ -357,6 +357,6 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
 
     return {
         instrument: "doubleBass",
-        music: music.filter((bar, idx) => chart.rangeStartIdx <= idx && idx <= chart.rangeEndIdx)
+        music
     }
 }
