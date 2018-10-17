@@ -44,6 +44,11 @@ export class Chord extends Domain {
                 extension[9] = "2";
                 return { ...infoBase, extension };
 
+            case ChordShape.Majb5:
+                infoBase = Chord.shapeToInfo(ChordShape.Maj);
+                extension[5] = "T";
+                return { ...infoBase, extension };
+
             case ChordShape.Maj7b5:
                 infoBase = Chord.shapeToInfo(ChordShape.Maj7);
                 extension[5] = "T";
