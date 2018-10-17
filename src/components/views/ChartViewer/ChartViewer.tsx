@@ -4,7 +4,7 @@ import * as Util from "../../../shared/Util";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
 import { Chord } from "../../../shared/music/domain/ChordClass";
 import Chart from "../../../shared/music/Chart";
-import { ISong, IMusicIdx, NoteName, Tempo, ChordName, PresentableChordShape } from "../../../shared/types";
+import { ISong, IMusicIdx, NoteName, Tempo, ChordName, PresentableChordShape, IChartBar } from "../../../shared/types";
 import "./ChartViewer.css";
 
 export interface IChartViewerProps {
@@ -54,7 +54,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                     {this.renderTitle()}
                 </header>
                 <section className="chart-body">
-                    {this.renderProgression()}
+                    {this.renderProgressionLines()}
                 </section>
             </div>
         );
@@ -103,16 +103,18 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
      * PROGRESSION
      */
 
-    public renderProgression = (): JSX.Element[] => {
+    public renderProgressionLines = (): JSX.Element[] => {
         let { chart, sessionIdx, editingMode } = this.props;
         let { bars, rangeStartIdx, rangeEndIdx } = chart as Chart;
         let { hoveredBarIdx, precedingInsertBarIdx, followingInsertBarIdx } = this.state;
-        let renderBars: JSX.Element[] = [];
+        let lines: JSX.Element[] = [];
+        let lineBars: JSX.Element[] = [];
 
         if (bars && bars.length > 0) {
             let baseKey = bars[0].chordSegments[0].key;
             let chordName: ChordName;
             let prevChordName: ChordName;
+            let prevBar: IChartBar | undefined;
 
             bars.forEach((bar, i) => {
                 let chordNameElements = [];
@@ -188,7 +190,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                             </div>
                         )
                         : 
-                        <div className="bar bar-chord-group" key={0}>
+                        <div className="bar bar-chord-group" style={{ flexGrow: 20, justifyContent: useDivisionSign ? "center" : "space-between" }} key={0}>
                             {useDivisionSign
                                 ? (
                                     <div className="bar division-sign">
@@ -200,12 +202,19 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                         </div>
                 );
                 
-                let doubleLineStart = (
-                    <div style={{ height: "100%", left: 0, width: 5, borderRight: "solid black 1px" }} />
+                let doubleLineStart = i === 0 && (
+                    <div style={{ flexGrow: 1, height: "100%", left: 0, width: 5, borderRight: "solid black 2px", borderLeft: "solid black 1px" }} />
                 );
 
-                let doubleLineEnd = (
-                    <div style={{ height: "100%", right: 0, width: 5, borderLeft: "solid black 1px" }} />
+                let doubleLineEnd = i === bars.length - 1 && (
+                    <div style={{ flexGrow: 1, height: "100%", right: 0, width: 5, borderLeft: "solid black 2px", borderRight: "solid black 1px" }} />
+                );
+
+                let timeSignatureElement = (!prevBar || !Util.shallowEqual(prevBar.timeSignature, bar.timeSignature)) && (
+                    <div className="time-signature" >
+                        <span>{bar.timeSignature[0]}</span>
+                        <span>{bar.timeSignature[1]}</span>
+                    </div>
                 );
 
                 let barElement = (
@@ -215,31 +224,52 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                         onClick={() => this._onBarClick(i)}
                         onMouseEnter={() => this._onBarEnter(i)}
                         onMouseLeave={this._onBarLeave}
+                        style={{ borderRight: i % 4 === 3 ? undefined : "solid black 1px" }}
                     >
-                        {i === 0 && doubleLineStart}
+                        {doubleLineStart}
+                        {timeSignatureElement}
                         {barElementContent}
-                        {i === bars.length - 1 && doubleLineEnd}
+                        {doubleLineEnd}
                     </div>
                 );
                 
 
                 if (precedingAddBarBox) {
-                    renderBars.push(precedingAddBarBox);
+                    lineBars.push(precedingAddBarBox);
                 }
 
-                renderBars.push(barElement);
+                lineBars.push(barElement);
 
                 if (followingAddBarBox) {
-                    renderBars.push(followingAddBarBox)
+                    lineBars.push(followingAddBarBox)
                 }
+
+                if (i % 4 === 3) {
+                    lines.push(this.renderProgressionLine(lineBars));
+                    lineBars = [];
+                }
+
+                prevBar = bar;
             });
         }
 
         if (editingMode) {
-            renderBars.push(this.renderAddBarBox(bars.length));
+            lineBars.push(this.renderAddBarBox(bars.length));
         }
 
-        return renderBars
+        if (lineBars.length > 0) {
+            lines.push(this.renderProgressionLine(lineBars));
+        }
+
+        return lines;
+    }
+
+    public renderProgressionLine(bars: JSX.Element[]) {
+        return (
+            <div className="line" >
+                {bars}
+            </div>
+        );
     }
 
     public renderAddBarBox = (barIdx: number, preceding?: boolean) => (

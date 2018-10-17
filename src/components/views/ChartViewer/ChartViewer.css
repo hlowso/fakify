@@ -4,13 +4,29 @@
     width: 700px;
     min-height: 385px;
     background-color: white;
+    border-left: solid #222 1px;
+    border-right: solid #222 1px;
     /* border-right: solid white 1px; */
 }
 
 #chart-viewer .chart-header {
     display: flex;
     height: 20%;
-    border-right: solid black 1px;
+}
+
+#chart-viewer .song-title {
+    font-size: 300%;
+    margin: 10px;
+    text-decoration: underline;
+}
+
+#chart-viewer .line {
+    display: flex;
+    margin-bottom: 10px;
+    height: 50px;
+    width: 100%;
+
+    border-top: solid black 1px;    
     border-bottom: solid black 1px;
 }
 
@@ -31,17 +47,14 @@
 
 #chart-viewer .chart-body {
     display: flex;
-    flex-wrap: wrap;
     height: 80%;
+    width: 100%;
+    flex-direction: column;
 }
 
 #chart-viewer .bar-container {
     display: flex;
     width: 25%;
-    height: 100px;
-    border-right: solid black 1px;
-    border-bottom: solid black 1px;
-
     cursor: pointer;
 }
 
@@ -69,6 +82,7 @@
 
 #chart-viewer .chord-name {
     height: 20px;
+    margin: 5px;
 }
 
 #chart-viewer .division-sign {
@@ -97,9 +111,8 @@
 
 #chart-viewer .bar-chord-group {
     display: flex;
-    justify-content: space-around;
     padding-top: 5px;
-    font-size: 115%;
+    font-size: 150%;
 }
 
 #chart-viewer .bar-beat-group {
@@ -112,7 +125,14 @@
     border-bottom: solid black 1px;
 }
 
-#chart-viewer .song-title {
-    font-size: 300%;
-    margin: 10px;
+#chart-viewer .time-signature {
+    display: flex;
+    flex-direction: column;
+    font-size: 150%;
+    padding-left: 2px;
+}
+
+#chart-viewer .time-signature span {
+    line-height: 20px;
+    height: 20px;
 }

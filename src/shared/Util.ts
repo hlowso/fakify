@@ -22,6 +22,10 @@ export const objectIsEmpty = (object: any) => {
     return Object.keys(object).length === 0;
 };
 
+export function shallowEqual(A: any, B: any) {
+    return JSON.stringify(A) === JSON.stringify(B);
+};
+
 export const waitFor = (getUpdate: () => boolean, rate: number) => {
     return new Promise((resolve, reject) => {
         (function check() {
