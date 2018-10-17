@@ -87,7 +87,7 @@ class Chart {
     }
 
     public static validChordSegments = (chordSegments: IChordSegment[], timeSignature: TimeSignature) => {
-        if (!Array.isArray(chordSegments) || chordSegments.length === 0 || chordSegments.length > timeSignature[1]) {
+        if (!Array.isArray(chordSegments) || chordSegments.length === 0 || chordSegments.length > timeSignature[0]) {
             return false;
         }
 
@@ -111,8 +111,7 @@ class Chart {
 
             if (i === 0 && beatIdx !== 0) {
                 return false;
-            } else if (beatIdx <= prevBeatIdx || beatIdx >= timeSignature[1]) {
-
+            } else if (beatIdx <= prevBeatIdx || beatIdx >= timeSignature[0]) {
                 return false;
             }
 

@@ -13758,6 +13758,7 @@ module.exports = Db;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* unused harmony export shallowEqual */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types__ = __webpack_require__(65);
 
 // export const redirect = (route: string) => {
@@ -13783,6 +13784,10 @@ const objectIsEmpty = (object) => {
 };
 /* unused harmony export objectIsEmpty */
 
+function shallowEqual(A, B) {
+    return JSON.stringify(A) === JSON.stringify(B);
+}
+;
 const waitFor = (getUpdate, rate) => {
     return new Promise((resolve, reject) => {
         (function check() {
@@ -73225,7 +73230,7 @@ Chart.validRelativeChordName = (chordName) => {
     return true;
 };
 Chart.validChordSegments = (chordSegments, timeSignature) => {
-    if (!Array.isArray(chordSegments) || chordSegments.length === 0 || chordSegments.length > timeSignature[1]) {
+    if (!Array.isArray(chordSegments) || chordSegments.length === 0 || chordSegments.length > timeSignature[0]) {
         return false;
     }
     let prevBeatIdx = -1;
@@ -73244,7 +73249,7 @@ Chart.validChordSegments = (chordSegments, timeSignature) => {
         if (i === 0 && beatIdx !== 0) {
             return false;
         }
-        else if (beatIdx <= prevBeatIdx || beatIdx >= timeSignature[1]) {
+        else if (beatIdx <= prevBeatIdx || beatIdx >= timeSignature[0]) {
             return false;
         }
         prevBeatIdx = beatIdx;
@@ -73548,6 +73553,10 @@ Chord.shapeToInfo = (shape) => {
         case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Add9:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj);
             extension[9] = "2";
+            return Object.assign({}, infoBase, { extension });
+        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Majb5:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj);
+            extension[5] = "T";
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj7b5:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj7);
