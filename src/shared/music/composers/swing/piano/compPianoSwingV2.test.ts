@@ -3,6 +3,7 @@ import Chart from "../../../Chart";
 import Score from "../../../Score";
 import _251_bars from "../../../../test-data/bars-251";
 import _251_multichord_bars from "../../../../test-data/bars-251-multichord";
+import _4_chord_bar from "../../../../test-data/bars-4-chords";
 import C_Blues_bars from "../../../../test-data/bars-c-blues";
 import barsJustForFun from "../../../../test-data/bars-just-for-fun";
 import { compPianoSwingV2 } from "./compPianoSwingV2";
@@ -12,14 +13,17 @@ const _251_chart = new Chart(() => {}, _251_bars as IChartBar[], "A#|Bb", [ 120,
 const chart251Multi = new Chart(() => {}, _251_multichord_bars as IChartBar[], "B|Cb", [ 120, 4 ], Feel.Swing);
 const C_Blues_chart = new Chart(() => {}, C_Blues_bars as IChartBar[], "C", [ 120, 4 ], Feel.Swing);
 const chartJustForFun = new Chart(() => {}, barsJustForFun as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
+const chart4Chords = new Chart(() => {}, _4_chord_bar as IChartBar[], "G", [ 120, 4 ], Feel.Swing);
 
 test("generates at least 1 voicing per chord stretch", () => {
-	let testRuns = 50;
+	let testRuns = 1;
 	let successfulRuns = 0;
 
 	for (let i = 0; i < testRuns; i ++) {
-		let pass = compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings(_251_chart);
-		successfulRuns += pass ? 1 : 0;
+		// let pass1 = compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings(_251_chart);
+		let pass2 = compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings(chart4Chords);
+		// successfulRuns += pass1 ? 1 : 0;
+		successfulRuns += pass2 ? 1 : 0;
 	}
 
 	expect(successfulRuns).toBe(testRuns);
@@ -85,6 +89,7 @@ const ascensionTest = (chart: Chart, testRuns = 100) => {
 const compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings = (chart: Chart) => {
 	let { chordStretches, bars } = chart;
 	let { music } = compPianoSwingV2(chart);
+	
 	let absChordStretchSubbeatIndices = [0];
 	let absMusicSubbeatIndices = [-1];
 	let k = 0;

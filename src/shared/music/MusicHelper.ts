@@ -225,8 +225,10 @@ const _adjustBarsSwingFeel = (bars: IChartBar[]): IChartBar[] => {
             let { chordSegments } =  adjustedBars[barIdx];
             
             let segmentEndIdx = (
-                barIdx === stretchEnd.barIdx && barIdx !== stretchStart.barIdx
-                    ? stretchEnd.segmentIdx - 1
+                barIdx === stretchEnd.barIdx
+                    ? (barIdx === stretchStart.barIdx && stretchEnd.segmentIdx < stretchStart.segmentIdx) 
+                        ? chordSegments.length - 1
+                        : stretchEnd.segmentIdx - 1
                     : chordSegments.length - 1
             );
             
