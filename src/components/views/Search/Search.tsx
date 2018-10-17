@@ -37,7 +37,7 @@ export class Search extends Component<ISearchProps, ISearchState> {
         });
 
         return (
-            <div id="search" style={{ display: "flex", flexDirection: "column", width: "50%", marginTop: "auto" }} >
+            <div id="search" style={{ display: "flex", flexDirection: "column", width: "40%" }} >
                 <InputGroup style={{ width: "100%" }} >
                     <FormControl 
                         placeholder="Search for a chart" 

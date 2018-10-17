@@ -55,6 +55,7 @@
 #chart-viewer .bar-container {
     display: flex;
     width: 25%;
+    opacity: 0.3;
     cursor: pointer;
 }
 
@@ -73,11 +74,11 @@
 }
 
 #chart-viewer .within-range {
-    background-color: rgb(181, 213, 255);
+    opacity: 1;
 }
 
 #chart-viewer .current-bar {
-    background-color: cornflowerblue;
+    background-color: rgb(181, 213, 255);
 }
 
 #chart-viewer .chord-name {

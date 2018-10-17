@@ -27,7 +27,7 @@ class MenuBar extends Component<IMenuBarProps, IMenuBarState> {
             <div id="menu-bar">
                 <div style={{ height: 20, width: 28 }} />
                 <Search songTitles={this.props.songTitles} onSongTitleClick={this.props.onSongTitleClick} />
-                <Button style={{ padding: "3px 6px" }} onClick={openMIDISettingsModal} >
+                <Button style={{ height: 34, padding: "3px 6px" }} onClick={openMIDISettingsModal} >
                     <Glyphicon glyph="cog"  />
                 </Button>
             </div>
