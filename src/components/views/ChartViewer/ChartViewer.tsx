@@ -172,6 +172,8 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                         : undefined
                 );
 
+                let hoveredBarIsInRange = Number.isInteger(hoveredBarIdx as number) && (hoveredBarIdx as number) >= rangeStartIdx && (hoveredBarIdx as number) <= rangeEndIdx;
+
                 let barClasses = Cx({ 
                     "bar": true,
                     "bar-container": true, 
@@ -179,7 +181,12 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                     "current-bar": isCurrentlyPlayingBar && !editingMode,
                     "add-box-precedes": editingMode && Util.mod(i - 1, 4) !== 3 && (!!precedingAddBarBox || followingInsertBarIdx === i),
                     "add-box-follows": editingMode && (!!followingAddBarBox || precedingInsertBarIdx === i + 1),
-                    "shortened": editingMode && Util.mod(i, 4) === 3
+                    "shortened": editingMode && Util.mod(i, 4) === 3,
+                    "will-be-within-range": !editingMode && Number.isInteger(hoveredBarIdx as number) && (
+                        hoveredBarIsInRange 
+                            ? hoveredBarIdx === i
+                            : (Math.min(hoveredBarIdx as number, rangeStartIdx) <= i && i <= Math.max(hoveredBarIdx as number, rangeEndIdx))
+                    )
                 });
 
                 let barElementContent = (
@@ -224,7 +231,10 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                         onClick={() => this._onBarClick(i)}
                         onMouseEnter={() => this._onBarEnter(i)}
                         onMouseLeave={this._onBarLeave}
-                        style={{ borderRight: i % 4 === 3 ? undefined : "solid black 1px" }}
+                        style={{ 
+                            borderRight: i % 4 === 3 || i === rangeStartIdx - 1 ? undefined : "solid black 1px",
+                            borderLeft: i === rangeStartIdx && i !== 0 ? "solid black 1px" : undefined 
+                        }}
                     >
                         {doubleLineStart}
                         {timeSignatureElement}

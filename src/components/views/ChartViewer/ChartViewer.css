@@ -55,8 +55,16 @@
 #chart-viewer .bar-container {
     display: flex;
     width: 25%;
-    opacity: 0.3;
+    opacity: 0.2;
     cursor: pointer;
+}
+
+#chart-viewer .bar-container.will-be-within-range {
+    background-color: #aaa;
+}
+
+#chart-viewer .bar-container.will-be-within-range.within-range {
+    background-color: #eee;
 }
 
 #chart-viewer .bar-container.add-box-precedes,
@@ -78,7 +86,7 @@
 }
 
 #chart-viewer .current-bar {
-    background-color: rgb(181, 213, 255);
+    background-color: rgb(181, 213, 255) !important;
 }
 
 #chart-viewer .chord-name {
