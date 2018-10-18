@@ -275,3 +275,62 @@ export function voicingContainsNoClusters(voicing: number[]) {
 
     return true;
 }
+
+/**
+ * pickClosestKey
+ * @param prevKey a note name representing the target key
+ * @param keys an array of note names from which to choose the closest to prevKey
+ * @returns the closest key in keys to prevKey
+ */
+
+export function pickClosestKey(prevKey: NoteName | RelativeNoteName, keys: (NoteName | RelativeNoteName)[]): NoteName | RelativeNoteName | undefined {
+
+    /* VALIDATIONS */
+
+    let errMsg = 'invalid arguments passed to pickClosestKey:';
+
+    if (typeof prevKey !== "string" || !Array.isArray(keys) || keys.length === 0 ) {
+        console.error(errMsg, prevKey, keys);
+        return;
+    }
+
+    let relative: boolean;
+
+    if (NOTE_NAMES.indexOf(prevKey as NoteName) !== -1) {
+        relative = false;
+
+        if (keys.some(k => NOTE_NAMES.indexOf(k as NoteName) === -1)) {
+            console.error(errMsg, keys);
+            return;
+        }
+
+    } else if (RELATIVE_SCALE.indexOf(prevKey as RelativeNoteName) !== -1) {
+        relative = true;
+
+        if (keys.some(k => RELATIVE_SCALE.indexOf(k as RelativeNoteName)  === -1)) {
+            console.error(errMsg, keys);
+            return;
+        }
+
+    } else {
+        console.error(errMsg, prevKey);
+        return;
+    }
+
+    /* ALGORITHM */
+
+    let noteSet: (NoteName | RelativeNoteName)[] = relative ? RELATIVE_SCALE : NOTE_NAMES;
+    let prevKeyBaseIdx = noteSet.indexOf(prevKey);
+    let keyBaseIndices = keys.map(k => noteSet.indexOf(k));
+
+    let prevScale = C_NOTE_NAMES_INDICES.map(p => noteSet[Util.mod(prevKeyBaseIdx + p, 12)]);
+    let keyScales = keyBaseIndices.map(baseIdx => C_NOTE_NAMES_INDICES.map(p => noteSet[Util.mod(baseIdx + p, 12)]));
+
+    let distances: Array<[ NoteName | RelativeNoteName, number ]> = keyScales.map((scale, idx) => {
+        return [ keys[idx], scale.filter(n => prevScale.indexOf(n) !== -1).length ] as [ NoteName | RelativeNoteName, number ];
+    });
+
+    distances.sort((a, b) => a[1] - b[1]);
+
+    return distances[0][0];
+}
