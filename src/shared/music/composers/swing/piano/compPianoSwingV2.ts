@@ -1,6 +1,6 @@
 import * as Util from "../../../../Util";
 import { Chord } from "../../../domain/ChordClass";
-import { ChordName, Tempo, IMusicBar, IPart, IMusicIdx, IChordSegment, IStroke, IChordStretch } from "../../../../types";
+import { ChordName, Tempo, IMusicBar, IPart, IMusicIdx, IChordSegment, /*IStroke,*/ IChordStretch } from "../../../../types";
 import Chart from "../../../Chart";
 
 const VEL_FACTOR = 0.6;
@@ -8,7 +8,7 @@ const DURATION_SPREAD_ROOT = 3;
 const DURATION_SPREAD_FACTOR = Math.log2(DURATION_SPREAD_ROOT);
 const MAX_TEMPO = 210;
 const VOICING_TARGET = 60;
-const INITIAL_REFERRAL_TO_PREVIOUS_MUSIC_ODDS = 0.75;
+// const INITIAL_REFERRAL_TO_PREVIOUS_MUSIC_ODDS = 0.75;
 const NUDGE_WITHIN_RANGE_ODDS = 0.8;
 const VOICING_DEVIATION_LIMIT = 13;
 
@@ -47,45 +47,58 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
 
     // If there is previous music, we can set the starting values of absSubbeatIdx and 
     // previousVoicing accordingly
-    if (Array.isArray(prevMusic) && prevMusic.length > 0 && Math.random() < INITIAL_REFERRAL_TO_PREVIOUS_MUSIC_ODDS) {
 
-        let lastStroke: IStroke | undefined;
+    // TODO: uncomment the block below which consults the prevMusic array passed in
+    // to create initial settings
 
-        for (let barIdx = chart.rangeEndIdx; barIdx >= chart.rangeStartIdx; barIdx --) {
+    // if (Array.isArray(prevMusic) && prevMusic.length > 0 && Math.random() < INITIAL_REFERRAL_TO_PREVIOUS_MUSIC_ODDS) {
 
-            let lastMusicBar = prevMusic[barIdx];
+    //     let lastStroke: IStroke | undefined;
+    //     let subbeatDurationFromTopOfLastPlayedBarToTopOfChart = 0;
 
-            if (!Util.objectIsEmpty(lastMusicBar)) {
+    //     for (let barIdx = chart.rangeEndIdx; barIdx >= chart.rangeStartIdx; barIdx --) {
 
-                let subbeatIdx;
-                for (subbeatIdx in lastMusicBar) {
-                    lastStroke = lastMusicBar[subbeatIdx][0];
-                }
+    //         subbeatDurationFromTopOfLastPlayedBarToTopOfChart += bars[barIdx].durationInSubbeats as number;
 
-                if (lastStroke) {
-                    subbeatIdx = parseInt(subbeatIdx as string, undefined);
-                    absSubbeatIdx = subbeatIdx + lastStroke.durationInSubbeats - (bars[bars.length - 1].durationInSubbeats as number);
-                    previousVoicing = lastStroke.notes;
-                }
+    //         let lastMusicBar = prevMusic[barIdx];
 
-                break;
-            }
-        }
-    }
+    //         if (!Util.objectIsEmpty(lastMusicBar)) {
+
+    //             let subbeatIdx;
+    //             for (subbeatIdx in lastMusicBar) {
+    //                 lastStroke = lastMusicBar[subbeatIdx][0];
+    //             }
+
+    //             if (lastStroke) {
+    //                 subbeatIdx = parseInt(subbeatIdx as string, undefined);
+    //                 absSubbeatIdx = subbeatIdx + lastStroke.durationInSubbeats - subbeatDurationFromTopOfLastPlayedBarToTopOfChart;
+    //                 previousVoicing = lastStroke.notes;
+    //             }
+
+    //             break;
+    //         }
+
+    //     }
+
+    //     if (absSubbeatIdx <= -1) {
+    //         absSubbeatIdx = -1;
+    //     } else {
+    //         prevMusicIdx = musicIdx = chart.absSubbeatIdxToMusicIdx(absSubbeatIdx) as IMusicIdx; 
+    //     }
+    // }
 
     while (musicIdx) {        
         currTwoBarDuration = (bars[musicIdx.barIdx].durationInSubbeats as number) + (bars[Util.mod(musicIdx.barIdx + 1, bars.length)].durationInSubbeats as number);
         remainderOfCurrStretchPlusNextStretch = remainderOfCurrStretch + (chordStretches[Util.mod(stretchIdx + 1, chordStretches.length)].durationInSubbeats as number);
         
-        if (currTwoBarDuration < remainderOfCurrStretchPlusNextStretch) {
+        // Subtract 2 from remainder of curr stretch plus next because the next voicing
+        // must land at or before the second last subbeat of the next stretch in order
+        // for it to count for that stretch
+        if (currTwoBarDuration < remainderOfCurrStretchPlusNextStretch - 2) {
             maxSubbeatWait = currTwoBarDuration;
         } else {
-            maxSubbeatWait = remainderOfCurrStretchPlusNextStretch;
+            maxSubbeatWait = remainderOfCurrStretchPlusNextStretch - 2;
         }
-
-        // Subbtract 1 from the max subbeat wait, because if the stroke lands on 
-        // the last subbeat of a segment, it's chord will be that of the next segment
-        maxSubbeatWait --;
 
         waitChoices = [];
         currWeight = 1;
@@ -110,11 +123,11 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
         musicIdx = chart.absSubbeatIdxToMusicIdx(absSubbeatIdx) as IMusicIdx; 
         
         if (prevMusicIdx) {
-            maxStrokeDurationBars[prevMusicIdx.barIdx][prevMusicIdx.subbeatIdx as number] = Math.min(subbeatWait, remainderOfCurrStretch + 3);
+            maxStrokeDurationBars[prevMusicIdx.barIdx][prevMusicIdx.subbeatIdx as number] = subbeatWait;
         }
 
         remainderOfCurrStretch -= subbeatWait;
-        if (remainderOfCurrStretch < 0) {
+        if (remainderOfCurrStretch <= 0) {
             stretchIdx ++;
             remainderOfCurrStretch += (chordStretches[Util.mod(stretchIdx, chordStretches.length)].durationInSubbeats as number);
         } 

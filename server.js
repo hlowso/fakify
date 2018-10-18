@@ -72801,7 +72801,7 @@ module.exports = __webpack_require__(287);
 
 
 class Chart {
-    constructor(externalUpdate, barsBase = [], context, tempo, feel, rangeStartIdx = 0, rangeEndIdx = barsBase.length) {
+    constructor(externalUpdate, barsBase = [], context, tempo, feel, rangeStartIdx = 0, rangeEndIdx = barsBase.length, id) {
         this.forEachBarInRange = (callback) => {
             for (let barIdx = this._rangeStartIdx; barIdx <= this._rangeEndIdx; barIdx++) {
                 callback(this._bars[barIdx], barIdx);
@@ -73074,6 +73074,7 @@ class Chart {
                 this._externalUpdate();
             }
         };
+        this._songId = id;
         this._addKeysToBars(barsBase, !context);
         // If a context has been provided, assume that this Chart is being
         // used in play mode
@@ -73101,6 +73102,9 @@ class Chart {
     /**
      * GETTERS
      */
+    get songId() {
+        return this._songId;
+    }
     get bars() {
         return this._bars;
     }

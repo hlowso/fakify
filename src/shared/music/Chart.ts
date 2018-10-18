@@ -168,7 +168,7 @@ class Chart {
         tempo?: Tempo,
         feel?: Feel,
         rangeStartIdx = 0, 
-        rangeEndIdx = barsBase.length,
+        rangeEndIdx = barsBase.length - 1,
         id?: Mongo.ObjectId | string
     ) {
 
