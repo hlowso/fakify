@@ -142,6 +142,11 @@ export class Chord extends Domain {
                 extension[11] = "T";
                 return { ...infoBase, extension };
 
+            case ChordShape.MinMaj7:
+                infoBase = Chord.shapeToInfo(ChordShape.Min7);
+                extension[7] = "7";
+                return { ...infoBase, extension };
+
             /**
              * DOMINANT
              */

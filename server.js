@@ -20363,7 +20363,7 @@ var ChordShape;
     ChordShape["Maj9"] = "Maj9";
     ChordShape["Add9"] = "Add9";
     ChordShape["Majb5"] = "Majb5";
-    ChordShape["Maj7b5"] = "mMaj7b5";
+    ChordShape["Maj7b5"] = "Maj7b5";
     ChordShape["Maj7$5"] = "Maj7$5";
     ChordShape["Maj7b9"] = "Maj7b9";
     ChordShape["Maj$9"] = "Maj$9";
@@ -20380,6 +20380,7 @@ var ChordShape;
     ChordShape["Min7b9"] = "Min7b9";
     ChordShape["Min7$9"] = "Min7$9";
     ChordShape["Min7$11"] = "Min7$11";
+    ChordShape["MinMaj7"] = "MinMaj7";
     ChordShape["Dom7"] = "Dom7";
     ChordShape["Dom9"] = "Dom9";
     ChordShape["Dom7b5"] = "Dom7b5";
@@ -20412,7 +20413,7 @@ var PresentableChordShape;
     PresentableChordShape["Majb9"] = "ma(b9)";
     PresentableChordShape["Maj7$9"] = "ma7($9)";
     PresentableChordShape["Maj7$11"] = "maj7(#11)";
-    PresentableChordShape["Min"] = "min";
+    PresentableChordShape["Min"] = "-";
     PresentableChordShape["Min6"] = "-6";
     PresentableChordShape["Min7"] = "-7";
     PresentableChordShape["Min9"] = "-9";
@@ -20422,6 +20423,7 @@ var PresentableChordShape;
     PresentableChordShape["Min7b9"] = "-7(b9)";
     PresentableChordShape["Min7$9"] = "-7($9)";
     PresentableChordShape["Min7$11"] = "-7(#11)";
+    PresentableChordShape["MinMaj7"] = "-(maj7)";
     PresentableChordShape["Dom7"] = "7";
     PresentableChordShape["Dom9"] = "9";
     PresentableChordShape["Dom7b5"] = "7(b5)";
@@ -72801,7 +72803,7 @@ module.exports = __webpack_require__(287);
 
 
 class Chart {
-    constructor(externalUpdate, barsBase = [], context, tempo, feel, rangeStartIdx = 0, rangeEndIdx = barsBase.length, id) {
+    constructor(externalUpdate, barsBase = [], context, tempo, feel, rangeStartIdx = 0, rangeEndIdx = barsBase.length - 1, id) {
         this.forEachBarInRange = (callback) => {
             for (let barIdx = this._rangeStartIdx; barIdx <= this._rangeEndIdx; barIdx++) {
                 callback(this._bars[barIdx], barIdx);
@@ -73258,6 +73260,7 @@ Chart.validChordSegments = (chordSegments, timeSignature) => {
         }
         prevBeatIdx = beatIdx;
         if (!Chart.validRelativeChordName(chordName)) {
+            console.log("IT's here!");
             return false;
         }
         if (!Chart.validRelativeNoteName(key)) {
@@ -73636,6 +73639,10 @@ Chord.shapeToInfo = (shape) => {
         case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min7$11:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min7);
             extension[11] = "T";
+            return Object.assign({}, infoBase, { extension });
+        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].MinMaj7:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min7);
+            extension[7] = "7";
             return Object.assign({}, infoBase, { extension });
         /**
          * DOMINANT

@@ -64,6 +64,14 @@ const chordData: IChordDatum[] = [
         testScaleBase: "E",
         testScaleNotes: [ "E", "F#|Gb", "G#|Ab", "A", "B|Cb", "C#|Db", "D#|Eb" ],
         testScaleNotesPostExtension: [ "E", "G", "G#|Ab", "A", "B|Cb", "D", "D#|Eb" ]
+    },
+    {
+        chordName: [ "G", ChordShape.MinMaj7 ],
+        reqNotes: [ "A#|Bb", "F#|Gb" ],
+        notes: [ "G", "A#|Bb", "D", "F#|Gb" ],
+        testScaleBase: "F",
+        testScaleNotes: [ "F", "G", "A", "A#|Bb", "C", "D", "E" ],
+        testScaleNotesPostExtension: [ "F#|Gb", "G", "A", "A#|Bb", "C", "D", "E" ]
     }
 ];
 
