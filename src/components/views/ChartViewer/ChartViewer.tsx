@@ -6,6 +6,7 @@ import { Chord } from "../../../shared/music/domain/ChordClass";
 import Chart from "../../../shared/music/Chart";
 import { ISong, IMusicIdx, NoteName, Tempo, ChordName, PresentableChordShape, IChartBar } from "../../../shared/types";
 import "./ChartViewer.css";
+import $ from "jquery";
 
 export interface IChartViewerProps {
     editingMode?: boolean;
@@ -24,13 +25,16 @@ export interface IChartViewerState {
     hoveredBarIdx?: number;
     precedingInsertBarIdx?: number; 
     followingInsertBarIdx?: number;
+    lastInLineIndices?: number[];
+    linesAreGrouped?: boolean;
 }
 
 class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     constructor(props: IChartViewerProps) {
         super(props);
         this.state = {
-            editingTitle: false
+            editingTitle: false,
+            linesAreGrouped: false
         };
     }
 
@@ -47,8 +51,18 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             );
         }
 
+        let $playView = $("#play-view");
+        let $menuBar = $("#menu-bar");
+        let $keyboard = $("#keyboard");
+
+        let dynamicStyle = {} as any;
+
+        if ($playView && $menuBar && $keyboard) {
+            dynamicStyle.height = ($playView.height() as number) - ($menuBar.height() as number) - ($keyboard.height() as number); 
+        }
+
         return (
-            <div id="chart-viewer">
+            <div id="chart-viewer" style={dynamicStyle} >
                 <header className="chart-header" style={{ justifyContent: editingMode ? "space-between" : "center" }} >
                     {false && this.renderLeftHandSettings()}
                     {this.renderTitle()}
@@ -106,7 +120,8 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     public renderProgressionLines = (): JSX.Element[] => {
         let { chart, sessionIdx, editingMode } = this.props;
         let { bars, rangeStartIdx, rangeEndIdx } = chart as Chart;
-        let { hoveredBarIdx, precedingInsertBarIdx, followingInsertBarIdx } = this.state;
+        let { hoveredBarIdx, precedingInsertBarIdx, followingInsertBarIdx, lastInLineIndices } = this.state;
+        let lastBarsInLines = lastInLineIndices ? Util.copyObject(lastInLineIndices) : null;
         let lines: JSX.Element[] = [];
         let lineBars: JSX.Element[] = [];
 
@@ -115,6 +130,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             let chordName: ChordName;
             let prevChordName: ChordName;
             let prevBar: IChartBar | undefined;
+            let currLineHas2Bars = Array.isArray(lastBarsInLines) ? lastBarsInLines[0] === 1 : false;
 
             bars.forEach((bar, i) => {
                 let chordNameElements = [];
@@ -142,20 +158,32 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
                     let displayedChordBase: string | undefined;
                     let displayedChordShape: JSX.Element | undefined;
+                    let chordPlaceholder: string | undefined;
                     
                     if (chordSegment) {
+
                         prevChordName = chordName;
                         chordName = chordSegment.chordName as ChordName;
+
                         if (!Chord.chordNamesAreEqual(chordName, prevChordName)) {
                             useDivisionSign = false;
                             displayedChordBase = `${MusicHelper.getPresentableNoteName(chordName[0] as NoteName, baseKey)}`;
-                            displayedChordShape = (<sup>{PresentableChordShape[chordName[1]]}</sup>);
-                        }
+
+                            let presentableShape = PresentableChordShape[chordName[1]];
+                            displayedChordShape = (
+                                <sup className="chord-shape" >
+                                    {presentableShape}
+                                </sup>
+                            );
+                        } 
+
+                    } else if (bar.timeSignature[0] >= 5 && bar.chordSegments.length > 1) {
+                        chordPlaceholder = "%";
                     }
 
                     chordNameElements.push(
                         <span className={chordNameClasses} key={beatIdx}>
-                            {displayedChordBase}{displayedChordShape}
+                            {displayedChordBase}{displayedChordShape}{chordPlaceholder}
                         </span>
                     );
                 }
@@ -224,6 +252,12 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                     </div>
                 );
 
+                let isLastInLine = lineBars.length === 3;
+                if (Array.isArray(lastBarsInLines) && lastBarsInLines.length && lastBarsInLines[0] === i) {
+                    isLastInLine = true;
+                    lastBarsInLines.shift();
+                }
+
                 let barElement = (
                     <div 
                         key={i}
@@ -232,7 +266,8 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                         onMouseEnter={() => this._onBarEnter(i)}
                         onMouseLeave={this._onBarLeave}
                         style={{ 
-                            borderRight: i % 4 === 3 || i === rangeStartIdx - 1 ? undefined : "solid black 1px",
+                            width: currLineHas2Bars ? "50%" : undefined,
+                            borderRight: isLastInLine || i === rangeStartIdx - 1 ? undefined : "solid black 1px",
                             borderLeft: i === rangeStartIdx && i !== 0 ? "solid black 1px" : undefined 
                         }}
                     >
@@ -254,12 +289,13 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                     lineBars.push(followingAddBarBox)
                 }
 
-                if (i % 4 === 3) {
+                if (isLastInLine) {
                     lines.push(this.renderProgressionLine(lineBars));
                     lineBars = [];
                 }
 
                 prevBar = bar;
+                currLineHas2Bars = Array.isArray(lastBarsInLines) && lastBarsInLines.length > 0 && isLastInLine ? i + 2 === lastBarsInLines[0] : currLineHas2Bars;
             });
         }
 
@@ -432,6 +468,94 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         if (resetTempo) {
             resetTempo(tempo);
         }
+    }
+
+    /**
+     * LIFE CYCLE
+     */
+
+    public componentDidUpdate(prevProps: IChartViewerProps) {
+        let { chart } = this.props;
+
+        if (chart && prevProps.chart) {
+            if (chart.songId !== prevProps.chart.songId) {
+                this.setState({ linesAreGrouped: false, lastInLineIndices: undefined });
+            }
+        }
+
+        if (chart && chart.bars) {
+
+            if (!this.state.lastInLineIndices) {
+
+                let lastInLineIndices = chart.bars.map((b, i) => i);
+                this.setState({ lastInLineIndices });
+
+            } else if (!this.state.linesAreGrouped) {
+                this.groupBarsIntoLines();
+            }
+        }
+    }
+
+
+
+    private groupBarsIntoLines = () => {
+        let { chart } = this.props;
+
+        if (!chart || !chart.bars) {
+            return;
+        }
+
+        let chartWidth = $("#chart-viewer").width() as number;
+        let lastInLineIndices: number[] = [];
+        let currGroup: number[] = [];
+        let breakUpGroup = false;
+
+        $(".bar-container").each(function(barIdx) {
+
+            if (breakUpGroup) {
+                lastInLineIndices.push(barIdx);
+                currGroup = [];
+                breakUpGroup = false;
+                return;
+            }
+
+            let barWidth = $(this).width() as number;
+
+            if (barWidth > chartWidth / 4) {
+
+                switch(currGroup.length) {
+                    case 0:
+                        breakUpGroup = true;
+                        return;
+                    case 1:
+                        lastInLineIndices.push(barIdx);
+                        currGroup = [];
+                        return;
+                    case 2:
+                        lastInLineIndices.push(currGroup[1]);
+                        breakUpGroup = true;
+                        return;
+                    case 3:
+                        lastInLineIndices.push(currGroup[1]);
+                        lastInLineIndices.push(barIdx);
+                        currGroup = [];
+                        return;
+                }
+
+            }
+
+            currGroup.push(barIdx);
+
+            if (currGroup.length === 4) {
+                lastInLineIndices.push(barIdx);
+                currGroup = [];
+            }
+        });
+
+        this.setState({ 
+            lastInLineIndices,
+            linesAreGrouped: true
+        });
     }
 };
 

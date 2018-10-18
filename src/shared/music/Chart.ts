@@ -1,3 +1,4 @@
+import * as Mongo from "mongodb";
 import * as Util from "../Util";
 import * as MusicHelper from "../music/MusicHelper";
 import { IChartBar, Feel, NoteName, Tempo, IMusicIdx, IChordStretch, IChordSegment, ChordName, ChordShape, RelativeNoteName, TimeSignature } from "../types";
@@ -5,6 +6,7 @@ import { Domain } from "./domain/Domain";
 import { Chord } from "./domain/ChordClass";
 
 class Chart {
+    private _songId?: Mongo.ObjectId | string;
     private _barsBase: IChartBar[];
     private _bars: IChartBar[];
     private _chordStretches?: IChordStretch[];
@@ -166,8 +168,12 @@ class Chart {
         tempo?: Tempo,
         feel?: Feel,
         rangeStartIdx = 0, 
-        rangeEndIdx = barsBase.length
+        rangeEndIdx = barsBase.length,
+        id?: Mongo.ObjectId | string
     ) {
+
+        this._songId = id;
+
         this._addKeysToBars(barsBase, !context);
 
         // If a context has been provided, assume that this Chart is being
@@ -535,6 +541,10 @@ class Chart {
     /**
      * GETTERS
      */
+
+    get songId() {
+        return this._songId;
+    }
 
     get bars(): IChartBar[] {
         return this._bars;

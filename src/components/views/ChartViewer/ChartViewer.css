@@ -1,11 +1,10 @@
 #chart-viewer {
-    display: flex;
-    flex-direction: column;
-    width: 700px;
+    width: 1000px;
     min-height: 385px;
     background-color: white;
     border-left: solid #222 1px;
     border-right: solid #222 1px;
+    overflow-y: scroll;
     /* border-right: solid white 1px; */
 }
 
@@ -47,14 +46,14 @@
 
 #chart-viewer .chart-body {
     display: flex;
-    height: 80%;
     width: 100%;
     flex-direction: column;
+    padding-bottom: 100px;
 }
 
 #chart-viewer .bar-container {
     display: flex;
-    width: 25%;
+    min-width: 25%;
     opacity: 0.2;
     cursor: pointer;
 }
@@ -69,16 +68,16 @@
 
 #chart-viewer .bar-container.add-box-precedes,
 #chart-viewer .bar-container.add-box-follows {
-    width: 22.3%;
+    width: 22.5%;
 } 
 
 #chart-viewer .bar-container.add-box-precedes.add-box-follows,
 #chart-viewer .bar-container.add-box-follows.shortened {
-    width: 19.8%;
+    width: 20%;
 }
 
 #chart-viewer .bar-container.add-box-precedes.add-box-follows.shortened {
-    width: 17.3%;
+    width: 17.5%;
 }
 
 #chart-viewer .within-range {
@@ -91,7 +90,8 @@
 
 #chart-viewer .chord-name {
     height: 20px;
-    margin: 5px;
+    margin: 2px;
+    line-height: 20px;
 }
 
 #chart-viewer .division-sign {
@@ -102,7 +102,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 4.8%;
+    width: 5%;
     height: 100px;
     border-right: solid black 1px;
     border-bottom: solid black 1px;
@@ -120,8 +120,9 @@
 
 #chart-viewer .bar-chord-group {
     display: flex;
-    padding-top: 5px;
-    font-size: 150%;
+    padding: 3px;
+    font-size: 130%;
+    align-items: center;
 }
 
 #chart-viewer .bar-beat-group {
@@ -144,4 +145,9 @@
 #chart-viewer .time-signature span {
     line-height: 20px;
     height: 20px;
+}
+
+#chart-viewer .chord-shape {
+    font-size: 75%;
+    letter-spacing: -1px;
 }

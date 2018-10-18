@@ -6,7 +6,7 @@
 
 #play-view .chart-container { 
     display: flex; 
-    width: 740px; 
+    width: 1040px; 
     min-height: 385px;
     background-color: #ddd;
     flex-direction: column; 

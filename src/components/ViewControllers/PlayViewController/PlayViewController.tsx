@@ -221,7 +221,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             tempo, 
             feel,
             rangeStartIdx, 
-            rangeEndIdx
+            rangeEndIdx,
+            _id
         ); 
     }
 
