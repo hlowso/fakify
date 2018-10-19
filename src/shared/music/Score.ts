@@ -128,7 +128,12 @@ class Score {
         this._bars.forEach(callback);
     }
 
-    public getPart = (instrument: string): IPart => {
+    public getPart = (instrument: string): IPart | null => {
+
+        if (this.instruments.indexOf(instrument) === -1) {
+            return null;
+        }
+
         let music = this._bars.map(bar => {
             let musicBar: IMusicBar = {};
             for (let subbeatIdx in bar) {
@@ -156,6 +161,26 @@ class Score {
 
     get lastBar() {
         return this._bars[this._bars.length - 1];
+    }
+
+    get instruments() {
+        let instruments: string[] = [];
+
+        if (!Array.isArray(this._bars) || this._bars.length === 0) {
+            return [];
+        }
+
+        this._bars.forEach(bar => {
+            for (let subbeatIdx in bar) {
+                for (let instrument in bar[subbeatIdx]) {
+                    if (instruments.indexOf(instrument) === -1) {
+                        instruments.push(instrument);
+                    }
+                }
+            }
+        });
+
+        return instruments;
     }
 }
 

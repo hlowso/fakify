@@ -2,7 +2,7 @@ import compSwingPianoV2 from "./swing/piano/compPianoSwingV2"
 import { compBassSwingV2 } from "./swing/bass/compBassSwingV2";
 import compDrumsSwingV1 from "./swing/drums/compDrumsSwingV1";
 import { generateSwingExerciseV0 } from "./swing/generateSwingExerciseV0";
-import { Feel, Difficulty, IExercise, IMusicBar } from "../../types";
+import { Feel, Difficulty, IExercise, IMusicBar, IPart } from "../../types";
 import Chart from "../Chart";
 import Score from "../Score";
 
@@ -18,8 +18,8 @@ const _getSwingAccompaniment = (chart: Chart, prevScore?: Score): Score => {
     let prevBassMusic: IMusicBar[] | undefined;
     
     if (prevScore) {
-        prevPianoMusic = prevScore.getPart("piano").music;
-        prevBassMusic = prevScore.getPart("doubleBass").music;
+        prevPianoMusic = (prevScore.getPart("piano") as IPart).music;
+        prevBassMusic = (prevScore.getPart("doubleBass") as IPart).music;
     }
 
     return new Score([

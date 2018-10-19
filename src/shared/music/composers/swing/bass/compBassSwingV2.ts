@@ -27,8 +27,8 @@ const BASS_FLOOR = 36;
 const BASS_CEILING = 60;
 
 export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart => {
-    let { chordStretches, bars } = chart;
-    chordStretches = chordStretches as IChordStretch[];
+    let { chordStretchesInRange, bars } = chart;
+    chordStretchesInRange = chordStretchesInRange as IChordStretch[];
     
     let music: IMusicBar[] = [];
     let quarterPitches: number[] = [];
@@ -80,7 +80,7 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
 
     // Now get the closer of the closest tonic and closest fifth
     // of the first chord of the progression
-    let firstChord = new Chord(chordStretches[0].chordName as ChordName);
+    let firstChord = new Chord(chordStretchesInRange[0].chordName as ChordName);
     let closestTonic = (firstChord.getClosestNoteInstance(lastPitchFromPrevMusic, 1)[1] as Note).pitch;
     let closestFifth = (firstChord.getClosestNoteInstance(lastPitchFromPrevMusic, 5)[1] as Note).pitch;
 
@@ -283,7 +283,7 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
         WALK ALGORITHM
      ********************/
 
-    chordStretches.forEach((stretch, stretchIdx) => {
+    chordStretchesInRange.forEach((stretch, stretchIdx) => {
         let { chordName, key, durationInSubbeats } = stretch;
         chordName = chordName as ChordName;
 
@@ -299,7 +299,7 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
 
             // Handle chord transition
             if (beat >= durationInBeats - 1) {
-                let nextStretch = (chordStretches as IChordStretch[])[Util.mod(stretchIdx + 1, (chordStretches as IChordStretch[]).length)];
+                let nextStretch = (chordStretchesInRange as IChordStretch[])[Util.mod(stretchIdx + 1, (chordStretchesInRange as IChordStretch[]).length)];
                 if (beat === durationInBeats) {
                     change(true, nextStretch);
                 } else {
@@ -328,28 +328,30 @@ export const compBassSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =>
     music = bars.map((bar, barIdx) => {
         let musicBar: IMusicBar = {};
 
-        for (let subbeatIdx = 0; subbeatIdx < (bar.durationInSubbeats as number); subbeatIdx += 3) {
-            let quarterPitch = quarterPitches[absBeatIdx];
-            let skipPitch = skipPitches[absBeatIdx];
-            let quarterDuration = 3;
-            
-            if (skipPitch) {
-                musicBar[subbeatIdx + 2] = [{
-                    notes: [skipPitch],
-                    velocity: 0.5,
-                    durationInSubbeats: 1
+        if (chart.barIdxIsInRange(barIdx)) {
+            for (let subbeatIdx = 0; subbeatIdx < (bar.durationInSubbeats as number); subbeatIdx += 3) {
+                let quarterPitch = quarterPitches[absBeatIdx];
+                let skipPitch = skipPitches[absBeatIdx];
+                let quarterDuration = 3;
+                
+                if (skipPitch) {
+                    musicBar[subbeatIdx + 2] = [{
+                        notes: [skipPitch],
+                        velocity: 0.5,
+                        durationInSubbeats: 1
+                    }];
+    
+                    quarterDuration = 2;
+                }
+    
+                musicBar[subbeatIdx] = [{
+                    notes: [quarterPitch],
+                    velocity: 1,
+                    durationInSubbeats: quarterDuration
                 }];
-
-                quarterDuration = 2;
+    
+                absBeatIdx ++;
             }
-
-            musicBar[subbeatIdx] = [{
-                notes: [quarterPitch],
-                velocity: 1,
-                durationInSubbeats: quarterDuration
-            }];
-
-            absBeatIdx ++;
         }
 
         return musicBar;
