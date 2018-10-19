@@ -10,6 +10,7 @@ class Chart {
     private _barsBase: IChartBar[];
     private _bars: IChartBar[];
     private _chordStretches?: IChordStretch[];
+    private _chordStretchesInRange?: IChordStretch[];
     private _context: NoteName;
     private _tempo?: Tempo;
     private _feel?: Feel;
@@ -17,6 +18,7 @@ class Chart {
     private _rangeStartIdx: number;
     private _rangeEndIdx: number;
     private _durationInSubbeats: number;
+    private _rangeDurationInSubbeats: number;
 
     public static validTempo = (tempo: Tempo) => {
         if (!Array.isArray(tempo) || tempo.length !== 2) {
@@ -283,6 +285,10 @@ class Chart {
     ) {
 
         this._songId = id;
+        this._tempo = tempo;
+        this._externalUpdate = externalUpdate;
+        this._rangeStartIdx = rangeStartIdx;
+        this._rangeEndIdx = rangeEndIdx;
 
         Chart.addKeysToBars(barsBase, !context);
 
@@ -302,13 +308,6 @@ class Chart {
         
         // Build the contextualized, time adjusted bars
         this._resetBarsAndChordStretches();
-        
-
-        this._tempo = tempo;
-        this._externalUpdate = externalUpdate;
-        this._rangeStartIdx = rangeStartIdx;
-        this._rangeEndIdx = rangeEndIdx;
-        this._durationInSubbeats = 0;
 
         if (externalUpdate) {
             externalUpdate();
@@ -349,7 +348,12 @@ class Chart {
         return this.segmentAtIdx(idx).key;
     }
 
-    public absSubbeatIdxToMusicIdx = (absIdx: number): IMusicIdx | undefined => {
+    public absSubbeatIdxToMusicIdx = (absIdx: number): IMusicIdx | null => {
+
+        if (!Number.isInteger(absIdx)) {
+            return null;
+        }
+
         let totalSubbeatCount = 0;
 
         for (let barIdx = 0; barIdx < this._bars.length; barIdx ++) {
@@ -374,7 +378,34 @@ class Chart {
             }
         }
 
-        return;
+        return null;
+    }
+
+    public musicIdxToAbsSubbeatIdx = (musicIdx: IMusicIdx): number | null => {
+
+        if (!musicIdx || !Number.isInteger(musicIdx.barIdx) || !Number.isInteger(musicIdx.subbeatIdx as number)) {
+            return null;
+        }
+
+        musicIdx.subbeatIdx = musicIdx.subbeatIdx as number;
+
+        if (musicIdx.barIdx < 0 || musicIdx.barIdx >= this._bars.length) {
+            return null;
+        }
+
+        let currBar = this._bars[musicIdx.barIdx];
+
+        if (musicIdx.subbeatIdx < 0 || musicIdx.subbeatIdx >= (currBar.durationInSubbeats as number)) {
+            return null;
+        }
+
+        let absSubbeatIdx = musicIdx.subbeatIdx;
+
+        for (let barIdx = 0; barIdx < musicIdx.barIdx; barIdx ++) {
+            absSubbeatIdx += this._bars[barIdx].durationInSubbeats as number;
+        }
+
+        return absSubbeatIdx;
     }
 
     public addBar = (idx: number, bar?: IChartBar) => {
@@ -436,29 +467,74 @@ class Chart {
     private _calculateChartDuration = () => {
         if (this._feel) {
             this._durationInSubbeats = 0;
-            this._bars.forEach(bar => { 
-                this._durationInSubbeats += bar.durationInSubbeats as number;
+            this._rangeDurationInSubbeats = 0;
+            this._bars.forEach((bar, barIdx) => { 
+                let barDuration = bar.durationInSubbeats as number;
+                this._durationInSubbeats += barDuration;
+
+                if (this.barIdxIsInRange(barIdx)) {
+                    this._rangeDurationInSubbeats += barDuration;
+                }
             });
         }   
     }
 
     private _buildChordStretches = () => {
         this._chordStretches = [];
+        this._chordStretchesInRange = [];
         let subbeatsBeforeChange = 0;
+        let subbeatsBeforeChangeInRange = 0;
 
         // TODO: shouldn't depend on bars having subbeat to get chord stretches
         if (this._feel && this._bars.length > 0) {
             this._bars.forEach(bar => {
-                bar.chordSegments.forEach(segment => {
+                bar.chordSegments.forEach((segment, segIdx) => {
+
+                    let segSubbeatsBeforeChange = segment.subbeatsBeforeChange as number;
+                    let segDuration = segment.durationInSubbeats as number;
+
+                    // Chord Stretches
+                    
                     if (subbeatsBeforeChange === 0) {
-                        subbeatsBeforeChange = segment.subbeatsBeforeChange as number;
+                        subbeatsBeforeChange = segSubbeatsBeforeChange;
                         (this._chordStretches as IChordStretch[]).push({
                             chordName: segment.chordName,
                             key: segment.key,
                             durationInSubbeats: subbeatsBeforeChange
                         });
                     }
-                    subbeatsBeforeChange -= segment.durationInSubbeats as number;
+                    subbeatsBeforeChange -= segDuration;
+
+                    // Chord Stretches In Range
+
+                    if (this.barIdxIsInRange(bar.barIdx)){
+
+                        // Make sure to cut the last stretch off if necessary
+                        let rangeStretches = this._chordStretchesInRange as IChordStretch[];
+
+                        if (
+                            bar.barIdx === this.rangeEndIdx && 
+                            segIdx === bar.chordSegments.length - 1 &&
+                            rangeStretches.length > 0 &&
+                            !Chord.chordNamesAreEqual(segment.chordName as ChordName, rangeStretches[rangeStretches.length - 1].chordName as ChordName)
+                        ) {
+                            (this._chordStretchesInRange as IChordStretch[]).push({
+                                chordName: segment.chordName,
+                                key: segment.key,
+                                durationInSubbeats: segment.durationInSubbeats
+                            });
+
+                        } else if (subbeatsBeforeChangeInRange === 0) {
+                            subbeatsBeforeChangeInRange = segSubbeatsBeforeChange;
+                            (this._chordStretchesInRange as IChordStretch[]).push({
+                                chordName: segment.chordName,
+                                key: segment.key,
+                                durationInSubbeats: subbeatsBeforeChangeInRange
+                            });
+                        }
+
+                        subbeatsBeforeChangeInRange -= segDuration;
+                    } 
                 });
             });
         }
@@ -471,6 +547,13 @@ class Chart {
                 this._calculateChartDuration();
             }
             this._chordStretches[0].durationInSubbeats = this._durationInSubbeats;
+        }
+
+        if (this._chordStretchesInRange.length === 1) {
+            if (!Number.isInteger(this._rangeDurationInSubbeats)) {
+                this._calculateChartDuration();
+            }
+            this._chordStretchesInRange[0].durationInSubbeats = this._rangeDurationInSubbeats;
         }
     }
 
@@ -569,6 +652,10 @@ class Chart {
 
     get chordStretches() {
         return this._chordStretches;
+    }
+
+    get chordStretchesInRange() {
+        return this._chordStretchesInRange;
     }
 
     get context(): NoteName {

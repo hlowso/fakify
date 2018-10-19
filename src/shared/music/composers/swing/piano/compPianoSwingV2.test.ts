@@ -11,11 +11,11 @@ import { compPianoSwingV2 } from "./compPianoSwingV2";
 import { IChartBar, Feel, IChordStretch, IMusicBar } from "../../../../types";
 
 const _251_chart = new Chart(() => {}, _251_bars as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
-const chart251Multi = new Chart(() => {}, _251_multichord_bars as IChartBar[], "B|Cb", [ 120, 4 ], Feel.Swing);
 const C_Blues_chart = new Chart(() => {}, C_Blues_bars as IChartBar[], "C", [ 120, 4 ], Feel.Swing);
 const chartJustForFun = new Chart(() => {}, barsJustForFun as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
 const chart4Chords = new Chart(() => {}, _4_chord_bar as IChartBar[], "G", [ 120, 4 ], Feel.Swing);
 const chart7_4Full = new Chart(() => {}, bars7_4_full as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
+const chart251Multi = new Chart(() => {}, _251_multichord_bars as IChartBar[], "B|Cb", [ 120, 4 ], Feel.Swing);
 
 test("generates at least 1 voicing per chord stretch", () => {
 	let testRuns = 50;
@@ -25,6 +25,15 @@ test("generates at least 1 voicing per chord stretch", () => {
 	successfulRuns += compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings(chart7_4Full, testRuns);
 
 	expect(successfulRuns).toBe(testRuns * 3);
+});
+
+test("generates at least 1 voicing per chord stretch when range is shortened", () => {
+	const short251 = new Chart(() => {}, _251_bars as IChartBar[], "E", [ 200, 4 ], Feel.Swing, 3, 6);
+
+	let testRuns = 100;
+	let successfulRuns = compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings(short251, testRuns);
+
+	expect(successfulRuns).toBe(testRuns);
 });
 
 test("rate of chord ascension and chord descension are roughly equal", () => {
@@ -92,30 +101,31 @@ const compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings = (chart: Ch
 
 	test:
 	for (let i = 0; i < testRuns; i ++) {
-		let { chordStretches, bars } = chart;
+		let { chordStretchesInRange, barsInRange } = chart;
 		music = compPianoSwingV2(chart, music).music;
 		
-		let absChordStretchSubbeatIndices = [0];
-		let absMusicSubbeatIndices = [-1];
+		let absStartIdx = chart.musicIdxToAbsSubbeatIdx({ barIdx: chart.rangeStartIdx, subbeatIdx: 0 }) as number;
+		let absChordStretchSubbeatIndices = [absStartIdx];
+		let absMusicSubbeatIndices = [absStartIdx - 1];
 		let k = 0;
 		let currStretchCovered = false;
-		let barSubbeatCount = 0;
-		chordStretches = chordStretches as IChordStretch[];	
+		let barSubbeatCount = absStartIdx;
+		chordStretchesInRange = chordStretchesInRange as IChordStretch[];	
 
-		for (let stretchIdx = 0; stretchIdx < chordStretches.length; stretchIdx ++) {
-			let currDur = chordStretches[stretchIdx].durationInSubbeats as number;
+		for (let stretchIdx = 0; stretchIdx < chordStretchesInRange.length; stretchIdx ++) {
+			let currDur = chordStretchesInRange[stretchIdx].durationInSubbeats as number;
 			absChordStretchSubbeatIndices.push(absChordStretchSubbeatIndices[stretchIdx] + currDur);
 		}
 
 		absChordStretchSubbeatIndices.shift();
 
-		for (let barIdx = 0; barIdx < bars.length; barIdx ++) {
-			for (let subbeatIdx in music[barIdx]) {
+		barsInRange.forEach(bar => {
+			for (let subbeatIdx in (music as IMusicBar[])[bar.barIdx]) {
 				absMusicSubbeatIndices.push(barSubbeatCount + parseInt(subbeatIdx));
 				k ++;
 			}
-			barSubbeatCount += bars[barIdx].durationInSubbeats as number;
-		}
+			barSubbeatCount += bar.durationInSubbeats as number;
+		});
 
 		absMusicSubbeatIndices.shift();
 		k = 0;
@@ -135,6 +145,8 @@ const compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings = (chart: Ch
 			}
 
 			if (!currStretchCovered) {
+
+				console.log(music);
 				continue test;
 			}
 		}
