@@ -1,6 +1,6 @@
 import * as Util from "../../../../Util";
 import { Chord } from "../../../domain/ChordClass";
-import { ChordName, Tempo, IMusicBar, IPart, IMusicIdx, IChordSegment, /*IStroke,*/ IChordStretch, IChartBar } from "../../../../types";
+import { ChordName, Tempo, IMusicBar, IPart, IMusicIdx, IChordSegment, IStroke, IChordStretch, IChartBar } from "../../../../types";
 import Chart from "../../../Chart";
 
 const VEL_FACTOR = 0.6;
@@ -8,7 +8,7 @@ const DURATION_SPREAD_ROOT = 3;
 const DURATION_SPREAD_FACTOR = Math.log2(DURATION_SPREAD_ROOT);
 const MAX_TEMPO = 210;
 const VOICING_TARGET = 60;
-// const INITIAL_REFERRAL_TO_PREVIOUS_MUSIC_ODDS = 0.75;
+const INITIAL_REFERRAL_TO_PREVIOUS_MUSIC_ODDS = 0.75;
 const NUDGE_WITHIN_RANGE_ODDS = 0.8;
 const VOICING_DEVIATION_LIMIT = 13;
 
@@ -25,12 +25,14 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
 
     let musicIdx: IMusicIdx | undefined; 
     let currTwoBarDuration: number;
-    let absSubbeatIdx = (chart.musicIdxToAbsSubbeatIdx({ barIdx: chart.rangeStartIdx, subbeatIdx: 0 }) as number) - 1;
+    let absStartIdx = (chart.musicIdxToAbsSubbeatIdx({ barIdx: chart.rangeStartIdx, subbeatIdx: 0 }) as number) - 1;
+    let absSubbeatIdx = absStartIdx;
     let maxSubbeatWait: number;
     let subbeatWait: number;
     let remainderOfCurrStretch = 0;
     let remainderOfCurrStretchPlusNextStretch: number;
     let stretchIdx = -1;
+    let buffer: number | undefined = 0;
 
     let maxStrokeDurationBars: Array<number[]> = bars.map(bar => []);
 
@@ -41,44 +43,36 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
     // If there is previous music, we can set the starting values of absSubbeatIdx and 
     // previousVoicing accordingly
 
-    // TODO: uncomment the block below which consults the prevMusic array passed in
-    // to create initial settings
+    if (Array.isArray(prevMusic) && prevMusic.length > 0 && Math.random() < INITIAL_REFERRAL_TO_PREVIOUS_MUSIC_ODDS) {
 
-    // if (Array.isArray(prevMusic) && prevMusic.length > 0 && Math.random() < INITIAL_REFERRAL_TO_PREVIOUS_MUSIC_ODDS) {
+        let lastStroke: IStroke | undefined;
+        let subbeatDurationFromTopOfLastPlayedBarToTopOfChart = 0;
 
-    //     let lastStroke: IStroke | undefined;
-    //     let subbeatDurationFromTopOfLastPlayedBarToTopOfChart = 0;
+        for (let barIdx = chart.rangeEndIdx; barIdx >= chart.rangeStartIdx; barIdx --) {
 
-    //     for (let barIdx = chart.rangeEndIdx; barIdx >= chart.rangeStartIdx; barIdx --) {
+            subbeatDurationFromTopOfLastPlayedBarToTopOfChart += bars[barIdx].durationInSubbeats as number;
 
-    //         subbeatDurationFromTopOfLastPlayedBarToTopOfChart += bars[barIdx].durationInSubbeats as number;
+            let lastMusicBar = prevMusic[barIdx];
 
-    //         let lastMusicBar = prevMusic[barIdx];
+            if (!Util.objectIsEmpty(lastMusicBar)) {
 
-    //         if (!Util.objectIsEmpty(lastMusicBar)) {
+                let subbeatIdx;
+                for (subbeatIdx in lastMusicBar) {
+                    lastStroke = lastMusicBar[subbeatIdx][0];
+                }
 
-    //             let subbeatIdx;
-    //             for (subbeatIdx in lastMusicBar) {
-    //                 lastStroke = lastMusicBar[subbeatIdx][0];
-    //             }
+                if (lastStroke) {
+                    subbeatIdx = parseInt(subbeatIdx as string, undefined);
+                    buffer = subbeatIdx + lastStroke.durationInSubbeats - subbeatDurationFromTopOfLastPlayedBarToTopOfChart;
 
-    //             if (lastStroke) {
-    //                 subbeatIdx = parseInt(subbeatIdx as string, undefined);
-    //                 absSubbeatIdx = subbeatIdx + lastStroke.durationInSubbeats - subbeatDurationFromTopOfLastPlayedBarToTopOfChart;
-    //                 previousVoicing = lastStroke.notes;
-    //             }
+                    previousVoicing = lastStroke.notes;
+                }
 
-    //             break;
-    //         }
+                break;
+            }
 
-    //     }
-
-    //     if (absSubbeatIdx <= -1) {
-    //         absSubbeatIdx = -1;
-    //     } else {
-    //         prevMusicIdx = musicIdx = chart.absSubbeatIdxToMusicIdx(absSubbeatIdx) as IMusicIdx; 
-    //     }
-    // }
+        }
+    }
 
     /**
      * FILL maxStrokeDurationBars
@@ -98,13 +92,9 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
         // Subtract 2 from remainder of curr stretch plus next because the next voicing
         // must land at or before the second last subbeat of the next stretch in order
         // for it to count for that stretch
-        if (currTwoBarDuration < remainderOfCurrStretchPlusNextStretch - 2) {
-            maxSubbeatWait = currTwoBarDuration;
-        } else {
-            maxSubbeatWait = remainderOfCurrStretchPlusNextStretch - 2;
-        }
-
-        subbeatWait = getMaxDuration(maxSubbeatWait, absSubbeatIdx);
+        maxSubbeatWait = Math.min(currTwoBarDuration, remainderOfCurrStretchPlusNextStretch - 2);
+        subbeatWait = getMaxDuration(maxSubbeatWait, absSubbeatIdx, buffer);
+        buffer = undefined;
         setMaxStrokeDuration(maxStrokeDurationBars, subbeatWait, musicIdx);
 
         remainderOfCurrStretch -= subbeatWait;
@@ -215,14 +205,21 @@ function getSegment(chart: Chart, barIdx: number, subbeatIdx: number) {
     return segment;
 }
 
-function getMaxDuration(maxSubbeatWait: number, absSubbeatIdx: number) {
+function getMaxDuration(maxSubbeatWait: number, absSubbeatIdx: number, buffer?: number) {
     let waitChoices: [number, number][] = [];
     let currWeight = 1;
     let currIdxIsOffBeat = Util.mod(absSubbeatIdx, 3) === 2;
     let subbeatWait = currIdxIsOffBeat ? 1 : 2; 
 
+    if (buffer && buffer > maxSubbeatWait) {
+        buffer = undefined;
+    }
+
     while (subbeatWait <= maxSubbeatWait) {
-        waitChoices.push([subbeatWait, Math.max(currWeight, 1)]);
+        if (!buffer || subbeatWait >= buffer) {
+            waitChoices.push([subbeatWait, Math.max(currWeight, 1)]);
+        }
+
         currWeight += (subbeatWait < 4) ? 1 : -1;
         subbeatWait += (
             Util.mod(subbeatWait, 3) === 0

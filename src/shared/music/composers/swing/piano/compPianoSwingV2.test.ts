@@ -7,6 +7,7 @@ import _4_chord_bar from "../../../../test-data/bars-4-chords";
 import C_Blues_bars from "../../../../test-data/bars-c-blues";
 import barsJustForFun from "../../../../test-data/bars-just-for-fun";
 import bars7_4_full from "../../../../test-data/bars-7-4-full-bar";
+import barsByeBye from "../../../../test-data/barsByeByeBlackbird";
 import { compPianoSwingV2 } from "./compPianoSwingV2";
 import { IChartBar, Feel, IChordStretch, IMusicBar } from "../../../../types";
 
@@ -46,14 +47,20 @@ test("all durations have integer values", () => {
 	let testRuns = 100;
 	let successfulRuns = 0;
 	let music: IMusicBar[] | undefined = undefined;
+	let music2: IMusicBar[] | undefined = undefined;
+
+	let shortByeBye = new Chart(() => {}, barsByeBye as IChartBar[], "F", [ 120, 4 ], Feel.Swing, 3, 17);
 
 	for (let i = 0; i < testRuns; i ++) {
 		music = compPianoSwingV2(chart251Multi, music).music;
 		let pass = compPianoSwingV2_All_Durations_Have_Values(music);
+		music2 = compPianoSwingV2(shortByeBye, music2).music;
+		let pass2 = compPianoSwingV2_All_Durations_Have_Values(music2);
 		successfulRuns += pass ? 1 : 0;
+		successfulRuns += pass2 ? 1 : 0;
 	}
 
-	expect(successfulRuns).toBe(testRuns);
+	expect(successfulRuns).toBe(testRuns * 2);
 });
 
 /**
@@ -146,7 +153,7 @@ const compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings = (chart: Ch
 
 			if (!currStretchCovered) {
 
-				console.log(music);
+				// console.log(music);
 				continue test;
 			}
 		}
