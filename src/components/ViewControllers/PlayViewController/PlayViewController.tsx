@@ -15,6 +15,7 @@ import Chart from "../../../shared/music/Chart";
 import "./PlayViewController.css";
 import { ISong, NoteName, PlayMode, Tempo, IMusicIdx, IChartBar } from "../../../shared/types";
 import { Dashboard } from "../../views/Dashboard/Dashboard";
+import $ from "jquery";
 
 export interface IPlayVCProps {
     // TODO: get proper types for all this
@@ -82,6 +83,54 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
     public componentWillUnmount() {
         this._stopSession();
+    }
+
+    public componentDidUpdate() {
+        this._setScrollToPutCurrentBarInView();
+    }
+
+    private _setScrollToPutCurrentBarInView = () => {
+
+        let { sessionManager } = this.props;
+
+        if (!sessionManager || !sessionManager.inSession || !sessionManager.sessionIdx) {
+            return;
+        }
+
+        let { sessionIdx } = sessionManager;
+
+        let $chart = $("#chart-viewer") as any;
+        let $currBar: any;
+
+        $(".bar-container").each(function(barIdx) {
+            if (barIdx === sessionIdx.barIdx ) {
+                $currBar = $( this );
+            }
+        });
+
+        if (!$currBar) {
+            return;
+        }
+
+        let doUpdate = false;
+        let currBarY = $currBar.offset().top;
+        let chartUpperLimit = $chart.offset().top + 100;
+        let chartLowerLimit = $chart.offset().top + $chart.height() - 100;
+
+        let chartScrollTop = $chart[0].scrollTop;
+        let chartScrollBottom = $chart[0].scrollHeight - $chart.height();
+
+        if (currBarY < chartUpperLimit && chartScrollTop !== 0) {
+            $chart[0].scrollTop -= 100;
+            doUpdate = true;
+        } else if (currBarY > chartLowerLimit && chartScrollTop !== chartScrollBottom) {
+            $chart[0].scrollTop += 100;
+            doUpdate = true;
+        }
+
+        if (doUpdate) {
+            this.forceUpdate();
+        }
     }
 
     /**************

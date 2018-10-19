@@ -24902,7 +24902,8 @@ module.exports = { connectOp, logout, validOptions };
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["h"] = voicingContainsNoClusters;
+/* harmony export (immutable) */ __webpack_exports__["i"] = voicingContainsNoClusters;
+/* harmony export (immutable) */ __webpack_exports__["h"] = pickClosestKey;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Util__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__types__ = __webpack_require__(65);
 
@@ -25154,6 +25155,50 @@ function voicingContainsNoClusters(voicing) {
         k++;
     }
     return true;
+}
+/**
+ * pickClosestKey
+ * @param prevKey a note name representing the target key
+ * @param keys an array of note names from which to choose the closest to prevKey
+ * @returns the closest key in keys to prevKey
+ */
+function pickClosestKey(prevKey, keys) {
+    /* VALIDATIONS */
+    let errMsg = 'invalid arguments passed to pickClosestKey:';
+    if (typeof prevKey !== "string" || !Array.isArray(keys) || keys.length === 0) {
+        console.error(errMsg, prevKey, keys);
+        return;
+    }
+    let relative;
+    if (NOTE_NAMES.indexOf(prevKey) !== -1) {
+        relative = false;
+        if (keys.some(k => NOTE_NAMES.indexOf(k) === -1)) {
+            console.error(errMsg, keys);
+            return;
+        }
+    }
+    else if (RELATIVE_SCALE.indexOf(prevKey) !== -1) {
+        relative = true;
+        if (keys.some(k => RELATIVE_SCALE.indexOf(k) === -1)) {
+            console.error(errMsg, keys);
+            return;
+        }
+    }
+    else {
+        console.error(errMsg, prevKey);
+        return;
+    }
+    /* ALGORITHM */
+    let noteSet = relative ? RELATIVE_SCALE : NOTE_NAMES;
+    let prevKeyBaseIdx = noteSet.indexOf(prevKey);
+    let keyBaseIndices = keys.map(k => noteSet.indexOf(k));
+    let prevScale = C_NOTE_NAMES_INDICES.map(p => noteSet[__WEBPACK_IMPORTED_MODULE_0__Util__["e" /* mod */](prevKeyBaseIdx + p, 12)]);
+    let keyScales = keyBaseIndices.map(baseIdx => C_NOTE_NAMES_INDICES.map(p => noteSet[__WEBPACK_IMPORTED_MODULE_0__Util__["e" /* mod */](baseIdx + p, 12)]));
+    let distances = keyScales.map((scale, idx) => {
+        return [keys[idx], scale.filter(n => prevScale.indexOf(n) !== -1).length];
+    });
+    distances.sort((a, b) => a[1] - b[1]);
+    return distances[0][0];
 }
 
 
@@ -72881,89 +72926,6 @@ class Chart {
             this._bars[idx] = bar;
             this._onDirectBarsChange();
         };
-        this._addKeysToBars = (bars, contextualized = false) => {
-            if (bars.length > 0) {
-                let noteSet = __WEBPACK_IMPORTED_MODULE_3__domain_Domain__["a" /* Domain */].RELATIVE_NOTE_NAMES;
-                if (contextualized) {
-                    noteSet = __WEBPACK_IMPORTED_MODULE_3__domain_Domain__["a" /* Domain */].NOTE_NAMES;
-                }
-                let keyStretches = [];
-                let possibleChordKeys = [];
-                let keyStretchPossibilities = [];
-                let currentStretchPossibility;
-                // Get the possible keys per chord segment
-                bars.forEach(barBase => {
-                    barBase.chordSegments.forEach(segment => {
-                        possibleChordKeys = [
-                            ...possibleChordKeys,
-                            __WEBPACK_IMPORTED_MODULE_4__domain_ChordClass__["a" /* Chord */].getSuitableKeys(segment.chordName)
-                        ];
-                    });
-                });
-                // Get the possible keys per key stretch
-                currentStretchPossibility = { keys: possibleChordKeys[0], segmentCount: 1 };
-                for (let i = 1; i < possibleChordKeys.length; i++) {
-                    let chordKeys = possibleChordKeys[i];
-                    let keyOverlap = currentStretchPossibility.keys.filter(key => chordKeys.indexOf(key) !== -1);
-                    if (keyOverlap.length === 0) {
-                        keyStretchPossibilities.push(currentStretchPossibility);
-                        currentStretchPossibility = { keys: chordKeys, segmentCount: 1 };
-                    }
-                    else {
-                        currentStretchPossibility.keys = keyOverlap;
-                        currentStretchPossibility.segmentCount++;
-                    }
-                }
-                keyStretchPossibilities.push(currentStretchPossibility);
-                // Now pick the best key possibility per key stretch
-                currentStretchPossibility = keyStretchPossibilities[0];
-                let stretchIdx = 0;
-                let segmentCount = 0;
-                let tonicFound;
-                let tonicFoundForSixth;
-                bars.forEach(barBase => {
-                    barBase.chordSegments.forEach(segment => {
-                        let { chordName } = segment;
-                        let base = chordName[0];
-                        let minorThirdAboveBase = noteSet[__WEBPACK_IMPORTED_MODULE_0__Util__["e" /* mod */](noteSet.indexOf(base) + 4, 12)];
-                        if (currentStretchPossibility.keys.indexOf(base) !== -1) {
-                            tonicFound = base;
-                        }
-                        if (currentStretchPossibility.keys.indexOf(minorThirdAboveBase) !== -1) {
-                            tonicFoundForSixth = minorThirdAboveBase;
-                        }
-                        segmentCount++;
-                        if (segmentCount === currentStretchPossibility.segmentCount) {
-                            if (tonicFound) {
-                                keyStretches.push({ keys: [tonicFound], segmentCount });
-                            }
-                            else if (tonicFoundForSixth) {
-                                keyStretches.push({ keys: [tonicFoundForSixth], segmentCount });
-                            }
-                            else {
-                                keyStretches.push({ keys: [currentStretchPossibility.keys[0]], segmentCount });
-                            }
-                            stretchIdx++;
-                            currentStretchPossibility = keyStretchPossibilities[stretchIdx];
-                            segmentCount = 0;
-                        }
-                    });
-                });
-                // Add the key attribute to each segment
-                stretchIdx = 0;
-                segmentCount = 0;
-                bars.forEach(barBase => {
-                    barBase.chordSegments.forEach(segment => {
-                        segment.key = keyStretches[stretchIdx].keys[0];
-                        segmentCount++;
-                        if (segmentCount === keyStretches[stretchIdx].segmentCount) {
-                            stretchIdx++;
-                            segmentCount = 0;
-                        }
-                    });
-                });
-            }
-        };
         this._resetBarsAndChordStretches = () => {
             this._resetBars();
             this._buildChordStretches();
@@ -73017,7 +72979,7 @@ class Chart {
         this._onDirectBarsChange = () => {
             if (this._bars.length > 0) {
                 this._updateBarIndices();
-                this._addKeysToBars(this._bars, true);
+                Chart.addKeysToBars(this._bars, true);
                 this._setContextAndBaseBarsFromBars();
                 this._resetBarsAndChordStretches();
                 this._runExternalUpdate();
@@ -73077,7 +73039,7 @@ class Chart {
             }
         };
         this._songId = id;
-        this._addKeysToBars(barsBase, !context);
+        Chart.addKeysToBars(barsBase, !context);
         // If a context has been provided, assume that this Chart is being
         // used in play mode
         if (context) {
@@ -73260,7 +73222,6 @@ Chart.validChordSegments = (chordSegments, timeSignature) => {
         }
         prevBeatIdx = beatIdx;
         if (!Chart.validRelativeChordName(chordName)) {
-            console.log("IT's here!");
             return false;
         }
         if (!Chart.validRelativeNoteName(key)) {
@@ -73290,6 +73251,99 @@ Chart.validBaseBars = (baseBars) => {
         }
     }
     return true;
+};
+Chart.addKeysToBars = (bars, contextualized = false) => {
+    if (bars.length > 0) {
+        let noteSet = __WEBPACK_IMPORTED_MODULE_3__domain_Domain__["a" /* Domain */].RELATIVE_NOTE_NAMES;
+        if (contextualized) {
+            noteSet = __WEBPACK_IMPORTED_MODULE_3__domain_Domain__["a" /* Domain */].NOTE_NAMES;
+        }
+        let keyStretches = [];
+        let possibleChordKeys = [];
+        let keyStretchPossibilities = [];
+        let currentStretchPossibility;
+        // Get the possible keys per chord segment
+        bars.forEach(barBase => {
+            barBase.chordSegments.forEach(segment => {
+                possibleChordKeys = [
+                    ...possibleChordKeys,
+                    __WEBPACK_IMPORTED_MODULE_4__domain_ChordClass__["a" /* Chord */].getSuitableKeys(segment.chordName)
+                ];
+            });
+        });
+        // Get the possible keys per key stretch
+        currentStretchPossibility = { keys: possibleChordKeys[0], segmentCount: 1 };
+        for (let i = 1; i < possibleChordKeys.length; i++) {
+            let chordKeys = possibleChordKeys[i];
+            let keyOverlap = currentStretchPossibility.keys.filter(key => chordKeys.indexOf(key) !== -1);
+            if (keyOverlap.length === 0) {
+                keyStretchPossibilities.push(currentStretchPossibility);
+                currentStretchPossibility = { keys: chordKeys, segmentCount: 1 };
+            }
+            else {
+                currentStretchPossibility.keys = keyOverlap;
+                currentStretchPossibility.segmentCount++;
+            }
+        }
+        keyStretchPossibilities.push(currentStretchPossibility);
+        // Now pick the best key possibility per key stretch
+        currentStretchPossibility = keyStretchPossibilities[0];
+        let stretchIdx = 0;
+        let segmentCount = 0;
+        let tonicFound;
+        let tonicFoundForSixth;
+        bars.forEach(barBase => {
+            barBase.chordSegments.forEach(segment => {
+                let { chordName } = segment;
+                let base = chordName[0];
+                let minorThirdAboveBase = noteSet[__WEBPACK_IMPORTED_MODULE_0__Util__["e" /* mod */](noteSet.indexOf(base) + 4, 12)];
+                if (currentStretchPossibility.keys.indexOf(base) !== -1) {
+                    tonicFound = base;
+                }
+                if (currentStretchPossibility.keys.indexOf(minorThirdAboveBase) !== -1) {
+                    tonicFoundForSixth = minorThirdAboveBase;
+                }
+                segmentCount++;
+                if (segmentCount === currentStretchPossibility.segmentCount) {
+                    if (tonicFound) {
+                        keyStretches.push({ keys: [tonicFound], segmentCount });
+                    }
+                    else if (tonicFoundForSixth) {
+                        keyStretches.push({ keys: [tonicFoundForSixth], segmentCount });
+                    }
+                    else {
+                        let chosenKey;
+                        if (keyStretches.length > 0) {
+                            let prevKey = keyStretches[keyStretches.length - 1].keys[0];
+                            chosenKey = __WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["h" /* pickClosestKey */](prevKey, currentStretchPossibility.keys);
+                        }
+                        else {
+                            chosenKey = currentStretchPossibility.keys[0];
+                        }
+                        keyStretches.push({ keys: [chosenKey], segmentCount });
+                    }
+                    stretchIdx++;
+                    currentStretchPossibility = keyStretchPossibilities[stretchIdx];
+                    segmentCount = 0;
+                    tonicFound = undefined;
+                    tonicFoundForSixth = undefined;
+                }
+            });
+        });
+        // Add the key attribute to each segment
+        stretchIdx = 0;
+        segmentCount = 0;
+        bars.forEach(barBase => {
+            barBase.chordSegments.forEach(segment => {
+                segment.key = keyStretches[stretchIdx].keys[0];
+                segmentCount++;
+                if (segmentCount === keyStretches[stretchIdx].segmentCount) {
+                    stretchIdx++;
+                    segmentCount = 0;
+                }
+            });
+        });
+    }
 };
 /* harmony default export */ __webpack_exports__["a"] = (Chart);
 
@@ -73766,7 +73820,7 @@ Chord.chordNamesAreEqual = (cn1, cn2) => {
 Chord.canAddWithoutCluster = (notes, newNote) => {
     let newNotes = [...notes, newNote];
     newNotes.sort((a, b) => a.pitch - b.pitch);
-    return Object(__WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["h" /* voicingContainsNoClusters */])(newNotes.map(n => n.pitch));
+    return Object(__WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["i" /* voicingContainsNoClusters */])(newNotes.map(n => n.pitch));
 };
 
 
