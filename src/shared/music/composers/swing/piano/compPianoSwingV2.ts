@@ -1,6 +1,6 @@
 import * as Util from "../../../../Util";
 import { Chord } from "../../../domain/ChordClass";
-import { ChordName, Tempo, IMusicBar, IPart, IMusicIdx, IChordSegment, /*IStroke,*/ IChordStretch } from "../../../../types";
+import { ChordName, Tempo, IMusicBar, IPart, IMusicIdx, IChordSegment, /*IStroke,*/ IChordStretch, IChartBar } from "../../../../types";
 import Chart from "../../../Chart";
 
 const VEL_FACTOR = 0.6;
@@ -13,6 +13,11 @@ const NUDGE_WITHIN_RANGE_ODDS = 0.8;
 const VOICING_DEVIATION_LIMIT = 13;
 
 export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart => {
+
+    /**
+     * DECLARATIONS & INIT
+     */
+
     let { chordStretches, bars } = chart;
     chordStretches = chordStretches as IChordStretch[];
     let music: IMusicBar[] = [];
@@ -27,23 +32,12 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
     let remainderOfCurrStretch = 0;
     let remainderOfCurrStretchPlusNextStretch: number;
     let stretchIdx = -1;
-    let waitChoices: [number, number][];
-    let currWeight: number;
-    let randVar: () => number;
-    let currIdxIsOffBeat: boolean;
 
     let maxStrokeDurationBars: Array<number[]> = bars.map(bar => []);
-    let maxPossibleDurationToDuration = (max: number) => {
-        let durationSkewer = 0.5 * (chart.tempo as Tempo)[0] / MAX_TEMPO; 
 
-        // base must be a number between 0 and 2
-        let base = Math.random() + (
-            Math.random() < durationSkewer
-                ? 0
-                : 1
-        );
-        return Math.ceil( max *  Math.pow(base, DURATION_SPREAD_FACTOR) / DURATION_SPREAD_ROOT );
-    }
+    /**
+     * CONSULT PREV MUSIC FOR INIT
+     */
 
     // If there is previous music, we can set the starting values of absSubbeatIdx and 
     // previousVoicing accordingly
@@ -87,10 +81,15 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
     //     }
     // }
 
+    /**
+     * FILL maxStrokeDurationBars
+     */
+
     while (musicIdx) {        
-        currTwoBarDuration = (bars[musicIdx.barIdx].durationInSubbeats as number) + (bars[Util.mod(musicIdx.barIdx + 1, bars.length)].durationInSubbeats as number);
-        remainderOfCurrStretchPlusNextStretch = remainderOfCurrStretch + (chordStretches[Util.mod(stretchIdx + 1, chordStretches.length)].durationInSubbeats as number);
+        currTwoBarDuration = getCurrTwoBarDuration(bars, musicIdx.barIdx);
+        remainderOfCurrStretchPlusNextStretch = remainderOfCurrStretch + getStretchDuration(chordStretches, stretchIdx + 1);
         
+        // Get the maximum possible wait time in subbeats/
         // Subtract 2 from remainder of curr stretch plus next because the next voicing
         // must land at or before the second last subbeat of the next stretch in order
         // for it to count for that stretch
@@ -100,25 +99,7 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
             maxSubbeatWait = remainderOfCurrStretchPlusNextStretch - 2;
         }
 
-        waitChoices = [];
-        currWeight = 1;
-        currIdxIsOffBeat = Util.mod(absSubbeatIdx, 3) === 2;
-        subbeatWait = currIdxIsOffBeat ? 1 : 2; 
-
-        while (subbeatWait <= maxSubbeatWait) {
-            waitChoices.push([subbeatWait, Math.max(currWeight, 1)]);
-            currWeight += (subbeatWait < 4) ? 1 : -1;
-            subbeatWait += (
-                Util.mod(subbeatWait, 3) === 0
-                    ? currIdxIsOffBeat
-                        ? 1 : 2
-                    : currIdxIsOffBeat
-                        ? 2 : 1
-            );
-        }
-
-        randVar = Util.generateCustomRandomVariable(waitChoices); 
-        subbeatWait = randVar();
+        subbeatWait = getMaxDuration(maxSubbeatWait, absSubbeatIdx);
         absSubbeatIdx += subbeatWait;
         musicIdx = chart.absSubbeatIdxToMusicIdx(absSubbeatIdx) as IMusicIdx; 
         
@@ -129,11 +110,15 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
         remainderOfCurrStretch -= subbeatWait;
         if (remainderOfCurrStretch <= 0) {
             stretchIdx ++;
-            remainderOfCurrStretch += (chordStretches[Util.mod(stretchIdx, chordStretches.length)].durationInSubbeats as number);
+            remainderOfCurrStretch += getStretchDuration(chordStretches, stretchIdx);
         } 
 
         prevMusicIdx = musicIdx;
     }
+
+    /**
+     * GENERATE CHORD VOICINGS AND CREATE MUSIC ARRAY
+     */
 
     maxStrokeDurationBars.forEach((maxStrokeDurationBar, barIdx) => {
         let musicBar: IMusicBar = {};
@@ -149,30 +134,8 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
                 }
             }
 
-            let chord = new Chord(segment.chordName as ChordName);
-            let nudgeFactor = NaN;           
-
-            if (previousVoicing.length > 0) {
-                let prevVoicingAvg = Util.mean(previousVoicing);
-                let diff = prevVoicingAvg - VOICING_TARGET;
-
-                if (diff > VOICING_DEVIATION_LIMIT) {
-                    nudgeFactor = -0.5;
-                } else if (diff < -1 * VOICING_DEVIATION_LIMIT) {
-                    nudgeFactor = 0.5;
-                } else {
-                    let diffFactor = Math.pow(diff / VOICING_DEVIATION_LIMIT, 2) * 3;
-                    diffFactor = diffFactor > 1 ? 1 : diffFactor;
-                    let diffFactorSign = diff > 0 ? -1 : 1;
-
-                    if (Math.random() < NUDGE_WITHIN_RANGE_ODDS) {
-                        nudgeFactor = diffFactorSign * diffFactor;
-                    }
-                }
-            }
-
-            let voicing = chord.voice(VOICING_TARGET, previousVoicing, nudgeFactor);
-            let durationInSubbeats = maxPossibleDurationToDuration(maxDuration);
+            let voicing = getVoicing(segment.chordName as ChordName, previousVoicing);
+            let durationInSubbeats = maxPossibleDurationToDuration(maxDuration, chart.tempo as Tempo);
 
             // Quiet down piano by default since it's 
             // inherently louder than double bass and drums
@@ -207,5 +170,78 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
         music
     };
 };
+
+/**
+ * HELPERS
+ */
+
+function getStretchDuration(stretches: IChordStretch[], stretchIdx: number) {
+    return stretches[Util.mod(stretchIdx, stretches.length)].durationInSubbeats as number;
+}
+
+function getCurrTwoBarDuration(bars: IChartBar[], barIdx: number) {
+    return (bars[barIdx].durationInSubbeats as number) 
+        + (bars[Util.mod(barIdx + 1, bars.length)].durationInSubbeats as number);
+}
+
+function getMaxDuration(maxSubbeatWait: number, absSubbeatIdx: number) {
+    let waitChoices: [number, number][] = [];
+    let currWeight = 1;
+    let currIdxIsOffBeat = Util.mod(absSubbeatIdx, 3) === 2;
+    let subbeatWait = currIdxIsOffBeat ? 1 : 2; 
+
+    while (subbeatWait <= maxSubbeatWait) {
+        waitChoices.push([subbeatWait, Math.max(currWeight, 1)]);
+        currWeight += (subbeatWait < 4) ? 1 : -1;
+        subbeatWait += (
+            Util.mod(subbeatWait, 3) === 0
+                ? currIdxIsOffBeat
+                    ? 1 : 2
+                : currIdxIsOffBeat
+                    ? 2 : 1
+        );
+    }
+
+    let randVar = Util.generateCustomRandomVariable(waitChoices); 
+    return randVar();
+}
+
+function getVoicing(chordName: ChordName, previousVoicing: number[]) {
+    let chord = new Chord(chordName);
+    let nudgeFactor = NaN;           
+
+    if (previousVoicing.length > 0) {
+        let prevVoicingAvg = Util.mean(previousVoicing);
+        let diff = prevVoicingAvg - VOICING_TARGET;
+
+        if (diff > VOICING_DEVIATION_LIMIT) {
+            nudgeFactor = -0.5;
+        } else if (diff < -1 * VOICING_DEVIATION_LIMIT) {
+            nudgeFactor = 0.5;
+        } else {
+            let diffFactor = Math.pow(diff / VOICING_DEVIATION_LIMIT, 2) * 3;
+            diffFactor = diffFactor > 1 ? 1 : diffFactor;
+            let diffFactorSign = diff > 0 ? -1 : 1;
+
+            if (Math.random() < NUDGE_WITHIN_RANGE_ODDS) {
+                nudgeFactor = diffFactorSign * diffFactor;
+            }
+        }
+    }
+
+    return chord.voice(VOICING_TARGET, previousVoicing, nudgeFactor);
+}
+
+function maxPossibleDurationToDuration(max: number, tempo: Tempo) {
+    let durationSkewer = 0.5 * tempo[0] / MAX_TEMPO; 
+
+    // base must be a number between 0 and 2
+    let base = Math.random() + (
+        Math.random() < durationSkewer
+            ? 0
+            : 1
+    );
+    return Math.ceil( max *  Math.pow(base, DURATION_SPREAD_FACTOR) / DURATION_SPREAD_ROOT );
+}
 
 export default compPianoSwingV2;
