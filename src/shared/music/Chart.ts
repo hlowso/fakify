@@ -104,6 +104,12 @@ class Chart {
                 return false;
             }
 
+            for (let prop in segment) {
+                if (prop !== "beatIdx" && prop !== "chordName" && prop !== "key") {
+                    return false;
+                }
+            }
+
             let { beatIdx, chordName, key } = segment;
             beatIdx = beatIdx as number;
             chordName = chordName as ChordName;
@@ -145,11 +151,13 @@ class Chart {
                 return false;
             }
 
-            let { barIdx, timeSignature, chordSegments } = bar;
-
-            if (!Number.isInteger(barIdx) || barIdx !== i) {
-                return false;
+            for (let prop in bar) {
+                if (prop !== "timeSignature" && prop !== "chordSegments") {
+                    return false;
+                }
             }
+
+            let { timeSignature, chordSegments } = bar;
 
             if (!Chart.validTimeSignature(timeSignature)) {
                 return false;
@@ -461,6 +469,8 @@ class Chart {
                 );
                 this._calculateChartDuration();
             }
+
+            this._updateBarIndices();
         }
     }
 
@@ -606,6 +616,25 @@ class Chart {
 
             this._context = context as NoteName;
             this._barsBase = MusicHelper.contextualizeOrDecontextualizeBars(this._bars, context as NoteName, true);
+            this._stripBarsBase();
+        }
+    }
+
+    private _stripBarsBase = () => {
+        if (!Array.isArray(this._barsBase)) {
+            return;
+        }
+
+        for (let barIdx = 0; barIdx < this._barsBase.length; barIdx ++) {
+            delete this._barsBase[barIdx]["barIdx"];
+            delete this._barsBase[barIdx]["durationInSubbeats"];
+
+            for (let segIdx = 0; segIdx < this._barsBase[barIdx].chordSegments.length; segIdx ++) {
+                delete this._barsBase[barIdx].chordSegments[segIdx]["subbeatIdx"];
+                delete this._barsBase[barIdx].chordSegments[segIdx]["durationInSubbeats"];
+                delete this._barsBase[barIdx].chordSegments[segIdx]["subbeatsBeforeChange"];
+                delete this._barsBase[barIdx].chordSegments[segIdx]["durationInBeats"];
+            }
         }
     }
     

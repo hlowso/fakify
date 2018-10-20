@@ -132,9 +132,9 @@ export const adjustBarTimes = (bars: IChartBar[], feel: Feel): IChartBar[] => {
 const _adjustBarsSwingFeel = (bars: IChartBar[]): IChartBar[] => {
 
     // First we convert time signatures and beat indices
-    let adjustedBars: IChartBar[] = bars.map(bar => {
+    let adjustedBars: IChartBar[] = bars.map((bar, barIdx) => {
 
-        let { timeSignature, chordSegments, barIdx } = bar;
+        let { timeSignature, chordSegments } = bar;
         let conversionFactor: number; 
         let subbeatsInBar = 0;
 

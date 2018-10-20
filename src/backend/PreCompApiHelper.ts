@@ -153,6 +153,12 @@ export class PreCompApiHelper {
             return false;
         }
 
+        for (let prop in chart) {
+            if ([ "title", "originalContext", "originalTempo", "barsBase" ].indexOf(prop) === -1) {
+                return false;
+            }
+        }
+
         let { title, originalContext, originalTempo, barsBase } = chart;
 
         if (typeof title !== "string" || title.length > 30) {

@@ -72958,6 +72958,7 @@ class Chart {
                     this._bars = __WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["e" /* adjustBarTimes */](this._bars, this._feel);
                     this._calculateChartDuration();
                 }
+                this._updateBarIndices();
             }
         };
         this._calculateChartDuration = () => {
@@ -73079,6 +73080,22 @@ class Chart {
                 }
                 this._context = context;
                 this._barsBase = __WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["g" /* contextualizeOrDecontextualizeBars */](this._bars, context, true);
+                this._stripBarsBase();
+            }
+        };
+        this._stripBarsBase = () => {
+            if (!Array.isArray(this._barsBase)) {
+                return;
+            }
+            for (let barIdx = 0; barIdx < this._barsBase.length; barIdx++) {
+                delete this._barsBase[barIdx]["barIdx"];
+                delete this._barsBase[barIdx]["durationInSubbeats"];
+                for (let segIdx = 0; segIdx < this._barsBase[barIdx].chordSegments.length; segIdx++) {
+                    delete this._barsBase[barIdx].chordSegments[segIdx]["subbeatIdx"];
+                    delete this._barsBase[barIdx].chordSegments[segIdx]["durationInSubbeats"];
+                    delete this._barsBase[barIdx].chordSegments[segIdx]["subbeatsBeforeChange"];
+                    delete this._barsBase[barIdx].chordSegments[segIdx]["durationInBeats"];
+                }
             }
         };
         this._completeMusicIdx = (idx) => {
@@ -73302,10 +73319,7 @@ Chart.validBaseBars = (baseBars) => {
         if (typeof bar !== "object") {
             return false;
         }
-        let { barIdx, timeSignature, chordSegments } = bar;
-        if (!Number.isInteger(barIdx) || barIdx !== i) {
-            return false;
-        }
+        let { timeSignature, chordSegments } = bar;
         if (!Chart.validTimeSignature(timeSignature)) {
             return false;
         }
