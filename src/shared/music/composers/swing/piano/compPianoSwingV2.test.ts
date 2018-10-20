@@ -9,7 +9,7 @@ import barsJustForFun from "../../../../test-data/bars-just-for-fun";
 import bars7_4_full from "../../../../test-data/bars-7-4-full-bar";
 import barsByeBye from "../../../../test-data/barsByeByeBlackbird";
 import { compPianoSwingV2 } from "./compPianoSwingV2";
-import { IChartBar, Feel, IChordStretch, IMusicBar } from "../../../../types";
+import { IChartBar, Feel, IChordStretch, IMusicBar, IStroke } from "../../../../types";
 
 const _251_chart = new Chart(() => {}, _251_bars as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
 const C_Blues_chart = new Chart(() => {}, C_Blues_bars as IChartBar[], "C", [ 120, 4 ], Feel.Swing);
@@ -17,6 +17,8 @@ const chartJustForFun = new Chart(() => {}, barsJustForFun as IChartBar[], "A#|B
 const chart4Chords = new Chart(() => {}, _4_chord_bar as IChartBar[], "G", [ 120, 4 ], Feel.Swing);
 const chart7_4Full = new Chart(() => {}, bars7_4_full as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
 const chart251Multi = new Chart(() => {}, _251_multichord_bars as IChartBar[], "B|Cb", [ 120, 4 ], Feel.Swing);
+const shortByeBye = new Chart(() => {}, barsByeBye as IChartBar[], "F", [ 120, 4 ], Feel.Swing, 3, 17);
+
 
 test("generates at least 1 voicing per chord stretch", () => {
 	let testRuns = 50;
@@ -49,8 +51,6 @@ test("all durations have integer values", () => {
 	let music: IMusicBar[] | undefined = undefined;
 	let music2: IMusicBar[] | undefined = undefined;
 
-	let shortByeBye = new Chart(() => {}, barsByeBye as IChartBar[], "F", [ 120, 4 ], Feel.Swing, 3, 17);
-
 	for (let i = 0; i < testRuns; i ++) {
 		music = compPianoSwingV2(chart251Multi, music).music;
 		let pass = compPianoSwingV2_All_Durations_Have_Values(music);
@@ -63,9 +63,118 @@ test("all durations have integer values", () => {
 	expect(successfulRuns).toBe(testRuns * 2);
 });
 
+test("piano chords don't overlap in time within music array", () => {
+	expect(compPianoSwingV2_Chords_Do_Not_Overlap(shortByeBye, 100)).toBe(100);
+});
+
+test("piano chords don't overlap across music arrays", () => {
+	expect(compPianoSwingV2_Chords_Do_Not_Overlap_Across_Music_Arrays(shortByeBye, 100)).toBe(100);
+});
+
 /**
  * HELPERS
  */
+
+function compPianoSwingV2_Chords_Do_Not_Overlap(chart: Chart, testRuns: number) {
+	let { bars } = chart;
+	let successfulRuns = 0;
+	let music: IMusicBar[] | undefined = undefined;
+	let lastAbsIdx: number | undefined;
+	let currAbsIdx: number | undefined;
+	let currDuration: number | undefined;
+	let absSubbeatIdx = 0;
+
+	test:
+	for (let i = 0; i < testRuns; i ++ ) {
+		music = compPianoSwingV2(chart, music).music;
+
+		for (let barIdx = 0; barIdx < music.length; barIdx ++) {
+			let musicBar = music[barIdx];
+			for (let subbeat in musicBar) {
+				currAbsIdx = absSubbeatIdx + parseInt(subbeat, undefined);
+
+				if (Number.isInteger(lastAbsIdx as number) && Number.isInteger(currDuration as number)) {
+					if ((lastAbsIdx as number) + (currDuration as number) > (currAbsIdx as number)) {
+						continue test;
+					}
+				}
+
+				lastAbsIdx = currAbsIdx as number;
+			}
+
+			absSubbeatIdx += bars[barIdx].durationInSubbeats as number;
+		}
+
+		successfulRuns ++;
+	}
+
+	return successfulRuns;
+}
+
+function compPianoSwingV2_Chords_Do_Not_Overlap_Across_Music_Arrays(chart: Chart, testRuns: number) {
+	
+	let { music } = compPianoSwingV2(chart);
+
+	let successfulRuns = 0;
+
+	function getDistanceToTopAndCurrDuration(chart: Chart, music: IMusicBar[]) {
+		let distanceToTop = 0;
+		let currDuration: number;
+		for (let barIdx = music.length - 1; barIdx >= 0; barIdx --) {
+			let bar = music[barIdx];
+			distanceToTop += chart.bars[barIdx].durationInSubbeats as number;
+
+			if (!Util.objectIsEmpty(bar)) {
+				let lastStroke: IStroke | undefined;
+				let subbeatIdx: number | undefined;
+
+				for (let subbeat in bar) {
+					lastStroke = bar[subbeat][0];
+					subbeatIdx = parseInt(subbeat, undefined);
+				}
+				
+				currDuration = (lastStroke as IStroke).durationInSubbeats as number;
+				distanceToTop -= subbeatIdx as number;
+
+				return {
+					currDuration,
+					distanceToTop
+				};
+			}
+
+		}
+
+		return { currDuration: -1, distanceToTop: -1 };
+	}
+
+	for (let i = 0; i < testRuns; i ++) {
+
+		let { currDuration, distanceToTop } = getDistanceToTopAndCurrDuration(chart, music);
+
+		music = compPianoSwingV2(chart, music).music;
+
+		let distanceToFirstStroke = 0;
+		let barIdx = 0;
+
+		findFirstSubbeat:
+		for (let bar of music) {
+			if (!Util.objectIsEmpty(bar)) {
+				for (let subbeat in bar) {
+					distanceToFirstStroke += parseInt(subbeat, undefined);
+					break findFirstSubbeat;
+				}
+			}
+			distanceToFirstStroke += chart.bars[barIdx].durationInSubbeats as number;
+			barIdx ++;
+		}
+
+		if (currDuration <= distanceToTop + distanceToFirstStroke) {
+			successfulRuns ++;
+		}
+	}
+
+	return successfulRuns;
+}
 
 function compPianoSwingV2_All_Durations_Have_Values(music: IMusicBar[]) {
 	for (let bar of music) {

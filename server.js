@@ -72876,6 +72876,9 @@ class Chart {
             return this.segmentAtIdx(idx).key;
         };
         this.absSubbeatIdxToMusicIdx = (absIdx) => {
+            if (!Number.isInteger(absIdx)) {
+                return null;
+            }
             let totalSubbeatCount = 0;
             for (let barIdx = 0; barIdx < this._bars.length; barIdx++) {
                 let bar = this._bars[barIdx];
@@ -72894,7 +72897,25 @@ class Chart {
                     barSubbeatCount += segmentDuration;
                 }
             }
-            return;
+            return null;
+        };
+        this.musicIdxToAbsSubbeatIdx = (musicIdx) => {
+            if (!musicIdx || !Number.isInteger(musicIdx.barIdx) || !Number.isInteger(musicIdx.subbeatIdx)) {
+                return null;
+            }
+            musicIdx.subbeatIdx = musicIdx.subbeatIdx;
+            if (musicIdx.barIdx < 0 || musicIdx.barIdx >= this._bars.length) {
+                return null;
+            }
+            let currBar = this._bars[musicIdx.barIdx];
+            if (musicIdx.subbeatIdx < 0 || musicIdx.subbeatIdx >= currBar.durationInSubbeats) {
+                return null;
+            }
+            let absSubbeatIdx = musicIdx.subbeatIdx;
+            for (let barIdx = 0; barIdx < musicIdx.barIdx; barIdx++) {
+                absSubbeatIdx += this._bars[barIdx].durationInSubbeats;
+            }
+            return absSubbeatIdx;
         };
         this.addBar = (idx, bar) => {
             if (bar) {
@@ -72942,27 +72963,61 @@ class Chart {
         this._calculateChartDuration = () => {
             if (this._feel) {
                 this._durationInSubbeats = 0;
-                this._bars.forEach(bar => {
-                    this._durationInSubbeats += bar.durationInSubbeats;
+                this._rangeDurationInSubbeats = 0;
+                this._bars.forEach((bar, barIdx) => {
+                    let barDuration = bar.durationInSubbeats;
+                    this._durationInSubbeats += barDuration;
+                    if (this.barIdxIsInRange(barIdx)) {
+                        this._rangeDurationInSubbeats += barDuration;
+                    }
                 });
             }
         };
         this._buildChordStretches = () => {
             this._chordStretches = [];
+            this._chordStretchesInRange = [];
             let subbeatsBeforeChange = 0;
+            let subbeatsBeforeChangeInRange = 0;
             // TODO: shouldn't depend on bars having subbeat to get chord stretches
             if (this._feel && this._bars.length > 0) {
                 this._bars.forEach(bar => {
-                    bar.chordSegments.forEach(segment => {
+                    bar.chordSegments.forEach((segment, segIdx) => {
+                        let segSubbeatsBeforeChange = segment.subbeatsBeforeChange;
+                        let segDuration = segment.durationInSubbeats;
+                        // Chord Stretches
                         if (subbeatsBeforeChange === 0) {
-                            subbeatsBeforeChange = segment.subbeatsBeforeChange;
+                            subbeatsBeforeChange = segSubbeatsBeforeChange;
                             this._chordStretches.push({
                                 chordName: segment.chordName,
                                 key: segment.key,
                                 durationInSubbeats: subbeatsBeforeChange
                             });
                         }
-                        subbeatsBeforeChange -= segment.durationInSubbeats;
+                        subbeatsBeforeChange -= segDuration;
+                        // Chord Stretches In Range
+                        if (this.barIdxIsInRange(bar.barIdx)) {
+                            // Make sure to cut the last stretch off if necessary
+                            let rangeStretches = this._chordStretchesInRange;
+                            if (bar.barIdx === this.rangeEndIdx &&
+                                segIdx === bar.chordSegments.length - 1 &&
+                                rangeStretches.length > 0 &&
+                                !__WEBPACK_IMPORTED_MODULE_4__domain_ChordClass__["a" /* Chord */].chordNamesAreEqual(segment.chordName, rangeStretches[rangeStretches.length - 1].chordName)) {
+                                this._chordStretchesInRange.push({
+                                    chordName: segment.chordName,
+                                    key: segment.key,
+                                    durationInSubbeats: segment.durationInSubbeats
+                                });
+                            }
+                            else if (subbeatsBeforeChangeInRange === 0) {
+                                subbeatsBeforeChangeInRange = segSubbeatsBeforeChange;
+                                this._chordStretchesInRange.push({
+                                    chordName: segment.chordName,
+                                    key: segment.key,
+                                    durationInSubbeats: subbeatsBeforeChangeInRange
+                                });
+                            }
+                            subbeatsBeforeChangeInRange -= segDuration;
+                        }
                     });
                 });
             }
@@ -72974,6 +73029,12 @@ class Chart {
                     this._calculateChartDuration();
                 }
                 this._chordStretches[0].durationInSubbeats = this._durationInSubbeats;
+            }
+            if (this._chordStretchesInRange.length === 1) {
+                if (!Number.isInteger(this._rangeDurationInSubbeats)) {
+                    this._calculateChartDuration();
+                }
+                this._chordStretchesInRange[0].durationInSubbeats = this._rangeDurationInSubbeats;
             }
         };
         this._onDirectBarsChange = () => {
@@ -73039,6 +73100,10 @@ class Chart {
             }
         };
         this._songId = id;
+        this._tempo = tempo;
+        this._externalUpdate = externalUpdate;
+        this._rangeStartIdx = rangeStartIdx;
+        this._rangeEndIdx = rangeEndIdx;
         Chart.addKeysToBars(barsBase, !context);
         // If a context has been provided, assume that this Chart is being
         // used in play mode
@@ -73054,11 +73119,6 @@ class Chart {
         this._feel = feel || this.suitableFeels[0];
         // Build the contextualized, time adjusted bars
         this._resetBarsAndChordStretches();
-        this._tempo = tempo;
-        this._externalUpdate = externalUpdate;
-        this._rangeStartIdx = rangeStartIdx;
-        this._rangeEndIdx = rangeEndIdx;
-        this._durationInSubbeats = 0;
         if (externalUpdate) {
             externalUpdate();
         }
@@ -73077,6 +73137,9 @@ class Chart {
     }
     get chordStretches() {
         return this._chordStretches;
+    }
+    get chordStretchesInRange() {
+        return this._chordStretchesInRange;
     }
     get context() {
         return this._context;
