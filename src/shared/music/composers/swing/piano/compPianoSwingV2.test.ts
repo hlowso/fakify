@@ -18,6 +18,7 @@ const chart4Chords = new Chart(() => {}, _4_chord_bar as IChartBar[], "G", [ 120
 const chart7_4Full = new Chart(() => {}, bars7_4_full as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
 const chart251Multi = new Chart(() => {}, _251_multichord_bars as IChartBar[], "B|Cb", [ 120, 4 ], Feel.Swing);
 const shortByeBye = new Chart(() => {}, barsByeBye as IChartBar[], "F", [ 120, 4 ], Feel.Swing, 3, 17);
+const chartByeBye = new Chart(() => {}, barsByeBye as IChartBar[], "F", [ 120, 4 ], Feel.Swing);
 
 
 test("generates at least 1 voicing per chord stretch", () => {
@@ -69,6 +70,27 @@ test("piano chords don't overlap in time within music array", () => {
 
 test("piano chords don't overlap across music arrays", () => {
 	expect(compPianoSwingV2_Chords_Do_Not_Overlap_Across_Music_Arrays(shortByeBye, 100)).toBe(100);
+});
+
+test("piano music is valid", () => {
+
+	let charts = [
+		shortByeBye,
+		chartByeBye,
+		chartJustForFun,
+		chart4Chords,
+		chart251Multi,
+		chart7_4Full,
+		_251_chart,
+		C_Blues_chart
+	];
+
+	for (let chart of charts) {
+		let music: IMusicBar[] | undefined;
+		for (let i = 0; i < 100; i ++) {
+			expect(Score.validPart(compPianoSwingV2(chart, music))).toBe(true);
+		}
+	}
 });
 
 /**
