@@ -23,6 +23,7 @@ export class SessionManager {
     protected _chorusIdx = -1;
     protected _barIdx: number;
     protected _segmentIdx = -1;
+    protected _failure = false;
 
     private _WAITTIME_FACTOR = (3 / 4) * 1000;
     private _PREP_TIME = 0.02;
@@ -93,6 +94,10 @@ export class SessionManager {
         return scale.noteClasses;
     }
 
+    get failure() {
+        return this._failure;
+    }
+
     /**
      * PUBLIC FUNCTIONS
      */
@@ -103,7 +108,12 @@ export class SessionManager {
                 Util.waitFor(getUpdate, this._TIME_CHECKER_RATE)
                     .then(() => {
                         if (!timeout || this.inSession) {
-                            this._stepBySegment();
+                            let stepWasSuccessful = this._stepBySegment();
+
+                            if (!stepWasSuccessful) {
+                                throw new Error("Could not step to next segment");
+                            }
+
                             this._queueCurrSegment();
                             let nextQueueTime = this._nextSegmentQueueTime;
                             let nextQueueTimeMinusPrepTime = nextQueueTime - this._PREP_TIME;
@@ -112,6 +122,13 @@ export class SessionManager {
                                 () => (this._audioContext.currentTime > nextQueueTimeMinusPrepTime)
                             );
                         }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        this._failure = true;
+                        this._startTime = NaN;
+
+                        // TODO: more thorough cleanup might be necessary...
                     });
             }, timeout);
         };
@@ -192,6 +209,8 @@ export class SessionManager {
         }
     }
 
+    // Returns false if the stepping fails, which most likely 
+    // will be due to a score compilation failure
     private _stepBySegment = () => {
         this._segmentIdx = (this._segmentIdx + 1) % this.currChartBar.chordSegments.length;
 
@@ -204,7 +223,12 @@ export class SessionManager {
                 this._chorusIdx ++;
 
                 // Refresh the score
-                this._score = this._compileMusic();
+                try {
+                    this._score = this._compileMusic();
+                } catch (err) {
+                    console.error(err);
+                    return false;
+                }
 
                 // Reset the queue times
                 this._resetQueueTimes();
@@ -212,6 +236,8 @@ export class SessionManager {
         }
 
         this._onUpdate();
+
+        return true;
     }
 
     // TODO refactor this bish...

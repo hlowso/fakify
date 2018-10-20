@@ -4,6 +4,65 @@ import * as Util from "../Util";
 class Score {
     private _bars: IScoreBar[]; 
 
+    public static validStrokes = (strokes: IStroke[]) => {
+        if (!Array.isArray(strokes)) {
+            return false;
+        }
+
+        for (let stroke of strokes) {
+            if (
+                !stroke || 
+                !Number.isInteger(stroke.durationInSubbeats) ||
+                stroke.durationInSubbeats <= 0 ||
+                !Number.isFinite(stroke.velocity) ||
+                stroke.velocity < 0 ||
+                stroke.velocity > 1 ||
+                !Array.isArray(stroke.notes) ||
+                stroke.notes.length === 0 ||
+                stroke.notes.some(n => !Number.isInteger(n))
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static validMusic = (music: IMusicBar[]) => {
+        if (!Array.isArray(music)) {
+            return false;
+        }
+
+        for (let bar of music) {
+            for (let subbeat in bar) {
+                let subbeatIdx = parseInt(subbeat, undefined);
+
+                if (!Number.isInteger(subbeatIdx) || subbeatIdx < 0 || !Score.validStrokes(bar[subbeat])) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public static validPart = (part: IPart) => {
+        if (!part) {
+            return false;
+        }
+
+        switch(part.instrument) {
+            case "piano":
+            case "doubleBass":
+            case "shutHiHat":
+            case "rideCymbal":
+                return Score.validMusic(part.music);
+
+            default:
+                return false;
+        }
+    }
+
     // Returns a tuple of 3 integers in which the first is the number of times a subsequent 
     // voicing notes average was greater than the one preceeding, the second is the number
     // of times a subsequent voicing notes average was less than the one preceding, and
@@ -61,7 +120,7 @@ class Score {
             partsOrScores = [partsOrScores];
         }
 
-        partsOrScores.forEach(partOrScore => {
+        for (let partOrScore of partsOrScores) {
             // If the current object is a score
             if (partOrScore instanceof Score) {
                 (partOrScore as Score).forEachBar((otherBar, idx) => {
@@ -84,7 +143,12 @@ class Score {
 
             // If the current object is a part
             } else {
-                let { instrument, music } = (partOrScore as IPart);
+
+                if (!Score.validPart(partOrScore)) {
+                    throw new Error("Invalid part passed to score constructor");
+                }
+
+                let { instrument, music } = partOrScore;
                 music.forEach((bar, idx) => {
                     if (!this._bars[idx]) {
                         this._bars[idx] = {};
@@ -99,9 +163,8 @@ class Score {
                         this._bars[idx][subbeatIdx][instrument] = this._bars[idx][subbeatIdx][instrument].concat(bar[subbeatIdx]);
                     }
                 });
-
             }
-        });
+        }
     }
 
     public barAt = (idx: number): IScoreBar => {

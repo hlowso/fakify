@@ -51,6 +51,8 @@ export interface ISongTitle {
     title: string;
 }
 
+export type InstrumentType = "piano" | "doubleBass" | "shutHiHat" | "rideCymbal";
+
 export type Tempo = [number, number];
 export type TimeSignature = [number, number];
 export type NoteName = "C" | "C#|Db" | "D" | "D#|Eb" | "E" | "F" | "F#|Gb" | "G" | "G#|Ab" | "A" | "A#|Bb" | "B|Cb";
