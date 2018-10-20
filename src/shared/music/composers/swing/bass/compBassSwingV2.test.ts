@@ -1,11 +1,14 @@
 import Chart from "../../../Chart";
+import Score from "../../../Score";
 import { Chord } from "../../../domain/ChordClass";
 import * as Util from "../../../../Util";
 import barsBase from "../../../../test-data/bars-251";
+import barsByeBye from "../../../../test-data/barsByeByeBlackbird";
 import { compBassSwingV2 } from "./compBassSwingV2";
-import { IChartBar, Feel, IChordStretch, ChordName } from "../../../../types";
+import { IChartBar, Feel, IChordStretch, ChordName, IMusicBar } from "../../../../types";
 
-const chart = new Chart(() => {}, barsBase as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
+const chart251 = new Chart(() => {}, barsBase as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
+const chartByeBye = new Chart(() => {}, barsByeBye as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
 
 test("compBassSwingV2 generates at least one tonic or fifth of the current chord per chord stretch", () => {
 
@@ -13,10 +16,26 @@ test("compBassSwingV2 generates at least one tonic or fifth of the current chord
 	let successfulRuns = 0;
 
 	for (let i = 0; i < testRuns; i ++) {
-		successfulRuns += compBassSwingV2_Generates_At_Least_One_Tonic_Or_Fifth_Per_Chord_Stretch(chart) ? 1 : 0;
+		successfulRuns += compBassSwingV2_Generates_At_Least_One_Tonic_Or_Fifth_Per_Chord_Stretch(chart251) ? 1 : 0;
+		successfulRuns += compBassSwingV2_Generates_At_Least_One_Tonic_Or_Fifth_Per_Chord_Stretch(chartByeBye) ? 1 : 0;
 	}
 
-	expect(successfulRuns).toBe(testRuns);
+	expect(successfulRuns).toBe(2 * testRuns);
+});
+
+test("piano music is valid", () => {
+
+	let charts = [
+		chartByeBye,
+		chart251
+	];
+
+	for (let chart of charts) {
+		let music: IMusicBar[] | undefined;
+		for (let i = 0; i < 100; i ++) {
+			expect(Score.validPart(compBassSwingV2(chart, music))).toBe(true);
+		}
+	}
 });
 
 /**
