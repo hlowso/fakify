@@ -320,6 +320,7 @@ class AppRouter extends Component {
         if (sessionManager) {
             sessionManager.stop();
         }
+        this.setState({ sessionManager: null });
     }
 
     /********************

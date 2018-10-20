@@ -127,6 +127,7 @@ export class SessionManager {
                         console.error(err);
                         this._failure = true;
                         this._startTime = NaN;
+                        this._onUpdate();
 
                         // TODO: more thorough cleanup might be necessary...
                     });

@@ -146,8 +146,9 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         } = this.state;
 
         // let selectedSongId = selectedSong ? (selectedSong as ISong)._id: null;
-        let chartIsLoaded = !!this._chart;
         let inSession = sessionManager && sessionManager.inSession;
+        let sessionFailed = sessionManager && sessionManager.failure;
+        let chartIsLoaded = !!this._chart && !sessionFailed;
         let sessionIdx = inSession ? sessionManager.sessionIdx : null;
         let currNoteClasses = inSession ? sessionManager.currKeyNoteClasses : [];
         let firstNote = inSession ? (sessionManager as ListeningSessionManager).firstNote : NaN;
@@ -171,7 +172,9 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                         sessionIdx={sessionIdx as IMusicIdx} 
                         recontextualize={this._recontextualize} 
                         resetTempo={this._resetTempo} 
-                        onBarClick={this._onBarClick} />
+                        onBarClick={this._onBarClick} 
+                        sessionFailed={sessionFailed} 
+                        resetChart={this._resetChart} />
                     <Dashboard 
                         inSession={inSession}
                         chartIsLoaded={chartIsLoaded}

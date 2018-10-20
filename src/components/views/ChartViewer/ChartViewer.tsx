@@ -13,11 +13,13 @@ export interface IChartViewerProps {
     song?: ISong;
     chart?: Chart;
     sessionIdx?: IMusicIdx;
+    sessionFailed?: boolean;
     onBarClick?: (barIdx: number) => void;
     onAddBar?: (barIdx: number) => void;
     recontextualize?: (noteName: NoteName) => void;
     resetTempo?: (tempo: Tempo) => void;
     onSongTitleChange?: (updatedTitle: string) => void;
+    resetChart?: () => void;
 }
 
 export interface IChartViewerState {
@@ -39,37 +41,52 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     public render(): JSX.Element {
-        let { song, chart, editingMode } = this.props;
+        let { song, chart, editingMode, sessionFailed } = this.props;
         let noChartData = Util.objectIsEmpty(song) ||
                         Util.objectIsEmpty(chart);
 
-        if (noChartData) {
-            return (
-                <div id="chart-viewer">
-                    <h2 style={{ textAlign: "center" }}>No chart loaded</h2>
-                </div>
-            );
-        }
-
-        let $playView = $("#play-view");
-        let $menuBar = $("#menu-bar");
-        let $keyboard = $("#keyboard");
-
+        let content: JSX.Element[] | JSX.Element;
         let dynamicStyle = {} as any;
 
-        if ($playView && $menuBar && $keyboard) {
-            dynamicStyle.height = ($playView.height() as number) - ($menuBar.height() as number) - ($keyboard.height() as number); 
+        if (noChartData) {
+
+            content = <h2 style={{ textAlign: "center" }}>No chart loaded</h2>;
+
+        } else if (sessionFailed) {
+
+            content = (
+                <div style={{ textAlign: "center" }}>
+                    <h2  key={1} >
+                        An error occured while playing your chart :(
+                    </h2>
+                    <a onClick={this._resetChart} key={2} style={{ fontSize: "150%" }} >Reset Chart</a>
+                </div>
+            );
+                
+        } else {
+
+            let $playView = $("#play-view");
+            let $menuBar = $("#menu-bar");
+            let $keyboard = $("#keyboard");
+
+            if ($playView && $menuBar && $keyboard) {
+                dynamicStyle.height = ($playView.height() as number) - ($menuBar.height() as number) - ($keyboard.height() as number); 
+            }
+
+            content = [
+                <header className="chart-header" style={{ justifyContent: editingMode ? "space-between" : "center" }} key={0} >
+                    {false && this.renderLeftHandSettings()}
+                    {this.renderTitle()}
+                </header>,
+                <section className="chart-body" key={1} >
+                    {this.renderProgressionLines()}
+                </section>
+            ];
         }
 
         return (
             <div id="chart-viewer" style={dynamicStyle} >
-                <header className="chart-header" style={{ justifyContent: editingMode ? "space-between" : "center" }} >
-                    {false && this.renderLeftHandSettings()}
-                    {this.renderTitle()}
-                </header>
-                <section className="chart-body">
-                    {this.renderProgressionLines()}
-                </section>
+                {content}
             </div>
         );
     }
@@ -467,6 +484,16 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         let { resetTempo } = this.props;
         if (resetTempo) {
             resetTempo(tempo);
+        }
+    }
+
+    /**
+     * RESET CHART
+     */
+
+    private _resetChart = () => {
+        if (this.props.resetChart) {
+            this.props.resetChart();
         }
     }
 
