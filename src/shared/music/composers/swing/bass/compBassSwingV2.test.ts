@@ -4,11 +4,14 @@ import { Chord } from "../../../domain/ChordClass";
 import * as Util from "../../../../Util";
 import barsBase from "../../../../test-data/bars-251";
 import barsByeBye from "../../../../test-data/barsByeByeBlackbird";
+import bars7_4WithCs from "../../../../test-data/bars7_4WithCs";
 import { compBassSwingV2 } from "./compBassSwingV2";
 import { IChartBar, Feel, IChordStretch, ChordName, IMusicBar } from "../../../../types";
 
 const chart251 = new Chart(() => {}, barsBase as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
 const chartByeBye = new Chart(() => {}, barsByeBye as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
+const shortByeBye = new Chart(() => {}, barsByeBye as IChartBar[], "F#|Gb", [ 120, 4 ], Feel.Swing, 7, 7);
+const short7_4WithCs = new Chart(() => {}, bars7_4WithCs as IChartBar[], "C", [ 120, 4 ], Feel.Swing, 3, 3 );
 
 test("compBassSwingV2 generates at least one tonic or fifth of the current chord per chord stretch", () => {
 
@@ -23,11 +26,13 @@ test("compBassSwingV2 generates at least one tonic or fifth of the current chord
 	expect(successfulRuns).toBe(2 * testRuns);
 });
 
-test("piano music is valid", () => {
+test("bass music is valid", () => {
 
 	let charts = [
 		chartByeBye,
-		chart251
+		chart251,
+		shortByeBye,
+		short7_4WithCs
 	];
 
 	for (let chart of charts) {
@@ -35,6 +40,24 @@ test("piano music is valid", () => {
 		for (let i = 0; i < 100; i ++) {
 			expect(Score.validPart(compBassSwingV2(chart, music))).toBe(true);
 		}
+	}
+});
+
+test("changing range doesn't invalidate music", () => {
+	for (let i = 0; i < 100; i ++) {
+
+		short7_4WithCs.rangeEndIdx = 8;
+
+		let pass = Score.validPart(compBassSwingV2(short7_4WithCs));
+
+		if (!pass) {
+			console.log(i);
+		}
+
+		expect(pass).toBe(true);
+
+		short7_4WithCs.rangeEndIdx = 3;
+		expect(Score.validPart(compBassSwingV2(short7_4WithCs))).toBe(true);
 	}
 });
 

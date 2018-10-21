@@ -549,20 +549,16 @@ class Chart {
             });
         }
 
+        this._calculateChartDuration();
+
         // There may be only one chord stretch, in which case its 
         // durationInSubbeats property should be the same as that 
         // on the whole chart
         if (this._chordStretches.length === 1) {
-            if (!Number.isInteger(this._durationInSubbeats)) {
-                this._calculateChartDuration();
-            }
             this._chordStretches[0].durationInSubbeats = this._durationInSubbeats;
         }
 
         if (this._chordStretchesInRange.length === 1) {
-            if (!Number.isInteger(this._rangeDurationInSubbeats)) {
-                this._calculateChartDuration();
-            }
             this._chordStretchesInRange[0].durationInSubbeats = this._rangeDurationInSubbeats;
         }
     }
@@ -741,6 +737,7 @@ class Chart {
     }
 
     get barsBase() {
+        this._stripBarsBase();
         return this._barsBase;
     }
 
