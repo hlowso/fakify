@@ -767,11 +767,13 @@ class Chart {
 
     set rangeStartIdx(newIdx: number) {
         this._rangeStartIdx = newIdx;
+        this._buildChordStretches();
         this._runExternalUpdate();
     }
 
     set rangeEndIdx(newIdx: number) {
         this._rangeEndIdx = newIdx;
+        this._buildChordStretches();
         this._runExternalUpdate();
     }
 }
