@@ -30,6 +30,7 @@ export interface IPlayVCState {
     selectedSong: ISong | {};
     midiSettingsModalOpen: boolean;
     playMode: PlayMode;
+    spaceClickDone: boolean;
 }
 
 class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
@@ -43,7 +44,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             songTitles: {},
             selectedSong: {},
             midiSettingsModalOpen: false,
-            playMode: PlayMode.None         
+            playMode: PlayMode.None,
+            spaceClickDone: true       
         };
     }
 
@@ -79,10 +81,16 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                     }, this._resetChart);
                 }
             });
+
+        window.addEventListener("keydown", this._onKeyDown);
+        window.addEventListener("keyup", this._onKeyUp);
     }
 
     public componentWillUnmount() {
         this._stopSession();
+
+        window.removeEventListener("keydown", this._onKeyDown);
+        window.removeEventListener("keyup", this._onKeyUp);
     }
 
     public componentDidUpdate() {
@@ -348,6 +356,41 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                     this.setState({ selectedSong }, this._resetChart);
                 }
             });
+    }
+
+    /**
+     * GENERAL HANDLERS
+     */
+
+    private _onKeyDown: EventListenerOrEventListenerObject = (evt: KeyboardEvent) => {
+        switch((evt.code)) {
+            case "Space":
+                this._onSpace();
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    private _onKeyUp: EventListenerOrEventListenerObject = (evt: KeyboardEvent) => {
+        this.setState({ 
+            spaceClickDone: true 
+        });
+    }
+
+    private _onSpace = () => {
+        let { sessionManager } = this.props;
+
+        if (!this.state.spaceClickDone) {
+            return;
+        }
+
+        sessionManager && sessionManager.inSession 
+            ? this._stopSession() 
+            : this._startSession();
+
+        this.setState({ spaceClickDone: false });
     }
     
 }

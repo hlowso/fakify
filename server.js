@@ -25046,8 +25046,8 @@ const adjustBarTimes = (bars, feel) => {
 // parts. 
 const _adjustBarsSwingFeel = (bars) => {
     // First we convert time signatures and beat indices
-    let adjustedBars = bars.map(bar => {
-        let { timeSignature, chordSegments, barIdx } = bar;
+    let adjustedBars = bars.map((bar, barIdx) => {
+        let { timeSignature, chordSegments } = bar;
         let conversionFactor;
         let subbeatsInBar = 0;
         if (timeSignature[1] === 4) {
@@ -71290,6 +71290,11 @@ class PreCompApiHelper {
             if (typeof chart !== "object") {
                 return false;
             }
+            for (let prop in chart) {
+                if (["title", "originalContext", "originalTempo", "barsBase"].indexOf(prop) === -1) {
+                    return false;
+                }
+            }
             let { title, originalContext, originalTempo, barsBase } = chart;
             if (typeof title !== "string" || title.length > 30) {
                 return false;
@@ -73287,6 +73292,11 @@ Chart.validChordSegments = (chordSegments, timeSignature) => {
         if (typeof segment !== "object") {
             return false;
         }
+        for (let prop in segment) {
+            if (prop !== "beatIdx" && prop !== "chordName" && prop !== "key") {
+                return false;
+            }
+        }
         let { beatIdx, chordName, key } = segment;
         beatIdx = beatIdx;
         chordName = chordName;
@@ -73318,6 +73328,11 @@ Chart.validBaseBars = (baseBars) => {
         let bar = baseBars[i];
         if (typeof bar !== "object") {
             return false;
+        }
+        for (let prop in bar) {
+            if (prop !== "timeSignature" && prop !== "chordSegments") {
+                return false;
+            }
         }
         let { timeSignature, chordSegments } = bar;
         if (!Chart.validTimeSignature(timeSignature)) {
