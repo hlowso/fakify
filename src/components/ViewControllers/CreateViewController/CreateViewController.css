@@ -4,29 +4,46 @@
     height: 100%;
 }
 
-#create-view .central-container {
-    width: 800px;
-    height: 100%;
-    background-color: white; 
+#create-view .central-container { 
+    width: 1040px; 
+    background-color: #dedede;
+
+    border-right: solid #222 1px;
+    border-left: solid #222 1px;
+}
+
+#create-view #song-list-container {
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    background-color: white;
+    width: 90%;
+    height: 90%;
+
+    border: solid 1px #222;
+    border-radius: 5px;
+}
+
+#create-view #song-list-header {
+    height: 15%;
+    padding: 20px;
+}
+
+#create-view #song-list {
+    height: 85%;
+    overflow: auto;
 }
 
 #create-view .user-title {
-    width: 90%;
-    height: 30px;
+    width: 100%;
+    height: 40px;
+    font-size: 130%;
+    padding: 5px;
 
-    margin: auto;
-    margin-bottom: 10px;
-    margin-top: 10px;    
-    padding: 10px;
-
-    border: solid 1px black;
-    border-radius: 5px;
-
-    font-size: 150%;
+    border-top: solid 1px #222;
 }
 
 #create-view .user-title:hover {
     cursor: pointer;
-    background-color: #222;
-    color: white;
+    background-color: #ddd;
 }

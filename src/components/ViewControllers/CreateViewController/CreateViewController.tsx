@@ -5,7 +5,9 @@ import * as Util from "../../../shared/Util";
 import * as Api from "../../../shared/Api";
 import { ISong, IChartBar, ChordShape, Tabs } from "../../../shared/types";
 import Chart from "../../../shared/music/Chart";
+import $ from "jquery";
 import "./CreateViewController.css";
+import { Button } from "react-bootstrap";
 
 export interface ICreateVCProps {
     StateHelper: any;
@@ -59,12 +61,6 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     public renderCentralPanel() {
         let { 
             loadingSongTitles, 
-            userSongTitles, 
-            editingSong, 
-            isUpdatingBar,
-            isAddingBar,
-            editBar,
-            errorMessage 
         } = this.state;
 
         let content: JSX.Element | JSX.Element[] = (
@@ -72,36 +68,95 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         );
 
         if (!loadingSongTitles) {
-            if (!this._editingChart) {
-                content = [];
-                userSongTitles = userSongTitles as { [chartId: string]: string };
-
-                for (let chartId in userSongTitles) {
-                    content.push(
-                        <div className="user-title" onClick={() => this._onChooseEditSong(chartId)} >
-                            {userSongTitles[chartId]}
-                        </div>
-                    );
-                }
-
-                content.push(
-                    <button style={{ marginLeft: 20 }} onClick={ this._onNewSong }>
-                        New Song
-                    </button>
-                );
-            } else {
-                content = (
-                    <ChartViewer
-                        editingMode={true}
-                        song={editingSong}
-                        chart={this._editingChart} 
-                        onBarClick={this._onBarClick}
-                        onAddBar={this._onAddBar}
-                        onSongTitleChange={this._onSongTitleChange}
-                    />
-                );
-            }
+            content = (
+                !this._editingChart
+                    ? this.renderSongList()
+                    : this.renderEditingChart()
+            );
         }
+
+        let dynamicStyles = {} as any;
+        let $nav = $(".nav-container");
+        let navHeight = $nav.outerHeight();
+
+        if (Number.isFinite(navHeight as number)) {
+            dynamicStyles.height = window.innerHeight - (navHeight as number);
+        }
+
+        return (
+            <div className="central-container" style={dynamicStyles} >
+                {content}
+                {this.renderFooterButtons()}
+                {this.renderBarEditingModal()}
+            </div>
+        );
+    }
+
+    public renderSongList() {
+        let buttonSection = (
+            <div id="song-list-header" >
+                <Button 
+                    bsStyle="success" 
+                    bsSize="large"
+                    onClick={this._onNewSong} >
+                    New Song
+                </Button>
+            </div>
+        );
+
+        let list = (
+            <div id="song-list">
+                {this.renderSongListItems()}
+            </div>
+        );
+
+        return (
+            <div id="song-list-container" >
+                {buttonSection}
+                {list}
+            </div>
+        );
+    }
+
+    public renderSongListItems() {
+        let { userSongTitles } = this.state;
+        userSongTitles = userSongTitles as { [chartId: string]: string };
+
+        let listItems = [];
+
+        for (let chartId in userSongTitles) {
+            listItems.push({
+                chartId,
+                title: userSongTitles[chartId]
+            });
+        }
+
+        listItems.sort((a, b) => a.title < b.title ? -1 : 1);
+
+        return listItems.map(titleItem => (
+            <div className="user-title" onClick={() => this._onChooseEditSong(titleItem.chartId)} >
+                <span>{titleItem.title}</span>
+            </div>
+        ));
+    }
+
+    public renderEditingChart() {
+        let { editingSong } = this.state;
+        return (
+            <ChartViewer
+                editingMode={true}
+                song={editingSong}
+                chart={this._editingChart} 
+                onBarClick={this._onBarClick}
+                onAddBar={this._onAddBar}
+                onSongTitleChange={this._onSongTitleChange}
+            />
+        );
+    }
+
+    public renderFooterButtons() {
+
+        let { errorMessage } = this.state;
 
         let buttonStyle = {
             width: 150,
@@ -109,7 +164,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
             fontSize: "150%"
         };
 
-        let footerButtons = this._editingChart && (
+        return this._editingChart && (
             <div style={{ 
                 position: "fixed", 
                 display: "flex", 
@@ -119,15 +174,18 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                 alignItems: "center", 
                 bottom: 0, 
                 backgroundColor: "#222"
-            }}>
+            }} >
                 <button style={buttonStyle} onClick={this._onSaveChart}>Save</button>
                 <button style={buttonStyle} onClick={this._onCancel}>Cancel</button>                
                 <button style={buttonStyle} onClick={this._onStartOver}>Start Over</button>
                 {errorMessage && <span style={{ color: "red" }}>{errorMessage}</span>}
             </div>
         );
+    }
 
-        let barEditingModal = (isUpdatingBar || isAddingBar) && (
+    public renderBarEditingModal() {
+        let { isUpdatingBar, isAddingBar, editBar} = this.state;
+        return (isUpdatingBar || isAddingBar) && (
             <BarEditingModal 
                 isOpen={true}
                 close={() => this.setState({ isAddingBar: false, isUpdatingBar: false })}
@@ -135,14 +193,6 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                 onEdit={updatedEditingBar => this.setState({ editBar: updatedEditingBar })}
                 onSave={this._onSaveBar}
             />
-        );
-
-        return (
-            <div className="central-container" >
-                {content}
-                {footerButtons}
-                {barEditingModal}
-            </div>
         );
     }
 
@@ -238,7 +288,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
     private _onCancel = () => {
         this._editingChart = undefined;
-        this.setState({ updatingChartId: "" });
+        this.setState({ updatingChartId: "", editingSong: undefined });
         this.forceUpdate();
     }
 

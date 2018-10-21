@@ -56,6 +56,12 @@
     text-align: center;
 }
 
+#tab-list button:hover {
+    background-color: #222;  
+    color: white;
+}
+
+#tab-list button:hover.active,
 #tab-list .active {
     background-color: #ddd;
     color: #222;

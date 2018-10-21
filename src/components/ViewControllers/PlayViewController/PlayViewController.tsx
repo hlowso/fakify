@@ -40,7 +40,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
     constructor(props: IPlayVCProps) {
         super(props);
         this.state = {
-            loadingSelectedSong: false,
+            loadingSelectedSong: true,
             songTitles: {},
             selectedSong: {},
             midiSettingsModalOpen: false,
@@ -70,16 +70,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             .then(songTitles => {
                 this.setState({ songTitles });
                 if (selectedSongId in songTitles) {
-                    return Api.getSongAsync(selectedSongId);
+                    this.loadSong(selectedSongId);
                 } 
-                return;
-            })
-            .then(song => {
-                if (song) {
-                    this.setState({ 
-                        selectedSong: song
-                    }, this._resetChart);
-                }
             });
 
         window.addEventListener("keydown", this._onKeyDown);
@@ -151,6 +143,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             songTitles, 
             selectedSong, 
             midiSettingsModalOpen, 
+            loadingSelectedSong
         } = this.state;
 
         // let selectedSongId = selectedSong ? (selectedSong as ISong)._id: null;
@@ -182,7 +175,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                         resetTempo={this._resetTempo} 
                         onBarClick={this._onBarClick} 
                         sessionFailed={sessionFailed} 
-                        resetChart={this._resetChart} />
+                        resetChart={this._resetChart} 
+                        loadingChart={loadingSelectedSong} />
                     <Dashboard 
                         inSession={inSession}
                         chartIsLoaded={chartIsLoaded}
@@ -222,9 +216,9 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         ); 
     }
 
-    /*********************
-        TRAINING WINDOW
-    **********************/
+    /****************
+        DASHBOARD
+    ****************/
 
     private _startSession = () => {
         if (!this._chart) {
@@ -239,6 +233,28 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             return;
         }    
         this.props.SoundActions.killTake();
+    }
+
+    private _recontextualize = (newKeyContext: NoteName) => {
+        this._stopSession();
+        let { selectedSong } = this.state;
+
+        (this._chart as Chart).context = newKeyContext;
+        
+        StorageHelper.updateChartSettings((selectedSong as ISong)._id as string, {
+            context: newKeyContext
+        });
+    }
+
+    private _resetTempo = (newTempo: Tempo) => {
+        this._stopSession();
+        let { selectedSong } = this.state;
+
+        (this._chart as Chart).tempo = newTempo;
+
+        StorageHelper.updateChartSettings((selectedSong as ISong)._id as string, {
+            tempo: newTempo
+        });
     }
 
     // private _setPlayMode = (playMode: PlayMode) => {
@@ -321,41 +337,13 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         });
     }
 
-    private _recontextualize = (newKeyContext: NoteName) => {
-        this._stopSession();
-        let { selectedSong } = this.state;
-
-        (this._chart as Chart).context = newKeyContext;
-        
-        StorageHelper.updateChartSettings((selectedSong as ISong)._id as string, {
-            context: newKeyContext
-        });
-    }
-
-    private _resetTempo = (newTempo: Tempo) => {
-        this._stopSession();
-        let { selectedSong } = this.state;
-
-        (this._chart as Chart).tempo = newTempo;
-
-        StorageHelper.updateChartSettings((selectedSong as ISong)._id as string, {
-            tempo: newTempo
-        });
-    }
-
     /**********************
         SONG LIST PANEL   
     **********************/
 
     public onSongListItemClick = (selectedSongId: string) => {
         StorageHelper.setSelectedSongId(selectedSongId);
-        
-        Api.getSongAsync(selectedSongId)
-            .then(selectedSong => {
-                if (selectedSong) {
-                    this.setState({ selectedSong }, this._resetChart);
-                }
-            });
+        this.loadSong(selectedSongId);
     }
 
     /**
@@ -365,6 +353,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
     private _onKeyDown: EventListenerOrEventListenerObject = (evt: KeyboardEvent) => {
         switch((evt.code)) {
             case "Space":
+                evt.preventDefault();
                 this._onSpace();
                 break;
 
@@ -391,6 +380,27 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             : this._startSession();
 
         this.setState({ spaceClickDone: false });
+    }
+
+    /**
+     * HELPERS
+     */
+
+    public async loadSong(chartId: string) {
+        if (typeof chartId !== "string") {
+            return;
+        }
+
+        this.setState({ loadingSelectedSong: true });
+
+        let selectedSong = await Api.getSongAsync(chartId);
+
+        if (selectedSong) {
+            this.setState({ 
+                selectedSong,
+                loadingSelectedSong: false 
+            }, this._resetChart);
+        }
     }
     
 }

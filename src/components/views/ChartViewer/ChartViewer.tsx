@@ -14,6 +14,7 @@ export interface IChartViewerProps {
     chart?: Chart;
     sessionIdx?: IMusicIdx;
     sessionFailed?: boolean;
+    loadingChart?: boolean;
     onBarClick?: (barIdx: number) => void;
     onAddBar?: (barIdx: number) => void;
     recontextualize?: (noteName: NoteName) => void;
@@ -41,14 +42,18 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     public render(): JSX.Element {
-        let { song, chart, editingMode, sessionFailed } = this.props;
+        let { song, chart, editingMode, sessionFailed, loadingChart } = this.props;
         let noChartData = Util.objectIsEmpty(song) ||
                         Util.objectIsEmpty(chart);
 
         let content: JSX.Element[] | JSX.Element;
         let dynamicStyle = {} as any;
 
-        if (noChartData) {
+        if (loadingChart) {
+
+            content = <h2 style={{ textAlign: "center" }} >loading chart...</h2>;
+
+        } else if (noChartData) {
 
             content = <h2 style={{ textAlign: "center" }}>No chart loaded</h2>;
 
