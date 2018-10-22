@@ -280,11 +280,11 @@ export class Chord extends Domain {
         });
     }
 
-    public static chordNamesAreEqual = (cn1: ChordName, cn2: ChordName) => {
+    public static chordNamesAreEqual = (cn1?: ChordName, cn2?: ChordName) => {
         if (!cn1 && !cn2) return true;
         if (!cn1 && cn2) return false;
         if (cn1 && !cn2) return false;
-        return cn1[0] === cn2[0] && cn1[1] === cn2[1];
+        return (cn1 as ChordName)[0] === (cn2 as ChordName)[0] && (cn1 as ChordName)[1] === (cn2 as ChordName)[1];
     }
 
     public static canAddWithoutCluster = (notes: Note[], newNote: Note) => {

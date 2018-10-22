@@ -53,8 +53,6 @@
 
 #chart-viewer .bar-container {
     display: flex;
-    min-width: 25%;
-    opacity: 0.2;
     cursor: pointer;
 }
 
@@ -64,24 +62,6 @@
 
 #chart-viewer .bar-container.will-be-within-range.within-range {
     background-color: #eee;
-}
-
-#chart-viewer .bar-container.add-box-precedes,
-#chart-viewer .bar-container.add-box-follows {
-    width: 22.5%;
-} 
-
-#chart-viewer .bar-container.add-box-precedes.add-box-follows,
-#chart-viewer .bar-container.add-box-follows.shortened {
-    width: 20%;
-}
-
-#chart-viewer .bar-container.add-box-precedes.add-box-follows.shortened {
-    width: 17.5%;
-}
-
-#chart-viewer .within-range {
-    opacity: 1;
 }
 
 #chart-viewer .current-bar {
@@ -100,13 +80,12 @@
 
 #chart-viewer .add-bar-box {
     display: flex;
+    background-color: #ddd;
     justify-content: center;
     align-items: center;
-    width: 5%;
-    height: 100px;
     border-right: solid black 1px;
-    border-bottom: solid black 1px;
     font-size: 150%;
+    cursor: pointer;
 }
 
 #chart-viewer .add-bar-box:hover {

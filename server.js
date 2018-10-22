@@ -72923,6 +72923,9 @@ class Chart {
             return absSubbeatIdx;
         };
         this.addBar = (idx, bar) => {
+            if (!Number.isInteger(idx) || idx < 0 || idx >= this._bars.length) {
+                return;
+            }
             if (bar) {
                 this._bars.splice(idx, 0, bar);
             }
@@ -72949,7 +72952,17 @@ class Chart {
             this._onDirectBarsChange();
         };
         this.updateBar = (idx, bar) => {
+            if (!Number.isInteger(idx) || idx < 0 || idx >= this._bars.length) {
+                return;
+            }
             this._bars[idx] = bar;
+            this._onDirectBarsChange();
+        };
+        this.deleteBar = (idx) => {
+            if (!Number.isInteger(idx) || idx < 0 || idx >= this._bars.length) {
+                return;
+            }
+            this._bars.splice(idx, 1);
             this._onDirectBarsChange();
         };
         this._resetBarsAndChordStretches = () => {

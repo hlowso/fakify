@@ -5,8 +5,11 @@
 }
 
 #create-view .central-container { 
+    display: flex;
     width: 1040px; 
-    background-color: #dedede;
+    min-height: 385px;
+    background-color: #ddd;
+    justify-content: center; 
 
     border-right: solid #222 1px;
     border-left: solid #222 1px;
