@@ -417,6 +417,10 @@ class Chart {
     }
 
     public addBar = (idx: number, bar?: IChartBar) => {
+        if (!Number.isInteger(idx) || idx < 0 || idx >= this._bars.length) {
+            return;
+        }
+
         if (bar) {
             this._bars.splice(idx, 0, bar);
         } else {
@@ -446,7 +450,20 @@ class Chart {
     }
 
     public updateBar = (idx: number, bar: IChartBar) => {
+        if (!Number.isInteger(idx) || idx < 0 || idx >= this._bars.length) {
+            return;
+        }
+
         this._bars[idx] = bar;
+        this._onDirectBarsChange();
+    }
+
+    public deleteBar = (idx: number) => {
+        if (!Number.isInteger(idx) || idx < 0 || idx >= this._bars.length) {
+            return;
+        }
+
+        this._bars.splice(idx, 1);
         this._onDirectBarsChange();
     }
 
