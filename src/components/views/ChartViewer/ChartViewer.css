@@ -80,7 +80,6 @@
 
 #chart-viewer .add-bar-box {
     display: flex;
-    background-color: #ddd;
     justify-content: center;
     align-items: center;
     border-right: solid black 1px;
@@ -99,8 +98,9 @@
 
 #chart-viewer .bar-chord-group {
     display: flex;
-    padding: 3px;
     font-size: 130%;
+    flex-grow: 20;
+    padding: 3px;
     align-items: center;
 }
 

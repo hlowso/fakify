@@ -26,6 +26,10 @@ export function shallowEqual(A: any, B: any) {
     return JSON.stringify(A) === JSON.stringify(B);
 };
 
+export function waitAsync(milliseconds: number) {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
 export const waitFor = (getUpdate: () => boolean, rate: number) => {
     return new Promise((resolve, reject) => {
         (function check() {
