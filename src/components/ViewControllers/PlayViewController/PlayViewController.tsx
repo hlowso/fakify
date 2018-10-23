@@ -351,6 +351,11 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
      */
 
     private _onKeyDown: EventListenerOrEventListenerObject = (evt: KeyboardEvent) => {
+
+        if((evt.target as Element).tagName === "INPUT") {
+            return;
+        }
+
         switch((evt.code)) {
             case "Space":
                 evt.preventDefault();
@@ -363,6 +368,11 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
     }
 
     private _onKeyUp: EventListenerOrEventListenerObject = (evt: KeyboardEvent) => {
+
+        if((evt.target as Element).tagName === "INPUT") {
+            return;
+        }
+
         this.setState({ 
             spaceClickDone: true 
         });
