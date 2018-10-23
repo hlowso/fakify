@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import * as Cx from "classnames";
-import { Glyphicon, Button } from "react-bootstrap";
+import { Button, Glyphicon, FormControl } from "react-bootstrap";
 import * as Util from "../../../shared/Util";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
 import { Chord } from "../../../shared/music/domain/ChordClass";
@@ -18,6 +18,8 @@ export interface IChartViewerProps {
     loadingChart?: boolean;
     onBarClick?: (barIdx: number) => void;
     onAddBar?: (barIdx: number) => void;
+    onEditBar?: (barIdx: number) => void;
+    onDeleteBar?: (barIdx: number) => void;
     recontextualize?: (noteName: NoteName) => void;
     resetTempo?: (tempo: Tempo) => void;
     onSongTitleChange?: (updatedTitle: string) => void;
@@ -27,15 +29,11 @@ export interface IChartViewerProps {
 export interface IChartViewerState {
     editingTitle?: boolean;
     hoveredBarIdx?: number;
-    precedingInsertBarIdx?: number; 
-    followingInsertBarIdx?: number;
     lastInLineIndices?: number[];
     linesAreGrouped?: boolean;
 }
 
 class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
-    private _addBoxHalfWidthPercent = 3;
-
     constructor(props: IChartViewerProps) {
         super(props);
         this.state = {
@@ -82,8 +80,9 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
             content = [
                 <header className="chart-header" style={{ justifyContent: editingMode ? "space-between" : "center" }} key={0} >
-                    {false && this.renderLeftHandSettings()}
+                    {this.renderLeftHandSettings()}
                     {this.renderTitle()}
+                    <div />
                 </header>,
                 <section className="chart-body" key={1} >
                     {this.renderProgressionLines()}
@@ -101,18 +100,23 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     public renderTitle = () => {
         let { editingMode, song } = this.props;
         let { editingTitle } = this.state;
+
+        if (!song) {
+            return;
+        }
+        
         return (
             editingTitle 
             ? (
-                <form onSubmit={this._onSubmitSongTitleForm} >
-                    <input 
-                        autoFocus={true}
-                        onFocus={(event: React.SyntheticEvent<any>) => (event.target as any).select()}
-                        onBlur={this._onSubmitSongTitleForm}
-                        value={(song as ISong).title}
-                        onChange={(event: React.SyntheticEvent<any>) => this._onSongTitleChange((event.target as any).value)} 
-                    />
-                </form>
+                <FormControl 
+                    autoFocus={true}
+                    onBlur={this._onSubmitSongTitleForm}
+                    onSubmit={this._onSubmitSongTitleForm}
+                    onFocus={(event: React.SyntheticEvent<any>) => (event.target as any).select()}
+                    onChange={(event: React.SyntheticEvent<any>) => this._onSongTitleChange((event.target as any).value)} 
+                    onKeyDown={this._onTitleEnter}
+                    value={song.title}
+                />
             )
             : (
                 <span 
@@ -123,6 +127,12 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                 </span>
             )
         );
+    }
+
+    private _onTitleEnter = (evt: React.KeyboardEvent<FormControl>) => {
+        if (evt.nativeEvent.code === "Enter") {
+            this._onSubmitSongTitleForm(evt);
+        }
     }
 
     private _onSubmitSongTitleForm = (event: React.SyntheticEvent<any>) => {
@@ -142,9 +152,9 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
      */
 
     public renderProgressionLines = (): JSX.Element[] => {
-        let { chart, editingMode } = this.props;
+        let { chart } = this.props;
         let { bars } = chart as Chart;
-        let { lastInLineIndices, linesAreGrouped } = this.state;
+        let { lastInLineIndices } = this.state;
         let lastBarsInLines = lastInLineIndices ? Util.copyObject(lastInLineIndices) : null;
         let lines: JSX.Element[] = [];
         let lineBars: JSX.Element[] = [];
@@ -156,24 +166,13 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
             bars.forEach((bar, i) => {
                 let isLastInLine = lineCount === 3;
-                let isFirstInLine = lineCount === 0;
 
                 if (Array.isArray(lastBarsInLines) && lastBarsInLines.length && lastBarsInLines[0] === i) {
                     isLastInLine = true;
                     lastBarsInLines.shift();
                 }
 
-                let precedingAddBarBox = this.renderAddBarBox(i, true);
-                if (precedingAddBarBox) {
-                    lineBars.push(precedingAddBarBox);
-                }
-
-                lineBars.push(this.renderBar(bar, prevBar, isFirstInLine, isLastInLine, currLineHas2Bars));
-
-                let followingAddBarBox = this.renderAddBarBox(i + 1, false);
-                if (followingAddBarBox) {
-                    lineBars.push(followingAddBarBox)
-                }
+                lineBars.push(this.renderBar(bar, prevBar, isLastInLine, currLineHas2Bars));
 
                 if (isLastInLine) {
                     lines.push(this.renderProgressionLine(lineBars));
@@ -193,10 +192,6 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             });
         }
 
-        if (editingMode && linesAreGrouped) {
-            lineBars.push(this.renderAddBarBox(bars.length) as JSX.Element);
-        }
-
         if (lineBars.length > 0) {
             lines.push(this.renderProgressionLine(lineBars));
         }
@@ -204,37 +199,37 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         return lines;
     }
 
-    public renderBar(bar: IChartBar, prevBar: IChartBar | undefined, isFirstInLine: boolean, isLastInLine: boolean, currLineHas2Bars: boolean) {
+    public renderBar(bar: IChartBar, prevBar: IChartBar | undefined, isLastInLine: boolean, currLineHas2Bars: boolean) {
 
         let { editingMode, chart, sessionIdx } = this.props;
-        let { linesAreGrouped } = this.state;
+        let { linesAreGrouped, hoveredBarIdx } = this.state;
         let { bars, rangeStartIdx, rangeEndIdx } = chart as Chart;
         let i = bar.barIdx;
         let prevChordName = prevBar ? prevBar.chordSegments[prevBar.chordSegments.length - 1].chordName : undefined;
         let isCurrentlyPlayingBar = sessionIdx && sessionIdx.barIdx === i;
         let isWithinRange = rangeStartIdx <= i &&
                                 i <= rangeEndIdx;
-        let baseKey = bars[0].chordSegments[0].key;                            
+        let baseKey = bars[0].chordSegments[0].key; 
 
         return (
             <div 
                 key={i}
                 className={this._getBarContainerClasses(i, rangeStartIdx, rangeEndIdx, !!isCurrentlyPlayingBar)}
-                onClick={() => this._onBarClick(i)}
-                onMouseEnter={(evt) => this._onBarEnter(evt, i)}
+                onMouseEnter={() => this._onBarEnter(i)}
                 onMouseLeave={this._onBarLeave}
                 style={{ 
                     opacity: editingMode ? 1 : (isWithinRange ? 1 : 0.2),
-                    width: linesAreGrouped ? `${this._getCurrRenderBarWidthPercent(i, isFirstInLine, isLastInLine, currLineHas2Bars)}%` : undefined,
+                    width: linesAreGrouped ? `${this._getCurrRenderBarWidthPercent(i, currLineHas2Bars)}%` : undefined,
                     minWidth: linesAreGrouped ? undefined : "25%",
                     borderRight: isLastInLine || i === rangeStartIdx - 1 ? undefined : "solid black 1px",
-                    borderLeft: i === rangeStartIdx && i !== 0 ? "solid black 1px" : undefined 
+                    borderLeft: i === rangeStartIdx && i !== 0 ? "solid black 1px" : undefined,
+                    backgroundColor: editingMode && hoveredBarIdx === i ? "#ddd" : undefined
                 }}
             >
-                {i === 0 && this.renderDoubleLine(true)}
+                {this.renderDoubleLine(i, true)}
                 {this.renderTimeSignature(prevBar, bar)}
                 {this.renderBarContent(i, this.renderBarChordElements(bar, !!isCurrentlyPlayingBar, baseKey as string, prevChordName))}
-                {i === bars.length - 1 && this.renderDoubleLine(false)}
+                {this.renderDoubleLine(i, false)}
             </div>
         );
     }
@@ -272,7 +267,9 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
                 prevChordName = chordName;
 
-            } else if (bar.timeSignature[0] >= 5 && bar.chordSegments.length > 1) {
+            } 
+            
+            if (!displayedChordBase && bar.timeSignature[0] >= 5 && bar.chordSegments.length > 1) {
                 chordPlaceholder = "%";
             }
 
@@ -297,32 +294,63 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
         return (
             editingMode && hoveredBarIdx === i
-                ? (
-                    <div style={{ flexGrow: 20 }} >
-                        <Button onClick={() => this._onBarClick(i)}>Edit</Button>
-                        <Button >Delete</Button>
+                ? this.renderBarButtonContent(i)
+                : (
+                    <div 
+                        className="bar bar-chord-group" 
+                        style={{ justifyContent: useDivisionSign ? "center" : "space-between" }} 
+                        key={0} >
+                        {useDivisionSign
+                            ? (
+                                <div className="bar division-sign">
+                                    %
+                                </div>
+                            )
+                            : chordNameElements
+                        }
                     </div>
                 )
-                : 
-                <div 
-                    className="bar bar-chord-group" 
-                    style={{ justifyContent: useDivisionSign ? "center" : "space-between" }} 
-                    key={0} >
-                    {useDivisionSign
-                        ? (
-                            <div className="bar division-sign">
-                                %
-                            </div>
-                        )
-                        : chordNameElements
-                    }
-                </div>
         );
     }
 
-    public renderDoubleLine(start: boolean) {
+    public renderBarButtonContent(i: number) {
+        return (
+            <div className="bar-buttons" >
+                <Button style={{ width: "10%", padding: 0 }} onClick={() => this._onAddBar(i)} > 
+                    <Glyphicon glyph="plus" style={{ margin: "auto" }} />
+                </Button>
+                <div style={{ width: "70%", display: "flex", flexDirection: "column" }} >
+                    <Button style={{ padding: 0 }} onClick={() => this._onEditBar(i)}>Edit</Button>
+                    <Button style={{ padding: 0 }} bsStyle="danger" onClick={() => this._onDeleteBar(i)}>Delete</Button>
+                </div>
+                <Button style={{ width: "10%", padding: 0 }} onClick={() => this._onAddBar(i + 1)}>
+                    <Glyphicon glyph="plus" />
+                </Button>
+            </div>
+        );
+    }
+
+    public renderDoubleLine(barIdx: number, start: boolean) {
+        let { chart, editingMode } = this.props;
+        let { hoveredBarIdx } = this.state;
+
+        if (!chart || (editingMode && barIdx === hoveredBarIdx)) {
+            return;
+        }
+
+        let { bars } = chart;
+
+        if (start) {
+            if (barIdx !== 0) {
+                return;
+            }
+        } else {
+            if (barIdx !== bars.length - 1) {
+                return;
+            }
+        }
+
         return <div style={{ 
-            flexGrow: 1, 
             height: "100%", 
             left: 0, 
             width: 5, 
@@ -332,7 +360,10 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     public renderTimeSignature(prevBar?: IChartBar, bar?: IChartBar) {
-        if (!bar) {
+        let { editingMode } = this.props;
+        let { hoveredBarIdx } = this.state;
+
+        if (!bar || (editingMode && bar.barIdx === hoveredBarIdx)) {
             return;
         }
 
@@ -352,80 +383,12 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         );
     }
 
-    public renderAddBarBox = (barIdx: number, preceding?: boolean) => {
-
-        let { editingMode } = this.props;
-        let { linesAreGrouped, precedingInsertBarIdx, followingInsertBarIdx } = this.state;
-
-        if (!editingMode || !linesAreGrouped) {
-            return;
-        }
-
-        if (preceding) {
-            if (barIdx !== precedingInsertBarIdx) {
-                return;
-            }
-        } else {
-            if (barIdx !== followingInsertBarIdx) {
-                return;
-            }
-        }
-
-        return (
-            <div 
-                key={`add-${barIdx}`}
-                style={{ width: `${2 * this._addBoxHalfWidthPercent}%` }}
-                className={`add-bar-box ${preceding ? "preceding" : ""}`}
-                onClick={() => this._onAddBar(barIdx)} 
-                onMouseLeave={preceding !== undefined ? this._onBarLeave : undefined }
-            >
-                <Glyphicon glyph="plus" />
-            </div>
-        );
-    }
-
-    private _onBarClick = (barIdx: number) => {
-        let { onBarClick } = this.props;
-        if (onBarClick) {
-            onBarClick(barIdx);
-        }
-    }
-
-    private _onBarEnter = (evt: React.MouseEvent<HTMLDivElement>, barIdx: number) => {
-        let cameFromAddBox = (
-            !!evt && 
-            !!evt.nativeEvent && 
-            !!evt.nativeEvent.fromElement &&
-            !!evt.nativeEvent.fromElement.className &&
-            evt.nativeEvent.fromElement.className.split(" ").indexOf("add-bar-box") !== -1
-        ); 
-            
-        this.setState({ 
-            hoveredBarIdx: barIdx,
-            precedingInsertBarIdx: barIdx === 0 ? undefined : barIdx,
-            followingInsertBarIdx: barIdx === (this.props.chart as Chart).bars.length - 1 ? undefined : barIdx + 1
-        }, !cameFromAddBox ? this._correctBarHover : undefined);
+    private _onBarEnter = (barIdx: number) => {
+        this.setState({ hoveredBarIdx: barIdx });
     }
 
     private _onBarLeave = (event: React.SyntheticEvent<any>) => {
-        if (event && event.nativeEvent && (event.nativeEvent as MouseEvent).toElement) {
-            let toElementClasses = (event.nativeEvent as MouseEvent).toElement.className.split(" ");
-            let stateUpdate: IChartViewerState = {};
-
-            if (toElementClasses.indexOf("bar") === -1) {
-                stateUpdate.hoveredBarIdx = undefined;
-                if (toElementClasses.indexOf("add-bar-box") === -1) {
-                    stateUpdate.precedingInsertBarIdx = undefined;
-                    stateUpdate.followingInsertBarIdx = undefined;
-                } else if (toElementClasses.indexOf("preceding") === -1) {
-                    stateUpdate.precedingInsertBarIdx = undefined;
-                } else {
-                    stateUpdate.followingInsertBarIdx = undefined;
-                }
-            }
-                
-            this.setState(stateUpdate);
-        }   
+        this.setState({ hoveredBarIdx: undefined });
     }
 
     private _onAddBar = (barIdx: number) => {
@@ -435,51 +398,30 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         }
     }
 
-    public renderLeftHandSettings = (): JSX.Element => {
+
+    private _onEditBar = (barIdx: number) => {
+        let { onEditBar } = this.props;
+        if (onEditBar) {
+            onEditBar(barIdx);
+        }
+    }
+
+    private _onDeleteBar = (barIdx: number) => {
+        let { onDeleteBar } = this.props;
+        if (onDeleteBar) {
+            onDeleteBar(barIdx);
+        }
+    }
+
+    public renderLeftHandSettings = () => {
+        if (!this.props.chart) {
+            return;
+        }
         return (
             <div className="left-hand-settings">
-                {this.renderKeyContextSelect()}
                 {this.renderTempoSelect()}
             </div>
         );
-    }
-
-    /**
-     * KEY SIGNATURE SELECT
-     */
-
-    public renderKeyContextSelect = (): JSX.Element => {
-        let { context } = this.props.chart as Chart;
-        let options = MusicHelper.NOTE_NAMES.map(
-            key => (
-                <option key={key} value={key} >
-                    {key}
-                </option>
-            )
-        );
-
-        return (
-            <div className="left-hand-settings-row">
-                <div>
-                    Key Context:
-                </div>
-                <select 
-                    className="left-hand-settings-right" 
-                    value={context}
-                    onChange={event => this._recontextualize((event.target.value as NoteName))}
-                >
-                    {options}
-                </select> 
-            </div>
-        );
-
-    }
-
-    private _recontextualize = (context: NoteName) => {
-        let { recontextualize } = this.props;
-        if (recontextualize) {
-            recontextualize(context);
-        }
     }
 
     /**
@@ -586,54 +528,14 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         });
     }
 
-    private _getCurrRenderBarWidthPercent = (i: number, isFirstInLine: boolean, isLastInLine: boolean, currLineHas2Bars: boolean) => {
-        let { editingMode } = this.props;
-        let { linesAreGrouped, precedingInsertBarIdx, followingInsertBarIdx } = this.state;
+    private _getCurrRenderBarWidthPercent = (i: number, currLineHas2Bars: boolean) => {
+        let { linesAreGrouped } = this.state;
 
         if (!linesAreGrouped) {
             return NaN;
         }
 
-        // Calculate bar width
-        let barWidthPercent = currLineHas2Bars ? 50 : 25;
-        let addBoxPrecedesCurrentBar = precedingInsertBarIdx === i || followingInsertBarIdx === i;
-        let addBoxFollowsCurrentBar = followingInsertBarIdx === i + 1 || precedingInsertBarIdx === i + 1;
-
-        if (editingMode) {
-
-            if (isFirstInLine) {
-
-                if (precedingInsertBarIdx === i) {
-                    barWidthPercent -= 2 * this._addBoxHalfWidthPercent;
-                }
-
-                if (addBoxFollowsCurrentBar) {
-                    barWidthPercent -= this._addBoxHalfWidthPercent;
-                }
-
-            } else if (isLastInLine) {
-
-                if (followingInsertBarIdx === i + 1) {
-                    barWidthPercent -= 2 * this._addBoxHalfWidthPercent;
-                }
-
-                if (addBoxPrecedesCurrentBar) {
-                    barWidthPercent -= this._addBoxHalfWidthPercent;
-                }
-
-            } else {
-
-                if (addBoxPrecedesCurrentBar) {
-                    barWidthPercent -= this._addBoxHalfWidthPercent;
-                }
-
-                if (addBoxFollowsCurrentBar) {
-                    barWidthPercent -= this._addBoxHalfWidthPercent;
-                }
-            }
-        }
-
-        return barWidthPercent;
+        return currLineHas2Bars ? 50 : 25;
     }
 
     /**
@@ -648,40 +550,19 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         let { chart } = this.props;
 
         if (chart && prevProps.chart) {
-            if (chart.songId !== prevProps.chart.songId) {
-                this.setState({ linesAreGrouped: false, lastInLineIndices: undefined });
+            if (
+                chart.songId !== prevProps.chart.songId ||
+                JSON.stringify(chart.bars) !== JSON.stringify(prevProps.chart.bars)
+            ) {
+                this._resetLineGroups();
             }
         }
 
         this._initializeBarLines();
     }
 
-    private _correctBarHover = async () => {
-        let { hoveredBarIdx, precedingInsertBarIdx, followingInsertBarIdx } = this.state;
-
-        if (!Number.isInteger(hoveredBarIdx as number)) {
-            return;
-        }
-
-        await Util.waitAsync(10);
-
-        let hoveringOverAddBox = false;
-        let preceding = false;
-
-        $(".add-bar-box").each(function() {
-            if ($(this).is(":hover")) {
-                hoveringOverAddBox = true;
-                preceding = $(this).hasClass("preceding");
-            }
-        });
-
-        if (hoveringOverAddBox) {
-            this.setState({ 
-                hoveredBarIdx: undefined,
-                precedingInsertBarIdx: preceding ? precedingInsertBarIdx : undefined,
-                followingInsertBarIdx: preceding ? undefined : followingInsertBarIdx  
-            });
-        }
+    private _resetLineGroups = () => {
+        this.setState({ linesAreGrouped: false, lastInLineIndices: undefined });
     }
 
     private _initializeBarLines = () => {

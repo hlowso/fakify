@@ -78,20 +78,6 @@
     text-align: center;
 }
 
-#chart-viewer .add-bar-box {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-right: solid black 1px;
-    font-size: 150%;
-    cursor: pointer;
-}
-
-#chart-viewer .add-bar-box:hover {
-    background-color: #222;
-    color: white;
-}
-
 #chart-viewer .current-chord {
     color: white;
 }
@@ -102,6 +88,13 @@
     flex-grow: 20;
     padding: 3px;
     align-items: center;
+}
+
+#chart-viewer .bar-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
 }
 
 #chart-viewer .bar-beat-group {

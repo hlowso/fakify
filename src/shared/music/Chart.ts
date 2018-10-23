@@ -417,34 +417,23 @@ class Chart {
     }
 
     public addBar = (idx: number, bar?: IChartBar) => {
-        if (!Number.isInteger(idx) || idx < 0 || idx >= this._bars.length) {
+        if (!Number.isInteger(idx) || idx < 0 || idx > this._bars.length) {
             return;
         }
 
-        if (bar) {
-            this._bars.splice(idx, 0, bar);
-        } else {
-            if (idx === 0) {
-                throw new Error("PRECOMP - ERROR: cannot copy bar to 0th index");
-            } else {
-                let barToExtend = this._bars[idx - 1];
-                let segmentToExtend = barToExtend.chordSegments[barToExtend.chordSegments.length - 1];
-
-                let newBar: IChartBar = {
-                    barIdx: idx,
-                    timeSignature: barToExtend.timeSignature,
-                    chordSegments: [],
-                }
-
-                newBar.chordSegments.push({
-                    beatIdx: 0,
-                    chordName: segmentToExtend.chordName,
-                    key: segmentToExtend.key
-                });
-
-                this._bars.splice(idx, 0, newBar);
-            }
+        if (!bar) {
+            bar = this._getExtendedBar(idx);
         }
+
+        if (!bar) {
+            return;
+        }
+
+        if (idx === this._bars.length) {
+            this._bars.push(bar);
+        } else {
+            this._bars.splice(idx, 0, bar);
+        }   
 
         this._onDirectBarsChange();
     }
@@ -465,6 +454,29 @@ class Chart {
 
         this._bars.splice(idx, 1);
         this._onDirectBarsChange();
+    }
+
+    private _getExtendedBar = (idx: number) => {
+        if (idx <= 0 || idx > this._bars.length) {
+            return;
+        }
+
+        let barToExtend = this._bars[idx - 1];
+        let segmentToExtend = barToExtend.chordSegments[barToExtend.chordSegments.length - 1];
+
+        let newBar: IChartBar = {
+            barIdx: idx,
+            timeSignature: barToExtend.timeSignature,
+            chordSegments: [],
+        }
+
+        newBar.chordSegments.push({
+            beatIdx: 0,
+            chordName: segmentToExtend.chordName,
+            key: segmentToExtend.key
+        });
+
+        return newBar;
     }
 
     private _resetBarsAndChordStretches = () => {

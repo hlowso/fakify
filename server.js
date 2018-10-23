@@ -13759,6 +13759,7 @@ module.exports = Db;
 
 "use strict";
 /* unused harmony export shallowEqual */
+/* unused harmony export waitAsync */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types__ = __webpack_require__(65);
 
 // export const redirect = (route: string) => {
@@ -13788,6 +13789,9 @@ function shallowEqual(A, B) {
     return JSON.stringify(A) === JSON.stringify(B);
 }
 ;
+function waitAsync(milliseconds) {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
 const waitFor = (getUpdate, rate) => {
     return new Promise((resolve, reject) => {
         (function check() {

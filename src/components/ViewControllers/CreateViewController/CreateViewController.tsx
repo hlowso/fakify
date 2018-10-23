@@ -3,7 +3,7 @@ import ChartViewer from "../../views/ChartViewer/ChartViewer";
 import { BarEditingModal } from "../../views/BarEditingModal/BarEditingModal";
 import * as Util from "../../../shared/Util";
 import * as Api from "../../../shared/Api";
-import { ISong, IChartBar, ChordShape, Tabs } from "../../../shared/types";
+import { ISong, IChartBar, ChordShape, Tabs, NoteName, TimeSignature } from "../../../shared/types";
 import Chart from "../../../shared/music/Chart";
 import $ from "jquery";
 import "./CreateViewController.css";
@@ -134,7 +134,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         listItems.sort((a, b) => a.title < b.title ? -1 : 1);
 
         return listItems.map(titleItem => (
-            <div className="user-title" onClick={() => this._onChooseEditSong(titleItem.chartId)} >
+            <div className="user-title" onClick={() => this._onChooseEditSongAsync(titleItem.chartId)} >
                 <span>{titleItem.title}</span>
             </div>
         ));
@@ -147,8 +147,9 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                 editingMode={true}
                 song={editingSong}
                 chart={this._editingChart} 
-                onBarClick={this._onBarClick}
+                onEditBar={this._onEditBar}
                 onAddBar={this._onAddBar}
+                onDeleteBar={this._onDeleteBar}
                 onSongTitleChange={this._onSongTitleChange}
             />
         );
@@ -158,26 +159,11 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
         let { errorMessage } = this.state;
 
-        let buttonStyle = {
-            width: 150,
-            height: 30,
-            fontSize: "150%"
-        };
-
         return this._editingChart && (
-            <div style={{ 
-                position: "fixed", 
-                display: "flex", 
-                width: "800px", 
-                height: "100px", 
-                justifyContent: "space-around", 
-                alignItems: "center", 
-                bottom: 0, 
-                backgroundColor: "#222"
-            }} >
-                <button style={buttonStyle} onClick={this._onSaveChart}>Save</button>
-                <button style={buttonStyle} onClick={this._onCancel}>Cancel</button>                
-                <button style={buttonStyle} onClick={this._onStartOver}>Start Over</button>
+            <div className="footer-section" >
+                <Button onClick={this._onSaveChart}>Save</Button>
+                <Button onClick={this._onCancel}>Cancel</Button>                
+                <Button onClick={this._onStartOver}>Start Over</Button>
                 {errorMessage && <span style={{ color: "red" }}>{errorMessage}</span>}
             </div>
         );
@@ -197,13 +183,33 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     }
 
     private _onNewSong = () => {
-        this.setState({ editingSong: {
-            title: "Untitled"
-        }});
-        this._resetChart();
+        this.setState({ 
+            editingSong: {
+                title: "Untitled"
+            }
+        }, () => this._resetChart(true));
     }
 
-    private _onBarClick = (barIdx: number) => {
+    private _onAddBar = (barIdx: number) => {
+
+        if (!this._editingChart) {
+            return;
+        }
+
+        if (barIdx === 0) {
+            this.setState({
+                isAddingBar: true,
+                editBar: this._getInitialBar(
+                    this._editingChart.context, 
+                    this._editingChart.bars[0].timeSignature
+                )
+            });
+        } else {
+            this._editingChart.addBar(barIdx);
+        }
+    }
+
+    private _onEditBar = (barIdx: number) => {
         let stateUpdate: ICreateVCState = { 
             isUpdatingBar: true,
             editBar: Util.copyObject((this._editingChart as Chart).bars[barIdx]) 
@@ -211,22 +217,8 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         this.setState(stateUpdate);
     }
 
-    private _onAddBar = (barIdx: number) => {
-        if (barIdx === 0) {
-            this.setState({
-                isAddingBar: true,
-                editBar: {
-                    barIdx: 0,
-                    timeSignature: [4, 4],
-                    chordSegments: [{
-                        beatIdx: 0,
-                        chordName: ["C", ChordShape.Maj]
-                    }]
-                }
-            });
-        } else {
-            (this._editingChart as Chart).addBar(barIdx);
-        }
+    private _onDeleteBar = (barIdx: number) => {
+        (this._editingChart as Chart).deleteBar(barIdx);
     }
 
     private _onSaveBar = () => {
@@ -297,13 +289,20 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         this._onSongTitleChange("Untitled");
     }
 
-    private _resetChart = () => {
+    private _resetChart = (newSong?: boolean) => {
+
         let { editingSong } = this.state;
+
         this._editingChart = new Chart(
             this.forceUpdate.bind(this),
             editingSong ? editingSong.barsBase : undefined,
-            editingSong ? editingSong.originalContext : undefined
+            editingSong ? editingSong.originalContext : undefined,
+            editingSong ? editingSong.originalTempo : [ 120, 4 ]
         );
+
+        if (newSong) {
+            this._editingChart.addBar(0, this._getInitialBar())
+        }
     }
 
     private _onSongTitleChange = (updatedTitle: string) => {
@@ -315,16 +314,29 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         });
     }
 
-    private _onChooseEditSong = (chartId: string) => {
-        Api.getSongAsync(chartId)
-            .then(editingSong => {
-                if (editingSong) {
-                    this.setState({ 
-                        editingSong, 
-                        updatingChartId: chartId 
-                    }, this._resetChart);
-                }
-            });
+    private _onChooseEditSongAsync = async (chartId: string) => {
+        let editingSong = await Api.getSongAsync(chartId)
+            
+        if (editingSong) {
+            this.setState({ 
+                editingSong, 
+                updatingChartId: chartId 
+            }, this._resetChart);
+        }
+    }
+
+    private _getInitialBar = (context?: NoteName, timeSignature?: TimeSignature): IChartBar => {
+        return {
+            barIdx: 0,
+            timeSignature: timeSignature || [4, 4],
+            chordSegments: [{
+                beatIdx: 0,
+                chordName: [
+                    context || "C", 
+                    ChordShape.Maj
+                ]
+            }]
+        }
     }
 }
 

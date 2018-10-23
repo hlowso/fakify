@@ -50,3 +50,14 @@
     cursor: pointer;
     background-color: #ddd;
 }
+
+#create-view .footer-section {
+    position: fixed; 
+    display: flex; 
+    width: 800px; 
+    height: 100px; 
+    justify-content: space-around; 
+    align-items: center; 
+    bottom: 0; 
+    background-color: #222;
+}
