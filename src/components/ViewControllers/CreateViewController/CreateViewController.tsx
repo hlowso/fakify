@@ -311,8 +311,6 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         let existingSong = await Api.isSongTitleTakenAsync(updatedTitle);
 
         if (existingSong) {
-
-            console.log("here");
             this.setState({ errorMessage: "Song title already exists" });
             return;
         }
