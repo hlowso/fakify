@@ -7,7 +7,7 @@ import { ISong, IChartBar, ChordShape, Tabs, NoteName, TimeSignature } from "../
 import Chart from "../../../shared/music/Chart";
 import $ from "jquery";
 import "./CreateViewController.css";
-import { Button } from "react-bootstrap";
+import { Button, ButtonGroup } from "react-bootstrap";
 
 export interface ICreateVCProps {
     StateHelper: any;
@@ -164,9 +164,11 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
         return this._editingChart && (
             <div className="footer-section" >
-                <Button onClick={this._onSaveChart} disabled={disableSave} >Save</Button>
-                <Button onClick={this._onCancel}>Cancel</Button>                
-                <Button onClick={this._onStartOver}>Start Over</Button>
+                <ButtonGroup bsSize="large" >
+                    <Button onClick={this._onSaveChart} disabled={disableSave} >Save</Button>
+                    <Button onClick={this._onCancel}>Cancel</Button>                
+                    <Button onClick={this._onStartOver}>Start Over</Button>
+                </ButtonGroup>
                 {errorMessage && <span style={{ color: "red" }}>{errorMessage}</span>}
             </div>
         );

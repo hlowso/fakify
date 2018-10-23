@@ -54,10 +54,20 @@
 #create-view .footer-section {
     position: fixed; 
     display: flex; 
-    width: 800px; 
+    width: 600px; 
     height: 100px; 
-    justify-content: space-around; 
+    flex-direction: column;
+
+    justify-content: center; 
     align-items: center; 
     bottom: 0; 
-    background-color: #222;
+    background-color: #ddd;
+
+    border-top: solid #222 1px;
+    border-left: solid #222 1px;
+    border-right: solid #222 1px;
+
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+
 }
