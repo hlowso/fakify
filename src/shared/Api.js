@@ -79,6 +79,11 @@ export async function getSongTitlesAsync() {
     return res.json();
 };
 
+export async function isSongTitleTakenAsync(title) {
+    let res = await FetchHelpers.GET(`/api/songs/taken/${title}`)
+    return res.json();
+}
+
 export async function getSongAsync(chartId) {
     let res = await FetchHelpers.GET(`/api/songs/${chartId}`);
     let json = res.json();

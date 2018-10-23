@@ -146,11 +146,12 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
             <ChartViewer
                 editingMode={true}
                 song={editingSong}
-                chart={this._editingChart} 
+                chart={this._editingChart}
+                chartTitleError={this.state.errorMessage === "Song title already exists"} 
                 onEditBar={this._onEditBar}
                 onAddBar={this._onAddBar}
                 onDeleteBar={this._onDeleteBar}
-                onSongTitleChange={this._onSongTitleChange}
+                onSongTitleChange={title => this._onSongTitleChangeAsync(title)}
             />
         );
     }
@@ -286,7 +287,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
     private _onStartOver = () => {
         this._resetChart();
-        this._onSongTitleChange("Untitled");
+        this._onSongTitleChangeAsync("Untitled");
     }
 
     private _resetChart = (newSong?: boolean) => {
@@ -305,7 +306,17 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         }
     }
 
-    private _onSongTitleChange = (updatedTitle: string) => {
+    private _onSongTitleChangeAsync = async (updatedTitle: string) => {
+
+        let existingSong = await Api.isSongTitleTakenAsync(updatedTitle);
+
+        if (existingSong) {
+
+            console.log("here");
+            this.setState({ errorMessage: "Song title already exists" });
+            return;
+        }
+
         let songUpdate = Util.copyObject(this.state.editingSong) as ISong;
         songUpdate.title = updatedTitle;
         this.setState({ 

@@ -2,7 +2,8 @@ import crypto from "crypto";
 import uuidv4 from "uuid/v4";
 import bcrypt from "bcryptjs";
 import { PreCompData } from "./PreCompData";
-import { IIncomingUser, ISong, NoteName, Tempo, IChartBar, ISession } from "../shared/types";
+import { IIncomingUser, ISong, NoteName, Tempo, IChartBar, ISession, ChartServerError } from "../shared/types";
+import { MAX_TITLE_LENGTH } from "../shared/Constants";
 import Chart from "../shared/music/Chart";
 import * as Mongo from "mongodb";
 
@@ -64,6 +65,8 @@ export class PreCompApiHelper {
         return this._data;
     }
 
+    // USERS
+
     public createUserAsync = async (newUser: IIncomingUser) => {
 
         let existingUser = await this._data.getUserByEmailAsync(newUser.email);
@@ -107,6 +110,8 @@ export class PreCompApiHelper {
         return { ...existingUser, token: newToken};
     }
 
+    // CHARTS
+
     public getChartTitleProjectionsAsync = async (userId?: Mongo.ObjectId) => {
         let titleProjections = {};
 
@@ -117,21 +122,25 @@ export class PreCompApiHelper {
         return titleProjections;
     }
 
-    public createChartAsync = async (chart: ISong, userId: Mongo.ObjectId) => {
+    public createChartAsync = async (chart: ISong, userId: Mongo.ObjectId): Promise<ChartServerError | boolean> => {
         if (!this._validSong(chart)) {
-            return false;
+            return ChartServerError.Invalid;
+        }
+
+        if (this.chartTitleExistsAsync(chart.title as string)) {
+            return ChartServerError.TitleTaken;
         }
 
         let chartCount = await this._data.countChartsAsync();
 
         if (chartCount >= 5000) {
-            return false;
+            return ChartServerError.ChartCount;
         }
 
         chartCount = await this._data.countChartsAsync(userId);
 
         if (chartCount >= 100) {
-            return false;
+            return ChartServerError.UserChartCount;
         }
 
         chart.userId = userId;
@@ -139,12 +148,26 @@ export class PreCompApiHelper {
         return await this._data.insertChartAsync(chart);
     }
 
-    public updateChartAsync = async (chartId: Mongo.ObjectId, chart: ISong) => {
+    public updateChartAsync = async (chartId: Mongo.ObjectId, chart: ISong): Promise<ChartServerError | boolean> => {
         if (!this._validSong(chart)) {
-            return false;
+            return ChartServerError.Invalid;
+        }
+
+        if (this.chartTitleExistsAsync(chart.title as string)) {
+            return ChartServerError.TitleTaken;
         }
 
         return await this._data.updateChartAsync(chartId, chart);
+    }
+
+    public chartTitleExistsAsync = async (title: string): Promise<boolean> => {
+        let existingChart = await this._data.getChartByTitleAsync(title);
+
+        if (existingChart) {
+            return true;
+        }
+
+        return false;
     }
 
     // TODO: validSong() should live elsewhere...
@@ -161,7 +184,7 @@ export class PreCompApiHelper {
 
         let { title, originalContext, originalTempo, barsBase } = chart;
 
-        if (typeof title !== "string" || title.length > 30) {
+        if (typeof title !== "string" || title.length > MAX_TITLE_LENGTH) {
             return false;
         }
 

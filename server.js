@@ -814,20 +814,20 @@ module.exports = {
   ReplSet: __webpack_require__(266),
   Mongos: __webpack_require__(268),
   Logger: __webpack_require__(24),
-  Cursor: __webpack_require__(61),
+  Cursor: __webpack_require__(62),
   ReadPreference: __webpack_require__(27),
   Sessions: __webpack_require__(269),
   BSON: BSON,
   // Raw operations
   Query: __webpack_require__(10).Query,
   // Auth mechanisms
-  defaultAuthProviders: __webpack_require__(59).defaultAuthProviders,
+  defaultAuthProviders: __webpack_require__(60).defaultAuthProviders,
   MongoCR: __webpack_require__(122),
   X509: __webpack_require__(123),
   Plain: __webpack_require__(124),
   GSSAPI: __webpack_require__(125),
-  ScramSHA1: __webpack_require__(60).ScramSHA1,
-  ScramSHA256: __webpack_require__(60).ScramSHA256,
+  ScramSHA1: __webpack_require__(61).ScramSHA1,
+  ScramSHA256: __webpack_require__(61).ScramSHA256,
   // Utilities
   parseConnectionString: __webpack_require__(270)
 };
@@ -6901,7 +6901,7 @@ function tryNormalizeType (value) {
  */
 
 var deprecate = __webpack_require__(15)('http-errors')
-var setPrototypeOf = __webpack_require__(39)
+var setPrototypeOf = __webpack_require__(40)
 var statuses = __webpack_require__(31)
 var inherits = __webpack_require__(91)
 
@@ -7721,12 +7721,12 @@ var Buffer = __webpack_require__(105).Buffer
 var contentDisposition = __webpack_require__(106);
 var contentType = __webpack_require__(25);
 var deprecate = __webpack_require__(15)('express');
-var flatten = __webpack_require__(45);
+var flatten = __webpack_require__(46);
 var mime = __webpack_require__(73).mime;
 var etag = __webpack_require__(107);
 var proxyaddr = __webpack_require__(110);
 var qs = __webpack_require__(71);
-var querystring = __webpack_require__(41);
+var querystring = __webpack_require__(42);
 
 /**
  * Return strong ETag for `body`.
@@ -11968,7 +11968,7 @@ function patchAssignSocket(res, callback) {
  * @private
  */
 
-var url = __webpack_require__(44)
+var url = __webpack_require__(45)
 var parse = url.parse
 var Url = url.Url
 
@@ -13758,22 +13758,164 @@ module.exports = Db;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ChartServerError; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return Tabs; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return ChordShape; });
+/* unused harmony export PresentableChordShape */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return Feel; });
+/* unused harmony export PlayMode */
+/* unused harmony export Difficulty */
+const AdminRoutes = [
+    "/login",
+    "/signup"
+];
+/* unused harmony export AdminRoutes */
+
+const StandardRoutes = [
+    "/play",
+    "/create"
+];
+/* unused harmony export StandardRoutes */
+
+var ChartServerError;
+(function (ChartServerError) {
+    ChartServerError["ChartCount"] = "There is no more space in the database for charts";
+    ChartServerError["UserChartCount"] = "User has reached chart limit";
+    ChartServerError["TitleTaken"] = "A chart with this name already exists";
+    ChartServerError["Invalid"] = "The chart is invalid";
+})(ChartServerError || (ChartServerError = {}));
+var Tabs;
+(function (Tabs) {
+    Tabs["Login"] = "login";
+    Tabs["Signup"] = "signup";
+    Tabs["Play"] = "play";
+    Tabs["Create"] = "create";
+    Tabs["None"] = "";
+})(Tabs || (Tabs = {}));
+var ChordShape;
+(function (ChordShape) {
+    ChordShape["Maj"] = "Maj";
+    ChordShape["Maj6"] = "Maj6";
+    ChordShape["Maj7"] = "Maj7";
+    ChordShape["Maj9"] = "Maj9";
+    ChordShape["Add9"] = "Add9";
+    ChordShape["Majb5"] = "Majb5";
+    ChordShape["Maj7b5"] = "Maj7b5";
+    ChordShape["Maj7$5"] = "Maj7$5";
+    ChordShape["Maj7b9"] = "Maj7b9";
+    ChordShape["Maj$9"] = "Maj$9";
+    ChordShape["Majb9"] = "Majb9";
+    ChordShape["Maj7$9"] = "Maj7$9";
+    ChordShape["Maj7$11"] = "Maj7$11";
+    ChordShape["Min"] = "Min";
+    ChordShape["Min6"] = "Min6";
+    ChordShape["Min7"] = "Min7";
+    ChordShape["Min9"] = "Min9";
+    ChordShape["Min$5"] = "Min$5";
+    ChordShape["Min7b5"] = "Min7b5";
+    ChordShape["Min7$5"] = "Min7$5";
+    ChordShape["Min7b9"] = "Min7b9";
+    ChordShape["Min7$9"] = "Min7$9";
+    ChordShape["Min7$11"] = "Min7$11";
+    ChordShape["MinMaj7"] = "MinMaj7";
+    ChordShape["Dom7"] = "Dom7";
+    ChordShape["Dom9"] = "Dom9";
+    ChordShape["Dom7b5"] = "Dom7b5";
+    ChordShape["Dom7$5"] = "Dom7$5";
+    ChordShape["Dom7b9"] = "Dom7b9";
+    ChordShape["Dom7$9"] = "Dom7$9";
+    ChordShape["Dom7$11"] = "Dom7$11";
+    ChordShape["Dom9b5"] = "Dom9b5";
+    ChordShape["Dom9$5"] = "Dom9$5";
+    ChordShape["Aug"] = "Aug";
+    ChordShape["Aug7"] = "Aug7";
+    ChordShape["Aug7$9"] = "Aug7$9";
+    ChordShape["Dim"] = "Dim";
+    ChordShape["Dim7"] = "Dim7";
+    ChordShape["Sus2"] = "Sus2";
+    ChordShape["Sus4"] = "Sus4";
+})(ChordShape || (ChordShape = {}));
+var PresentableChordShape;
+(function (PresentableChordShape) {
+    PresentableChordShape["Maj"] = "";
+    PresentableChordShape["Maj6"] = "6";
+    PresentableChordShape["Maj7"] = "ma7";
+    PresentableChordShape["Maj9"] = "ma9";
+    PresentableChordShape["Add9"] = "add9";
+    PresentableChordShape["Majb5"] = "ma(b5)";
+    PresentableChordShape["Maj7b5"] = "ma7(b5)";
+    PresentableChordShape["Maj7$5"] = "ma7(#5)";
+    PresentableChordShape["Maj7b9"] = "ma7(b9)";
+    PresentableChordShape["Maj$9"] = "ma(#9)";
+    PresentableChordShape["Majb9"] = "ma(b9)";
+    PresentableChordShape["Maj7$9"] = "ma7($9)";
+    PresentableChordShape["Maj7$11"] = "maj7(#11)";
+    PresentableChordShape["Min"] = "-";
+    PresentableChordShape["Min6"] = "-6";
+    PresentableChordShape["Min7"] = "-7";
+    PresentableChordShape["Min9"] = "-9";
+    PresentableChordShape["Min$5"] = "min(#5)";
+    PresentableChordShape["Min7b5"] = "-7(b5)";
+    PresentableChordShape["Min7$5"] = "-7(#5)";
+    PresentableChordShape["Min7b9"] = "-7(b9)";
+    PresentableChordShape["Min7$9"] = "-7($9)";
+    PresentableChordShape["Min7$11"] = "-7(#11)";
+    PresentableChordShape["MinMaj7"] = "-(maj7)";
+    PresentableChordShape["Dom7"] = "7";
+    PresentableChordShape["Dom9"] = "9";
+    PresentableChordShape["Dom7b5"] = "7(b5)";
+    PresentableChordShape["Dom7$5"] = "7(#5)";
+    PresentableChordShape["Dom7b9"] = "7(b9)";
+    PresentableChordShape["Dom7$9"] = "7(#9)";
+    PresentableChordShape["Dom7$11"] = "7(#11)";
+    PresentableChordShape["Dom9b5"] = "9(b5)";
+    PresentableChordShape["Dom9$5"] = "9(#5)";
+    PresentableChordShape["Aug"] = "aug";
+    PresentableChordShape["Aug7"] = "aug7";
+    PresentableChordShape["Aug7$9"] = "aug7($9)";
+    PresentableChordShape["Dim"] = "dim";
+    PresentableChordShape["Dim7"] = "dim7";
+    PresentableChordShape["Sus2"] = "sus2";
+    PresentableChordShape["Sus4"] = "sus4";
+})(PresentableChordShape || (PresentableChordShape = {}));
+var Feel;
+(function (Feel) {
+    Feel["Swing"] = "swing";
+})(Feel || (Feel = {}));
+var PlayMode;
+(function (PlayMode) {
+    PlayMode["None"] = "none";
+    PlayMode["Improv"] = "improv";
+    PlayMode["Listening"] = "listening";
+})(PlayMode || (PlayMode = {}));
+var Difficulty;
+(function (Difficulty) {
+    Difficulty["Easy"] = "easy";
+    Difficulty["Hard"] = "hard";
+})(Difficulty || (Difficulty = {}));
+
+
+/***/ }),
+/* 39 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* unused harmony export shallowEqual */
 /* unused harmony export waitAsync */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types__ = __webpack_require__(38);
 
 // export const redirect = (route: string) => {
 //     window.location.replace(`${window.location.origin}/${route}`);
 // };
 const getCurrentTab = () => {
     let windowPathname = window.location.pathname;
-    for (let tab in __WEBPACK_IMPORTED_MODULE_0__types__["c" /* Tabs */]) {
-        let currTab = __WEBPACK_IMPORTED_MODULE_0__types__["c" /* Tabs */][tab];
+    for (let tab in __WEBPACK_IMPORTED_MODULE_0__types__["d" /* Tabs */]) {
+        let currTab = __WEBPACK_IMPORTED_MODULE_0__types__["d" /* Tabs */][tab];
         if (new RegExp(currTab).test(windowPathname)) {
             return currTab;
         }
     }
-    return __WEBPACK_IMPORTED_MODULE_0__types__["c" /* Tabs */].None;
+    return __WEBPACK_IMPORTED_MODULE_0__types__["d" /* Tabs */].None;
 };
 /* unused harmony export getCurrentTab */
 
@@ -13900,7 +14042,7 @@ const vectorSum = (arr1, arr2) => {
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports) {
 
 module.exports = Object.setPrototypeOf || ({__proto__:[]} instanceof Array ? setProtoOf : mixinProperties);
@@ -13921,7 +14063,7 @@ function mixinProperties(obj, proto) {
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14109,13 +14251,13 @@ function contentstream (req, debug, inflate) {
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports) {
 
 module.exports = require("querystring");
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14182,7 +14324,7 @@ function encodeUrl (url) {
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14267,13 +14409,13 @@ function escapeHtml(string) {
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports) {
 
 module.exports = require("url");
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14344,13 +14486,13 @@ function arrayFlatten (array, depth) {
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports) {
 
 module.exports = require("http");
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports) {
 
 /**
@@ -14379,7 +14521,7 @@ exports = module.exports = function(a, b){
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14567,7 +14709,7 @@ function contentstream (req, debug, inflate) {
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports) {
 
 /**
@@ -14606,7 +14748,7 @@ module.exports.Double = Double;
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports) {
 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15466,7 +15608,7 @@ module.exports.Timestamp = Timestamp;
 
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Custom inspect property name / symbol.
@@ -15859,7 +16001,7 @@ module.exports.ObjectId = ObjectID;
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports) {
 
 /**
@@ -15898,7 +16040,7 @@ module.exports.BSONRegExp = BSONRegExp;
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Custom inspect property name / symbol.
@@ -15954,7 +16096,7 @@ module.exports.Symbol = Symbol;
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports) {
 
 /**
@@ -15984,7 +16126,7 @@ module.exports.Code = Code;
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16809,7 +16951,7 @@ module.exports.Decimal128 = Decimal128;
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports) {
 
 /**
@@ -16829,7 +16971,7 @@ module.exports.MaxKey = MaxKey;
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports) {
 
 /**
@@ -16867,7 +17009,7 @@ module.exports.DBRef = DBRef;
 
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16947,7 +17089,7 @@ module.exports = {
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16958,8 +17100,8 @@ const X509 = __webpack_require__(123);
 const Plain = __webpack_require__(124);
 const GSSAPI = __webpack_require__(125);
 const SSPI = __webpack_require__(260);
-const ScramSHA1 = __webpack_require__(60).ScramSHA1;
-const ScramSHA256 = __webpack_require__(60).ScramSHA256;
+const ScramSHA1 = __webpack_require__(61).ScramSHA1;
+const ScramSHA256 = __webpack_require__(61).ScramSHA256;
 
 /**
  * Returns the default authentication providers.
@@ -16983,7 +17125,7 @@ module.exports = { defaultAuthProviders };
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17431,7 +17573,7 @@ module.exports = { ScramSHA1, ScramSHA256 };
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18274,7 +18416,7 @@ module.exports = Cursor;
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18753,7 +18895,7 @@ module.exports = MongoClient;
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19867,7 +20009,7 @@ module.exports = {
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20329,140 +20471,6 @@ module.exports = Server;
 
 
 /***/ }),
-/* 65 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return Tabs; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ChordShape; });
-/* unused harmony export PresentableChordShape */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Feel; });
-/* unused harmony export PlayMode */
-/* unused harmony export Difficulty */
-const AdminRoutes = [
-    "/login",
-    "/signup"
-];
-/* unused harmony export AdminRoutes */
-
-const StandardRoutes = [
-    "/play",
-    "/create"
-];
-/* unused harmony export StandardRoutes */
-
-var Tabs;
-(function (Tabs) {
-    Tabs["Login"] = "login";
-    Tabs["Signup"] = "signup";
-    Tabs["Play"] = "play";
-    Tabs["Create"] = "create";
-    Tabs["None"] = "";
-})(Tabs || (Tabs = {}));
-var ChordShape;
-(function (ChordShape) {
-    ChordShape["Maj"] = "Maj";
-    ChordShape["Maj6"] = "Maj6";
-    ChordShape["Maj7"] = "Maj7";
-    ChordShape["Maj9"] = "Maj9";
-    ChordShape["Add9"] = "Add9";
-    ChordShape["Majb5"] = "Majb5";
-    ChordShape["Maj7b5"] = "Maj7b5";
-    ChordShape["Maj7$5"] = "Maj7$5";
-    ChordShape["Maj7b9"] = "Maj7b9";
-    ChordShape["Maj$9"] = "Maj$9";
-    ChordShape["Majb9"] = "Majb9";
-    ChordShape["Maj7$9"] = "Maj7$9";
-    ChordShape["Maj7$11"] = "Maj7$11";
-    ChordShape["Min"] = "Min";
-    ChordShape["Min6"] = "Min6";
-    ChordShape["Min7"] = "Min7";
-    ChordShape["Min9"] = "Min9";
-    ChordShape["Min$5"] = "Min$5";
-    ChordShape["Min7b5"] = "Min7b5";
-    ChordShape["Min7$5"] = "Min7$5";
-    ChordShape["Min7b9"] = "Min7b9";
-    ChordShape["Min7$9"] = "Min7$9";
-    ChordShape["Min7$11"] = "Min7$11";
-    ChordShape["MinMaj7"] = "MinMaj7";
-    ChordShape["Dom7"] = "Dom7";
-    ChordShape["Dom9"] = "Dom9";
-    ChordShape["Dom7b5"] = "Dom7b5";
-    ChordShape["Dom7$5"] = "Dom7$5";
-    ChordShape["Dom7b9"] = "Dom7b9";
-    ChordShape["Dom7$9"] = "Dom7$9";
-    ChordShape["Dom7$11"] = "Dom7$11";
-    ChordShape["Dom9b5"] = "Dom9b5";
-    ChordShape["Dom9$5"] = "Dom9$5";
-    ChordShape["Aug"] = "Aug";
-    ChordShape["Aug7"] = "Aug7";
-    ChordShape["Aug7$9"] = "Aug7$9";
-    ChordShape["Dim"] = "Dim";
-    ChordShape["Dim7"] = "Dim7";
-    ChordShape["Sus2"] = "Sus2";
-    ChordShape["Sus4"] = "Sus4";
-})(ChordShape || (ChordShape = {}));
-var PresentableChordShape;
-(function (PresentableChordShape) {
-    PresentableChordShape["Maj"] = "";
-    PresentableChordShape["Maj6"] = "6";
-    PresentableChordShape["Maj7"] = "ma7";
-    PresentableChordShape["Maj9"] = "ma9";
-    PresentableChordShape["Add9"] = "add9";
-    PresentableChordShape["Majb5"] = "ma(b5)";
-    PresentableChordShape["Maj7b5"] = "ma7(b5)";
-    PresentableChordShape["Maj7$5"] = "ma7(#5)";
-    PresentableChordShape["Maj7b9"] = "ma7(b9)";
-    PresentableChordShape["Maj$9"] = "ma(#9)";
-    PresentableChordShape["Majb9"] = "ma(b9)";
-    PresentableChordShape["Maj7$9"] = "ma7($9)";
-    PresentableChordShape["Maj7$11"] = "maj7(#11)";
-    PresentableChordShape["Min"] = "-";
-    PresentableChordShape["Min6"] = "-6";
-    PresentableChordShape["Min7"] = "-7";
-    PresentableChordShape["Min9"] = "-9";
-    PresentableChordShape["Min$5"] = "min(#5)";
-    PresentableChordShape["Min7b5"] = "-7(b5)";
-    PresentableChordShape["Min7$5"] = "-7(#5)";
-    PresentableChordShape["Min7b9"] = "-7(b9)";
-    PresentableChordShape["Min7$9"] = "-7($9)";
-    PresentableChordShape["Min7$11"] = "-7(#11)";
-    PresentableChordShape["MinMaj7"] = "-(maj7)";
-    PresentableChordShape["Dom7"] = "7";
-    PresentableChordShape["Dom9"] = "9";
-    PresentableChordShape["Dom7b5"] = "7(b5)";
-    PresentableChordShape["Dom7$5"] = "7(#5)";
-    PresentableChordShape["Dom7b9"] = "7(b9)";
-    PresentableChordShape["Dom7$9"] = "7(#9)";
-    PresentableChordShape["Dom7$11"] = "7(#11)";
-    PresentableChordShape["Dom9b5"] = "9(b5)";
-    PresentableChordShape["Dom9$5"] = "9(#5)";
-    PresentableChordShape["Aug"] = "aug";
-    PresentableChordShape["Aug7"] = "aug7";
-    PresentableChordShape["Aug7$9"] = "aug7($9)";
-    PresentableChordShape["Dim"] = "dim";
-    PresentableChordShape["Dim7"] = "dim7";
-    PresentableChordShape["Sus2"] = "sus2";
-    PresentableChordShape["Sus4"] = "sus4";
-})(PresentableChordShape || (PresentableChordShape = {}));
-var Feel;
-(function (Feel) {
-    Feel["Swing"] = "swing";
-})(Feel || (Feel = {}));
-var PlayMode;
-(function (PlayMode) {
-    PlayMode["None"] = "none";
-    PlayMode["Improv"] = "improv";
-    PlayMode["Listening"] = "listening";
-})(PlayMode || (PlayMode = {}));
-var Difficulty;
-(function (Difficulty) {
-    Difficulty["Easy"] = "easy";
-    Difficulty["Hard"] = "hard";
-})(Difficulty || (Difficulty = {}));
-
-
-/***/ }),
 /* 66 */
 /***/ (function(module, exports) {
 
@@ -20599,7 +20607,7 @@ module.exports = {
  * @private
  */
 
-var http = __webpack_require__(46);
+var http = __webpack_require__(47);
 
 /**
  * Module exports.
@@ -20679,8 +20687,8 @@ var createError = __webpack_require__(21)
 var debug = __webpack_require__(11)('send')
 var deprecate = __webpack_require__(15)('send')
 var destroy = __webpack_require__(184)
-var encodeUrl = __webpack_require__(42)
-var escapeHtml = __webpack_require__(43)
+var encodeUrl = __webpack_require__(43)
+var escapeHtml = __webpack_require__(44)
 var etag = __webpack_require__(107)
 var fresh = __webpack_require__(108)
 var fs = __webpack_require__(22)
@@ -22174,7 +22182,7 @@ var inherits = __webpack_require__(2).inherits,
   MongoNetworkError = __webpack_require__(4).MongoNetworkError,
   TwoSixWireProtocolSupport = __webpack_require__(264),
   ThreeTwoWireProtocolSupport = __webpack_require__(265),
-  BasicCursor = __webpack_require__(61),
+  BasicCursor = __webpack_require__(62),
   sdam = __webpack_require__(8),
   createClientInfo = __webpack_require__(8).createClientInfo,
   createCompressionInfo = __webpack_require__(8).createCompressionInfo,
@@ -23489,7 +23497,7 @@ class ChangeStream extends EventEmitter {
     super();
     const Collection = __webpack_require__(29);
     const Db = __webpack_require__(37);
-    const MongoClient = __webpack_require__(62);
+    const MongoClient = __webpack_require__(63);
 
     this.pipeline = pipeline || [];
     this.options = options || {};
@@ -24283,7 +24291,7 @@ const Mongos = __webpack_require__(129);
 const parse = __webpack_require__(1).parseConnectionString;
 const ReadPreference = __webpack_require__(1).ReadPreference;
 const ReplSet = __webpack_require__(130);
-const Server = __webpack_require__(64);
+const Server = __webpack_require__(65);
 const ServerSessionPool = __webpack_require__(1).Sessions.ServerSessionPool;
 
 const monitoringEvents = [
@@ -24401,7 +24409,7 @@ function clearAllEvents(topology) {
 
 // Collect all events in order from SDAM
 function collectEvents(mongoClient, topology) {
-  const MongoClient = __webpack_require__(62);
+  const MongoClient = __webpack_require__(63);
   const collectedEvents = [];
 
   if (mongoClient instanceof MongoClient) {
@@ -24908,8 +24916,8 @@ module.exports = { connectOp, logout, validOptions };
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["i"] = voicingContainsNoClusters;
 /* harmony export (immutable) */ __webpack_exports__["h"] = pickClosestKey;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Util__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__types__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Util__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__types__ = __webpack_require__(38);
 
 
 const NUMBER_OF_KEYS = 88;
@@ -25038,7 +25046,7 @@ const adjustBarTimes = (bars, feel) => {
         chordSegments.reverse();
     });
     switch (feel) {
-        case __WEBPACK_IMPORTED_MODULE_1__types__["b" /* Feel */].Swing:
+        case __WEBPACK_IMPORTED_MODULE_1__types__["c" /* Feel */].Swing:
             return _adjustBarsSwingFeel(bars);
     }
 };
@@ -25211,7 +25219,7 @@ function pickClosestKey(prevKey, keys) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Util__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Util__ = __webpack_require__(39);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Note__ = __webpack_require__(132);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__MusicHelper__ = __webpack_require__(87);
 
@@ -26633,12 +26641,12 @@ module.exports = {
 var Route = __webpack_require__(102);
 var Layer = __webpack_require__(103);
 var methods = __webpack_require__(72);
-var mixin = __webpack_require__(47);
+var mixin = __webpack_require__(48);
 var debug = __webpack_require__(11)('express:router');
 var deprecate = __webpack_require__(15)('express');
-var flatten = __webpack_require__(45);
+var flatten = __webpack_require__(46);
 var parseUrl = __webpack_require__(33);
-var setPrototypeOf = __webpack_require__(39)
+var setPrototypeOf = __webpack_require__(40)
 
 /**
  * Module variables.
@@ -27300,7 +27308,7 @@ function wrap(old, fn) {
  */
 
 var debug = __webpack_require__(11)('express:router:route');
-var flatten = __webpack_require__(45);
+var flatten = __webpack_require__(46);
 var Layer = __webpack_require__(103);
 var methods = __webpack_require__(72);
 
@@ -27709,7 +27717,7 @@ function decode_param(val) {
  * Module dependencies.
  */
 
-var merge = __webpack_require__(47)
+var merge = __webpack_require__(48)
 var parseUrl = __webpack_require__(33);
 var qs = __webpack_require__(71);
 
@@ -29326,7 +29334,7 @@ const core = __webpack_require__(1);
 const Instrumentation = __webpack_require__(271);
 
 // Set up the connect function
-const connect = __webpack_require__(62).connect;
+const connect = __webpack_require__(63).connect;
 
 // Expose error class
 connect.MongoError = core.MongoError;
@@ -29334,10 +29342,10 @@ connect.MongoNetworkError = core.MongoNetworkError;
 
 // Actual driver classes exported
 connect.Admin = __webpack_require__(128);
-connect.MongoClient = __webpack_require__(62);
+connect.MongoClient = __webpack_require__(63);
 connect.Db = __webpack_require__(37);
 connect.Collection = __webpack_require__(29);
-connect.Server = __webpack_require__(64);
+connect.Server = __webpack_require__(65);
 connect.ReplSet = __webpack_require__(130);
 connect.Mongos = __webpack_require__(129);
 connect.ReadPreference = __webpack_require__(1).ReadPreference;
@@ -29394,19 +29402,19 @@ module.exports = connect;
 
 var BSON = __webpack_require__(247),
   Binary = __webpack_require__(35),
-  Code = __webpack_require__(54),
-  DBRef = __webpack_require__(57),
-  Decimal128 = __webpack_require__(55),
-  Double = __webpack_require__(49),
+  Code = __webpack_require__(55),
+  DBRef = __webpack_require__(58),
+  Decimal128 = __webpack_require__(56),
+  Double = __webpack_require__(50),
   Int32 = __webpack_require__(78),
   Long = __webpack_require__(28),
   Map = __webpack_require__(77),
-  MaxKey = __webpack_require__(56),
+  MaxKey = __webpack_require__(57),
   MinKey = __webpack_require__(34),
-  ObjectId = __webpack_require__(51),
-  BSONRegExp = __webpack_require__(52),
-  Symbol = __webpack_require__(53),
-  Timestamp = __webpack_require__(50);
+  ObjectId = __webpack_require__(52),
+  BSONRegExp = __webpack_require__(53),
+  Symbol = __webpack_require__(54),
+  Timestamp = __webpack_require__(51);
 
 // BSON MAX VALUES
 BSON.BSON_INT32_MAX = 0x7fffffff;
@@ -29476,7 +29484,7 @@ var inherits = __webpack_require__(2).inherits,
   f = __webpack_require__(2).format,
   debugOptions = __webpack_require__(12).debugOptions,
   parseHeader = __webpack_require__(23).parseHeader,
-  decompress = __webpack_require__(58).decompress,
+  decompress = __webpack_require__(59).decompress,
   Response = __webpack_require__(10).Response,
   MongoNetworkError = __webpack_require__(4).MongoNetworkError,
   Logger = __webpack_require__(24),
@@ -31987,7 +31995,7 @@ const TopologyBase = __webpack_require__(30).TopologyBase;
 const MongoError = __webpack_require__(1).MongoError;
 const CMongos = __webpack_require__(1).Mongos;
 const Cursor = __webpack_require__(19);
-const Server = __webpack_require__(64);
+const Server = __webpack_require__(65);
 const Store = __webpack_require__(30).Store;
 const MAX_JS_INT = __webpack_require__(0).MAX_JS_INT;
 const translateOptions = __webpack_require__(0).translateOptions;
@@ -32442,7 +32450,7 @@ module.exports = Mongos;
 "use strict";
 
 
-const Server = __webpack_require__(64);
+const Server = __webpack_require__(65);
 const Cursor = __webpack_require__(19);
 const MongoError = __webpack_require__(1).MongoError;
 const TopologyBase = __webpack_require__(30).TopologyBase;
@@ -33186,7 +33194,7 @@ module.exports = Chunk;
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Domain__ = __webpack_require__(88);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Util__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Util__ = __webpack_require__(39);
 
 
 class Note {
@@ -33323,8 +33331,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_body_parser___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_body_parser__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__PreCompData__ = __webpack_require__(246);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PreCompApiHelper__ = __webpack_require__(282);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__controllers_api_AdminController__ = __webpack_require__(290);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__controllers_api_ChartsController__ = __webpack_require__(291);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__controllers_api_AdminController__ = __webpack_require__(291);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__controllers_api_ChartsController__ = __webpack_require__(292);
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -33861,7 +33869,7 @@ var bytes = __webpack_require__(18)
 var contentType = __webpack_require__(25)
 var createError = __webpack_require__(21)
 var debug = __webpack_require__(11)('body-parser:json')
-var read = __webpack_require__(40)
+var read = __webpack_require__(41)
 var typeis = __webpack_require__(20)
 
 /**
@@ -38831,7 +38839,7 @@ module.exports = {"application/1d-interleaved-parityfec":{"source":"iana"},"appl
 
 var bytes = __webpack_require__(18)
 var debug = __webpack_require__(11)('body-parser:raw')
-var read = __webpack_require__(40)
+var read = __webpack_require__(41)
 var typeis = __webpack_require__(20)
 
 /**
@@ -38940,7 +38948,7 @@ function typeChecker (type) {
 var bytes = __webpack_require__(18)
 var contentType = __webpack_require__(25)
 var debug = __webpack_require__(11)('body-parser:text')
-var read = __webpack_require__(40)
+var read = __webpack_require__(41)
 var typeis = __webpack_require__(20)
 
 /**
@@ -39072,7 +39080,7 @@ var contentType = __webpack_require__(25)
 var createError = __webpack_require__(21)
 var debug = __webpack_require__(11)('body-parser:urlencoded')
 var deprecate = __webpack_require__(15)('body-parser')
-var read = __webpack_require__(40)
+var read = __webpack_require__(41)
 var typeis = __webpack_require__(20)
 
 /**
@@ -39280,7 +39288,7 @@ function parser (name) {
       mod = __webpack_require__(71)
       break
     case 'querystring':
-      mod = __webpack_require__(41)
+      mod = __webpack_require__(42)
       break
   }
 
@@ -39831,15 +39839,15 @@ var middleware = __webpack_require__(181);
 var query = __webpack_require__(104);
 var debug = __webpack_require__(11)('express:application');
 var View = __webpack_require__(182);
-var http = __webpack_require__(46);
+var http = __webpack_require__(47);
 var compileETag = __webpack_require__(26).compileETag;
 var compileQueryParser = __webpack_require__(26).compileQueryParser;
 var compileTrust = __webpack_require__(26).compileTrust;
 var deprecate = __webpack_require__(15)('express');
-var flatten = __webpack_require__(45);
-var merge = __webpack_require__(47);
+var flatten = __webpack_require__(46);
+var merge = __webpack_require__(48);
 var resolve = __webpack_require__(13).resolve;
-var setPrototypeOf = __webpack_require__(39)
+var setPrototypeOf = __webpack_require__(40)
 var slice = Array.prototype.slice;
 
 /**
@@ -40474,8 +40482,8 @@ function tryRender(view, options, callback) {
  */
 
 var debug = __webpack_require__(11)('finalhandler')
-var encodeUrl = __webpack_require__(42)
-var escapeHtml = __webpack_require__(43)
+var encodeUrl = __webpack_require__(43)
+var escapeHtml = __webpack_require__(44)
 var onFinished = __webpack_require__(32)
 var parseUrl = __webpack_require__(33)
 var statuses = __webpack_require__(31)
@@ -40948,7 +40956,7 @@ function pathtoRegexp(path, keys, options) {
  * @private
  */
 
-var setPrototypeOf = __webpack_require__(39)
+var setPrototypeOf = __webpack_require__(40)
 
 /**
  * Initialization middleware, exposing the
@@ -42131,7 +42139,7 @@ var accepts = __webpack_require__(190);
 var deprecate = __webpack_require__(15)('express');
 var isIP = __webpack_require__(66).isIP;
 var typeis = __webpack_require__(20);
-var http = __webpack_require__(46);
+var http = __webpack_require__(47);
 var fresh = __webpack_require__(108);
 var parseRange = __webpack_require__(109);
 var parse = __webpack_require__(33);
@@ -43887,14 +43895,14 @@ function splitParameters(str) {
 var Buffer = __webpack_require__(105).Buffer
 var contentDisposition = __webpack_require__(106);
 var deprecate = __webpack_require__(15)('express');
-var encodeUrl = __webpack_require__(42);
-var escapeHtml = __webpack_require__(43);
-var http = __webpack_require__(46);
+var encodeUrl = __webpack_require__(43);
+var escapeHtml = __webpack_require__(44);
+var http = __webpack_require__(47);
 var isAbsolute = __webpack_require__(26).isAbsolute;
 var onFinished = __webpack_require__(32);
 var path = __webpack_require__(13);
 var statuses = __webpack_require__(31)
-var merge = __webpack_require__(47);
+var merge = __webpack_require__(48);
 var sign = __webpack_require__(197).sign;
 var normalizeType = __webpack_require__(26).normalizeType;
 var normalizeTypes = __webpack_require__(26).normalizeTypes;
@@ -45444,12 +45452,12 @@ function vary (res, field) {
  * @private
  */
 
-var encodeUrl = __webpack_require__(42)
-var escapeHtml = __webpack_require__(43)
+var encodeUrl = __webpack_require__(43)
+var escapeHtml = __webpack_require__(44)
 var parseUrl = __webpack_require__(33)
 var resolve = __webpack_require__(13).resolve
 var send = __webpack_require__(73)
-var url = __webpack_require__(44)
+var url = __webpack_require__(45)
 
 /**
  * Module exports.
@@ -45828,7 +45836,7 @@ var bytes = __webpack_require__(18)
 var contentType = __webpack_require__(25)
 var createError = __webpack_require__(21)
 var debug = __webpack_require__(11)('body-parser:json')
-var read = __webpack_require__(48)
+var read = __webpack_require__(49)
 var typeis = __webpack_require__(20)
 
 /**
@@ -51880,7 +51888,7 @@ module.exports = function (iconv) {
 
 var bytes = __webpack_require__(18)
 var debug = __webpack_require__(11)('body-parser:raw')
-var read = __webpack_require__(48)
+var read = __webpack_require__(49)
 var typeis = __webpack_require__(20)
 
 /**
@@ -51989,7 +51997,7 @@ function typeChecker (type) {
 var bytes = __webpack_require__(18)
 var contentType = __webpack_require__(25)
 var debug = __webpack_require__(11)('body-parser:text')
-var read = __webpack_require__(48)
+var read = __webpack_require__(49)
 var typeis = __webpack_require__(20)
 
 /**
@@ -52121,7 +52129,7 @@ var contentType = __webpack_require__(25)
 var createError = __webpack_require__(21)
 var debug = __webpack_require__(11)('body-parser:urlencoded')
 var deprecate = __webpack_require__(15)('body-parser')
-var read = __webpack_require__(48)
+var read = __webpack_require__(49)
 var typeis = __webpack_require__(20)
 
 /**
@@ -52329,7 +52337,7 @@ function parser (name) {
       mod = __webpack_require__(243)
       break
     case 'querystring':
-      mod = __webpack_require__(41)
+      mod = __webpack_require__(42)
       break
   }
 
@@ -52913,6 +52921,16 @@ class PreCompData {
                 });
             });
         };
+        this.getChartByTitleAsync = (title) => {
+            return new Promise((resolve, reject) => {
+                this._chartColl.findOne({ title }, (err, chart) => {
+                    if (err !== null) {
+                        reject(err);
+                    }
+                    resolve(chart);
+                });
+            });
+        };
         this.insertChartAsync = (chart) => {
             return new Promise((resolve, reject) => {
                 this._chartColl.insertOne(chart, (err, response) => {
@@ -52961,17 +52979,17 @@ class PreCompData {
 
 var Map = __webpack_require__(77),
   Long = __webpack_require__(28),
-  Double = __webpack_require__(49),
-  Timestamp = __webpack_require__(50),
-  ObjectID = __webpack_require__(51),
-  BSONRegExp = __webpack_require__(52),
-  Symbol = __webpack_require__(53),
+  Double = __webpack_require__(50),
+  Timestamp = __webpack_require__(51),
+  ObjectID = __webpack_require__(52),
+  BSONRegExp = __webpack_require__(53),
+  Symbol = __webpack_require__(54),
   Int32 = __webpack_require__(78),
-  Code = __webpack_require__(54),
-  Decimal128 = __webpack_require__(55),
+  Code = __webpack_require__(55),
+  Decimal128 = __webpack_require__(56),
   MinKey = __webpack_require__(34),
-  MaxKey = __webpack_require__(56),
-  DBRef = __webpack_require__(57),
+  MaxKey = __webpack_require__(57),
+  DBRef = __webpack_require__(58),
   Binary = __webpack_require__(35);
 
 // Parts of the parser
@@ -53352,17 +53370,17 @@ module.exports.Decimal128 = Decimal128;
 
 
 var Long = __webpack_require__(28).Long,
-  Double = __webpack_require__(49).Double,
-  Timestamp = __webpack_require__(50).Timestamp,
-  ObjectID = __webpack_require__(51).ObjectID,
-  Symbol = __webpack_require__(53).Symbol,
-  Code = __webpack_require__(54).Code,
+  Double = __webpack_require__(50).Double,
+  Timestamp = __webpack_require__(51).Timestamp,
+  ObjectID = __webpack_require__(52).ObjectID,
+  Symbol = __webpack_require__(54).Symbol,
+  Code = __webpack_require__(55).Code,
   MinKey = __webpack_require__(34).MinKey,
-  MaxKey = __webpack_require__(56).MaxKey,
-  Decimal128 = __webpack_require__(55),
+  MaxKey = __webpack_require__(57).MaxKey,
+  Decimal128 = __webpack_require__(56),
   Int32 = __webpack_require__(78),
-  DBRef = __webpack_require__(57).DBRef,
-  BSONRegExp = __webpack_require__(52).BSONRegExp,
+  DBRef = __webpack_require__(58).DBRef,
+  BSONRegExp = __webpack_require__(53).BSONRegExp,
   Binary = __webpack_require__(35).Binary;
 
 var deserialize = function(buffer, options, isArray) {
@@ -55459,16 +55477,16 @@ exports.writeIEEE754 = writeIEEE754;
 
 
 var Long = __webpack_require__(28).Long,
-  Double = __webpack_require__(49).Double,
-  Timestamp = __webpack_require__(50).Timestamp,
-  ObjectID = __webpack_require__(51).ObjectID,
-  Symbol = __webpack_require__(53).Symbol,
-  BSONRegExp = __webpack_require__(52).BSONRegExp,
-  Code = __webpack_require__(54).Code,
-  Decimal128 = __webpack_require__(55),
+  Double = __webpack_require__(50).Double,
+  Timestamp = __webpack_require__(51).Timestamp,
+  ObjectID = __webpack_require__(52).ObjectID,
+  Symbol = __webpack_require__(54).Symbol,
+  BSONRegExp = __webpack_require__(53).BSONRegExp,
+  Code = __webpack_require__(55).Code,
+  Decimal128 = __webpack_require__(56),
   MinKey = __webpack_require__(34).MinKey,
-  MaxKey = __webpack_require__(56).MaxKey,
-  DBRef = __webpack_require__(57).DBRef,
+  MaxKey = __webpack_require__(57).MaxKey,
+  DBRef = __webpack_require__(58).DBRef,
   Binary = __webpack_require__(35).Binary;
 
 var normalizedFunctionString = __webpack_require__(119).normalizedFunctionString;
@@ -57104,12 +57122,12 @@ const Query = __webpack_require__(10).Query;
 const CommandResult = __webpack_require__(257);
 const MESSAGE_HEADER_SIZE = __webpack_require__(23).MESSAGE_HEADER_SIZE;
 const opcodes = __webpack_require__(23).opcodes;
-const compress = __webpack_require__(58).compress;
-const compressorIDs = __webpack_require__(58).compressorIDs;
-const uncompressibleCommands = __webpack_require__(58).uncompressibleCommands;
+const compress = __webpack_require__(59).compress;
+const compressorIDs = __webpack_require__(59).compressorIDs;
+const uncompressibleCommands = __webpack_require__(59).uncompressibleCommands;
 const resolveClusterTime = __webpack_require__(8).resolveClusterTime;
 const apm = __webpack_require__(259);
-const defaultAuthProviders = __webpack_require__(59).defaultAuthProviders;
+const defaultAuthProviders = __webpack_require__(60).defaultAuthProviders;
 
 var DISCONNECTED = 'disconnected';
 var CONNECTING = 'connecting';
@@ -61555,7 +61573,7 @@ const inherits = __webpack_require__(2).inherits;
 const f = __webpack_require__(2).format;
 const EventEmitter = __webpack_require__(9).EventEmitter;
 const ReadPreference = __webpack_require__(27);
-const BasicCursor = __webpack_require__(61);
+const BasicCursor = __webpack_require__(62);
 const retrieveBSON = __webpack_require__(12).retrieveBSON;
 const Logger = __webpack_require__(24);
 const MongoError = __webpack_require__(4).MongoError;
@@ -61570,7 +61588,7 @@ const isRetryableWritesSupported = __webpack_require__(8).isRetryableWritesSuppo
 const relayEvents = __webpack_require__(17).relayEvents;
 const isRetryableError = __webpack_require__(4).isRetryableError;
 
-const defaultAuthProviders = __webpack_require__(59).defaultAuthProviders;
+const defaultAuthProviders = __webpack_require__(60).defaultAuthProviders;
 
 var BSON = retrieveBSON();
 
@@ -64388,7 +64406,7 @@ module.exports = ReplSetState;
 const inherits = __webpack_require__(2).inherits;
 const f = __webpack_require__(2).format;
 const EventEmitter = __webpack_require__(9).EventEmitter;
-const BasicCursor = __webpack_require__(61);
+const BasicCursor = __webpack_require__(62);
 const Logger = __webpack_require__(24);
 const retrieveBSON = __webpack_require__(12).retrieveBSON;
 const MongoError = __webpack_require__(4).MongoError;
@@ -64422,7 +64440,7 @@ const BSON = retrieveBSON();
  * server.connect();
  */
 
-const defaultAuthProviders = __webpack_require__(59).defaultAuthProviders;
+const defaultAuthProviders = __webpack_require__(60).defaultAuthProviders;
 
 //
 // States
@@ -66363,8 +66381,8 @@ module.exports = {
 
 "use strict";
 
-const URL = __webpack_require__(44);
-const qs = __webpack_require__(41);
+const URL = __webpack_require__(45);
+const qs = __webpack_require__(42);
 const dns = __webpack_require__(126);
 const MongoParseError = __webpack_require__(4).MongoParseError;
 
@@ -66777,7 +66795,7 @@ module.exports = { GET_MORE_NON_RESUMABLE_CODES, isResumableError };
 "use strict";
 
 
-const common = __webpack_require__(63);
+const common = __webpack_require__(64);
 const BulkOperationBase = common.BulkOperationBase;
 const utils = __webpack_require__(0);
 const toError = utils.toError;
@@ -66787,7 +66805,7 @@ const Batch = common.Batch;
 const mergeBatchResults = common.mergeBatchResults;
 const executeOperation = utils.executeOperation;
 const MongoWriteConcernError = __webpack_require__(1).MongoWriteConcernError;
-const handleMongoWriteConcernError = __webpack_require__(63).handleMongoWriteConcernError;
+const handleMongoWriteConcernError = __webpack_require__(64).handleMongoWriteConcernError;
 const bson = common.bson;
 
 /**
@@ -66986,7 +67004,7 @@ module.exports.Bulk = UnorderedBulkOperation;
 "use strict";
 
 
-const common = __webpack_require__(63);
+const common = __webpack_require__(64);
 const BulkOperationBase = common.BulkOperationBase;
 const utils = __webpack_require__(0);
 const toError = utils.toError;
@@ -66996,7 +67014,7 @@ const Batch = common.Batch;
 const mergeBatchResults = common.mergeBatchResults;
 const executeOperation = utils.executeOperation;
 const MongoWriteConcernError = __webpack_require__(1).MongoWriteConcernError;
-const handleMongoWriteConcernError = __webpack_require__(63).handleMongoWriteConcernError;
+const handleMongoWriteConcernError = __webpack_require__(64).handleMongoWriteConcernError;
 const bson = common.bson;
 
 /**
@@ -67321,7 +67339,7 @@ module.exports = {"_from":"mongodb","_id":"mongodb@3.1.3","_inBundle":false,"_in
 
 
 const ReadPreference = __webpack_require__(1).ReadPreference,
-  parser = __webpack_require__(44),
+  parser = __webpack_require__(45),
   f = __webpack_require__(2).format,
   Logger = __webpack_require__(1).Logger,
   dns = __webpack_require__(126);
@@ -71197,7 +71215,9 @@ function checkAborted(_this, callback) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_uuid_v4___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_uuid_v4__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bcryptjs__ = __webpack_require__(286);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bcryptjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_bcryptjs__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_music_Chart__ = __webpack_require__(288);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_types__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_Constants__ = __webpack_require__(288);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__shared_music_Chart__ = __webpack_require__(289);
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -71206,6 +71226,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+
+
 
 
 
@@ -71232,6 +71254,7 @@ function getDecryptor(secret) {
 }
 class PreCompApiHelper {
     constructor(data, secret) {
+        // USERS
         this.createUserAsync = (newUser) => __awaiter(this, void 0, void 0, function* () {
             let existingUser = yield this._data.getUserByEmailAsync(newUser.email);
             if (existingUser) {
@@ -71261,6 +71284,7 @@ class PreCompApiHelper {
             yield this._data.updateUserTokenAsync(existingUser.email, newToken);
             return Object.assign({}, existingUser, { token: newToken });
         });
+        // CHARTS
         this.getChartTitleProjectionsAsync = (userId) => __awaiter(this, void 0, void 0, function* () {
             let titleProjections = {};
             (yield this._data.getChartsAsync(userId)).forEach(chart => {
@@ -71270,24 +71294,37 @@ class PreCompApiHelper {
         });
         this.createChartAsync = (chart, userId) => __awaiter(this, void 0, void 0, function* () {
             if (!this._validSong(chart)) {
-                return false;
+                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartServerError */].Invalid;
+            }
+            if (this.chartTitleExistsAsync(chart.title)) {
+                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartServerError */].TitleTaken;
             }
             let chartCount = yield this._data.countChartsAsync();
             if (chartCount >= 5000) {
-                return false;
+                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartServerError */].ChartCount;
             }
             chartCount = yield this._data.countChartsAsync(userId);
             if (chartCount >= 100) {
-                return false;
+                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartServerError */].UserChartCount;
             }
             chart.userId = userId;
             return yield this._data.insertChartAsync(chart);
         });
         this.updateChartAsync = (chartId, chart) => __awaiter(this, void 0, void 0, function* () {
             if (!this._validSong(chart)) {
-                return false;
+                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartServerError */].Invalid;
+            }
+            if (this.chartTitleExistsAsync(chart.title)) {
+                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartServerError */].TitleTaken;
             }
             return yield this._data.updateChartAsync(chartId, chart);
+        });
+        this.chartTitleExistsAsync = (title) => __awaiter(this, void 0, void 0, function* () {
+            let existingChart = yield this._data.getChartByTitleAsync(title);
+            if (existingChart) {
+                return true;
+            }
+            return false;
         });
         // TODO: validSong() should live elsewhere...
         this._validSong = (chart) => {
@@ -71300,16 +71337,16 @@ class PreCompApiHelper {
                 }
             }
             let { title, originalContext, originalTempo, barsBase } = chart;
-            if (typeof title !== "string" || title.length > 30) {
+            if (typeof title !== "string" || title.length > __WEBPACK_IMPORTED_MODULE_4__shared_Constants__["a" /* MAX_TITLE_LENGTH */]) {
                 return false;
             }
-            if (!__WEBPACK_IMPORTED_MODULE_3__shared_music_Chart__["a" /* default */].validNoteName(originalContext)) {
+            if (!__WEBPACK_IMPORTED_MODULE_5__shared_music_Chart__["a" /* default */].validNoteName(originalContext)) {
                 return false;
             }
-            if (!__WEBPACK_IMPORTED_MODULE_3__shared_music_Chart__["a" /* default */].validTempo(originalTempo)) {
+            if (!__WEBPACK_IMPORTED_MODULE_5__shared_music_Chart__["a" /* default */].validTempo(originalTempo)) {
                 return false;
             }
-            if (!__WEBPACK_IMPORTED_MODULE_3__shared_music_Chart__["a" /* default */].validBaseBars(barsBase)) {
+            if (!__WEBPACK_IMPORTED_MODULE_5__shared_music_Chart__["a" /* default */].validBaseBars(barsBase)) {
                 return false;
             }
             return true;
@@ -72846,11 +72883,21 @@ module.exports = __webpack_require__(287);
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Util__ = __webpack_require__(38);
+const MAX_TITLE_LENGTH = 50;
+/* harmony export (immutable) */ __webpack_exports__["a"] = MAX_TITLE_LENGTH;
+
+
+
+/***/ }),
+/* 289 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Util__ = __webpack_require__(39);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__ = __webpack_require__(87);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__types__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__types__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__domain_Domain__ = __webpack_require__(88);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__domain_ChordClass__ = __webpack_require__(289);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__domain_ChordClass__ = __webpack_require__(290);
 
 
 
@@ -72927,31 +72974,20 @@ class Chart {
             return absSubbeatIdx;
         };
         this.addBar = (idx, bar) => {
-            if (!Number.isInteger(idx) || idx < 0 || idx >= this._bars.length) {
+            if (!Number.isInteger(idx) || idx < 0 || idx > this._bars.length) {
                 return;
             }
-            if (bar) {
-                this._bars.splice(idx, 0, bar);
+            if (!bar) {
+                bar = this._getExtendedBar(idx);
+            }
+            if (!bar) {
+                return;
+            }
+            if (idx === this._bars.length) {
+                this._bars.push(bar);
             }
             else {
-                if (idx === 0) {
-                    throw new Error("PRECOMP - ERROR: cannot copy bar to 0th index");
-                }
-                else {
-                    let barToExtend = this._bars[idx - 1];
-                    let segmentToExtend = barToExtend.chordSegments[barToExtend.chordSegments.length - 1];
-                    let newBar = {
-                        barIdx: idx,
-                        timeSignature: barToExtend.timeSignature,
-                        chordSegments: [],
-                    };
-                    newBar.chordSegments.push({
-                        beatIdx: 0,
-                        chordName: segmentToExtend.chordName,
-                        key: segmentToExtend.key
-                    });
-                    this._bars.splice(idx, 0, newBar);
-                }
+                this._bars.splice(idx, 0, bar);
             }
             this._onDirectBarsChange();
         };
@@ -72968,6 +73004,24 @@ class Chart {
             }
             this._bars.splice(idx, 1);
             this._onDirectBarsChange();
+        };
+        this._getExtendedBar = (idx) => {
+            if (idx <= 0 || idx > this._bars.length) {
+                return;
+            }
+            let barToExtend = this._bars[idx - 1];
+            let segmentToExtend = barToExtend.chordSegments[barToExtend.chordSegments.length - 1];
+            let newBar = {
+                barIdx: idx,
+                timeSignature: barToExtend.timeSignature,
+                chordSegments: [],
+            };
+            newBar.chordSegments.push({
+                beatIdx: 0,
+                chordName: segmentToExtend.chordName,
+                key: segmentToExtend.key
+            });
+            return newBar;
         };
         this._resetBarsAndChordStretches = () => {
             this._resetBars();
@@ -73209,7 +73263,7 @@ class Chart {
         };
         let swingIsSuitable = this._barsBase.reduce(swingIsSuitableReduction, true);
         return (swingIsSuitable
-            ? [__WEBPACK_IMPORTED_MODULE_2__types__["b" /* Feel */].Swing]
+            ? [__WEBPACK_IMPORTED_MODULE_2__types__["c" /* Feel */].Swing]
             : []);
     }
     get barsBase() {
@@ -73278,8 +73332,8 @@ Chart.validNoteName = (noteName) => {
     return __WEBPACK_IMPORTED_MODULE_3__domain_Domain__["a" /* Domain */].NOTE_NAMES.indexOf(noteName) !== -1;
 };
 Chart.validChordShape = (shape) => {
-    for (let shapeKey in __WEBPACK_IMPORTED_MODULE_2__types__["a" /* ChordShape */]) {
-        if (shape === __WEBPACK_IMPORTED_MODULE_2__types__["a" /* ChordShape */][shapeKey]) {
+    for (let shapeKey in __WEBPACK_IMPORTED_MODULE_2__types__["b" /* ChordShape */]) {
+        if (shape === __WEBPACK_IMPORTED_MODULE_2__types__["b" /* ChordShape */][shapeKey]) {
             return true;
         }
     }
@@ -73456,15 +73510,15 @@ Chart.addKeysToBars = (bars, contextualized = false) => {
 
 
 /***/ }),
-/* 289 */
+/* 290 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Util__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Util__ = __webpack_require__(39);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__ = __webpack_require__(87);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Domain__ = __webpack_require__(88);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Note__ = __webpack_require__(132);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__types__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__types__ = __webpack_require__(38);
 
 
 
@@ -73480,7 +73534,7 @@ class Chord extends __WEBPACK_IMPORTED_MODULE_2__Domain__["a" /* Domain */] {
             pos = 2 * i + 1;
             let pitch = lowestPitch + pitchDiff;
             let required = false;
-            if (pos === 3 || pos === 7 || shape === __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dim && pos === 5) {
+            if (pos === 3 || pos === 7 || shape === __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dim && pos === 5) {
                 required = true;
             }
             if (baseIntervals.length < 4 && pos === 1) {
@@ -73698,170 +73752,170 @@ Chord.shapeToInfo = (shape) => {
         /**
          * MAJOR
          */
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj:
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj:
             return {
                 shape,
                 baseIntervals: [0, 4, 7],
                 relativeTonicPositions: ["1", "4", "5"]
             };
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj6:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj6:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj);
             extension[13] = "6";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj7:
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7:
             return {
                 shape,
                 baseIntervals: [0, 4, 7, 11],
                 relativeTonicPositions: ["1", "4"]
             };
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj9:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj9:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7);
             extension[9] = "2";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Add9:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Add9:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj);
             extension[9] = "2";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Majb5:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Majb5:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj);
             extension[5] = "T";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj7b5:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7b5:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7);
             extension[5] = "T";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj7$5:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7$5:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7);
             extension[5] = "U";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj7b9:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7b9:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7);
             extension[9] = "H";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj$9:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj$9:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj);
             extension[9] = "N";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Majb9:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Majb9:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj);
             extension[9] = "H";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj7$9:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7$9:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7);
             extension[9] = "N";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj7$11:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7$11:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7);
             extension[11] = "T";
             return Object.assign({}, infoBase, { extension });
         /**
          * MINOR
          */
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min:
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min:
             return {
                 shape,
                 baseIntervals: [0, 3, 7],
                 relativeTonicPositions: ["2", "3", "6"]
             };
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min6:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min6:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min);
             extension[13] = "6";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min7:
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7:
             return {
                 shape,
                 baseIntervals: [0, 3, 7, 10],
                 relativeTonicPositions: ["2", "3", "6"]
             };
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min9:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min9:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7);
             extension[9] = "2";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min$5:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min$5:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min);
             extension[5] = "U";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min7b5:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7b5:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7);
             extension[5] = "T";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min7$5:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7$5:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7);
             extension[5] = "U";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min7b9:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7b9:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7);
             extension[9] = "H";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min7$9:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7$9:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7);
             extension[9] = "N";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min7$11:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7$11:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7);
             extension[11] = "T";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].MinMaj7:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Min7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].MinMaj7:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7);
             extension[7] = "7";
             return Object.assign({}, infoBase, { extension });
         /**
          * DOMINANT
          */
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dom7:
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7:
             return {
                 shape,
                 baseIntervals: [0, 4, 7, 10],
                 relativeTonicPositions: ["5"]
             };
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dom9:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dom7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom9:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
             extension[9] = "2";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dom7b5:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dom7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7b5:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
             extension[5] = "T";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dom7$5:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dom7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7$5:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
             extension[5] = "U";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dom7b9:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dom7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7b9:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
             extension[9] = "H";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dom7$9:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dom7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7$9:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
             extension[9] = "N";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dom7$11:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dom7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7$11:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
             extension[11] = "T";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dom9b5:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dom7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom9b5:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
             extension[9] = "2";
             extension[5] = "T";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dom9$5:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dom7);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom9$5:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
             extension[9] = "2";
             extension[5] = "U";
             return Object.assign({}, infoBase, { extension });
         /**
          * AUGMENTED
          */
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Aug:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Aug:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj);
             extension[5] = "U";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Aug7:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Aug7:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj);
             extension[5] = "U";
             extension[7] = "J";
             return Object.assign({}, infoBase, { extension });
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Aug7$9:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Maj);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Aug7$9:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj);
             extension[5] = "U";
             extension[7] = "J";
             extension[9] = "N";
@@ -73869,26 +73923,26 @@ Chord.shapeToInfo = (shape) => {
         /**
          * DIMINISHED
          */
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dim:
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dim:
             return {
                 shape,
                 baseIntervals: [0, 3, 6],
                 relativeTonicPositions: ["7"]
             };
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dim7:
-            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Dim);
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dim7:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dim);
             extension[7] = "6";
             return Object.assign({}, infoBase, { extension });
         /**
          * SUSPENDED
          */
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Sus2:
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Sus2:
             return {
                 shape,
                 baseIntervals: [0, 2, 7],
                 relativeTonicPositions: ["1", "2", "4", "5", "6"]
             };
-        case __WEBPACK_IMPORTED_MODULE_4__types__["a" /* ChordShape */].Sus4:
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Sus4:
             return {
                 shape,
                 baseIntervals: [0, 5, 7],
@@ -73932,7 +73986,7 @@ Chord.canAddWithoutCluster = (notes, newNote) => {
 
 
 /***/ }),
-/* 290 */
+/* 291 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -74000,7 +74054,7 @@ class AdminController extends __WEBPACK_IMPORTED_MODULE_0__PreCompController__["
 
 
 /***/ }),
-/* 291 */
+/* 292 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -74038,6 +74092,9 @@ class ChartsController extends __WEBPACK_IMPORTED_MODULE_0__PreCompController__[
         }));
         this._router.put("/:chartId", (req, res) => __awaiter(this, void 0, void 0, function* () {
             return res.send(yield this._api.updateChartAsync(new __WEBPACK_IMPORTED_MODULE_1_mongodb__["ObjectID"](req.params.chartId), req.body));
+        }));
+        this._router.get("/taken/:title", (req, res) => __awaiter(this, void 0, void 0, function* () {
+            return res.send(yield this._api.chartTitleExistsAsync(req.params.title));
         }));
     }
 }

@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import * as Cx from "classnames";
-import { Button, Glyphicon, FormControl } from "react-bootstrap";
+import { Button, Glyphicon, FormControl, FormGroup } from "react-bootstrap";
 import * as Util from "../../../shared/Util";
+import { MAX_TITLE_LENGTH } from '../../../shared/Constants';
 import * as MusicHelper from "../../../shared/music/MusicHelper";
 import { Chord } from "../../../shared/music/domain/ChordClass";
 import Chart from "../../../shared/music/Chart";
@@ -16,6 +17,7 @@ export interface IChartViewerProps {
     sessionIdx?: IMusicIdx;
     sessionFailed?: boolean;
     loadingChart?: boolean;
+    chartTitleError?: boolean;
     onBarClick?: (barIdx: number) => void;
     onAddBar?: (barIdx: number) => void;
     onEditBar?: (barIdx: number) => void;
@@ -27,7 +29,7 @@ export interface IChartViewerProps {
 }
 
 export interface IChartViewerState {
-    editingTitle?: boolean;
+    editingTitle?: string;
     hoveredBarIdx?: number;
     lastInLineIndices?: number[];
     linesAreGrouped?: boolean;
@@ -37,13 +39,13 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     constructor(props: IChartViewerProps) {
         super(props);
         this.state = {
-            editingTitle: false,
-            linesAreGrouped: false
+            linesAreGrouped: false,
+            editingTitle: "Untitled"
         };
     }
 
     public render(): JSX.Element {
-        let { song, chart, editingMode, sessionFailed, loadingChart } = this.props;
+        let { song, chart, sessionFailed, loadingChart } = this.props;
         let noChartData = Util.objectIsEmpty(song) ||
                         Util.objectIsEmpty(chart);
         let content: JSX.Element[] | JSX.Element;
@@ -79,10 +81,8 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             }
 
             content = [
-                <header className="chart-header" style={{ justifyContent: editingMode ? "space-between" : "center" }} key={0} >
-                    {this.renderLeftHandSettings()}
+                <header className="chart-header" key={0} >
                     {this.renderTitle()}
-                    <div />
                 </header>,
                 <section className="chart-body" key={1} >
                     {this.renderProgressionLines()}
@@ -98,32 +98,44 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     public renderTitle = () => {
-        let { editingMode, song } = this.props;
+        let { editingMode, song, chartTitleError } = this.props;
         let { editingTitle } = this.state;
 
-        if (!song) {
+        let isEditingTitle = typeof editingTitle === "string";
+        let editingTitleLength = isEditingTitle ? (editingTitle as string).length : 0;
+
+        if (!song || !song.title) {
             return;
         }
         
         return (
-            editingTitle 
+            isEditingTitle 
             ? (
-                <FormControl 
-                    autoFocus={true}
-                    onBlur={this._onSubmitSongTitleForm}
-                    onSubmit={this._onSubmitSongTitleForm}
-                    onFocus={(event: React.SyntheticEvent<any>) => (event.target as any).select()}
-                    onChange={(event: React.SyntheticEvent<any>) => this._onSongTitleChange((event.target as any).value)} 
-                    onKeyDown={this._onTitleEnter}
-                    value={song.title}
-                />
+                <FormGroup validationState={!editingTitle || chartTitleError ? "error" : undefined} >
+                    <FormControl 
+                        autoFocus={true}
+                        onBlur={this._onSubmitSongTitleForm}
+                        onSubmit={this._onSubmitSongTitleForm}
+                        onFocus={(event: React.SyntheticEvent<any>) => (event.target as any).select()}
+                        onChange={(event: React.SyntheticEvent<any>) => this._onSongTitleChange((event.target as any).value)} 
+                        onKeyDown={this._onTitleEnter}
+                        value={editingTitle}
+                        style={{
+                            marginTop: 25, 
+                            width: Math.max(editingTitleLength * (editingTitleLength >= 30 ? 15 : 30), 100),
+                            fontSize: editingTitleLength >= 30 ? "200%" : "300%",
+                            textAlign: "center"
+                        }}
+                    />
+                </FormGroup>
+                
             )
             : (
                 <span 
                     className="song-title"
-                    onClick={editingMode ? () => this.setState({ editingTitle: true }) : undefined}
+                    onClick={editingMode ? () => this.setState({ editingTitle: (song as ISong).title  }) : undefined}
                 >
-                    {(song as ISong).title}
+                    {song.title}
                 </span>
             )
         );
@@ -137,13 +149,30 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
     private _onSubmitSongTitleForm = (event: React.SyntheticEvent<any>) => {
         event.preventDefault();
-        this.setState({ editingTitle: false });
+
+        let { onSongTitleChange } = this.props;
+        let { editingTitle } = this.state;
+
+        if (!onSongTitleChange || !editingTitle || !editingTitle.trim() || editingTitle.trim().length > MAX_TITLE_LENGTH) {
+            return;
+        }
+
+        onSongTitleChange(editingTitle.trim());
     }
 
     private _onSongTitleChange = (updatedTitle: string) => {
-        let { onSongTitleChange } = this.props;
-        if (onSongTitleChange) {
-            onSongTitleChange(updatedTitle);
+        let { onSongTitleChange, chartTitleError, song } = this.props;
+
+        if (!song) {
+            return;
+        }
+
+        if (typeof updatedTitle === "string" && updatedTitle.length <= MAX_TITLE_LENGTH) {
+            this.setState({ editingTitle: updatedTitle });
+        }
+
+        if (chartTitleError && onSongTitleChange) {
+            onSongTitleChange(song.title as string);
         }
     }
 
@@ -288,13 +317,20 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     public renderBarContent(i: number, chordNameElements?: JSX.Element[]) {
-        let { editingMode } = this.props;
+        let { editingMode, chart } = this.props;
+
+        if (!chart) {
+            return;
+        }
+
+        let { bars } = chart;
+        let hideDelete = bars.length <= 1;
         let { hoveredBarIdx } = this.state;
         let useDivisionSign = !Array.isArray(chordNameElements);
 
         return (
             editingMode && hoveredBarIdx === i
-                ? this.renderBarButtonContent(i)
+                ? this.renderBarButtonContent(i, hideDelete)
                 : (
                     <div 
                         className="bar bar-chord-group" 
@@ -313,7 +349,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         );
     }
 
-    public renderBarButtonContent(i: number) {
+    public renderBarButtonContent(i: number, hideDelete = false) { 
         return (
             <div className="bar-buttons" >
                 <Button style={{ width: "10%", padding: 0 }} onClick={() => this._onAddBar(i)} > 
@@ -321,7 +357,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                 </Button>
                 <div style={{ width: "70%", display: "flex", flexDirection: "column" }} >
                     <Button style={{ padding: 0 }} onClick={() => this._onEditBar(i)}>Edit</Button>
-                    <Button style={{ padding: 0 }} bsStyle="danger" onClick={() => this._onDeleteBar(i)}>Delete</Button>
+                    {!hideDelete && <Button style={{ padding: 0 }} bsStyle="danger" onClick={() => this._onDeleteBar(i)}>Delete</Button>}
                 </div>
                 <Button style={{ width: "10%", padding: 0 }} onClick={() => this._onAddBar(i + 1)}>
                     <Glyphicon glyph="plus" />
@@ -413,59 +449,48 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         }
     }
 
-    public renderLeftHandSettings = () => {
-        if (!this.props.chart) {
-            return;
-        }
-        return (
-            <div className="left-hand-settings">
-                {this.renderTempoSelect()}
-            </div>
-        );
-    }
-
     /**
      * TEMPO SELECT
      */
 
-    public renderTempoSelect = (): JSX.Element => {
-        let { tempo } = this.props.chart as Chart;
-        let bpms = (tempo as Tempo)[0];
-        let options = [];
-        for (
-                let t = MusicHelper.LOWER_TEMPO_LIMIT; 
-                t <= MusicHelper.UPPER_TEMPO_LIMIT; 
-                t ++
-        ) {
-            options.push(
-                <option key={t} value={t} >
-                    {t}
-                </option>
-            );
-        }
+    // public renderTempoSelect = (): JSX.Element => {
+    //     let { tempo } = this.props.chart as Chart;
+    //     let bpms = (tempo as Tempo)[0];
+    //     let options = [];
+    //     for (
+    //             let t = MusicHelper.LOWER_TEMPO_LIMIT; 
+    //             t <= MusicHelper.UPPER_TEMPO_LIMIT; 
+    //             t ++
+    //     ) {
+    //         options.push(
+    //             <option key={t} value={t} >
+    //                 {t}
+    //             </option>
+    //         );
+    //     }
 
-        return (
-            <div className="left-hand-settings-row">
-                <div>
-                    Tempo:
-                </div>
-                <select 
-                    className="left-hand-settings-right" 
-                    value={bpms}
-                    onChange={event => this._resetTempo([Number(event.target.value), 4])}
-                >
-                    {options}
-                </select> 
-            </div>
-        );
-    }
+    //     return (
+    //         <div className="left-hand-settings-row">
+    //             <div>
+    //                 Tempo:
+    //             </div>
+    //             <select 
+    //                 className="left-hand-settings-right" 
+    //                 value={bpms}
+    //                 onChange={event => this._resetTempo([Number(event.target.value), 4])}
+    //             >
+    //                 {options}
+    //             </select> 
+    //         </div>
+    //     );
+    // }
 
-    private _resetTempo = (tempo: Tempo) => {
-        let { resetTempo } = this.props;
-        if (resetTempo) {
-            resetTempo(tempo);
-        }
-    }
+    // private _resetTempo = (tempo: Tempo) => {
+    //     let { resetTempo } = this.props;
+    //     if (resetTempo) {
+    //         resetTempo(tempo);
+    //     }
+    // }
 
     /**
      * RESET CHART
@@ -547,7 +572,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     public componentDidUpdate(prevProps: IChartViewerProps, prevState: IChartViewerState) {
-        let { chart } = this.props;
+        let { chart, song, chartTitleError } = this.props;
 
         if (chart && prevProps.chart) {
             if (
@@ -559,6 +584,10 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         }
 
         this._initializeBarLines();
+
+        if (prevProps.song && song && prevProps.song.title !== song.title && !chartTitleError) {
+            this.setState({ editingTitle: undefined });
+        }
     }
 
     private _resetLineGroups = () => {

@@ -29,6 +29,13 @@ export const StandardRoutes = [
     "/create"
 ]
 
+export enum ChartServerError {
+    ChartCount = "There is no more space in the database for charts",
+    UserChartCount = "User has reached chart limit",
+    TitleTaken = "A chart with this name already exists",
+    Invalid = "The chart is invalid"
+}
+
 export enum Tabs {
     Login = "login",
     Signup = "signup",

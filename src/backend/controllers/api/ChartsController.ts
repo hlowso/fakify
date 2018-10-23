@@ -32,5 +32,9 @@ export class ChartsController extends PreCompController {
         this._router.put("/:chartId", async (req, res) => {
             return res.send(await this._api.updateChartAsync(new Mongo.ObjectID(req.params.chartId as string), req.body as ISong));
         });
+
+        this._router.get("/taken/:title", async (req, res) => {
+            return res.send(await this._api.chartTitleExistsAsync(req.params.title as string));
+        });
     }
 }

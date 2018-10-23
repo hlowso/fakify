@@ -5,11 +5,11 @@
     border-left: solid #222 1px;
     border-right: solid #222 1px;
     overflow-y: scroll;
-    /* border-right: solid white 1px; */
 }
 
 #chart-viewer .chart-header {
     display: flex;
+    justify-content: center;
     height: 20%;
 }
 
@@ -17,6 +17,7 @@
     font-size: 300%;
     margin: 10px;
     text-decoration: underline;
+    cursor: pointer;
 }
 
 #chart-viewer .line {

@@ -150,6 +150,18 @@ export class PreCompData {
         });
     }
 
+    public getChartByTitleAsync = (title: string): Promise<ISong> => {
+        return new Promise((resolve, reject) => {
+            this._chartColl.findOne({ title }, (err, chart) => {
+                if (err !== null) {
+                    reject(err);
+                }
+
+                resolve(chart);
+            })
+        });
+    }
+
     public insertChartAsync = (chart: ISong): Promise<boolean> => {
         return new Promise((resolve, reject) => {
             this._chartColl.insertOne(chart, (err, response) => {
