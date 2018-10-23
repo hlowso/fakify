@@ -158,11 +158,13 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
     public renderFooterButtons() {
 
-        let { errorMessage } = this.state;
+        let { errorMessage, editingSong } = this.state;
+
+        let disableSave = !editingSong || !editingSong.title;
 
         return this._editingChart && (
             <div className="footer-section" >
-                <Button onClick={this._onSaveChart}>Save</Button>
+                <Button onClick={this._onSaveChart} disabled={disableSave} >Save</Button>
                 <Button onClick={this._onCancel}>Cancel</Button>                
                 <Button onClick={this._onStartOver}>Start Over</Button>
                 {errorMessage && <span style={{ color: "red" }}>{errorMessage}</span>}
@@ -185,9 +187,8 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
     private _onNewSong = () => {
         this.setState({ 
-            editingSong: {
-                title: "Untitled"
-            }
+            editingSong: {},
+            errorMessage: undefined
         }, () => this._resetChart(true));
     }
 
@@ -281,13 +282,14 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
     private _onCancel = () => {
         this._editingChart = undefined;
-        this.setState({ updatingChartId: "", editingSong: undefined });
+        this.setState({ updatingChartId: "", editingSong: undefined, errorMessage: undefined });
         this.forceUpdate();
     }
 
     private _onStartOver = () => {
-        this._resetChart();
-        this._onSongTitleChangeAsync("Untitled");
+        this._resetChart(true);
+        this._updateSongTitle();
+        this.setState({ errorMessage: undefined });
     }
 
     private _resetChart = (newSong?: boolean) => {
@@ -315,8 +317,12 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
             return;
         }
 
+        this._updateSongTitle(updatedTitle);        
+    }
+
+    private _updateSongTitle = (title?: string) => {
         let songUpdate = Util.copyObject(this.state.editingSong) as ISong;
-        songUpdate.title = updatedTitle;
+        songUpdate.title = title;
         this.setState({ 
             editingSong: songUpdate, 
             errorMessage: ""

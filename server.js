@@ -71296,7 +71296,7 @@ class PreCompApiHelper {
             if (!this._validSong(chart)) {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartServerError */].Invalid;
             }
-            if (this.chartTitleExistsAsync(chart.title)) {
+            if (yield this.chartTitleExistsAsync(chart.title)) {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartServerError */].TitleTaken;
             }
             let chartCount = yield this._data.countChartsAsync();
@@ -71314,7 +71314,7 @@ class PreCompApiHelper {
             if (!this._validSong(chart)) {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartServerError */].Invalid;
             }
-            if (this.chartTitleExistsAsync(chart.title)) {
+            if (yield this.chartTitleExistsAsync(chart.title)) {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartServerError */].TitleTaken;
             }
             return yield this._data.updateChartAsync(chartId, chart);

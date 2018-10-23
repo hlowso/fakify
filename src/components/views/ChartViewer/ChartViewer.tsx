@@ -40,14 +40,14 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         super(props);
         this.state = {
             linesAreGrouped: false,
-            editingTitle: "Untitled"
+            editingTitle: ""
         };
     }
 
     public render(): JSX.Element {
-        let { song, chart, sessionFailed, loadingChart } = this.props;
-        let noChartData = Util.objectIsEmpty(song) ||
-                        Util.objectIsEmpty(chart);
+        let { song, chart, sessionFailed, loadingChart, editingMode } = this.props;
+
+        let noChartData = Util.objectIsEmpty(chart) || (!editingMode && Util.objectIsEmpty(song));
         let content: JSX.Element[] | JSX.Element;
         let dynamicStyle = {} as any;
 
@@ -104,12 +104,12 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         let isEditingTitle = typeof editingTitle === "string";
         let editingTitleLength = isEditingTitle ? (editingTitle as string).length : 0;
 
-        if (!song || !song.title) {
+        if (!song) {
             return;
         }
         
         return (
-            isEditingTitle 
+            isEditingTitle || !song.title
             ? (
                 <FormGroup validationState={!editingTitle || chartTitleError ? "error" : undefined} >
                     <FormControl 
@@ -120,9 +120,10 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                         onChange={(event: React.SyntheticEvent<any>) => this._onSongTitleChange((event.target as any).value)} 
                         onKeyDown={this._onTitleEnter}
                         value={editingTitle}
+                        placeholder="Enter a title"
                         style={{
                             marginTop: 25, 
-                            width: Math.max(editingTitleLength * (editingTitleLength >= 30 ? 15 : 30), 100),
+                            width: editingTitleLength === 0 ? 300 : Math.max(editingTitleLength * (editingTitleLength >= 30 ? 15 : 30), 100),
                             fontSize: editingTitleLength >= 30 ? "200%" : "300%",
                             textAlign: "center"
                         }}
@@ -244,6 +245,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             <div 
                 key={i}
                 className={this._getBarContainerClasses(i, rangeStartIdx, rangeEndIdx, !!isCurrentlyPlayingBar)}
+                onClick={editingMode ? undefined : () => this._onBarClick(i)}
                 onMouseEnter={() => this._onBarEnter(i)}
                 onMouseLeave={this._onBarLeave}
                 style={{ 
@@ -417,6 +419,13 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                 {bars}
             </div>
         );
+    }
+
+    private _onBarClick = (barIdx: number) => {
+        let { onBarClick } = this.props;
+        if (onBarClick) {
+            onBarClick(barIdx);
+        }
     }
 
     private _onBarEnter = (barIdx: number) => {

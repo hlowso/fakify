@@ -127,7 +127,7 @@ export class PreCompApiHelper {
             return ChartServerError.Invalid;
         }
 
-        if (this.chartTitleExistsAsync(chart.title as string)) {
+        if (await this.chartTitleExistsAsync(chart.title as string)) {
             return ChartServerError.TitleTaken;
         }
 
@@ -153,7 +153,7 @@ export class PreCompApiHelper {
             return ChartServerError.Invalid;
         }
 
-        if (this.chartTitleExistsAsync(chart.title as string)) {
+        if (await this.chartTitleExistsAsync(chart.title as string)) {
             return ChartServerError.TitleTaken;
         }
 
