@@ -431,6 +431,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     private _onEditBar = (barIdx: number) => {
         let { onEditBar } = this.props;
         if (onEditBar) {
+            this.setState({ hoveredBarIdx: undefined });
             onEditBar(barIdx);
         }
     }
