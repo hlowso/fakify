@@ -157,7 +157,7 @@ export class PreCompApiHelper {
             return ChartServerError.TitleTaken;
         }
 
-        return await this._data.updateChartAsync(chartId, chart);
+        return await this._data.updateChartAsync(chart, chartId);
     }
 
     public chartTitleExistsAsync = async (title: string): Promise<boolean> => {

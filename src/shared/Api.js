@@ -79,9 +79,9 @@ export async function getSongTitlesAsync() {
     return res.json();
 };
 
-export async function isSongTitleTakenAsync(title) {
-    let res = await FetchHelpers.GET(`/api/songs/taken/${title}`)
-    return res.json();
+export async function getSongByTitleAsync(title) {
+    let res = await FetchHelpers.GET(`/api/songs/by-title/${title}`);
+    return await res.json();
 }
 
 export async function getSongAsync(chartId) {
@@ -94,3 +94,8 @@ export async function getSongAsync(chartId) {
             : null
     );
 };
+
+export async function deleteSongAsync(chartId) {
+    let res = await FetchHelpers.DELETE(`/api/songs/${chartId}`);
+    return await res.json();
+}

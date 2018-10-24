@@ -37,3 +37,7 @@ export const POST = (path: string, payload = null) => {
 export const PUT = (path: string, payload = null) => {
     return sendRequest(path, "PUT", payload);
 }
+
+export const DELETE = (path: string, payload = null) => {
+    return sendRequest(path, "DELETE", payload);
+}

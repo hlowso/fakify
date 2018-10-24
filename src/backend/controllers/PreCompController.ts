@@ -2,6 +2,7 @@ import path from "path";
 import { PreCompApiHelper } from "../PreCompApiHelper";
 import { Router } from "express";
 import { IUser, ISession } from "../../shared/types";
+import * as Mongo from "mongodb";
 
 export enum UnauthorizedResponse {
     GoToLogin,
@@ -54,5 +55,20 @@ export class PreCompController {
 
     get router() {
         return this._router;
+    }
+
+    protected parseObjectId = (id: string) => {
+        if (typeof id !== "string") {
+            return;
+        } 
+
+        let parsedId: Mongo.ObjectId | undefined;
+        try {
+            parsedId = new Mongo.ObjectId(id);
+        } catch (err) {
+            console.error(`Cannot parse mongo object ID: ${id}`);
+        }
+
+        return parsedId || null;
     }
 }

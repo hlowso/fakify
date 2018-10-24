@@ -7,7 +7,7 @@
 #signup-view .form-container {
     padding: 45px 15px 15px;
 
-    height: 300px;
+    height: 375px;
     background-color: #666;
 
     border: solid #555 2px;
@@ -24,7 +24,6 @@
 }
 
 #signup-view input[type="submit"] {
-    margin-top: 5%;
     width: 200px;
     border: 1px solid #666
 }

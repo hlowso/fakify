@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import * as Cx from "classnames";
 import { Button, Glyphicon, FormControl, FormGroup } from "react-bootstrap";
 import * as Util from "../../../shared/Util";
-import { MAX_TITLE_LENGTH } from '../../../shared/Constants';
 import * as MusicHelper from "../../../shared/music/MusicHelper";
 import { Chord } from "../../../shared/music/domain/ChordClass";
+import { MAX_TITLE_LENGTH } from '../../../shared/Constants';
 import Chart from "../../../shared/music/Chart";
 import { ISong, IMusicIdx, NoteName, Tempo, ChordName, PresentableChordShape, IChartBar, IChordSegment } from "../../../shared/types";
 import "./ChartViewer.css";
@@ -12,6 +12,7 @@ import $ from "jquery";
 
 export interface IChartViewerProps {
     editingMode?: boolean;
+    editingTitle?: string;
     song?: ISong;
     chart?: Chart;
     sessionIdx?: IMusicIdx;
@@ -24,12 +25,12 @@ export interface IChartViewerProps {
     onDeleteBar?: (barIdx: number) => void;
     recontextualize?: (noteName: NoteName) => void;
     resetTempo?: (tempo: Tempo) => void;
-    onSongTitleChange?: (updatedTitle: string) => void;
+    onSongTitleChange?: () => void;
     resetChart?: () => void;
+    onEditTitle?: (title: string) => void;
 }
 
 export interface IChartViewerState {
-    editingTitle?: string;
     hoveredBarIdx?: number;
     lastInLineIndices?: number[];
     linesAreGrouped?: boolean;
@@ -39,8 +40,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     constructor(props: IChartViewerProps) {
         super(props);
         this.state = {
-            linesAreGrouped: false,
-            editingTitle: ""
+            linesAreGrouped: false
         };
     }
 
@@ -98,10 +98,9 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     public renderTitle = () => {
-        let { editingMode, song, chartTitleError } = this.props;
-        let { editingTitle } = this.state;
+        let { editingMode, song, chartTitleError, editingTitle, onEditTitle } = this.props;
 
-        let isEditingTitle = typeof editingTitle === "string";
+        let isEditingTitle = typeof editingTitle === "string" && editingMode && onEditTitle;
         let editingTitleLength = isEditingTitle ? (editingTitle as string).length : 0;
 
         if (!song) {
@@ -109,15 +108,15 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         }
         
         return (
-            isEditingTitle || !song.title
+            isEditingTitle 
             ? (
-                <FormGroup validationState={!editingTitle || chartTitleError ? "error" : undefined} >
+                <FormGroup validationState={!(editingTitle as string).trim() || chartTitleError ? "error" : undefined} >
                     <FormControl 
                         autoFocus={true}
-                        onBlur={this._onSubmitSongTitleForm}
-                        onSubmit={this._onSubmitSongTitleForm}
+                        onBlur={() => this._onSongTitleChange()}
+                        onSubmit={() => this._onSongTitleChange()}
                         onFocus={(event: React.SyntheticEvent<any>) => (event.target as any).select()}
-                        onChange={(event: React.SyntheticEvent<any>) => this._onSongTitleChange((event.target as any).value)} 
+                        onChange={(event: React.SyntheticEvent<any>) => (onEditTitle as (title: string) => void)((event.target as any).value)} 
                         onKeyDown={this._onTitleEnter}
                         value={editingTitle}
                         placeholder="Enter a title"
@@ -134,7 +133,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             : (
                 <span 
                     className="song-title"
-                    onClick={editingMode ? () => this.setState({ editingTitle: (song as ISong).title  }) : undefined}
+                    onClick={editingMode && onEditTitle ? () => (onEditTitle as () => void)() : undefined}
                 >
                     {song.title}
                 </span>
@@ -144,36 +143,15 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
     private _onTitleEnter = (evt: React.KeyboardEvent<FormControl>) => {
         if (evt.nativeEvent.code === "Enter") {
-            this._onSubmitSongTitleForm(evt);
+            this._onSongTitleChange();
         }
     }
 
-    private _onSubmitSongTitleForm = (event: React.SyntheticEvent<any>) => {
-        event.preventDefault();
+    private _onSongTitleChange = () => {
+        let { onSongTitleChange, chartTitleError, editingTitle } = this.props;
 
-        let { onSongTitleChange } = this.props;
-        let { editingTitle } = this.state;
-
-        if (!onSongTitleChange || !editingTitle || !editingTitle.trim() || editingTitle.trim().length > MAX_TITLE_LENGTH) {
-            return;
-        }
-
-        onSongTitleChange(editingTitle.trim());
-    }
-
-    private _onSongTitleChange = (updatedTitle: string) => {
-        let { onSongTitleChange, chartTitleError, song } = this.props;
-
-        if (!song) {
-            return;
-        }
-
-        if (typeof updatedTitle === "string" && updatedTitle.length <= MAX_TITLE_LENGTH) {
-            this.setState({ editingTitle: updatedTitle });
-        }
-
-        if (chartTitleError && onSongTitleChange) {
-            onSongTitleChange(song.title as string);
+        if (!chartTitleError && onSongTitleChange && editingTitle && editingTitle.trim() && editingTitle.length <= MAX_TITLE_LENGTH) {
+            onSongTitleChange();
         }
     }
 
@@ -566,7 +544,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         let { linesAreGrouped } = this.state;
 
         if (!linesAreGrouped) {
-            return NaN;
+            return 0;
         }
 
         return currLineHas2Bars ? 50 : 25;
@@ -581,7 +559,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     public componentDidUpdate(prevProps: IChartViewerProps, prevState: IChartViewerState) {
-        let { chart, song, chartTitleError } = this.props;
+        let { chart } = this.props;
 
         if (chart && prevProps.chart) {
             if (
@@ -593,10 +571,6 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         }
 
         this._initializeBarLines();
-
-        if (prevProps.song && song && prevProps.song.title !== song.title && !chartTitleError) {
-            this.setState({ editingTitle: undefined });
-        }
     }
 
     private _resetLineGroups = () => {

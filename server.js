@@ -13948,7 +13948,12 @@ const waitFor = (getUpdate, rate) => {
 };
 /* unused harmony export waitFor */
 
-const copyObject = (object) => JSON.parse(JSON.stringify(object));
+const copyObject = (object) => {
+    if (!object) {
+        return object;
+    }
+    return JSON.parse(JSON.stringify(object));
+};
 /* harmony export (immutable) */ __webpack_exports__["b"] = copyObject;
 
 const length = (obj) => {
@@ -33267,6 +33272,8 @@ class Note {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_path___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_path__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_express__ = __webpack_require__(89);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_express___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_express__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_mongodb__ = __webpack_require__(117);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_mongodb___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_mongodb__);
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -33277,6 +33284,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 
 
+
 var UnauthorizedResponse;
 (function (UnauthorizedResponse) {
     UnauthorizedResponse[UnauthorizedResponse["GoToLogin"] = 0] = "GoToLogin";
@@ -33285,6 +33293,19 @@ var UnauthorizedResponse;
 })(UnauthorizedResponse || (UnauthorizedResponse = {}));
 class PreCompController {
     constructor(api) {
+        this.parseObjectId = (id) => {
+            if (typeof id !== "string") {
+                return;
+            }
+            let parsedId;
+            try {
+                parsedId = new __WEBPACK_IMPORTED_MODULE_2_mongodb__["ObjectId"](id);
+            }
+            catch (err) {
+                console.error(`Cannot parse mongo object ID: ${id}`);
+            }
+            return parsedId || null;
+        };
         this._api = api;
         this._router = Object(__WEBPACK_IMPORTED_MODULE_1_express__["Router"])();
         this._user = null;
@@ -52913,6 +52934,9 @@ class PreCompData {
         };
         this.getChartAsync = (_id) => {
             return new Promise((resolve, reject) => {
+                if (!_id) {
+                    resolve(null);
+                }
                 this._chartColl.findOne({ _id }, (err, chart) => {
                     if (err !== null) {
                         reject(err);
@@ -52941,15 +52965,31 @@ class PreCompData {
                 });
             });
         };
-        this.updateChartAsync = (_id, chart) => {
+        this.updateChartAsync = (chart, _id) => {
             let { title, originalContext, originalTempo, barsBase } = chart;
             let updateSet = { $set: { title, originalContext, originalTempo, barsBase } };
             return new Promise((resolve, reject) => {
+                if (!_id) {
+                    resolve(false);
+                }
                 this._chartColl.updateOne({ _id }, updateSet, (err, response) => {
                     if (err !== null) {
                         reject(err);
                     }
                     resolve(response.matchedCount === 1);
+                });
+            });
+        };
+        this.deleteChartAsync = (_id) => {
+            return new Promise((resolve, reject) => {
+                if (!_id) {
+                    reject("chartId cannot be falsey");
+                }
+                this._chartColl.deleteOne({ _id }, (err, response) => {
+                    if (err !== null) {
+                        reject(err);
+                    }
+                    resolve(response.deletedCount);
                 });
             });
         };
@@ -71317,7 +71357,7 @@ class PreCompApiHelper {
             if (yield this.chartTitleExistsAsync(chart.title)) {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartServerError */].TitleTaken;
             }
-            return yield this._data.updateChartAsync(chartId, chart);
+            return yield this._data.updateChartAsync(chart, chartId);
         });
         this.chartTitleExistsAsync = (title) => __awaiter(this, void 0, void 0, function* () {
             let existingChart = yield this._data.getChartByTitleAsync(title);
@@ -74059,8 +74099,6 @@ class AdminController extends __WEBPACK_IMPORTED_MODULE_0__PreCompController__["
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__PreCompController__ = __webpack_require__(133);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_mongodb__ = __webpack_require__(117);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_mongodb___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_mongodb__);
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -74070,7 +74108,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 
-
 class ChartsController extends __WEBPACK_IMPORTED_MODULE_0__PreCompController__["a" /* PreCompController */] {
     constructor(api) {
         super(api);
@@ -74079,22 +74116,28 @@ class ChartsController extends __WEBPACK_IMPORTED_MODULE_0__PreCompController__[
          * ROUTES
          */
         this._router.get("/titles", (req, res) => __awaiter(this, void 0, void 0, function* () {
-            return res.send(yield this._api.getChartTitleProjectionsAsync());
+            return res.json(yield this._api.getChartTitleProjectionsAsync());
         }));
         this._router.get("/user/titles", (req, res) => __awaiter(this, void 0, void 0, function* () {
-            return res.send(yield this._api.getChartTitleProjectionsAsync(this._user._id));
+            return res.json(yield this._api.getChartTitleProjectionsAsync(this._user._id));
         }));
         this._router.get("/:chartId", (req, res) => __awaiter(this, void 0, void 0, function* () {
-            return res.send(yield this._api.data.getChartAsync(new __WEBPACK_IMPORTED_MODULE_1_mongodb__["ObjectID"](req.params.chartId)));
+            let chartId = this.parseObjectId(req.params.chartId);
+            return res.json(yield this._api.data.getChartAsync(chartId || undefined));
         }));
         this._router.post("/", (req, res) => __awaiter(this, void 0, void 0, function* () {
-            return res.send(yield this._api.createChartAsync(req.body, this._user._id));
+            return res.json(yield this._api.createChartAsync(req.body, this._user._id));
         }));
         this._router.put("/:chartId", (req, res) => __awaiter(this, void 0, void 0, function* () {
-            return res.send(yield this._api.updateChartAsync(new __WEBPACK_IMPORTED_MODULE_1_mongodb__["ObjectID"](req.params.chartId), req.body));
+            let chartId = this.parseObjectId(req.params.chartId);
+            return res.json(yield this._api.data.updateChartAsync(req.body, chartId || undefined));
         }));
-        this._router.get("/taken/:title", (req, res) => __awaiter(this, void 0, void 0, function* () {
-            return res.send(yield this._api.chartTitleExistsAsync(req.params.title));
+        this._router.delete("/:chartId", (req, res) => __awaiter(this, void 0, void 0, function* () {
+            let chartId = this.parseObjectId(req.params.chartId);
+            return res.json(yield this._api.data.deleteChartAsync(chartId || undefined));
+        }));
+        this._router.get("/by-title/:title", (req, res) => __awaiter(this, void 0, void 0, function* () {
+            return res.json(yield this._api.data.getChartByTitleAsync(req.params.title));
         }));
     }
 }

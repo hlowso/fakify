@@ -1,13 +1,14 @@
 import React, { Component } from "react";
 import ChartViewer from "../../views/ChartViewer/ChartViewer";
 import { BarEditingModal } from "../../views/BarEditingModal/BarEditingModal";
+import { MAX_TITLE_LENGTH } from '../../../shared/Constants';
 import * as Util from "../../../shared/Util";
 import * as Api from "../../../shared/Api";
 import { ISong, IChartBar, ChordShape, Tabs, NoteName, TimeSignature } from "../../../shared/types";
 import Chart from "../../../shared/music/Chart";
 import $ from "jquery";
 import "./CreateViewController.css";
-import { Button, ButtonGroup } from "react-bootstrap";
+import { Button, ButtonGroup, Glyphicon } from "react-bootstrap";
 
 export interface ICreateVCProps {
     StateHelper: any;
@@ -23,6 +24,7 @@ export interface ICreateVCState {
     editBar?: IChartBar;
     errorMessage?: string;
     updatingChartId?: string;
+    editingTitle?: string;
 }
 
 class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
@@ -39,15 +41,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
     public componentWillMount() {
         let stateUpdate: ICreateVCState = { loadingSongTitles: false };
-        Api.getUserSongTitles()
-            .then(titles => {
-                if (Util.length(titles) === 0) {
-                    this._onNewSong();
-                } else {
-                    stateUpdate.userSongTitles = titles;
-                }
-                this.setState(stateUpdate);
-            });
+        this._refreshSongTitlesAsync().then(() => this.setState(stateUpdate));
     }
 
     public render() {
@@ -134,8 +128,21 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         listItems.sort((a, b) => a.title < b.title ? -1 : 1);
 
         return listItems.map(titleItem => (
-            <div className="user-title" onClick={() => this._onChooseEditSongAsync(titleItem.chartId)} >
-                <span>{titleItem.title}</span>
+            <div className="user-title" >
+                <ButtonGroup style={{ width: "100%", height: "100%"  }}>
+                    <Button 
+                        onClick={() => this._onChooseEditSongAsync(titleItem.chartId)}
+                        style={{ width: "95%", fontSize: "130%", height: "100%" }}
+                    >
+                        {titleItem.title}
+                    </Button>
+                    <Button 
+                        onClick={() => this._onDeleteSongAsync(titleItem.chartId)}
+                        bsStyle="danger" style={{ width: "5%", height: "100%" }}
+                    >
+                        <Glyphicon glyph="trash"/>
+                    </Button>
+                </ButtonGroup>
             </div>
         ));
     }
@@ -147,20 +154,27 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                 editingMode={true}
                 song={editingSong}
                 chart={this._editingChart}
+                editingTitle={this.state.editingTitle}
                 chartTitleError={this.state.errorMessage === "Song title already exists"} 
                 onEditBar={this._onEditBar}
                 onAddBar={this._onAddBar}
                 onDeleteBar={this._onDeleteBar}
-                onSongTitleChange={title => this._onSongTitleChangeAsync(title)}
+                onEditTitle={title => this._onEditingTitleChange(title)}
+                onSongTitleChange={() => this._onSongTitleChangeAsync()}
             />
         );
     }
 
     public renderFooterButtons() {
 
-        let { errorMessage, editingSong } = this.state;
+        let { errorMessage, editingSong, editingTitle } = this.state;
 
-        let disableSave = !editingSong || !editingSong.title;
+        let disableSave = typeof editingTitle === "string" || 
+                            !editingSong || 
+                            !editingSong.title || 
+                            !editingSong.title.trim() || 
+                            editingSong.title.trim().length > MAX_TITLE_LENGTH ||
+                            errorMessage === "Song title already exists";
 
         return this._editingChart && (
             <div className="footer-section" >
@@ -190,7 +204,8 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     private _onNewSong = () => {
         this.setState({ 
             editingSong: {},
-            errorMessage: undefined
+            errorMessage: undefined,
+            editingTitle: ""
         }, () => this._resetChart(true));
     }
 
@@ -284,14 +299,17 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
     private _onCancel = () => {
         this._editingChart = undefined;
-        this.setState({ updatingChartId: "", editingSong: undefined, errorMessage: undefined });
+        this.setState({ updatingChartId: "", editingSong: undefined, errorMessage: undefined, editingTitle: undefined });
         this.forceUpdate();
     }
 
     private _onStartOver = () => {
-        this._resetChart(true);
-        this._updateSongTitle();
-        this.setState({ errorMessage: undefined });
+        let { updatingChartId } = this.state;
+        if (!updatingChartId) {
+            return;
+        }
+
+        this._onChooseEditSongAsync(updatingChartId)
     }
 
     private _resetChart = (newSong?: boolean) => {
@@ -310,23 +328,53 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         }
     }
 
-    private _onSongTitleChangeAsync = async (updatedTitle: string) => {
+    private _onSongTitleChangeAsync = async () => {
+        let { editingTitle, updatingChartId } = this.state;
 
-        let existingSong = await Api.isSongTitleTakenAsync(updatedTitle);
+        if (!editingTitle || !editingTitle.trim() || editingTitle.trim().length > MAX_TITLE_LENGTH) {
+            return;
+        }
 
-        if (existingSong) {
+        let existingSong = await Api.getSongByTitleAsync(editingTitle);
+
+        if (existingSong && existingSong.chartId !== updatingChartId) {
             this.setState({ errorMessage: "Song title already exists" });
             return;
         }
 
-        this._updateSongTitle(updatedTitle);        
+        this._updateSongTitle(editingTitle);        
     }
+
+    private _onEditingTitleChange = (editingTitle?: string) => {
+
+        let { editingSong } = this.state;
+
+        if (!editingSong) {
+            return;
+        }
+
+        if (typeof editingTitle !== "string") {
+            editingTitle = editingSong.title;
+        }
+
+        if (typeof editingTitle !== "string" || editingTitle.length > MAX_TITLE_LENGTH) {
+            return;
+        }
+
+        this.setState({ editingTitle, errorMessage: undefined })
+    }   
 
     private _updateSongTitle = (title?: string) => {
         let songUpdate = Util.copyObject(this.state.editingSong) as ISong;
+
+        if (!songUpdate) {
+            return;
+        }
+
         songUpdate.title = title;
         this.setState({ 
-            editingSong: songUpdate, 
+            editingSong: songUpdate,
+            editingTitle: undefined, 
             errorMessage: ""
         });
     }
@@ -339,6 +387,21 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                 editingSong, 
                 updatingChartId: chartId 
             }, this._resetChart);
+        }
+    }
+
+    private _onDeleteSongAsync = async (chartId: string) => {
+        await Api.deleteSongAsync(chartId);
+        await this._refreshSongTitlesAsync();
+    }
+
+    private _refreshSongTitlesAsync = async() => {
+        let titles = await Api.getUserSongTitles();
+
+        if (Util.length(titles) === 0) {
+            this._onNewSong();
+        } else {
+            this.setState({ userSongTitles: titles });
         }
     }
 

@@ -138,8 +138,13 @@ export class PreCompData {
         });
     }
 
-    public getChartAsync = (_id: Mongo.ObjectId): Promise<ISong> => {
+    public getChartAsync = (_id?: Mongo.ObjectId): Promise<ISong | null> => {
         return new Promise((resolve, reject) => {
+
+            if (!_id) {
+                resolve(null);
+            }
+
             this._chartColl.findOne({ _id }, (err, chart) => {
                 if (err !== null) {
                     reject(err);
@@ -174,17 +179,37 @@ export class PreCompData {
         });
     }
 
-    public updateChartAsync = (_id: Mongo.ObjectId, chart: ISong): Promise<boolean> => {
+    public updateChartAsync = (chart: ISong, _id?: Mongo.ObjectId): Promise<boolean> => {
         let { title, originalContext, originalTempo, barsBase } = chart;
         let updateSet = { $set: { title, originalContext, originalTempo, barsBase } };
 
         return new Promise((resolve, reject) => {
+            if (!_id) {
+                resolve(false);
+            }
+
             this._chartColl.updateOne({ _id }, updateSet, (err, response) => {
                 if (err !== null) {
                     reject(err);
                 }
 
                 resolve(response.matchedCount === 1);
+            });
+        });
+    }
+
+    public deleteChartAsync = (_id?: Mongo.ObjectId): Promise<number> => {
+        return new Promise((resolve, reject) => {
+            if (!_id) {
+                reject("chartId cannot be falsey");
+            }
+
+            this._chartColl.deleteOne({ _id }, (err, response) => {
+                if (err !== null) {
+                    reject(err);
+                }
+
+                resolve(response.deletedCount);
             });
         });
     }
