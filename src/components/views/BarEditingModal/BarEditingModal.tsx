@@ -155,7 +155,7 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
                                     onClick={() => this._onRemoveChord(beatIdx)} 
                                     style={{ padding: 3, height: "30px" }}
                                 >
-                                    <Glyphicon glyph="trash" />
+                                    <Glyphicon glyph="minus" />
                                 </Button>
                             ) : undefined 
                     }
