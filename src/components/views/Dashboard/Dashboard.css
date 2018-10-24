@@ -12,7 +12,8 @@
     border-right: solid #222 1px;
 }
 
-#dashboard .play-button {
+#dashboard .play-button,
+#dashboard .select-all-bars {
     margin-top: auto;
     margin-bottom: auto;
     height: 30px;

@@ -14,6 +14,8 @@ export interface IDashboardProps {
     onTempoChange?: (tempo: Tempo) => void;
     start?: () => void;
     stop?: () => void;
+    onSelectAllBars?: () => void;
+    onSelectAllBarsHoverChange?: (hovering: boolean) => void;
 }
 
 export interface IDashboardState {
@@ -39,7 +41,9 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
         return (
             <div id="dashboard" style={dynamicStyle}>
                 {this.renderTempoSelect()}
+                {this.renderSelectAllBars()}
                 {this.renderPlayButton()}
+                <div style={{ width: 20 }} />
                 {this.renderKeySelect()}
             </div>
         );
@@ -85,6 +89,25 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
         }
 
         return options;
+    }
+
+    public renderSelectAllBars() {
+        let { chartIsLoaded, onSelectAllBars, onSelectAllBarsHoverChange } = this.props;
+
+        if (!chartIsLoaded || !onSelectAllBars || !onSelectAllBarsHoverChange) {
+            return;
+        }
+
+        return (
+            <Button 
+                title="Select all bars" 
+                className="select-all-bars" 
+                onClick={() => (onSelectAllBars as () => void)()}
+                onMouseEnter={() => (onSelectAllBarsHoverChange as (hovering: boolean) => void)(true) } 
+                onMouseLeave={() => (onSelectAllBarsHoverChange as (hovering: boolean) => void)(false) } >
+                <Glyphicon glyph={"sort"} />
+            </Button>
+        );
     }
 
     public renderPlayButton() {

@@ -21,6 +21,7 @@ export interface IChartViewerProps {
     chartTitleError?: boolean;
     isEditingBars?: boolean;
     hiddenKeyboard?: boolean;
+    highlightAllOutOfRange?: boolean;
     onBarClick?: (barIdx: number) => void;
     onAddBar?: (barIdx: number) => void;
     onEditBar?: (barIdx: number) => void;
@@ -518,22 +519,28 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
     private _getBarContainerClasses = (i: number, rangeStartIdx: number, rangeEndIdx: number, isCurrentlyPlayingBar: boolean) => {
 
-        let { editingMode } = this.props;
+        let { editingMode, highlightAllOutOfRange } = this.props;
         let { hoveredBarIdx } = this.state;
         let hoveredBarIsInRange = Number.isInteger(hoveredBarIdx as number) && (hoveredBarIdx as number) >= rangeStartIdx && (hoveredBarIdx as number) <= rangeEndIdx;
         let isWithinRange = rangeStartIdx <= i &&
                                     i <= rangeEndIdx;
+        let willBeWithinRange = (
+            (!isWithinRange && highlightAllOutOfRange) ||
+            (
+                !editingMode && Number.isInteger(hoveredBarIdx as number) && (
+                    hoveredBarIsInRange 
+                        ? hoveredBarIdx === i
+                        : (Math.min(hoveredBarIdx as number, rangeStartIdx) <= i && i <= Math.max(hoveredBarIdx as number, rangeEndIdx))
+                )
+            )
+        );
 
         return Cx({ 
             "bar": true,
             "bar-container": true, 
             "within-range": isWithinRange && !editingMode,
             "current-bar": isCurrentlyPlayingBar && !editingMode,
-            "will-be-within-range": !editingMode && Number.isInteger(hoveredBarIdx as number) && (
-                hoveredBarIsInRange 
-                    ? hoveredBarIdx === i
-                    : (Math.min(hoveredBarIdx as number, rangeStartIdx) <= i && i <= Math.max(hoveredBarIdx as number, rangeEndIdx))
-            )
+            "will-be-within-range": willBeWithinRange
         });
     }
 

@@ -32,6 +32,7 @@ export interface IPlayVCState {
     playMode?: PlayMode;
     spaceClickDone?: boolean;
     hideKeyboard?: boolean;
+    selectAllBarsHovered?: boolean;
 }
 
 class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
@@ -47,7 +48,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             midiSettingsModalOpen: false,
             playMode: PlayMode.None,
             spaceClickDone: true, 
-            hideKeyboard: false     
+            hideKeyboard: false,
+            selectAllBarsHovered: false     
         };
     }
 
@@ -151,7 +153,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             selectedSong, 
             midiSettingsModalOpen, 
             loadingSelectedSong,
-            hideKeyboard
+            hideKeyboard,
+            selectAllBarsHovered
         } = this.state;
 
         // let selectedSongId = selectedSong ? (selectedSong as ISong)._id: null;
@@ -185,7 +188,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                         onBarClick={this._onBarClick} 
                         sessionFailed={sessionFailed} 
                         resetChart={this._resetChart} 
-                        loadingChart={loadingSelectedSong} />
+                        loadingChart={loadingSelectedSong}
+                        highlightAllOutOfRange={selectAllBarsHovered} />
                     <Dashboard 
                         inSession={inSession}
                         chartIsLoaded={chartIsLoaded}
@@ -195,7 +199,9 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                         tempo={chartIsLoaded ? this._chart.tempo : undefined}
                         onTempoChange={this._resetTempo}
                         start={this._startSession}
-                        stop={this._stopSession} />
+                        stop={this._stopSession} 
+                        onSelectAllBars={this._onSelectAllBars}
+                        onSelectAllBarsHoverChange={this._onToggleSelectAllBarsHover} />
                 </div>
                 
                     {/* <TrainingWindow  
@@ -269,6 +275,22 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         });
     }
 
+    private _onSelectAllBars = () => {
+        if (!this._chart) {
+            return;
+        }
+
+        this._updateChartRange(0, this._chart.bars.length - 1);
+    }
+
+    private _onToggleSelectAllBarsHover = (hovering: boolean) => {
+        if (!this._chart) {
+            return;
+        }
+
+        this.setState({ selectAllBarsHovered: hovering });        
+    }
+
     // private _setPlayMode = (playMode: PlayMode) => {
     //     this.setState({ playMode });
     // }
@@ -319,8 +341,6 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
     *******************/
 
     private _onBarClick = (i: number) => {
-        this._stopSession();
-        let { selectedSong } = this.state;
         let { rangeEndIdx, rangeStartIdx } = this._chart as Chart;
         let withinRange = rangeStartIdx <= i && 
                           i <= rangeEndIdx;
@@ -340,12 +360,25 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                     : rangeEndIdx
         );
 
-        (this._chart as Chart).rangeStartIdx = rangeStartIdxUpdate;
-        (this._chart as Chart).rangeEndIdx = rangeEndIdxUpdate;
+        this._updateChartRange(rangeStartIdxUpdate, rangeEndIdxUpdate)
+    }
+
+    private _updateChartRange = (start: number, end: number) => {
+
+        if (!this._chart) {
+            return;
+        }
+
+        this._stopSession();
+
+        let { selectedSong } = this.state;
+
+        this._chart.rangeStartIdx = start;
+        this._chart.rangeEndIdx = end;
 
         StorageHelper.updateChartSettings((selectedSong as ISong)._id as string, {
-            rangeStartIdx: rangeStartIdxUpdate,
-            rangeEndIdx: rangeEndIdxUpdate
+            rangeStartIdx: start,
+            rangeEndIdx: end
         });
     }
 
