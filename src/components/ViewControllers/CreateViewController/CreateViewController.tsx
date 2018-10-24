@@ -4,7 +4,7 @@ import { BarEditingModal } from "../../views/BarEditingModal/BarEditingModal";
 import { MAX_TITLE_LENGTH } from '../../../shared/Constants';
 import * as Util from "../../../shared/Util";
 import * as Api from "../../../shared/Api";
-import { ISong, IChartBar, ChordShape, Tabs, NoteName, TimeSignature } from "../../../shared/types";
+import { ISong, IChartBar, ChordShape, Tabs, NoteName, TimeSignature, ChartServerError } from "../../../shared/types";
 import Chart from "../../../shared/music/Chart";
 import $ from "jquery";
 import "./CreateViewController.css";
@@ -148,7 +148,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     }
 
     public renderEditingChart() {
-        let { editingSong } = this.state;
+        let { editingSong, isAddingBar, isUpdatingBar } = this.state;
         return (
             <ChartViewer
                 editingMode={true}
@@ -156,6 +156,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                 chart={this._editingChart}
                 editingTitle={this.state.editingTitle}
                 chartTitleError={this.state.errorMessage === "Song title already exists"} 
+                isEditingBars={isAddingBar || isUpdatingBar}
                 onEditBar={this._onEditBar}
                 onAddBar={this._onAddBar}
                 onDeleteBar={this._onDeleteBar}
@@ -179,7 +180,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         return this._editingChart && (
             <div className="footer-section" >
                 <ButtonGroup bsSize="large" >
-                    <Button onClick={this._onSaveChart} disabled={disableSave} >Save</Button>
+                    <Button bsStyle="primary" onClick={this._onSaveChartAsync} disabled={disableSave} >Save</Button>
                     <Button onClick={this._onCancel}>Cancel</Button>                
                     <Button onClick={this._onStartOver}>Start Over</Button>
                 </ButtonGroup>
@@ -274,7 +275,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         };
     }
 
-    private _onSaveChart = () => {
+    private _onSaveChartAsync = async () => {
         let { redirect } = this.props;
         let { updatingChartId } = this.state;
         let newSong = this._consolidateSong();
@@ -285,21 +286,23 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                 : Api.saveSongAsync(newSong)
         ); 
 
-        promise.then((result: string) => {
-                switch (result) {
-                    case Api.SaveSongResults.Ok:
-                        redirect(Tabs.Create);
-                        break;
-                    case Api.SaveSongResults.TitleExists:
-                        this.setState({ errorMessage: "Song title exists" });
-                        break;
-                    case Api.SaveSongResults.InvalidSong:
-                    case Api.SaveSongResults.Error:
-                    default:
-                        this.setState({ errorMessage: "There was an error saving your song" });
-                        break;
-                }
-            });
+        let result = await promise;
+
+        switch (result) {
+            case true:
+                redirect(Tabs.Create);
+                break;
+            case ChartServerError.TitleTaken:
+                this.setState({ errorMessage: "Song title exists" });
+                break;
+            case ChartServerError.Invalid:
+            case ChartServerError.ChartCount:
+            case ChartServerError.UserChartCount:
+            case false:
+            default:
+                this.setState({ errorMessage: "There was an error saving your song" });
+                break;
+        }
     }
 
     private _onCancel = () => {
@@ -342,7 +345,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
         let existingSong = await Api.getSongByTitleAsync(editingTitle);
 
-        if (existingSong && existingSong.chartId !== updatingChartId) {
+        if (existingSong && existingSong._id !== updatingChartId) {
             this.setState({ errorMessage: "Song title already exists" });
             return;
         }

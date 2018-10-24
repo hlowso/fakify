@@ -1,4 +1,4 @@
-import { IPart, IScoreBar, IMusicIdx, IStroke, IMusicBar } from "../types";
+import { IPart, IScoreBar, IMusicIdx, IStroke, IMusicBar, InstrumentType } from "../types";
 import * as Util from "../Util";
 
 class Score {
@@ -212,6 +212,30 @@ class Score {
             instrument,
             music
         }
+    }
+
+    public changeVolume = (instrument: string, volFactor: number) => {
+        switch(instrument) {
+            default:
+            case "piano":
+                return this._changeVolume("piano", volFactor);
+            case "doubleBass":
+                return this._changeVolume("doubleBass", volFactor);
+            case "drums":
+                this._changeVolume("shutHiHat", volFactor);
+                return this._changeVolume("rideCymbal", volFactor);
+
+        }
+    }
+
+    private _changeVolume = (instrument: InstrumentType, volFactor: number) => {
+        this._bars.forEach((bar, barIdx) => {
+            for (let subbeat in bar) {
+                if (instrument in bar[subbeat]) {
+                    this._bars[barIdx][subbeat][instrument][0].velocity *= volFactor;
+                }
+            }
+        });
     }
 
     get bars(): IScoreBar[] {

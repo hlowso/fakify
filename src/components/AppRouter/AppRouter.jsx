@@ -34,6 +34,9 @@ class AppRouter extends Component {
             userEnvelopes: {},
             redirectDestination: "",
             onUserSessionKeyStroke: (keyStrokeRecord) => {},
+            pianoVolume: 10,
+            bassVolume: 10,
+            drumsVolume: 10
         };
     }
 
@@ -70,7 +73,8 @@ class AppRouter extends Component {
             connectToMidiInput: this.connectToMidiInput,
             playRangeLoop: this.playRangeLoop,
             killTake: this.killTake,
-            playUserMidiMessage: this.playUserMidiMessage
+            playUserMidiMessage: this.playUserMidiMessage,
+            setVolume: this.setVolume
         };
 
         let StateHelper = {
@@ -289,7 +293,7 @@ class AppRouter extends Component {
 
     playRangeLoop = (chart, playMode) => {
         this.killTake();
-        let { audioContext, fontPlayer } = this.state;
+        let { audioContext, fontPlayer, pianoVolume, bassVolume, drumsVolume } = this.state;
         
         let Manager;
         switch (playMode) {
@@ -308,7 +312,10 @@ class AppRouter extends Component {
             audioContext, 
             fontPlayer, 
             chart,
-            this.forceUpdate.bind(this)
+            this.forceUpdate.bind(this),
+            pianoVolume / 10,
+            bassVolume / 10,
+            drumsVolume / 10
         );
 
         sessionManager.start();
@@ -321,6 +328,18 @@ class AppRouter extends Component {
             sessionManager.stop();
         }
         this.setState({ sessionManager: null });
+    }
+
+    setVolume = (instrument, vol) => {
+        switch(instrument) {
+            default:
+            case "piano": 
+                return this.setState({ pianoVolume: vol });
+            case "bass":
+                return this.setState({ bassVolume: vol });
+            case "drums":
+                return this.setState({ drumsVolume: vol });
+        }
     }
 
     /********************

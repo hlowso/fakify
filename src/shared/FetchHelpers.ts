@@ -22,22 +22,22 @@ const sendRequest = (path: string, method: Method, payload: any) => {
     return fetch(url, options);
 }
 
-export const GET = (path: string, payload = null) => {
+export const GET = (path: string, payload?: any) => {
     return sendRequest(path, "GET", payload);
 }
 
-export const PATCH = (path: string, payload = null) => {
+export const PATCH = (path: string, payload?: any) => {
     return sendRequest(path, "PATCH", payload);
 }
 
-export const POST = (path: string, payload = null) => {
+export const POST = (path: string, payload?: any) => {
     return sendRequest(path, "POST", payload);
 }
 
-export const PUT = (path: string, payload = null) => {
+export const PUT = (path: string, payload?: any) => {
     return sendRequest(path, "PUT", payload);
 }
 
-export const DELETE = (path: string, payload = null) => {
+export const DELETE = (path: string, payload?: any) => {
     return sendRequest(path, "DELETE", payload);
 }

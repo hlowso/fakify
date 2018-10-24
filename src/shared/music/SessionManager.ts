@@ -30,8 +30,11 @@ export class SessionManager {
     private _TIME_CHECKER_RATE = 5;
     private _fontPlayer: any;
     private _onUpdate: () => void;
+    private _pianoVolFactor: number;
+    private _bassVolFactor: number;
+    private _drumsVolFactor: number;
 
-    constructor(audioContext: any, fontPlayer: any, chart: Chart, onUpdate: () => void) {
+    constructor(audioContext: any, fontPlayer: any, chart: Chart, onUpdate: () => void, pianoVolume = 1, bassVolume = 1, drumsVolume = 1) {
         this._audioContext = audioContext;
         this._fontPlayer = fontPlayer;
         this._chart = chart;
@@ -39,6 +42,10 @@ export class SessionManager {
 
         this._barIdx = chart.rangeEndIdx;
         this._onUpdate = onUpdate;
+
+        this._pianoVolFactor = pianoVolume;
+        this._bassVolFactor = bassVolume;
+        this._drumsVolFactor = drumsVolume;
     }
 
     /**
@@ -166,7 +173,11 @@ export class SessionManager {
      */
 
     protected _compileMusic() {
-        return CompV1(this._chart, this._score);
+        let score = CompV1(this._chart, this._score);
+        score.changeVolume("piano", this._pianoVolFactor);
+        score.changeVolume("doubleBass", this._bassVolFactor);
+        score.changeVolume("drums", this._drumsVolFactor);
+        return score;
     }
 
     /**
@@ -193,17 +204,19 @@ export class SessionManager {
                 let strokes = parts[instrument];
                 if (strokes) {
                     strokes.forEach(stroke => {
-                        stroke.notes.forEach(note => {
-                            this._fontPlayer.queueWaveTable(
-                                this._audioContext, 
-                                this._audioContext.destination, 
-                                window[soundfonts[instrument].variable], 
-                                this._queueTimes[this._barIdx][scoreIdx], 
-                                note,
-                                subbeatDuration * stroke.durationInSubbeats,
-                                stroke.velocity
-                            );
-                        });
+                        if (stroke.velocity > 0) {
+                            stroke.notes.forEach(note => {
+                                this._fontPlayer.queueWaveTable(
+                                    this._audioContext, 
+                                    this._audioContext.destination, 
+                                    window[soundfonts[instrument].variable], 
+                                    this._queueTimes[this._barIdx][scoreIdx], 
+                                    note,
+                                    subbeatDuration * stroke.durationInSubbeats,
+                                    stroke.velocity
+                                );
+                            });
+                        }
                     });
                 }
             }

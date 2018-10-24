@@ -19,6 +19,7 @@ export interface IChartViewerProps {
     sessionFailed?: boolean;
     loadingChart?: boolean;
     chartTitleError?: boolean;
+    isEditingBars?: boolean;
     onBarClick?: (barIdx: number) => void;
     onAddBar?: (barIdx: number) => void;
     onEditBar?: (barIdx: number) => void;
@@ -81,10 +82,10 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             }
 
             content = [
-                <header className="chart-header" key={0} >
+                <header className="chart-header" key={0} onMouseEnter={this._onBarLeave} >
                     {this.renderTitle()}
                 </header>,
-                <section className="chart-body" key={1} >
+                <section className="chart-body" key={1} onMouseEnter={this._onBarLeave} >
                     {this.renderProgressionLines()}
                 </section>
             ];
@@ -134,6 +135,8 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                 <span 
                     className="song-title"
                     onClick={editingMode && onEditTitle ? () => (onEditTitle as () => void)() : undefined}
+                    style={{ cursor: editingMode ? "pointer" : undefined }}
+                    onMouseEnter={this._onBarLeave}
                 >
                     {song.title}
                 </span>
@@ -559,12 +562,13 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     public componentDidUpdate(prevProps: IChartViewerProps, prevState: IChartViewerState) {
-        let { chart } = this.props;
+        let { chart, isEditingBars } = this.props;
 
         if (chart && prevProps.chart) {
             if (
                 chart.songId !== prevProps.chart.songId ||
-                JSON.stringify(chart.bars) !== JSON.stringify(prevProps.chart.bars)
+                JSON.stringify(chart.bars) !== JSON.stringify(prevProps.chart.bars) ||
+                isEditingBars !== prevProps.isEditingBars
             ) {
                 this._resetLineGroups();
             }

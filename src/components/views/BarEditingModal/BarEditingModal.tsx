@@ -31,7 +31,7 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
         let { isOpen, close, editingBar } = this.props;
         
         return (
-            <Modal dialogClassName="bar-editing-modal" show={isOpen} onHide={close}>
+            <Modal dialogClassName={`bar-editing-modal-${editingBar.timeSignature[0]}`} show={isOpen} onHide={close}>
                 <Modal.Header closeButton={true} >
                     <h2>Bar {editingBar.barIdx + 1}</h2>
                 </Modal.Header>
@@ -110,7 +110,7 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
                     {chordName
                         ? this.renderEditableChord(chordName, beatIdx)
                         : (
-                            <Button onClick={() => this._onAddChord(beatIdx)} >
+                            <Button style={{ padding: 3, height: "30px" }} onClick={() => this._onAddChord(beatIdx)} >
                                 Add Chord&nbsp;<Glyphicon glyph="plus" />
                             </Button>
                         )
@@ -133,16 +133,28 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
         return (
             <div>
                 <ButtonGroup>
-                    <DropdownButton id={`select-root-${beatIdx}`} title={MusicHelper.getPresentableNoteName(chordName[0] as NoteName, currentContext)}>
+                    <DropdownButton 
+                        id={`select-root-${beatIdx}`} 
+                        title={MusicHelper.getPresentableNoteName(chordName[0] as NoteName, currentContext)}
+                        style={{ padding: 3, height: "30px" }}
+                    >
                         {this.renderNoteOptions(beatIdx, chordName)}
                     </DropdownButton>
-                    <DropdownButton id={`select-shape-${beatIdx}`} title={chordName[1]} >
+                    <DropdownButton 
+                        id={`select-shape-${beatIdx}`} 
+                        title={PresentableChordShape[chordName[1]] || "maj"} 
+                        style={{ padding: 3, height: "30px" }}
+                    >
                         {this.renderShapeOptions(beatIdx, chordName)}
                     </DropdownButton>
                     {
                         beatIdx !== 0
                             ? (
-                                <Button bsStyle="danger" onClick={() => this._onRemoveChord(beatIdx)} >
+                                <Button 
+                                    bsStyle="danger" 
+                                    onClick={() => this._onRemoveChord(beatIdx)} 
+                                    style={{ padding: 3, height: "30px" }}
+                                >
                                     <Glyphicon glyph="trash" />
                                 </Button>
                             ) : undefined 
@@ -171,7 +183,7 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
     public renderShapeOptions(beatIdx: number, selected: ChordName) {
         let shapeOptions: JSX.Element[] = [];
         for (let shapeKey in PresentableChordShape) {
-            let shape = PresentableChordShape[shapeKey];
+            let shape = PresentableChordShape[shapeKey] || "maj";
             shapeOptions.push(
                 <MenuItem 
                     key={shapeKey} 

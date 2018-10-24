@@ -50,7 +50,10 @@ export class StorageHelper {
         return StorageHelper._get(StorageHelper._keys.SESSION_TOKEN) as string;
     }
 
-    public static setSessionToken = (token: string) => {
+    public static setSessionToken = (token: string | null) => {
+        if (!token) {
+            return;
+        }
         StorageHelper._set(StorageHelper._keys.SESSION_TOKEN, token);
     }
 

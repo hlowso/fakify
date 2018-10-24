@@ -1,8 +1,33 @@
-.bar-editing-modal {
+.bar-editing-modal-2 {
+    width: 500px;
+}
+
+.bar-editing-modal-3 {
+    width: 600px;
+}
+
+.bar-editing-modal-4 {
+    width: 700px;
+}
+
+.bar-editing-modal-5 {
+    width: 800px;
+}
+
+.bar-editing-modal-6 {
+    width: 900px;
+}
+
+.bar-editing-modal-7 {
     width: 1000px;
 }
 
-.bar-editing-modal .dropdown-menu {
+.bar-editing-modal-2 .dropdown-menu,
+.bar-editing-modal-3 .dropdown-menu,
+.bar-editing-modal-4 .dropdown-menu,
+.bar-editing-modal-5 .dropdown-menu,
+.bar-editing-modal-6 .dropdown-menu,
+.bar-editing-modal-7 .dropdown-menu {
     max-height: 200px;
     overflow-y: auto;
 }
