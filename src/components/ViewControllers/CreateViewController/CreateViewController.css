@@ -17,14 +17,12 @@
 
 #create-view #song-list-container {
     margin: auto;
-    margin-top: 20px;
-    margin-bottom: 20px;
     background-color: white;
     width: 90%;
-    height: 90%;
+    height: 100%;
 
-    border: solid 1px #222;
-    border-radius: 5px;
+    border-left: solid 1px #222;
+    border-right: solid 1px #222;
 }
 
 #create-view #song-list-header {
