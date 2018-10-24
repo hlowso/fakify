@@ -8,6 +8,7 @@
     display: flex; 
     width: 1040px; 
     min-height: 385px;
+    height: 100%;
     background-color: #ddd;
     flex-direction: column; 
     align-self: center; 

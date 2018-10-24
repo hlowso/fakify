@@ -25,13 +25,13 @@ export interface IPlayVCProps {
 }
 
 export interface IPlayVCState {
-    loadingSelectedSong: boolean;
-    songTitles: { [songId: string]: string }
-    selectedSong: ISong | {};
-    midiSettingsModalOpen: boolean;
-    playMode: PlayMode;
-    spaceClickDone: boolean;
-    hideKeyboard: boolean;
+    loadingSelectedSong?: boolean;
+    songTitles?: { [songId: string]: string }
+    selectedSong?: ISong | {};
+    midiSettingsModalOpen?: boolean;
+    playMode?: PlayMode;
+    spaceClickDone?: boolean;
+    hideKeyboard?: boolean;
 }
 
 class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
@@ -41,7 +41,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
     constructor(props: IPlayVCProps) {
         super(props);
         this.state = {
-            loadingSelectedSong: true,
+            loadingSelectedSong: false,
             songTitles: {},
             selectedSong: {},
             midiSettingsModalOpen: false,
@@ -170,7 +170,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                 <div>
                     <MenuBar 
                         openMIDISettingsModal={() => this.setState({ midiSettingsModalOpen: true })} 
-                        songTitles={songTitles} 
+                        songTitles={songTitles as { [chartId: string]: string }} 
                         onSongTitleClick={this.onSongListItemClick} />
                 </div>
                 <div className="chart-container" >
@@ -220,9 +220,9 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                 <MidSettingsModal 
                     SoundActions={this.props.SoundActions} 
                     StateHelper={this.props.StateHelper} 
-                    isOpen={midiSettingsModalOpen} 
+                    isOpen={!!midiSettingsModalOpen} 
                     close={()=> this.setState({ midiSettingsModalOpen: false })} 
-                    hiddenKeyboard={hideKeyboard}
+                    hiddenKeyboard={!!hideKeyboard}
                     onToggleHideKeyboard={() => this.setState({ hideKeyboard: !hideKeyboard })} />
             </div>
         ); 
@@ -415,14 +415,17 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
         this.setState({ loadingSelectedSong: true });
 
+        let stateUpdate: IPlayVCState = { loadingSelectedSong: false };
+        let stateCallback = () => {};
+
         let selectedSong = await Api.getSongAsync(chartId);
 
         if (selectedSong) {
-            this.setState({ 
-                selectedSong,
-                loadingSelectedSong: false 
-            }, this._resetChart);
+            stateUpdate.selectedSong = selectedSong;
+            stateCallback = this._resetChart;
         }
+
+        this.setState(stateUpdate, stateCallback)
     }
     
 }

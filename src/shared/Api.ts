@@ -54,7 +54,7 @@ export async function getUserSongTitles(): Promise<{ [chartId: string]: string }
 
 export async function getSongTitlesAsync(): Promise<{ [chartId: string]: string }> {
     let res = await FetchHelpers.GET('/api/songs/titles');
-    return res.json();
+    return await res.json();
 };
 
 export async function getSongByTitleAsync(title: string): Promise<ISong | null> {
