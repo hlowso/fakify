@@ -190,6 +190,10 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
     public renderBarEditingModal() {
         let { isUpdatingBar, isAddingBar, editBar} = this.state;
+        if (!this._editingChart) {
+            return;
+        }
+
         return (isUpdatingBar || isAddingBar) && (
             <BarEditingModal 
                 isOpen={true}
@@ -197,6 +201,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                 editingBar={editBar as IChartBar}
                 onEdit={updatedEditingBar => this.setState({ editBar: updatedEditingBar })}
                 onSave={this._onSaveBar}
+                currentContext={this._editingChart.context}
             />
         );
     }

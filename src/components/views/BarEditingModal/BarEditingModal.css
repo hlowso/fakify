@@ -1,0 +1,8 @@
+.bar-editing-modal {
+    width: 1000px;
+}
+
+.bar-editing-modal .dropdown-menu {
+    max-height: 200px;
+    overflow-y: auto;
+}

@@ -1,8 +1,9 @@
 import React, { Component } from "react";
-import Modal from "react-modal";
+import { Modal, Button, Glyphicon, ButtonGroup, DropdownButton, MenuItem } from "react-bootstrap";
 import * as Util from "../../../shared/Util";
+import * as MusicHelper from "../../../shared/music/MusicHelper";
 import { Domain } from "../../../shared/music/domain/Domain";
-import { IChartBar, IChordSegment, ChordShape, ChordName, NoteName } from "../../../shared/types";
+import { IChartBar, IChordSegment, ChordShape, ChordName, NoteName, PresentableChordShape } from "../../../shared/types";
 import "./BarEditingModal.css";
 
 export interface IBarEditingModalProps {
@@ -11,24 +12,11 @@ export interface IBarEditingModalProps {
     onEdit: (updatedBar: IChartBar) => void;
     onSave: () => void;
     editingBar: IChartBar;
+    currentContext: NoteName;
 };
 
 export interface IBarEditingModalState {
 
-};
-
-const modalStyles = {
-    overlay: {
-        backgroundColor: "rgba(150, 150, 150, 0.75)",
-    },
-    content: {
-        display: "flex",
-        flexDirection: "column",
-        margin: "auto",
-        width: "600px",
-        borderRadius: "10px",
-        backgroundColor: "#ddd",
-    }
 };
 
 export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditingModalState> {
@@ -43,20 +31,19 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
         let { isOpen, close, editingBar } = this.props;
         
         return (
-            <Modal
-                isOpen={isOpen}
-                onRequestClose={close}
-                contentLabel={"Bar Editing"} 
-                style={modalStyles} 
-            >
-                <div id="midi-settings-modal" >
-                    <div className="header">
-                        <span>Bar {editingBar.barIdx + 1}</span>
-                    </div>
+            <Modal dialogClassName="bar-editing-modal" show={isOpen} onHide={close}>
+                <Modal.Header closeButton={true} >
+                    <h2>Bar {editingBar.barIdx + 1}</h2>
+                </Modal.Header>
+                <Modal.Body>
                     {this.renderTimeSignatureSelect()}
                     {this.renderChordsSection()}
-                   <button style={{ marginTop: 10 }} onClick={() => this.props.onSave()} >Save</button>
-                </div>
+                </Modal.Body>
+                <Modal.Footer>
+                   <Button bsStyle="primary" style={{ marginTop: 10 }} onClick={() => this.props.onSave()} >
+                        Save
+                    </Button>
+                </Modal.Footer>
             </Modal>
         );
     }
@@ -67,17 +54,13 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
 
     public renderTimeSignatureSelect() {
         let { editingBar } = this.props;
-        let options = [2, 3, 4, 5, 6, 7].map(beats => (
-            <option key={beats} value={beats} >
-                {beats}
-            </option>
-        ));
+        let options = this.renderTimeOptions();
 
         return (
             <div style={{ marginTop: 10 }} >
-                <div>
-                    Time Signature:
-                </div>
+                <span style={{ fontSize: "130%" }}>
+                    Time Signature:&nbsp;
+                </span>
                 <select 
                     value={editingBar.timeSignature[0]}
                     onChange={event => this._onTimeSignatureChange(parseInt(event.target.value, undefined))}
@@ -87,6 +70,14 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
                 {" / 4"} 
             </div>
         );
+    }
+
+    public renderTimeOptions() {
+        return [2, 3, 4, 5, 6, 7].map(beats => (
+            <option key={beats} value={beats} >
+                {beats}
+            </option>
+        ));
     }
 
     private _onTimeSignatureChange = (timeSignatureBeats: number) => {
@@ -107,60 +98,21 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
         let { timeSignature, chordSegments } = this.props.editingBar;
         let editingChords: JSX.Element[] = [];
 
-        let noteOptions = Domain.NOTE_NAMES.map(note => (
-            <option key={note} value={note} >
-                {note}
-            </option>
-        ));
-
-        let shapeOptions: JSX.Element[] = [];
-        for (let shapeKey in ChordShape) {
-            let shape = ChordShape[shapeKey];
-            shapeOptions.push(
-                <option key={shapeKey} value={shape} >
-                    {shapeKey}
-                </option>
-            );
-        }
-       
         for (let beatIdx = 0; beatIdx < timeSignature[0]; beatIdx ++) {
             let segment = chordSegments.find(s => s.beatIdx === beatIdx) as IChordSegment;
             let chordName = (segment ? segment.chordName : undefined) as ChordName;
 
             editingChords.push(
-                <div>
+                <div style={{ padding: "3px" }}>
                     <div>
-                        Beat {beatIdx + 1}:
+                        Beat {beatIdx + 1}
                     </div>
                     {chordName
-                        ? (
-                            <div>
-                                <select 
-                                    value={chordName[0]}
-                                    onChange={event => this._onChangeChord(beatIdx, [event.target.value as NoteName, chordName[1]])}
-                                >
-                                    {noteOptions}
-                                </select>
-                                <select 
-                                    value={chordName[1]}
-                                    onChange={event => this._onChangeChord(beatIdx, [chordName[0], event.target.value as ChordShape])}
-                                >
-                                    {shapeOptions}
-                                </select>
-                                {
-                                    beatIdx !== 0
-                                        ? (
-                                            <button onClick={() => this._onRemoveChord(beatIdx)} >
-                                                -
-                                            </button>
-                                        ) : undefined 
-                                }
-                            </div>
-                        )
+                        ? this.renderEditableChord(chordName, beatIdx)
                         : (
-                            <span onClick={() => this._onAddChord(beatIdx)} >
-                                +
-                            </span>
+                            <Button onClick={() => this._onAddChord(beatIdx)} >
+                                Add Chord&nbsp;<Glyphicon glyph="plus" />
+                            </Button>
                         )
                     }
                 </div>
@@ -169,18 +121,73 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
 
         return (
             <div style={{ marginTop: 10, display: "flex", flexDirection: "column" }} >
-                <div>
-                    Chords
-                </div>
-                <div style={{ display: "flex" }} >
+                <div style={{ display: "flex", justifyContent: "space-between" }} >
                     {editingChords}
                 </div>
             </div>
         );
     }
 
+    public renderEditableChord(chordName: ChordName, beatIdx: number) {
+        let { currentContext } = this.props;
+        return (
+            <div>
+                <ButtonGroup>
+                    <DropdownButton id={`select-root-${beatIdx}`} title={MusicHelper.getPresentableNoteName(chordName[0] as NoteName, currentContext)}>
+                        {this.renderNoteOptions(beatIdx, chordName)}
+                    </DropdownButton>
+                    <DropdownButton id={`select-shape-${beatIdx}`} title={chordName[1]} >
+                        {this.renderShapeOptions(beatIdx, chordName)}
+                    </DropdownButton>
+                    {
+                        beatIdx !== 0
+                            ? (
+                                <Button bsStyle="danger" onClick={() => this._onRemoveChord(beatIdx)} >
+                                    <Glyphicon glyph="trash" />
+                                </Button>
+                            ) : undefined 
+                    }
+                </ButtonGroup>
+
+            </div>
+        );
+    }
+
+    public renderNoteOptions(beatIdx: number, selected: ChordName) {
+
+        let { currentContext } = this.props;
+
+        return Domain.NOTE_NAMES.map(note => (
+            <MenuItem 
+                key={note} 
+                active={selected[0] === note} 
+                onClick={() => this._onChangeChord(beatIdx, [ note, selected[1] ])}
+            >
+                {MusicHelper.getPresentableNoteName(note, currentContext)}
+            </MenuItem>
+        ));
+    }
+
+    public renderShapeOptions(beatIdx: number, selected: ChordName) {
+        let shapeOptions: JSX.Element[] = [];
+        for (let shapeKey in PresentableChordShape) {
+            let shape = PresentableChordShape[shapeKey];
+            shapeOptions.push(
+                <MenuItem 
+                    key={shapeKey} 
+                    active={selected[1] === shapeKey} 
+                    onClick={() => this._onChangeChord(beatIdx, [ selected[0], shapeKey as ChordShape ])} 
+                >
+                    {shape}
+                </MenuItem>
+            );
+        }
+
+        return shapeOptions;
+    }
+
     private _onAddChord = (beatIdx: number) => {
-        let { editingBar } = this.props;
+        let { editingBar, currentContext } = this.props;
         let updatedBar = Util.copyObject(editingBar);
 
         let segmentIdx = 0;
@@ -192,7 +199,7 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
       
         let newSegment: IChordSegment = {
             beatIdx,
-            chordName: ["C", ChordShape.Maj]
+            chordName: [ currentContext, ChordShape.Maj ]
         } 
 
         updatedBar.chordSegments.splice(segmentIdx, 0, newSegment);
