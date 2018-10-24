@@ -41,7 +41,7 @@ class AdminRouter extends Component {
         let VCProps = this.getChildProps();
 
         return (
-            <main>
+            <main style={{ height: window.innerHeight - 85 }} >
                 <Switch>
                     <Route exact path='/signup' render={() => <SignUpViewController {...VCProps} />} />
                     <Route exact path='/login' render={() => <LoginViewController {...VCProps} />} />

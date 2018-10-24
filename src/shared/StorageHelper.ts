@@ -57,12 +57,30 @@ export class StorageHelper {
         StorageHelper._set(StorageHelper._keys.SESSION_TOKEN, token);
     }
 
+    public static getVolume = (instrument: "piano" | "bass" | "drums"): number => {
+        return parseInt(StorageHelper._get(`${StorageHelper._keys.VOLUME_PREFIX}${instrument}`), undefined);
+    }
+
+    public static setVolume = (instrument: "piano" | "bass" | "drums", volume: number) => {
+        StorageHelper._set(`${StorageHelper._keys.VOLUME_PREFIX}${instrument}`, volume.toString());
+    }
+
+    public static getHideKeyboard = () => {
+        return StorageHelper._get(StorageHelper._keys.HIDE_KEYBOARD) === "true";
+    }
+
+    public static setHideKeyboard = (hideKeyboard: boolean) => {
+        StorageHelper._set(StorageHelper._keys.HIDE_KEYBOARD, hideKeyboard ? "true" : "false");
+    }
+
     private static _keys = {
         MIDI_INPUT_ID: "MIDI_INPUT_ID",
         SELECTED_SONG_ID: "SELECTED_SONG_ID",
         CHART_SETTINGS_PREFIX: "CHART_SETTINGS_",
         PLAY_MODE: "PLAY_MODE",
-        SESSION_TOKEN: "SESSION_TOKEN"
+        SESSION_TOKEN: "SESSION_TOKEN",
+        VOLUME_PREFIX: "VOLUME_",
+        HIDE_KEYBOARD: "HIDE_KEYBOARD"
     }
 
     private static _getStorageKey = (key: string): string => {

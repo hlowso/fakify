@@ -8,6 +8,7 @@ export interface IDashboardProps {
     inSession?: boolean;
     chartIsLoaded?: boolean;
     context?: NoteName;
+    hiddenKeyboard?: boolean;
     onKeyChange?: (context: NoteName) => void;
     tempo?: Tempo;
     onTempoChange?: (tempo: Tempo) => void;
@@ -28,10 +29,11 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
     }
 
     public render() {
-        let { chartIsLoaded } = this.props;
+        let { chartIsLoaded, hiddenKeyboard } = this.props;
 
         let dynamicStyle = {
-            height: chartIsLoaded ? 40 : 20
+            height: chartIsLoaded ? 40 : 20,
+            bottom: hiddenKeyboard ? 0 : 160
         };
 
         return (

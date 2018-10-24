@@ -20,6 +20,7 @@ export interface IChartViewerProps {
     loadingChart?: boolean;
     chartTitleError?: boolean;
     isEditingBars?: boolean;
+    hiddenKeyboard?: boolean;
     onBarClick?: (barIdx: number) => void;
     onAddBar?: (barIdx: number) => void;
     onEditBar?: (barIdx: number) => void;
@@ -46,7 +47,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     public render(): JSX.Element {
-        let { song, chart, sessionFailed, loadingChart, editingMode } = this.props;
+        let { song, chart, sessionFailed, loadingChart, editingMode, hiddenKeyboard } = this.props;
 
         let noChartData = Util.objectIsEmpty(chart) || (!editingMode && Util.objectIsEmpty(song));
         let content: JSX.Element[] | JSX.Element;
@@ -77,8 +78,10 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             let $menuBar = $("#menu-bar");
             let $keyboard = $("#keyboard");
 
-            if ($playView && $menuBar && $keyboard) {
-                dynamicStyle.height = ($playView.height() as number) - ($menuBar.height() as number) - ($keyboard.height() as number); 
+            let keyboardHeight = hiddenKeyboard ? 0 : ($keyboard ? $keyboard.height() : 0);
+
+            if ($playView && $menuBar) {
+                dynamicStyle.height = ($playView.height() as number) - ($menuBar.height() as number) - (keyboardHeight as number); 
             }
 
             content = [

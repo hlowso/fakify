@@ -31,6 +31,7 @@ export interface IPlayVCState {
     midiSettingsModalOpen: boolean;
     playMode: PlayMode;
     spaceClickDone: boolean;
+    hideKeyboard: boolean;
 }
 
 class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
@@ -45,7 +46,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             selectedSong: {},
             midiSettingsModalOpen: false,
             playMode: PlayMode.None,
-            spaceClickDone: true       
+            spaceClickDone: true, 
+            hideKeyboard: false     
         };
     }
 
@@ -57,6 +59,11 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         let { SoundActions } = this.props;
         let midiInputId = StorageHelper.getMidiInputId();
         let selectedSongId = StorageHelper.getSelectedSongId();
+        let hideKeyboard = StorageHelper.getHideKeyboard();
+
+        if (hideKeyboard !== this.state.hideKeyboard) {
+            this.setState({ hideKeyboard });
+        }
 
         if (midiInputId) {
             let connectionSuccessful = SoundActions.connectToMidiInput(midiInputId);
@@ -143,7 +150,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             songTitles, 
             selectedSong, 
             midiSettingsModalOpen, 
-            loadingSelectedSong
+            loadingSelectedSong,
+            hideKeyboard
         } = this.state;
 
         // let selectedSongId = selectedSong ? (selectedSong as ISong)._id: null;
@@ -168,6 +176,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                 <div className="chart-container" >
                     <ChartViewer
                         editingMode={false}
+                        hiddenKeyboard={hideKeyboard}
                         song={selectedSong as ISong}
                         chart={this._chart as Chart} 
                         sessionIdx={sessionIdx as IMusicIdx} 
@@ -181,6 +190,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                         inSession={inSession}
                         chartIsLoaded={chartIsLoaded}
                         context={chartIsLoaded ? this._chart.context : undefined}
+                        hiddenKeyboard={hideKeyboard}
                         onKeyChange={this._recontextualize}
                         tempo={chartIsLoaded ? this._chart.tempo : undefined}
                         onTempoChange={this._resetTempo}
@@ -196,7 +206,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                         report={report} 
                         userShouldPlay={userShouldPlay}
                         firstNoteColor={this._firstNoteColor} /> */}
-                <Keyboard
+                {!hideKeyboard && <Keyboard
                     showKeyChanges={showKeyChanges} 
                     depressedKeys={this.props.StateHelper.getCurrentUserKeysDepressed()} 
                     currentKeyBasePitches={currNoteClasses.map(n => n.basePitch)} 
@@ -205,13 +215,15 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                     firstNote={firstNote || NaN} 
                     rangeStartNote={rangeStartNote || MusicHelper.LOWEST_A}
                     rangeEndNote={rangeEndNote || MusicHelper.HIGHEST_C} 
-                    firstNoteColor={this._firstNoteColor} />
+                    firstNoteColor={this._firstNoteColor} />}
 
                 <MidSettingsModal 
                     SoundActions={this.props.SoundActions} 
                     StateHelper={this.props.StateHelper} 
                     isOpen={midiSettingsModalOpen} 
-                    close={()=> this.setState({ midiSettingsModalOpen: false })} />
+                    close={()=> this.setState({ midiSettingsModalOpen: false })} 
+                    hiddenKeyboard={hideKeyboard}
+                    onToggleHideKeyboard={() => this.setState({ hideKeyboard: !hideKeyboard })} />
             </div>
         ); 
     }

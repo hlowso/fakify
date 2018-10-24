@@ -55,6 +55,26 @@ class AppRouter extends Component {
                 }
                 this.setState({ loading: false });
             });
+
+        let pianoVolume = StorageHelper.getVolume("piano");
+        let bassVolume = StorageHelper.getVolume("bass");
+        let drumsVolume = StorageHelper.getVolume("drums");
+
+        let stateUpdate = {};
+
+        if (Number.isInteger(pianoVolume) && pianoVolume <= 10 && pianoVolume >= 0) {
+            stateUpdate.pianoVolume = pianoVolume;
+        }
+
+        if (Number.isInteger(bassVolume) && bassVolume <= 10 && bassVolume >= 0) {
+            stateUpdate.bassVolume = bassVolume;
+        }
+
+        if (Number.isInteger(drumsVolume) && drumsVolume <= 10 && drumsVolume >= 0) {
+            stateUpdate.drumsVolume = drumsVolume;
+        }
+
+        this.setState(stateUpdate);
     }
 
     componentDidUpdate() {

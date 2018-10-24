@@ -2,7 +2,6 @@
     display: flex;
     justify-content: space-around;
     position: fixed;
-    bottom: 160px;
     background-color: #ddd;
     min-width: 760px;
 

@@ -1,11 +1,14 @@
 import React, { Component } from "react";
 import { Modal, Button } from "react-bootstrap";
+import { StorageHelper } from "../../../shared/StorageHelper";
 import "./MidiSettingsModal.css";
 
 export interface ISettingsModalProps {
     StateHelper: any;
     SoundActions: any;
     isOpen: boolean;
+    hiddenKeyboard: boolean;
+    onToggleHideKeyboard: () => void;
     close: () => void;
 }
 
@@ -82,33 +85,10 @@ class MidiSettingsModal extends Component<ISettingsModalProps, ISettingsModalSta
                     <h2>Settings</h2>
                 </Modal.Header>
                 <Modal.Body>
-                    Piano: 
-                    <input 
-                        type="range" 
-                        id="piano-volume" 
-                        name="piano" 
-                        min="0" 
-                        max="10"
-                        value={state.pianoVolume}
-                        onChange={(evt: React.SyntheticEvent<any>) => this._onVolumeChange("piano", evt.nativeEvent)} />
-                    Bass:
-                    <input 
-                        type="range" 
-                        id="bass-volume" 
-                        name="bass" 
-                        min="0" 
-                        max="10"
-                        value={state.bassVolume}
-                        onChange={(evt: React.SyntheticEvent<any>) => this._onVolumeChange("bass", evt.nativeEvent)} />
-                    Drums:
-                    <input 
-                        type="range" 
-                        id="drums-volume" 
-                        name="drums" 
-                        min="0" 
-                        max="10"
-                        value={state.drumsVolume}
-                        onChange={(evt: React.SyntheticEvent<any>) => this._onVolumeChange("drums", evt.nativeEvent)} />
+                    {this.renderVolumeSelect("piano", state.pianoVolume)}
+                    {this.renderVolumeSelect("bass", state.bassVolume)}
+                    {this.renderVolumeSelect("drums", state.drumsVolume)}
+                    {this.renderHideKeyboard()}
                 </Modal.Body>
                 <Modal.Footer>
                    <Button bsStyle="primary" style={{ marginTop: 10 }} onClick={() => close()} >
@@ -119,11 +99,51 @@ class MidiSettingsModal extends Component<ISettingsModalProps, ISettingsModalSta
         ); 
     }
 
+    public renderVolumeSelect(instrument: "piano" | "bass" | "drums", currVolume: number) {
+        return (
+            <div style={{ display: "flex", marginBottom: 20 }}>
+                <span style={{ fontSize: "130%", width: 140 }}>{instrument}:</span> 
+                <input 
+                    style={{ width: 200 }}
+                    type="range" 
+                    name={instrument} 
+                    min="0" 
+                    max="10"
+                    value={currVolume}
+                    onChange={(evt: React.SyntheticEvent<any>) => this._onVolumeChange(instrument, evt.nativeEvent)} 
+                />
+            </div>
+        )
+    }   
+
+    public renderHideKeyboard() {
+        let { hiddenKeyboard } = this.props;
+        return (
+            <div style={{ display: "flex" }}>   
+                <span style={{ fontSize: "130%", width: 140 }}>Hide Keyboard</span>
+                <input
+                    type="checkbox"
+                    name="hide-keyboard"
+                    checked={hiddenKeyboard}
+                    onChange={() => this._onToggleHideKeyboard()}
+                />
+            </div>
+        );
+    }
+
     private _onVolumeChange = (instrument: "piano" | "bass" | "drums", evt: any) => {
         let { SoundActions } = this.props;
         let vol = parseInt(evt.target.value, undefined);
 
+        StorageHelper.setVolume(instrument, vol);
         SoundActions.setVolume(instrument, vol);
+    }
+
+    private _onToggleHideKeyboard = () => {
+        let { hiddenKeyboard, onToggleHideKeyboard } = this.props;
+
+        StorageHelper.setHideKeyboard(!hiddenKeyboard);
+        onToggleHideKeyboard();
     }
 
     // private onMidiInputSelectionChange = (event: React.SyntheticEvent<any>) => {
