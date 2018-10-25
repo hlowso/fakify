@@ -2,7 +2,7 @@ import crypto from "crypto";
 import uuidv4 from "uuid/v4";
 import bcrypt from "bcryptjs";
 import { PreCompData } from "./PreCompData";
-import { IIncomingUser, ISong, NoteName, Tempo, IChartBar, ISession, ChartServerError } from "../shared/types";
+import { IIncomingUser, ISong, NoteName, Tempo, IChartBar, ISession, ChartServerError, SignupResponse, IUser } from "../shared/types";
 import { MAX_TITLE_LENGTH } from "../shared/Constants";
 import Chart from "../shared/music/Chart";
 import * as Mongo from "mongodb";
@@ -67,21 +67,21 @@ export class PreCompApiHelper {
 
     // USERS
 
-    public createUserAsync = async (newUser: IIncomingUser) => {
+    public createUserAsync = async (newUser: IIncomingUser): Promise<SignupResponse | IUser> => {
 
         let existingUser = await this._data.getUserByEmailAsync(newUser.email);
 
         if (existingUser) {
-            return null;
+            return SignupResponse.EmailTaken;
         }
 
         let userCount = await this._data.countUsersAsync();
 
         if (userCount >= 5000) {
-            return null;
+            return SignupResponse.Error;
         }
 
-        let user = { 
+        let user: IUser = { 
             email: newUser.email, 
             passhash: bcrypt.hashSync(newUser.password, 10), 
             token: uuidv4() 

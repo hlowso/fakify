@@ -1,16 +1,27 @@
 import React, { Component } from "react";
 import { Link, Redirect } from "react-router-dom";
-
 import * as Api from "../../../shared/Api";
-
+import { SignupResponse } from "../../../shared/types";
 import "./SignUpViewController.css";
 
 const PASSWORD_MINIMUM_LENGTH = 8;
 const NO_MATCH_MESSAGE = "passwords don't match";
-const PASSWORD_TOO_SHORT_MESSAGE = `password must be at least ${PASSWORD_MINIMUM_LENGTH} characters`
+const PASSWORD_TOO_SHORT_MESSAGE = `password must be at least ${PASSWORD_MINIMUM_LENGTH} characters`;
 
-class SignUpViewController extends Component {
-    constructor(props) {
+export interface ISignUpVCProps {
+
+}
+
+export interface ISignUpVCState {
+    currentEmail?: string;
+    currentPassword?: string;
+    currentConfirmPassword?: string;
+    errorMessage?: string;
+    signupSuccessful?: boolean;
+}
+
+class SignUpViewController extends Component<ISignUpVCProps, ISignUpVCState> {
+    constructor(props: ISignUpVCProps) {
         super(props);
         this.state = {
             currentEmail: "",
@@ -21,7 +32,7 @@ class SignUpViewController extends Component {
         };
     }
 
-    render() {
+    public render() {
         let { 
             currentEmail, 
             currentPassword, 
@@ -40,7 +51,7 @@ class SignUpViewController extends Component {
                     
                         <div className="signup-container form-container">
             
-                            <form onSubmit={this.submitHandler}>
+                            <form onSubmit={this._submitHandler}>
                                 <table style={{width: "100%"}}>
                                     <col style={{width: "30%"}} />
                                     <col style={{width: "70%"}} />
@@ -56,7 +67,7 @@ class SignUpViewController extends Component {
                                                     value={currentEmail}
                                                     name="currentEmail"
                                                     placeholder="example@gmail.com"
-                                                    onChange={this.handleInputChange}
+                                                    onChange={this._handleInputChange}
                                                 />
                                             </td>
                                         </tr>
@@ -70,7 +81,7 @@ class SignUpViewController extends Component {
                                                     value={currentPassword}
                                                     name="currentPassword"
                                                     placeholder="password"
-                                                    onChange={this.handleInputChange}
+                                                    onChange={this._handleInputChange}
                                                 />
                                             </td>
                                         </tr>
@@ -84,7 +95,7 @@ class SignUpViewController extends Component {
                                                     value={currentConfirmPassword}
                                                     name="currentConfirmPassword"
                                                     placeholder="confirm password"
-                                                    onChange={this.handleInputChange}
+                                                    onChange={this._handleInputChange}
                                                 />
                                             </td>
                                         </tr>
@@ -115,21 +126,22 @@ class SignUpViewController extends Component {
                 );
     }
 
-    handleInputChange = event => {
+    private _handleInputChange = (event: React.ChangeEvent<any>) => {
         let { name, value } = event.target;
-        let stateUpdate = {};
+        let stateUpdate: ISignUpVCState = {};
         stateUpdate[name] = value;
 
         this.setState(stateUpdate);
     }
 
-    submitHandler = event => {
+    private _submitHandler = async (event: React.FormEvent<any>) => {
         event.preventDefault();
+
         let { 
             currentEmail,
             currentPassword,
             currentConfirmPassword
-         } = event.target;
+         } = event.target as any;
 
         let email = currentEmail.value,
             password = currentPassword.value,
@@ -137,22 +149,24 @@ class SignUpViewController extends Component {
 
         if (password.length < PASSWORD_MINIMUM_LENGTH) {
             this.setState({ errorMessage: PASSWORD_TOO_SHORT_MESSAGE});
-        }
-        else if (password !== confirmPassword) {
+        } else if (password !== confirmPassword) {
             this.setState({ errorMessage: NO_MATCH_MESSAGE});
-        }
-        else {
+        } else {
             let newUser = { email, password };
-            let stateUpdate = {};
-            Api.signup(newUser)
-                .then(user => {
-                    if (user) {
-                        stateUpdate.signupSuccessful = true;
-                    } else {
-                        stateUpdate.errorMessage = "a user already exists with that email";
-                    }
-                    this.setState(stateUpdate);
-                });
+            let res = await Api.signupAsync(newUser);
+
+            switch(res) {
+                case SignupResponse.EmailTaken:
+                case SignupResponse.InvalidCredentials:
+                case SignupResponse.Error:
+                    return this.setState({ errorMessage: res });
+
+                case SignupResponse.OK: 
+                    return this.setState({ signupSuccessful: true });
+
+                default:
+                    return this.setState({ errorMessage: SignupResponse.Error });
+            }
         }
     }
 };

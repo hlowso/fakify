@@ -1,6 +1,6 @@
 import * as FetchHelpers from "./FetchHelpers";
 import { StorageHelper } from "./StorageHelper";
-import { IIncomingUser, ISong, IUser, ChartServerError, LoginResponse } from "./types";
+import { IIncomingUser, ISong, IUser, ChartServerError, LoginResponse, SignupResponse } from "./types";
 
 export async function authenticateAsync(): Promise<IUser | null> {
     let res = await FetchHelpers.GET('/api/admin/authenticate', null, true);
@@ -12,8 +12,11 @@ export async function authenticateAsync(): Promise<IUser | null> {
 
 export async function loginAsync(returningUser: IIncomingUser): Promise<LoginResponse> {
     let res = await FetchHelpers.PATCH('/api/admin/login', returningUser, true);
-    let sessionToken = res.headers.get("X-Session-Token");
-    StorageHelper.setSessionToken(sessionToken);
+
+    if (res.status === 200) {
+        let sessionToken = res.headers.get("X-Session-Token");
+        StorageHelper.setSessionToken(sessionToken);
+    }
 
     return await res.json() as LoginResponse;
 };
@@ -23,16 +26,15 @@ export async function logoutAsync() {
     return res.json();
 };
 
-export const signup = (newUser: IIncomingUser): Promise<IUser | null> => {
-    return FetchHelpers.POST('/api/admin/signup', newUser, true)
-        .then(res => {
-            if (res.status === 200) {
-                let sessionToken = res.headers.get("X-Session-Token");
-                StorageHelper.setSessionToken(sessionToken);
-                return res.json();
-            }
-            return null;
-        });
+export async function signupAsync(newUser: IIncomingUser): Promise<SignupResponse> {
+    let res = await FetchHelpers.POST('/api/admin/signup', newUser, true);
+
+    if (res.status === 200) {
+        let sessionToken = res.headers.get("X-Session-Token");
+        StorageHelper.setSessionToken(sessionToken);
+    }
+                
+    return await res.json() as SignupResponse;
 };
 
 export async function saveSongAsync(newSong: ISong): Promise<ChartServerError | boolean> {

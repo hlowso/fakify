@@ -1,6 +1,6 @@
 import { UnauthorizedResponse, PreCompController } from "../PreCompController";
 import { PreCompApiHelper } from "../../PreCompApiHelper";
-import { IIncomingUser, IUser, LoginResponse } from "../../../shared/types";
+import { IIncomingUser, IUser, LoginResponse, SignupResponse } from "../../../shared/types";
 
 export class AdminController extends PreCompController {
     constructor(api: PreCompApiHelper) {
@@ -13,16 +13,32 @@ export class AdminController extends PreCompController {
          */
 
         this._router.post("/signup", async (req, res) => {
-            let user = await this._api.createUserAsync(req.body as IIncomingUser);
-
-            if (!user) {
-                res.status(403);
-                return res.send("User already exists");
+            let result: IUser | SignupResponse;
+            
+            try {
+                result = await this._api.createUserAsync(req.body as IIncomingUser);
+            } catch (err) {
+                res.status(500);
+                return res.json(SignupResponse.Error);
             }
 
-            res.set("X-Session-Token", this._api.encryptSessionToken({ token: user.token }));            
+            if (typeof result === "string") {
+                switch (result) {
+                    default:
+                    case SignupResponse.Error:
+                        res.status(500);
+                        return res.json(SignupResponse.Error);
+    
+                    case SignupResponse.EmailTaken:
+                    case SignupResponse.InvalidCredentials:
+                        res.status(403);
+                        return res.json(result);
+    
+                }
+            }
 
-            return res.send(user);
+            res.set("X-Session-Token", this._api.encryptSessionToken({ token: result.token }));            
+            return res.send(SignupResponse.OK);
         });
 
         this._router.patch("/login", async (req, res) => {

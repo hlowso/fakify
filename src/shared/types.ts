@@ -42,6 +42,13 @@ export enum LoginResponse {
     Error = "cannot login right now, try again soon"
 }
 
+export enum SignupResponse {
+    OK = "OK",
+    InvalidCredentials = "email or password invalid",
+    EmailTaken = "a user with that email already exists",
+    Error = "cannot sign up right now, try again soon"
+}
+
 export enum Tab {
     Login = "login",
     Signup = "signup",
