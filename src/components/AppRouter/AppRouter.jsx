@@ -77,11 +77,20 @@ class AppRouter extends Component {
         this.setState(stateUpdate);
     }
 
-    componentDidUpdate() {
-        let { redirectDestination } = this.state;
+    componentDidUpdate(prevProps, prevState) {
+        let { redirectDestination, pianoVolume, bassVolume, drumsVolume } = this.state;
+        
         if (redirectDestination) {
             this.setState({ redirectDestination: "" });
         }
+
+        if(
+            prevState.pianoVolume !== pianoVolume ||
+            prevState.bassVolume !== bassVolume ||
+            prevState.drumsVolume !== drumsVolume 
+        ) {
+            this.killTake();
+        } 
     }
 
     render() {
