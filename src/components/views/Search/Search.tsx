@@ -10,31 +10,27 @@ export interface ISearchProps {
 
 export interface ISearchState {
     query: string;
+    showAll: boolean;
+    ignoreBlur: boolean;
 }
 
 export class Search extends Component<ISearchProps, ISearchState> {
+
+    private _matchHeight = 25;
+
     constructor(props: ISearchProps) {
         super(props);
         this.state = {
-            query: ""
+            query: "",
+            showAll: false,
+            ignoreBlur: false
         };
     }
 
     public render() {
 
         let { query } = this.state;
-        let matchElems: JSX.Element[] = [];
-        
-        this._getCurrentMatches().forEach(match => {
-            matchElems.push(
-                <div
-                    className="match" 
-                    onClick={() => this._onSongTitleClick(match.songId as string)}
-                >
-                    {match.title}
-                </div>
-            );
-        });
+        let matchElems = this.renderMatchElements();
 
         return (
             <div id="search" style={{ display: "flex", flexDirection: "column", width: "40%" }} >
@@ -48,12 +44,30 @@ export class Search extends Component<ISearchProps, ISearchState> {
                     <InputGroup.Button>
                         <Button onClick={this._onSearchButtonClick} ><Glyphicon glyph="search" /></Button>
                     </InputGroup.Button>
+                    <InputGroup.Button>
+                        <Button onClick={this._onBrowse} onBlur={this._onLeaveBrowse} ><Glyphicon glyph="align-justify" /></Button>
+                    </InputGroup.Button>
                     
                 </InputGroup>
-                <div className="matches">
+                <div className="matches" style={{ minHeight: Array.isArray(matchElems) ? matchElems.length * this._matchHeight : 0 }} >
                     {matchElems}
                 </div>
             </div>
+        );
+    }
+
+    public renderMatchElements() {
+        return this._getCurrentMatches().map(match => (
+                <div
+                    className="match"
+                    style={{ height: this._matchHeight }}
+                    onClick={() => this._onSongTitleClick(match.songId as string)}
+                    onMouseEnter={this._onMatchEnter}
+                    onMouseLeave={this._onMatchLeave}
+                >
+                    {match.title}
+                </div>
+            )
         );
     }
 
@@ -66,8 +80,8 @@ export class Search extends Component<ISearchProps, ISearchState> {
     }
 
     private _onSongTitleClick = (songId: string) => {
-        this.setState({ query: "" });
         this.props.onSongTitleClick(songId);
+        this.setState({ query: "", showAll: false });
     }
 
     private _onSearchButtonClick = (evt: React.SyntheticEvent<any>) => {
@@ -82,15 +96,37 @@ export class Search extends Component<ISearchProps, ISearchState> {
         }
     }
 
+    private _onBrowse = () => {
+        this.setState({ showAll: true });
+    }
+
+    private _onLeaveBrowse = (evt: React.FocusEvent<Button>) => {
+        if (this.state.ignoreBlur) {
+            return;
+        }
+        this.setState({ showAll: false });
+    }
+
+    private _onMatchEnter = (evt: React.MouseEvent<Element>) => {
+        this.setState({ ignoreBlur: true });
+    }
+
+    private _onMatchLeave = (evt: React.MouseEvent<Element>) => {
+        let { toElement } = evt.nativeEvent;
+        if (toElement.className.split(" ").indexOf("match") === -1) {
+            this.setState({ ignoreBlur: false });
+        }
+    }
+
     /**
      * HELPERS
      */
 
     private _getCurrentMatches = (): ISongTitle[] => {
         let { songTitles } = this.props;
-        let { query } = this.state;
+        let { query, showAll } = this.state;
 
-        if (!query || !songTitles) {
+        if (!songTitles) {
             return [];
         }
 
@@ -98,7 +134,7 @@ export class Search extends Component<ISearchProps, ISearchState> {
 
         for (let songId in songTitles) {
             let title = songTitles[songId];
-            if (title.startsWith(query)) {
+            if (showAll || (query && title.startsWith(query))) {
                 matchingTitles.push({ songId, title });
             }
         }

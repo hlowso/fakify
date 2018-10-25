@@ -1,9 +1,9 @@
 #search .matches { 
-    display: flex; 
-    flex-direction: column; 
     width: 100%;
+    z-index: 10;
+    max-height: 300px;
+    overflow-y: auto;
     background-color: white;
-    z-index: 1;
 
     border-left: solid black 1px;
     border-right: solid black 1px;
