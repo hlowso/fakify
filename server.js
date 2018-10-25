@@ -33341,7 +33341,7 @@ class PreCompController {
                     default:
                     case UnauthorizedResponse.Return401:
                         res.status(401);
-                        return res.send("Missing authentication token");
+                        return res.json("Missing authentication token");
                 }
             }
             else {
@@ -33415,13 +33415,6 @@ const exitHandler = (data, options, exitCode) => {
         // Setup server
         const server = __WEBPACK_IMPORTED_MODULE_0_express___default()();
         server.use(__WEBPACK_IMPORTED_MODULE_0_express___default.a.static('public'));
-        // server.use(cookieSession({
-        //     name: "PreComp Session",
-        //     secret: SESSION_SECRET as string,
-        //     maxAge: 24 * 60 * 60 * 1000 * 7, // One week
-        //     signed: false,
-        //     httpOnly: false
-        // }));
         server.use(__WEBPACK_IMPORTED_MODULE_1_body_parser___default.a.json());
         // Enable CORS
         server.use((req, res, next) => {
@@ -33432,7 +33425,7 @@ const exitHandler = (data, options, exitCode) => {
             res.header("Access-Control-Allow-Credentials", "true");
             if (req.method === "OPTIONS") {
                 res.status(204);
-                res.send();
+                res.json();
             }
             else {
                 next();
@@ -74093,7 +74086,7 @@ class AdminController extends __WEBPACK_IMPORTED_MODULE_0__PreCompController__["
                 }
             }
             res.set("X-Session-Token", this._api.encryptSessionToken({ token: result.token }));
-            return res.send(__WEBPACK_IMPORTED_MODULE_1__shared_types__["e" /* SignupResponse */].OK);
+            return res.json(__WEBPACK_IMPORTED_MODULE_1__shared_types__["e" /* SignupResponse */].OK);
         }));
         this._router.patch("/login", (req, res) => __awaiter(this, void 0, void 0, function* () {
             let user;
@@ -74128,10 +74121,10 @@ class AdminController extends __WEBPACK_IMPORTED_MODULE_0__PreCompController__["
         }));
         this._router.get("/authenticate", (req, res) => __awaiter(this, void 0, void 0, function* () {
             if (this._user) {
-                return res.send(this._user);
+                return res.json(this._user);
             }
             res.status(401);
-            return res.send("Missing or incorrect authentication token");
+            return res.json("Missing or incorrect authentication token");
         }));
     }
 }

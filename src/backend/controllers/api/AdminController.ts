@@ -38,7 +38,7 @@ export class AdminController extends PreCompController {
             }
 
             res.set("X-Session-Token", this._api.encryptSessionToken({ token: result.token }));            
-            return res.send(SignupResponse.OK);
+            return res.json(SignupResponse.OK);
         });
 
         this._router.patch("/login", async (req, res) => {
@@ -80,11 +80,11 @@ export class AdminController extends PreCompController {
 
         this._router.get("/authenticate", async (req, res) => { 
             if (this._user) {
-                return res.send(this._user);
+                return res.json(this._user);
             }
 
             res.status(401);
-            return res.send("Missing or incorrect authentication token");
+            return res.json("Missing or incorrect authentication token");
         });
     }
 }

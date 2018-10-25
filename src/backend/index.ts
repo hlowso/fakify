@@ -55,13 +55,6 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
     const server = express();
 
     server.use(express.static('public'));
-    // server.use(cookieSession({
-    //     name: "PreComp Session",
-    //     secret: SESSION_SECRET as string,
-    //     maxAge: 24 * 60 * 60 * 1000 * 7, // One week
-    //     signed: false,
-    //     httpOnly: false
-    // }));
     server.use(bodyParser.json());
 
     // Enable CORS
@@ -74,7 +67,7 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
 
         if (req.method === "OPTIONS") {
             res.status(204);
-            res.send();
+            res.json();
         } else {
             next();
         }

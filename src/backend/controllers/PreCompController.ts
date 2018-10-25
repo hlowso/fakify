@@ -45,7 +45,7 @@ export class PreCompController {
                     default:
                     case UnauthorizedResponse.Return401:
                         res.status(401);
-                        return res.send("Missing authentication token");
+                        return res.json("Missing authentication token");
                 }
             } else {
                 await next();

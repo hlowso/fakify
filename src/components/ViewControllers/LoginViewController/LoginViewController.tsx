@@ -107,6 +107,7 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
         let { name, value } = event.target;
         let stateUpdate: ILoginVCState = {};
         stateUpdate[name] = value;
+        stateUpdate.errorMessage = undefined;
 
         this.setState(stateUpdate);
     }

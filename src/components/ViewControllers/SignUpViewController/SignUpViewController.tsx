@@ -130,6 +130,7 @@ class SignUpViewController extends Component<ISignUpVCProps, ISignUpVCState> {
         let { name, value } = event.target;
         let stateUpdate: ISignUpVCState = {};
         stateUpdate[name] = value;
+        stateUpdate.errorMessage = undefined;
 
         this.setState(stateUpdate);
     }
