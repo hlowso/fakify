@@ -125,7 +125,7 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
     }
 
     public renderLegend() {
-        let { hiddenKeyboard } = this.props;
+        let { chartIsLoaded, hiddenKeyboard } = this.props;
         let dynamicStyle = hiddenKeyboard ? { width: 20, height: 20 } : undefined; 
         let content = !hiddenKeyboard && (
             <span style={{ display: "flex" }}>
@@ -133,7 +133,7 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
             </span>
         );
 
-        return (
+        return chartIsLoaded && (
             <div className="legend" style={dynamicStyle}>
                 {content}
             </div>
