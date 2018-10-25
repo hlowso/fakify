@@ -60,7 +60,12 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
         } else if (noChartData) {
 
-            content = <h2 style={{ textAlign: "center" }}>No chart loaded.</h2>;
+            content = (
+                <div>
+                    <h2 style={{ textAlign: "center" }} >No chart loaded.</h2>
+                    <p style={{ textAlign: "center", fontSize: "130%" }} >Search for a chart or click the browse icon to get started.</p>
+                </div>
+            );
 
         } else if (sessionFailed) {
 
