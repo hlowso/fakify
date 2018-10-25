@@ -4,12 +4,12 @@ import { Link } from "react-router-dom";
 import * as Api from "../../../shared/Api"; 
 import "./TopNav.css";
 
-interface INavUser {
+export interface INavUser {
     email: string;
 }
 
 export interface ITopNavProps {
-    user: INavUser;
+    user: INavUser | null;
     setUser: (user?: INavUser) => void;
     redirect: (tab: string) => void;
     isMobile: boolean;
@@ -88,7 +88,7 @@ class TopNav extends Component<ITopNavProps, {}> {
 
     private _onClickLogout = async (event: React.SyntheticEvent<any>) => {
         this.props.setUser();
-        await Api.logout();
+        await Api.logoutAsync();
     }
 }
 

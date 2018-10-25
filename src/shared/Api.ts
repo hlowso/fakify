@@ -18,8 +18,9 @@ export async function loginAsync(returningUser: IIncomingUser): Promise<LoginRes
     return await res.json() as LoginResponse;
 };
 
-export const logout = () => {
-    return FetchHelpers.PATCH('/api/admin/logout', null, true);
+export async function logoutAsync() {
+    let res = await FetchHelpers.PATCH('/api/admin/logout', null, true);
+    return res.json();
 };
 
 export const signup = (newUser: IIncomingUser): Promise<IUser | null> => {

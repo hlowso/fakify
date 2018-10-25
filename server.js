@@ -74090,7 +74090,7 @@ class AdminController extends __WEBPACK_IMPORTED_MODULE_0__PreCompController__["
             }
             this._sessionToken = undefined;
             this._user = null;
-            return res.send(found);
+            return res.json(found);
         }));
         this._router.get("/authenticate", (req, res) => __awaiter(this, void 0, void 0, function* () {
             if (this._user) {

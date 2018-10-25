@@ -27,7 +27,7 @@ export class AdminController extends PreCompController {
 
         this._router.patch("/login", async (req, res) => {
             let user: IUser | null;
-            
+
             try {
                 user = await this._api.loginUserAsync(req.body as IIncomingUser);
             } catch (err) {
@@ -59,7 +59,7 @@ export class AdminController extends PreCompController {
             this._sessionToken = undefined;
             this._user = null;
 
-            return res.send(found);
+            return res.json(found);
         });
 
         this._router.get("/authenticate", async (req, res) => { 

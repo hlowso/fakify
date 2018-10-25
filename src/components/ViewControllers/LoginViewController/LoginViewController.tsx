@@ -123,25 +123,22 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
             password = currentPassword.value;
 
         if (password.length === 0) {
-            this.setState({ errorMessage: "password cannot be empty" });
-        } else {
-            let returningUser = { email, password };
-            let res = await Api.loginAsync(returningUser);
-            let stateUpdate: ILoginVCState = {};
+            return this.setState({ errorMessage: "password cannot be empty" });
+        }
 
-            switch (res) {
-                default:
-                case LoginResponse.BadCredentials: 
-                case LoginResponse.Error:
-                    stateUpdate.errorMessage = res as string;
-                    break;
+        let returningUser = { email, password };
+        let res = await Api.loginAsync(returningUser);
 
-                case LoginResponse.OK:
-                    stateUpdate.accessGranted = true;
-                    break;
-            }
+        switch (res) {
+            case LoginResponse.BadCredentials: 
+            case LoginResponse.Error:
+                return this.setState({ errorMessage: res as string });
 
-            this.setState(stateUpdate);
+            case LoginResponse.OK:
+                return this.setState({ accessGranted: true });
+
+            default:
+                return this.setState({ errorMessage: LoginResponse.Error });
         }
     }
 };

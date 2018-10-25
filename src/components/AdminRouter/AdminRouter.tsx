@@ -1,57 +1,67 @@
 import React, { Component } from "react";
 import { Switch, Route, Redirect } from "react-router";
 
-import TopNav from "../views/TopNav/TopNav";
+import TopNav, { INavUser } from "../views/TopNav/TopNav";
 import SignUpViewController from '../ViewControllers/SignUpViewController/SignUpViewController';
 import LoginViewController from '../ViewControllers/LoginViewController/LoginViewController';
 import Authenticator from "../Authenticator/Authenticator";
+import { Tab } from "../../shared/types";
 
-class AdminRouter extends Component {
-    constructor(props) {
+export interface IAdminRouterProps {
+    isMobile: boolean;
+}
+
+export interface IAdminRouterState {
+    user: INavUser | null;
+    redirectDestination: Tab;
+}
+
+class AdminRouter extends Component<IAdminRouterProps, IAdminRouterState> {
+    constructor(props: IAdminRouterProps) {
         super(props);
         this.state = {
-            user: {},
-            redirectDestination: ""
+            user: null,
+            redirectDestination: Tab.None
         };
     }
 
-    componentDidUpdate() {
+    public componentDidUpdate() {
         let { redirectDestination } = this.state;
         if (redirectDestination) {
-            this.setState({ redirectDestination: "" });
+            this.setState({ redirectDestination: Tab.None });
         }
     }
 
-    render() {
+    public render() {
         let { user, redirectDestination } = this.state;
 
         return redirectDestination
             ? (
-                <Redirect to={redirectDestination} />
+                <Redirect to={`/${redirectDestination}`} />
             )
             : (
                 <div id="app-router">
-                    <TopNav user={user} {...this.getChildProps()} />
+                    <TopNav user={user} {...this._getChildProps()} />
                     {this.renderRouter()}
                 </div>
             );
     }
 
-    renderRouter = () => {
-        let VCProps = this.getChildProps();
+    public renderRouter = () => {
+        let VCProps = this._getChildProps();
 
         return (
             <main style={{ height: window.innerHeight - 85 }} >
                 <Switch>
-                    <Route exact path='/signup' render={() => <SignUpViewController {...VCProps} />} />
-                    <Route exact path='/login' render={() => <LoginViewController {...VCProps} />} />
+                    <Route exact={true} path='/signup' render={() => <SignUpViewController {...VCProps} />} />
+                    <Route exact={true} path='/login' render={() => <LoginViewController {...VCProps} />} />
                     <Route path='/' render={() => <Authenticator {...VCProps} />} />                    
                 </Switch>
             </main>
         );
     }
 
-    getChildProps = () => {
+    private _getChildProps = () => {
         return {
             setUser: this.setUser,
             redirect: this._redirect,
@@ -59,12 +69,12 @@ class AdminRouter extends Component {
         };
     }
 
-    setUser = userUpdate => {
+    public setUser = (userUpdate?: INavUser) => {
         this.setState({ user: userUpdate ? {...this.state.user, ...userUpdate} : null });
     }
 
-    _redirect = tab => {
-        this.setState({ redirectDestination: `/${tab}` })
+    private _redirect = (tab: Tab) => {
+        this.setState({ redirectDestination: tab });
     }
 };
 
