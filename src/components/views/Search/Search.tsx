@@ -138,7 +138,15 @@ export class Search extends Component<ISearchProps, ISearchState> {
 
         for (let songId in songTitles) {
             let title = songTitles[songId];
-            if (showAll || (query && title.startsWith(query))) {
+            let matchCondition = (
+                title && 
+                query &&
+                typeof title === "string" && 
+                typeof query === "string" && 
+                title.toLowerCase().startsWith(query.toLowerCase())
+            );
+
+            if (showAll || matchCondition) {
                 matchingTitles.push({ songId, title });
             }
         }
