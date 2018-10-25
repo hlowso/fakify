@@ -1,6 +1,6 @@
 import { UnauthorizedResponse, PreCompController } from "../PreCompController";
 import { PreCompApiHelper } from "../../PreCompApiHelper";
-import { IIncomingUser } from "../../../shared/types";
+import { IIncomingUser, IUser, LoginResponse } from "../../../shared/types";
 
 export class AdminController extends PreCompController {
     constructor(api: PreCompApiHelper) {
@@ -26,16 +26,22 @@ export class AdminController extends PreCompController {
         });
 
         this._router.patch("/login", async (req, res) => {
-            let user = await this._api.loginUserAsync(req.body as IIncomingUser);
+            let user: IUser | null;
+            
+            try {
+                user = await this._api.loginUserAsync(req.body as IIncomingUser);
+            } catch (err) {
+                res.status(500);
+                return res.json(LoginResponse.Error);
+            }
 
             if (!user) {
                 res.status(401);
-                return res.send("Incorrect username or password");
+                return res.json(LoginResponse.BadCredentials);
             }
 
             res.set("X-Session-Token", this._api.encryptSessionToken({ token: user.token }));                        
-
-            return res.send(user);
+            return res.json(LoginResponse.OK);
         });
 
         this._router.patch("/logout", async (req, res) => {

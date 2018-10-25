@@ -36,6 +36,12 @@ export enum ChartServerError {
     Invalid = "The chart is invalid"
 }
 
+export enum LoginResponse {
+    OK = "OK",
+    BadCredentials = "email or password incorrect",
+    Error = "cannot login right now, try again soon"
+}
+
 export enum Tab {
     Login = "login",
     Signup = "signup",

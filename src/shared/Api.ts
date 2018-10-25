@@ -1,6 +1,6 @@
 import * as FetchHelpers from "./FetchHelpers";
 import { StorageHelper } from "./StorageHelper";
-import { IIncomingUser, ISong, IUser, ChartServerError } from "./types";
+import { IIncomingUser, ISong, IUser, ChartServerError, LoginResponse } from "./types";
 
 export async function authenticateAsync(): Promise<IUser | null> {
     let res = await FetchHelpers.GET('/api/admin/authenticate', null, true);
@@ -10,13 +10,12 @@ export async function authenticateAsync(): Promise<IUser | null> {
     return null;
 };
 
-export async function login(returningUser: IIncomingUser): Promise<Response> {
+export async function loginAsync(returningUser: IIncomingUser): Promise<LoginResponse> {
     let res = await FetchHelpers.PATCH('/api/admin/login', returningUser, true);
     let sessionToken = res.headers.get("X-Session-Token");
-
     StorageHelper.setSessionToken(sessionToken);
 
-    return res;
+    return await res.json() as LoginResponse;
 };
 
 export const logout = () => {

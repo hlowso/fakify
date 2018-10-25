@@ -1,12 +1,22 @@
 import React, { Component } from "react";
 import { Link, Redirect } from "react-router-dom";
-
 import * as Api from "../../../shared/Api";
-
+import { LoginResponse } from "../../../shared/types";
 import "./LoginViewController.css";
 
-class LoginViewController extends Component {
-    constructor(props) {
+export interface ILoginVCProps {
+
+}
+
+export interface ILoginVCState {
+    currentEmail?: string;
+    currentPassword?: string;
+    errorMessage?: string;
+    accessGranted?: boolean;
+}
+
+class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
+    constructor(props: ILoginVCProps) {
         super(props);
         this.state = {
             currentEmail: "",
@@ -16,7 +26,7 @@ class LoginViewController extends Component {
         };
     }
 
-    render() {
+    public render() {
         let { 
             currentEmail, 
             currentPassword, 
@@ -32,7 +42,7 @@ class LoginViewController extends Component {
                             <h1>Login</h1>                
                         </div>
                         <div className="login-container form-container">
-                            <form onSubmit={this.handleSubmit}>
+                            <form onSubmit={this._handleSubmitAsync}>
                                 <table style={{width: "100%"}}>
                                     <col style={{width: "30%"}} />
                                     <col style={{width: "70%"}} />
@@ -48,7 +58,7 @@ class LoginViewController extends Component {
                                                     value={currentEmail}
                                                     name="currentEmail"
                                                     placeholder="example@gmail.com"
-                                                    onChange={this.handleInputChange}
+                                                    onChange={this._handleInputChange}
                                                 />
                                             </td>
                                         </tr>
@@ -62,7 +72,7 @@ class LoginViewController extends Component {
                                                     value={currentPassword}
                                                     name="currentPassword"
                                                     placeholder="password"
-                                                    onChange={this.handleInputChange}
+                                                    onChange={this._handleInputChange}
                                                 />
                                             </td>
                                         </tr>
@@ -93,40 +103,45 @@ class LoginViewController extends Component {
         );
     }
 
-    handleInputChange = event => {
+    private _handleInputChange = (event: React.ChangeEvent<any>) => {
         let { name, value } = event.target;
-        let stateUpdate = {};
+        let stateUpdate: ILoginVCState = {};
         stateUpdate[name] = value;
 
         this.setState(stateUpdate);
     }
 
-    handleSubmit = event => {
+    private _handleSubmitAsync = async (event: React.FormEvent<any>) => {
         event.preventDefault();
 
         let { 
             currentEmail,
             currentPassword
-         } = event.target;
+         } = event.target as any;
 
         let email = currentEmail.value,
             password = currentPassword.value;
 
         if (password.length === 0) {
             this.setState({ errorMessage: "password cannot be empty" });
-        }
-        else {
+        } else {
             let returningUser = { email, password };
-            Api.login(returningUser)
-                .then(res => {
-                    let stateUpdate = {};
-                    if (res.status === 200) {
-                        stateUpdate.accessGranted = true;
-                    } else {
-                        stateUpdate.errorMessage = "email or password incorrect";
-                    }
-                    this.setState(stateUpdate);
-                });
+            let res = await Api.loginAsync(returningUser);
+            let stateUpdate: ILoginVCState = {};
+
+            switch (res) {
+                default:
+                case LoginResponse.BadCredentials: 
+                case LoginResponse.Error:
+                    stateUpdate.errorMessage = res as string;
+                    break;
+
+                case LoginResponse.OK:
+                    stateUpdate.accessGranted = true;
+                    break;
+            }
+
+            this.setState(stateUpdate);
         }
     }
 };
