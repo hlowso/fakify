@@ -36,7 +36,7 @@ export enum ChartServerError {
     Invalid = "The chart is invalid"
 }
 
-export enum Tabs {
+export enum Tab {
     Login = "login",
     Signup = "signup",
     Play = "play",

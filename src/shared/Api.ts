@@ -2,14 +2,12 @@ import * as FetchHelpers from "./FetchHelpers";
 import { StorageHelper } from "./StorageHelper";
 import { IIncomingUser, ISong, IUser, ChartServerError } from "./types";
 
-export function authenticate(): Promise<IUser | null> {
-    return FetchHelpers.GET('/api/admin/authenticate', null, true)
-        .then(res => {
-            if (res.status === 200) {
-                return res.json();
-            }
-            return null;
-        });
+export async function authenticateAsync(): Promise<IUser | null> {
+    let res = await FetchHelpers.GET('/api/admin/authenticate', null, true);
+    if (res.status === 200) {
+        return res.json();
+    }
+    return null;
 };
 
 export async function login(returningUser: IIncomingUser): Promise<Response> {

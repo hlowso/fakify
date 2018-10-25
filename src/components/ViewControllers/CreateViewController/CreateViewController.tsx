@@ -4,7 +4,7 @@ import { BarEditingModal } from "../../views/BarEditingModal/BarEditingModal";
 import { MAX_TITLE_LENGTH } from '../../../shared/Constants';
 import * as Util from "../../../shared/Util";
 import * as Api from "../../../shared/Api";
-import { ISong, IChartBar, ChordShape, Tabs, NoteName, TimeSignature, ChartServerError } from "../../../shared/types";
+import { ISong, IChartBar, ChordShape, Tab, NoteName, TimeSignature, ChartServerError } from "../../../shared/types";
 import Chart from "../../../shared/music/Chart";
 import $ from "jquery";
 import "./CreateViewController.css";
@@ -12,7 +12,7 @@ import { Button, ButtonGroup, Glyphicon } from "react-bootstrap";
 
 export interface ICreateVCProps {
     StateHelper: any;
-    redirect: (tab: Tabs) => void;
+    redirect: (tab: Tab) => void;
 }
 
 export interface ICreateVCState {
@@ -290,7 +290,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
         switch (result) {
             case true:
-                redirect(Tabs.Create);
+                redirect(Tab.Create);
                 break;
             case ChartServerError.TitleTaken:
                 this.setState({ errorMessage: "Song title exists" });

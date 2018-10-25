@@ -1,4 +1,4 @@
-import { Tabs, ISubbeatTimeMap, IMusicIdx } from "./types";
+import { Tab, ISubbeatTimeMap, IMusicIdx } from "./types";
 
 // export const redirect = (route: string) => {
 //     window.location.replace(`${window.location.origin}/${route}`);
@@ -6,13 +6,13 @@ import { Tabs, ISubbeatTimeMap, IMusicIdx } from "./types";
 
 export const getCurrentTab = () => {
     let windowPathname = window.location.pathname;
-    for (let tab in Tabs) {
-        let currTab = Tabs[tab];
+    for (let tab in Tab) {
+        let currTab = Tab[tab];
         if (new RegExp(currTab).test(windowPathname)) {
-            return currTab as Tabs;
+            return currTab as Tab;
         }
     }
-    return Tabs.None;
+    return Tab.None;
 }
 
 export const objectIsEmpty = (object: any) => {
