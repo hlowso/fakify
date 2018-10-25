@@ -42,10 +42,14 @@ export class Search extends Component<ISearchProps, ISearchState> {
                         value={query}
                     />
                     <InputGroup.Button>
-                        <Button onClick={this._onSearchButtonClick} ><Glyphicon glyph="search" /></Button>
+                        <Button title="Search" onClick={this._onSearchButtonClick} >
+                            <Glyphicon glyph="search" />
+                        </Button>
                     </InputGroup.Button>
                     <InputGroup.Button>
-                        <Button onClick={this._onBrowse} onBlur={this._onLeaveBrowse} ><Glyphicon glyph="align-justify" /></Button>
+                        <Button title="Browse" onClick={this._onBrowse} onBlur={this._onLeaveBrowse} >
+                            <Glyphicon glyph="align-justify" />
+                        </Button>
                     </InputGroup.Button>
                     
                 </InputGroup>
