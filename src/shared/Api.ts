@@ -3,7 +3,7 @@ import { StorageHelper } from "./StorageHelper";
 import { IIncomingUser, ISong, IUser, ChartServerError } from "./types";
 
 export function authenticate(): Promise<IUser | null> {
-    return FetchHelpers.GET('/api/admin/authenticate')
+    return FetchHelpers.GET('/api/admin/authenticate', null, true)
         .then(res => {
             if (res.status === 200) {
                 return res.json();
@@ -13,7 +13,7 @@ export function authenticate(): Promise<IUser | null> {
 };
 
 export async function login(returningUser: IIncomingUser): Promise<Response> {
-    let res = await FetchHelpers.PATCH('/api/admin/login', returningUser);
+    let res = await FetchHelpers.PATCH('/api/admin/login', returningUser, true);
     let sessionToken = res.headers.get("X-Session-Token");
 
     StorageHelper.setSessionToken(sessionToken);
@@ -22,11 +22,11 @@ export async function login(returningUser: IIncomingUser): Promise<Response> {
 };
 
 export const logout = () => {
-    return FetchHelpers.PATCH('/api/admin/logout');
+    return FetchHelpers.PATCH('/api/admin/logout', null, true);
 };
 
 export const signup = (newUser: IIncomingUser): Promise<IUser | null> => {
-    return FetchHelpers.POST('/api/admin/signup', newUser)
+    return FetchHelpers.POST('/api/admin/signup', newUser, true)
         .then(res => {
             if (res.status === 200) {
                 let sessionToken = res.headers.get("X-Session-Token");

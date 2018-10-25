@@ -1,7 +1,7 @@
 import { StorageHelper } from "./StorageHelper";
 import { Method } from "./types";
 
-const sendRequest = (path: string, method: Method, payload: any) => {
+const sendRequestAsync = async (path: string, method: Method, payload: any, ignoreUnauthorized = false) => {
     let url = (
         process.env.REACT_APP_DEPLOY_BUILD
             ? "https://fakify.herokuapp.com"
@@ -19,25 +19,31 @@ const sendRequest = (path: string, method: Method, payload: any) => {
         body: method !== "GET" && payload ? JSON.stringify(payload) : undefined
     };
 
-    return fetch(url, options);
+    let res = await fetch(url, options);
+
+    if (res.status === 401 && !ignoreUnauthorized) {
+        window.location.reload();
+    }
+
+    return res;
 }
 
-export const GET = (path: string, payload?: any) => {
-    return sendRequest(path, "GET", payload);
+export const GET = (path: string, payload?: any, ignoreUnauthorized = false) => {
+    return sendRequestAsync(path, "GET", payload, ignoreUnauthorized);
 }
 
-export const PATCH = (path: string, payload?: any) => {
-    return sendRequest(path, "PATCH", payload);
+export const PATCH = (path: string, payload?: any, ignoreUnauthorized = false) => {
+    return sendRequestAsync(path, "PATCH", payload, ignoreUnauthorized);
 }
 
-export const POST = (path: string, payload?: any) => {
-    return sendRequest(path, "POST", payload);
+export const POST = (path: string, payload?: any, ignoreUnauthorized = false) => {
+    return sendRequestAsync(path, "POST", payload, ignoreUnauthorized);
 }
 
-export const PUT = (path: string, payload?: any) => {
-    return sendRequest(path, "PUT", payload);
+export const PUT = (path: string, payload?: any, ignoreUnauthorized = false) => {
+    return sendRequestAsync(path, "PUT", payload, ignoreUnauthorized);
 }
 
-export const DELETE = (path: string, payload?: any) => {
-    return sendRequest(path, "DELETE", payload);
+export const DELETE = (path: string, payload?: any, ignoreUnauthorized = false) => {
+    return sendRequestAsync(path, "DELETE", payload, ignoreUnauthorized);
 }
