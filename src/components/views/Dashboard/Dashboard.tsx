@@ -43,7 +43,7 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
                 {this.renderTempoSelect()}
                 {this.renderSelectAllBars()}
                 {this.renderPlayButton()}
-                <div style={{ width: 20 }} />
+                {this.renderLegend()}
                 {this.renderKeySelect()}
             </div>
         );
@@ -121,6 +121,22 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
             <Button className="play-button" onClick={inSession ? this._onStop : this._onPlay} >
                 <Glyphicon glyph={inSession ? "stop" : "play"} />
             </Button>
+        );
+    }
+
+    public renderLegend() {
+        let { hiddenKeyboard } = this.props;
+        let dynamicStyle = hiddenKeyboard ? { width: 20, height: 20 } : undefined; 
+        let content = !hiddenKeyboard && (
+            <span style={{ display: "flex" }}>
+                <div style={{ width: 10, height: 10, backgroundColor: "coral", margin: 0, alignSelf: "center" }} />&nbsp;= In Key
+            </span>
+        );
+
+        return (
+            <div className="legend" style={dynamicStyle}>
+                {content}
+            </div>
         );
     }
 
