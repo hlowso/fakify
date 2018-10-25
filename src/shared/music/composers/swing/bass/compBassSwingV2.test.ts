@@ -47,14 +47,7 @@ test("changing range doesn't invalidate music", () => {
 	for (let i = 0; i < 100; i ++) {
 
 		short7_4WithCs.rangeEndIdx = 8;
-
-		let pass = Score.validPart(compBassSwingV2(short7_4WithCs));
-
-		if (!pass) {
-			console.log(i);
-		}
-
-		expect(pass).toBe(true);
+		expect(Score.validPart(compBassSwingV2(short7_4WithCs))).toBe(true);
 
 		short7_4WithCs.rangeEndIdx = 3;
 		expect(Score.validPart(compBassSwingV2(short7_4WithCs))).toBe(true);
