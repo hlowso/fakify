@@ -3,7 +3,7 @@ import uuidv4 from "uuid/v4";
 import bcrypt from "bcryptjs";
 import { PreCompData } from "./PreCompData";
 import { IIncomingUser, ISong, NoteName, Tempo, IChartBar, ISession, ChartResponse, SignupResponse, IUser } from "../shared/types";
-import { MAX_TITLE_LENGTH } from "../shared/Constants";
+import { MAX_TITLE_LENGTH, MIN_PASSWORD_LENGTH, EMAIL_REGEX } from "../shared/Constants";
 import Chart from "../shared/music/Chart";
 import * as Mongo from "mongodb";
 
@@ -68,6 +68,10 @@ export class PreCompApiHelper {
     // USERS
 
     public createUserAsync = async (newUser: IIncomingUser): Promise<SignupResponse | IUser> => {
+
+        if (newUser.password.length < MIN_PASSWORD_LENGTH || !EMAIL_REGEX.test(newUser.email)) {
+            return SignupResponse.InvalidCredentials;
+        }
 
         let existingUser = await this._data.getUserByEmailAsync(newUser.email);
 

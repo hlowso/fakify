@@ -2,11 +2,11 @@ import React, { Component } from "react";
 import { Link, Redirect } from "react-router-dom";
 import * as Api from "../../../shared/Api";
 import { SignupResponse } from "../../../shared/types";
+import { MIN_PASSWORD_LENGTH } from "../../../shared/Constants";
 import "./SignUpViewController.css";
 
-const PASSWORD_MINIMUM_LENGTH = 8;
 const NO_MATCH_MESSAGE = "passwords don't match";
-const PASSWORD_TOO_SHORT_MESSAGE = `password must be at least ${PASSWORD_MINIMUM_LENGTH} characters`;
+const PASSWORD_TOO_SHORT_MESSAGE = `password must be at least ${MIN_PASSWORD_LENGTH} characters`;
 
 export interface ISignUpVCProps {
 
@@ -147,7 +147,7 @@ class SignUpViewController extends Component<ISignUpVCProps, ISignUpVCState> {
             password = currentPassword.value,
             confirmPassword = currentConfirmPassword.value;
 
-        if (password.length < PASSWORD_MINIMUM_LENGTH) {
+        if (password.length < MIN_PASSWORD_LENGTH) {
             this.setState({ errorMessage: PASSWORD_TOO_SHORT_MESSAGE});
         } else if (password !== confirmPassword) {
             this.setState({ errorMessage: NO_MATCH_MESSAGE});

@@ -71313,6 +71313,9 @@ class PreCompApiHelper {
     constructor(data, secret) {
         // USERS
         this.createUserAsync = (newUser) => __awaiter(this, void 0, void 0, function* () {
+            if (newUser.password.length < __WEBPACK_IMPORTED_MODULE_4__shared_Constants__["c" /* MIN_PASSWORD_LENGTH */] || !__WEBPACK_IMPORTED_MODULE_4__shared_Constants__["a" /* EMAIL_REGEX */].test(newUser.email)) {
+                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["e" /* SignupResponse */].InvalidCredentials;
+            }
             let existingUser = yield this._data.getUserByEmailAsync(newUser.email);
             if (existingUser) {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["e" /* SignupResponse */].EmailTaken;
@@ -71394,7 +71397,7 @@ class PreCompApiHelper {
                 }
             }
             let { title, originalContext, originalTempo, barsBase } = chart;
-            if (typeof title !== "string" || title.length > __WEBPACK_IMPORTED_MODULE_4__shared_Constants__["a" /* MAX_TITLE_LENGTH */]) {
+            if (typeof title !== "string" || title.length > __WEBPACK_IMPORTED_MODULE_4__shared_Constants__["b" /* MAX_TITLE_LENGTH */]) {
                 return false;
             }
             if (!__WEBPACK_IMPORTED_MODULE_5__shared_music_Chart__["a" /* default */].validNoteName(originalContext)) {
@@ -72941,7 +72944,13 @@ module.exports = __webpack_require__(287);
 
 "use strict";
 const MAX_TITLE_LENGTH = 50;
-/* harmony export (immutable) */ __webpack_exports__["a"] = MAX_TITLE_LENGTH;
+/* harmony export (immutable) */ __webpack_exports__["b"] = MAX_TITLE_LENGTH;
+
+const MIN_PASSWORD_LENGTH = 8;
+/* harmony export (immutable) */ __webpack_exports__["c"] = MIN_PASSWORD_LENGTH;
+
+const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+/* harmony export (immutable) */ __webpack_exports__["a"] = EMAIL_REGEX;
 
 
 

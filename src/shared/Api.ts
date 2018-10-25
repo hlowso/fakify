@@ -1,6 +1,6 @@
 import * as FetchHelpers from "./FetchHelpers";
 import { StorageHelper } from "./StorageHelper";
-import { IIncomingUser, ISong, IUser, ChartResponse, LoginResponse, SignupResponse } from "./types";
+import { IIncomingUser, ISong, IUser, ChartResponse, LoginResponse, SignupResponse, ITitles } from "./types";
 
 export async function authenticateAsync(): Promise<IUser | null> {
     let res = await FetchHelpers.GET('/api/admin/authenticate', null, true);
@@ -18,12 +18,12 @@ export async function loginAsync(returningUser: IIncomingUser): Promise<LoginRes
         StorageHelper.setSessionToken(sessionToken);
     }
 
-    return await res.json() as LoginResponse;
+    return getResponseJson<LoginResponse>(res) || LoginResponse.Error;
 };
 
 export async function logoutAsync() {
     let res = await FetchHelpers.PATCH('/api/admin/logout', null, true);
-    return res.json();
+    return getResponseJson<boolean>(res) || false;
 };
 
 export async function signupAsync(newUser: IIncomingUser): Promise<SignupResponse> {
@@ -34,40 +34,56 @@ export async function signupAsync(newUser: IIncomingUser): Promise<SignupRespons
         StorageHelper.setSessionToken(sessionToken);
     }
                 
-    return await res.json() as SignupResponse;
+    return getResponseJson<SignupResponse>(res) || SignupResponse.Error;
 };
 
 export async function saveSongAsync(newSong: ISong): Promise<ChartResponse> {
     let res = await FetchHelpers.POST('/api/songs', newSong);
-    return await res.json() as ChartResponse;
+    return getResponseJson<ChartResponse>(res) || ChartResponse.Error;
 }
 
 export async function updateSongAsync(chartId: string, newSong: ISong): Promise<ChartResponse> {
     let res = await FetchHelpers.PUT(`/api/songs/${chartId}`, newSong);
-    return await res.json() as ChartResponse;
+    return getResponseJson<ChartResponse>(res) || ChartResponse.Error;
 }
 
-export async function getUserSongTitles(): Promise<{ [chartId: string]: string }> {
+export async function getUserSongTitles(): Promise<ITitles> {
     let res = await FetchHelpers.GET('/api/songs/user/titles');
-    return res.json();
+    return getResponseJson<ITitles>(res) || {};
 };
 
-export async function getSongTitlesAsync(): Promise<{ [chartId: string]: string }> {
+export async function getSongTitlesAsync(): Promise<ITitles> {
     let res = await FetchHelpers.GET('/api/songs/titles');
-    return await res.json();
+    return getResponseJson<ITitles>(res) || {};
 };
 
 export async function getSongByTitleAsync(title: string): Promise<ISong | null> {
     let res = await FetchHelpers.GET(`/api/songs/by-title/${title}`);
-    return await res.json();
+    return getResponseJson<ISong | null>(res) || null;
 }
 
 export async function getSongAsync(chartId: string): Promise<ISong | null> {
     let res = await FetchHelpers.GET(`/api/songs/${chartId}`);
-    return await res.json();
+    return getResponseJson<ISong | null>(res) || null;    
 };
 
-export async function deleteSongAsync(chartId: string): Promise<boolean> {
+export async function deleteSongAsync(chartId: string): Promise<number> {
     let res = await FetchHelpers.DELETE(`/api/songs/${chartId}`);
-    return await res.json();
+    return getResponseJson<number>(res) || 0;    
+}
+
+/**
+ * HELPERS
+ */
+
+async function getResponseJson<T>(res: Response) {
+    let json: any;
+
+    try {
+        json = await res.json() as T;
+    } catch (err) {
+        json = null;
+    }
+
+    return json;
 }
