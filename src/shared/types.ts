@@ -69,7 +69,7 @@ export interface ISong {
 }
 
 export interface ISongTitle {
-    songId: Mongo.ObjectId | string;
+    chartId: string;
     title: string;
 }
 

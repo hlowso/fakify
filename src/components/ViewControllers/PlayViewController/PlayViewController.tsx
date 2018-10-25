@@ -4,7 +4,7 @@ import MenuBar from "../../views/MenuBar/MenuBar";
 // import SongListPanel from "../../views/SongListPanel/SongListPanel";
 import ChartViewer from "../../views/ChartViewer/ChartViewer";
 import Keyboard from "../../views/Keyboard/Keyboard";
-import MidSettingsModal from "../../views/MidiSettingsModal/MidiSettingsModal";
+import SettingsModal from "../../views/SettingsModal/SettingsModal";
 
 import * as Api from "../../../shared/Api";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
@@ -28,7 +28,7 @@ export interface IPlayVCState {
     loadingSelectedSong?: boolean;
     songTitles?: { [songId: string]: string }
     selectedSong?: ISong | {};
-    midiSettingsModalOpen?: boolean;
+    settingsModalOpen?: boolean;
     playMode?: PlayMode;
     spaceClickDone?: boolean;
     hideKeyboard?: boolean;
@@ -45,7 +45,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             loadingSelectedSong: false,
             songTitles: {},
             selectedSong: {},
-            midiSettingsModalOpen: false,
+            settingsModalOpen: false,
             playMode: PlayMode.None,
             spaceClickDone: true, 
             hideKeyboard: false,
@@ -72,7 +72,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             if (!connectionSuccessful) {
                 StorageHelper.setMidiInputId("");
             }
-            this.setState({ midiSettingsModalOpen: !connectionSuccessful });
+            this.setState({ settingsModalOpen: !connectionSuccessful });
         }
 
         this.loadSongTitlesAsync(selectedSongId);
@@ -145,7 +145,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         let { 
             songTitles, 
             selectedSong, 
-            midiSettingsModalOpen, 
+            settingsModalOpen, 
             loadingSelectedSong,
             hideKeyboard,
             selectAllBarsHovered
@@ -166,7 +166,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             <div id="play-view">
                 <div>
                     <MenuBar 
-                        openMIDISettingsModal={() => this.setState({ midiSettingsModalOpen: true })} 
+                        openMIDISettingsModal={() => this.setState({ settingsModalOpen: true })} 
                         songTitles={songTitles as { [chartId: string]: string }} 
                         onSongTitleClick={this.onSongListItemClick} />
                 </div>
@@ -217,11 +217,11 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                     rangeEndNote={rangeEndNote || MusicHelper.HIGHEST_C} 
                     firstNoteColor={this._firstNoteColor} />}
 
-                <MidSettingsModal 
+                <SettingsModal 
                     SoundActions={this.props.SoundActions} 
                     StateHelper={this.props.StateHelper} 
-                    isOpen={!!midiSettingsModalOpen} 
-                    close={()=> this.setState({ midiSettingsModalOpen: false })} 
+                    isOpen={!!settingsModalOpen} 
+                    close={()=> this.setState({ settingsModalOpen: false })} 
                     hiddenKeyboard={!!hideKeyboard}
                     onToggleHideKeyboard={() => this.setState({ hideKeyboard: !hideKeyboard })} />
             </div>

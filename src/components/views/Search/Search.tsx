@@ -65,7 +65,7 @@ export class Search extends Component<ISearchProps, ISearchState> {
                 <div
                     className="match"
                     style={{ height: this._matchHeight }}
-                    onClick={() => this._onSongTitleClick(match.songId as string)}
+                    onClick={() => this._onSongTitleClick(match.chartId as string)}
                     onMouseEnter={this._onMatchEnter}
                     onMouseLeave={this._onMatchLeave}
                 >
@@ -136,8 +136,8 @@ export class Search extends Component<ISearchProps, ISearchState> {
 
         let matchingTitles: ISongTitle[] = [];
 
-        for (let songId in songTitles) {
-            let title = songTitles[songId];
+        for (let chartId in songTitles) {
+            let title = songTitles[chartId];
             let matchCondition = (
                 title && 
                 query &&
@@ -147,7 +147,7 @@ export class Search extends Component<ISearchProps, ISearchState> {
             );
 
             if (showAll || matchCondition) {
-                matchingTitles.push({ songId, title });
+                matchingTitles.push({ chartId, title });
             }
         }
 
@@ -159,7 +159,7 @@ export class Search extends Component<ISearchProps, ISearchState> {
     private _loadTopMatch = () => {
         let matches = this._getCurrentMatches();
         if (Array.isArray(matches) && matches.length > 0) {
-            this._onSongTitleClick(matches[0].songId as string);
+            this._onSongTitleClick(matches[0].chartId as string);
         }
     }
 }

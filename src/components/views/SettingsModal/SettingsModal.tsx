@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { StorageHelper } from "../../../shared/StorageHelper";
-import "./MidiSettingsModal.css";
 
 export interface ISettingsModalProps {
     StateHelper: any;
@@ -19,7 +18,7 @@ export interface ISettingsModalState {
     // midiInputConnectionError: string;
 }
 
-class MidiSettingsModal extends Component<ISettingsModalProps, ISettingsModalState> {
+class SettingsModal extends Component<ISettingsModalProps, ISettingsModalState> {
     constructor(props: ISettingsModalProps) {
         super(props);
         this.state = {
@@ -178,4 +177,4 @@ class MidiSettingsModal extends Component<ISettingsModalProps, ISettingsModalSta
     // }
 }
 
-export default MidiSettingsModal;
+export default SettingsModal;

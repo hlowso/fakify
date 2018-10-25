@@ -4,11 +4,11 @@ import { BarEditingModal } from "../../views/BarEditingModal/BarEditingModal";
 import { MAX_TITLE_LENGTH } from '../../../shared/Constants';
 import * as Util from "../../../shared/Util";
 import * as Api from "../../../shared/Api";
-import { ISong, IChartBar, ChordShape, Tab, NoteName, TimeSignature, ChartResponse } from "../../../shared/types";
+import { ISong, IChartBar, ChordShape, Tab, NoteName, TimeSignature, ChartResponse, ITitles, ISongTitle } from "../../../shared/types";
 import Chart from "../../../shared/music/Chart";
 import $ from "jquery";
 import "./CreateViewController.css";
-import { Button, ButtonGroup, Glyphicon } from "react-bootstrap";
+import { Button, ButtonGroup, Glyphicon, Modal } from "react-bootstrap";
 
 export interface ICreateVCProps {
     StateHelper: any;
@@ -17,7 +17,7 @@ export interface ICreateVCProps {
 
 export interface ICreateVCState {
     loadingSongTitles?: boolean;
-    userSongTitles?: { [chartId: string]: string };
+    userSongTitles?: ITitles;
     editingSong?: ISong;
     isUpdatingBar?: boolean;
     isAddingBar?: boolean;
@@ -25,6 +25,7 @@ export interface ICreateVCState {
     errorMessage?: string;
     updatingChartId?: string;
     editingTitle?: string;
+    deleteCandidate?: ISongTitle;
 }
 
 class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
@@ -33,21 +34,20 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     constructor(props: ICreateVCProps) {
         super(props);
         this.state = {
-            loadingSongTitles: true,
             isUpdatingBar: false,
             isAddingBar: false,
         };
     }
 
     public componentWillMount() {
-        let stateUpdate: ICreateVCState = { loadingSongTitles: false };
-        this._refreshSongTitlesAsync().then(() => this.setState(stateUpdate));
+        this._refreshSongTitlesAsync();
     }
 
     public render() {
         return (
             <div id="create-view">
                 {this.renderCentralPanel()}
+                {this.renderDeleteChartModal()}
             </div>
         );
     }
@@ -114,9 +114,12 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
     public renderSongListItems() {
         let { userSongTitles } = this.state;
-        userSongTitles = userSongTitles as { [chartId: string]: string };
 
-        let listItems = [];
+        if (!userSongTitles) {
+            return;
+        }
+
+        let listItems: ISongTitle[] = [];
 
         for (let chartId in userSongTitles) {
             listItems.push({
@@ -137,7 +140,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                         {titleItem.title}
                     </Button>
                     <Button 
-                        onClick={() => this._onDeleteSongAsync(titleItem.chartId)}
+                        onClick={() => this.setState({ deleteCandidate: titleItem })}
                         bsStyle="danger" style={{ width: "5%", height: "100%" }}
                     >
                         <Glyphicon glyph="trash"/>
@@ -204,6 +207,35 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                 onSave={this._onSaveBar}
                 currentContext={this._editingChart.context}
             />
+        );
+    }
+
+    public renderDeleteChartModal() {
+
+        let { deleteCandidate } = this.state;
+
+        if (!deleteCandidate) {
+            return;
+        }
+
+        let { title, chartId } = deleteCandidate;
+
+        return (
+            <Modal dialogClassName="delete-chart-modal" show={true} onHide={() => this.setState({ deleteCandidate: undefined })}>
+                <Modal.Header closeButton={true} >
+                    <h2>{title}</h2>
+                </Modal.Header>
+                <Modal.Body>
+                    <span style={{ fontSize: "130%" }} >
+                        Are you sure you want to delete this chart?
+                    </span>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button bsStyle="danger" style={{ marginTop: 10 }} onClick={() => this._onDeleteSongAsync(chartId)} >
+                        Delete&nbsp;<Glyphicon glyph="trash" />
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         );
     }
 
@@ -403,12 +435,16 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     }
 
     private _refreshSongTitlesAsync = async() => {
+        this.setState({ loadingSongTitles: true });
         let titles = await Api.getUserSongTitles();
+
+        this.setState({ 
+            userSongTitles: titles, 
+            loadingSongTitles: false 
+        });
 
         if (!titles || Util.length(titles) === 0) {
             this._onNewSong();
-        } else {
-            this.setState({ userSongTitles: titles });
         }
     }
 
