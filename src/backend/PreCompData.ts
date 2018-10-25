@@ -1,7 +1,7 @@
 import * as Mongo from "mongodb";
-import { IUser, ISong } from "../shared/types";
+import { IUser, ISong, IDataHelper } from "../shared/types";
 
-export class PreCompData {
+export class DataHelper implements IDataHelper {
     private _mongoServer: string;
     private _user: string;
     private _password: string;
@@ -83,26 +83,26 @@ export class PreCompData {
         });
     }
 
-    public insertUserAsync = (user: IUser): Promise<Mongo.InsertOneWriteOpResult> => {
+    public insertUserAsync = (user: IUser): Promise<boolean> => {
         return new Promise((resolve, reject) => {
             this._userColl.insertOne(user, (err, response) => {
                 if (err !== null) {
                     reject(err);
                 }
 
-                resolve(response);
+                resolve(response.insertedCount === 1);
             });
         });
     }
 
-    public updateUserTokenAsync = (email: string, token: string): Promise<Mongo.UpdateWriteOpResult> => {
+    public updateUserTokenAsync = (email: string, token: string): Promise<boolean> => {
         return new Promise((resolve, reject) => {
             this._userColl.updateOne({ email }, { $set: { token } }, (err, response) => {
                 if (err != null) {
                     reject(err);
                 }
 
-                resolve(response);
+                resolve(response.matchedCount === 1);
             });
         });
     }
@@ -155,8 +155,13 @@ export class PreCompData {
         });
     }
 
-    public getChartByTitleAsync = (title: string): Promise<ISong> => {
+    public getChartByTitleAsync = (title: string): Promise<ISong | null> => {
         return new Promise((resolve, reject) => {
+
+            if (!title || typeof title !== "string") {
+                resolve(null);
+            }
+
             this._chartColl.findOne({ title }, (err, chart) => {
                 if (err !== null) {
                     reject(err);

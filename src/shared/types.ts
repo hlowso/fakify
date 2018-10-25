@@ -1,5 +1,21 @@
 import * as Mongo from "mongodb";
 
+export interface IDataHelper {
+    countUsersAsync: () => Promise<number>;
+    getUserByTokenAsync: (token: string) => Promise<IUser | null>;
+    getUserByEmailAsync: (email: string) => Promise<IUser | null>;
+    insertUserAsync: (user: IUser) => Promise<boolean>;
+    updateUserTokenAsync: (email: string, token: string) => Promise<boolean>;
+    clearUserTokenAsync: (token: string) => Promise<boolean>;
+    countChartsAsync: (userId?: Mongo.ObjectId) => Promise<number>;
+    getChartsAsync: (userId?: Mongo.ObjectId) => Promise<ISong[]>;
+    getChartAsync: (_id?: Mongo.ObjectId) => Promise<ISong | null>;
+    getChartByTitleAsync: (title: string) => Promise<ISong | null>;
+    insertChartAsync: (chart: ISong) => Promise<boolean>;
+    updateChartAsync: (chart: ISong, _id?: Mongo.ObjectId) => Promise<boolean>;
+    deleteChartAsync: (_id?: Mongo.ObjectId) => Promise<number>;
+}
+
 export interface ISession {
     token: string;
 }

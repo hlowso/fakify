@@ -1,7 +1,7 @@
 import express from "express";
 // import cookieSession from "cookie-session";
 import bodyParser from "body-parser";
-import { PreCompData } from "./PreCompData";
+import { DataHelper } from "./PreCompData";
 import { PreCompApiHelper } from "./PreCompApiHelper";
 
 import { AdminController } from "./controllers/api/AdminController";
@@ -11,7 +11,7 @@ import { ChartsController } from "./controllers/api/ChartsController";
 
 // import { AdminRoutes, StandardRoutes } from "../shared/types";
 
-const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
+const exitHandler = (data: DataHelper, options: any, exitCode: number) => {
     data.close();
     if (options.exit) {
         process.exit();
@@ -34,7 +34,7 @@ const exitHandler = (data: PreCompData, options: any, exitCode: number) => {
     } = process.env;
 
     // Create database helper
-    const data = new PreCompData(
+    const data = new DataHelper(
         MONGO_SERVER as string,
         MONGO_USER as string,
         MONGO_PASSWORD as string,

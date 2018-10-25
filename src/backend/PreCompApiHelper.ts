@@ -1,8 +1,7 @@
 import crypto from "crypto";
 import uuidv4 from "uuid/v4";
 import bcrypt from "bcryptjs";
-import { PreCompData } from "./PreCompData";
-import { IIncomingUser, ISong, NoteName, Tempo, IChartBar, ISession, ChartResponse, SignupResponse, IUser } from "../shared/types";
+import { IIncomingUser, ISong, NoteName, Tempo, IChartBar, ISession, ChartResponse, SignupResponse, IUser, IDataHelper } from "../shared/types";
 import { MAX_TITLE_LENGTH, MIN_PASSWORD_LENGTH, EMAIL_REGEX } from "../shared/Constants";
 import Chart from "../shared/music/Chart";
 import * as Mongo from "mongodb";
@@ -32,12 +31,12 @@ function getDecryptor(secret: string) {
 }
 
 export class PreCompApiHelper {
-    private _data: PreCompData;
+    private _data: IDataHelper;
 
     public encryptSessionToken: (sessionToken?: ISession) => string | undefined;
     public decryptSessionTokenEncryption: (encryption?: string) => ISession | undefined;    
 
-    constructor(data: PreCompData, secret: string) {
+    constructor(data: IDataHelper, secret: string) {
         this._data = data;
 
         let encrypt = getEncryptor(secret);
@@ -91,7 +90,11 @@ export class PreCompApiHelper {
             token: uuidv4() 
         };
 
-        await this._data.insertUserAsync(user);
+        let success = await this._data.insertUserAsync(user);
+
+        if (!success) {
+            return SignupResponse.Error;
+        }
 
         return user;
     }
@@ -109,7 +112,11 @@ export class PreCompApiHelper {
 
         let newToken = uuidv4();
 
-        await this._data.updateUserTokenAsync(existingUser.email, newToken);
+        let success = await this._data.updateUserTokenAsync(existingUser.email, newToken);
+
+        if (!success) {
+            return null;
+        }
 
         return { ...existingUser, token: newToken};
     }
