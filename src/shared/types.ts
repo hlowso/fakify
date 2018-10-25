@@ -29,11 +29,13 @@ export const StandardRoutes = [
     "/create"
 ]
 
-export enum ChartServerError {
+export enum ChartResponse {
+    OK = "OK",
     ChartCount = "There is no more space in the database for charts",
     UserChartCount = "User has reached chart limit",
     TitleTaken = "A chart with this name already exists",
-    Invalid = "The chart is invalid"
+    Invalid = "The chart is invalid",
+    Error = "Cannot create or update charts right now, try again soon"
 }
 
 export enum LoginResponse {
@@ -69,6 +71,10 @@ export interface ISong {
 export interface ISongTitle {
     songId: Mongo.ObjectId | string;
     title: string;
+}
+
+export interface ITitles {
+    [chartId: string]: string; 
 }
 
 export type InstrumentType = "piano" | "doubleBass" | "shutHiHat" | "rideCymbal";

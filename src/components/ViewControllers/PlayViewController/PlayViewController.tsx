@@ -75,13 +75,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             this.setState({ midiSettingsModalOpen: !connectionSuccessful });
         }
 
-        Api.getSongTitlesAsync()
-            .then(songTitles => {
-                this.setState({ songTitles });
-                if (selectedSongId in songTitles) {
-                    this.loadSong(selectedSongId);
-                } 
-            });
+        this.loadSongTitlesAsync(selectedSongId);
 
         window.addEventListener("keydown", this._onKeyDown);
         window.addEventListener("keyup", this._onKeyUp);
@@ -388,7 +382,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
     public onSongListItemClick = (selectedSongId: string) => {
         StorageHelper.setSelectedSongId(selectedSongId);
-        this.loadSong(selectedSongId);
+        this.loadSongAsync(selectedSongId);
     }
 
     /**
@@ -441,7 +435,21 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
      * HELPERS
      */
 
-    public async loadSong(chartId: string) {
+    public async loadSongTitlesAsync(selectedSongId?: string) {
+        let songTitles = await Api.getSongTitlesAsync();
+
+        if (!songTitles) {
+            return;
+        } 
+
+        this.setState({ songTitles });
+        
+        if (typeof selectedSongId === "string" && selectedSongId in songTitles) {
+            this.loadSongAsync(selectedSongId);
+        } 
+    }
+
+    public async loadSongAsync(chartId: string) {
         if (typeof chartId !== "string") {
             return;
         }

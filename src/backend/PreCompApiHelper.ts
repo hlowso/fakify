@@ -2,7 +2,7 @@ import crypto from "crypto";
 import uuidv4 from "uuid/v4";
 import bcrypt from "bcryptjs";
 import { PreCompData } from "./PreCompData";
-import { IIncomingUser, ISong, NoteName, Tempo, IChartBar, ISession, ChartServerError, SignupResponse, IUser } from "../shared/types";
+import { IIncomingUser, ISong, NoteName, Tempo, IChartBar, ISession, ChartResponse, SignupResponse, IUser } from "../shared/types";
 import { MAX_TITLE_LENGTH } from "../shared/Constants";
 import Chart from "../shared/music/Chart";
 import * as Mongo from "mongodb";
@@ -122,42 +122,42 @@ export class PreCompApiHelper {
         return titleProjections;
     }
 
-    public createChartAsync = async (chart: ISong, userId: Mongo.ObjectId): Promise<ChartServerError | boolean> => {
+    public createChartAsync = async (chart: ISong, userId: Mongo.ObjectId): Promise<ChartResponse> => {
         if (!this._validSong(chart)) {
-            return ChartServerError.Invalid;
+            return ChartResponse.Invalid;
         }
 
         if (await this.chartTitleExistsAsync(chart.title as string)) {
-            return ChartServerError.TitleTaken;
+            return ChartResponse.TitleTaken;
         }
 
         let chartCount = await this._data.countChartsAsync();
 
         if (chartCount >= 5000) {
-            return ChartServerError.ChartCount;
+            return ChartResponse.ChartCount;
         }
 
         chartCount = await this._data.countChartsAsync(userId);
 
         if (chartCount >= 100) {
-            return ChartServerError.UserChartCount;
+            return ChartResponse.UserChartCount;
         }
 
         chart.userId = userId;
 
-        return await this._data.insertChartAsync(chart);
+        return (await this._data.insertChartAsync(chart)) ? ChartResponse.OK : ChartResponse.Error;
     }
 
-    public updateChartAsync = async (chartId: Mongo.ObjectId, chart: ISong): Promise<ChartServerError | boolean> => {
+    public updateChartAsync = async (chart: ISong, chartId?: Mongo.ObjectId, ): Promise<ChartResponse> => {
         if (!this._validSong(chart)) {
-            return ChartServerError.Invalid;
+            return ChartResponse.Invalid;
         }
 
         if (await this.chartTitleExistsAsync(chart.title as string)) {
-            return ChartServerError.TitleTaken;
+            return ChartResponse.TitleTaken;
         }
 
-        return await this._data.updateChartAsync(chart, chartId);
+        return (await this._data.updateChartAsync(chart, chartId)) ? ChartResponse.OK : ChartResponse.Error;
     }
 
     public chartTitleExistsAsync = async (title: string): Promise<boolean> => {

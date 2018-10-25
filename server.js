@@ -2028,7 +2028,7 @@ function removeDocuments(coll, selector, options, callback) {
  * @param {Collection~collectionResultCallback} [callback] The results callback
  */
 function rename(coll, newName, options, callback) {
-  const Collection = __webpack_require__(29);
+  const Collection = __webpack_require__(30);
   // Check the collection name
   checkCollectionName(newName);
   // Build the command
@@ -2591,7 +2591,7 @@ function addUser(db, username, password, options, callback) {
  * @param {Db~collectionsResultCallback} [callback] The results callback
  */
 function collections(db, options, callback) {
-  const Collection = __webpack_require__(29);
+  const Collection = __webpack_require__(30);
 
   options = Object.assign({}, options, { nameOnly: true });
   // Let's get the collection names
@@ -2631,7 +2631,7 @@ function collections(db, options, callback) {
  * @param {Db~collectionResultCallback} [callback] The results callback
  */
 function createCollection(db, name, options, callback) {
-  const Collection = __webpack_require__(29);
+  const Collection = __webpack_require__(30);
 
   // Get the write concern options
   const finalOptions = applyWriteConcern(Object.assign({}, options), { db }, options);
@@ -8213,6 +8213,165 @@ module.exports = ReadPreference;
 
 /***/ }),
 /* 28 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ChartResponse; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return LoginResponse; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return SignupResponse; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return Tab; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return ChordShape; });
+/* unused harmony export PresentableChordShape */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return Feel; });
+/* unused harmony export PlayMode */
+/* unused harmony export Difficulty */
+const AdminRoutes = [
+    "/login",
+    "/signup"
+];
+/* unused harmony export AdminRoutes */
+
+const StandardRoutes = [
+    "/play",
+    "/create"
+];
+/* unused harmony export StandardRoutes */
+
+var ChartResponse;
+(function (ChartResponse) {
+    ChartResponse["OK"] = "OK";
+    ChartResponse["ChartCount"] = "There is no more space in the database for charts";
+    ChartResponse["UserChartCount"] = "User has reached chart limit";
+    ChartResponse["TitleTaken"] = "A chart with this name already exists";
+    ChartResponse["Invalid"] = "The chart is invalid";
+    ChartResponse["Error"] = "Cannot create or update charts right now, try again soon";
+})(ChartResponse || (ChartResponse = {}));
+var LoginResponse;
+(function (LoginResponse) {
+    LoginResponse["OK"] = "OK";
+    LoginResponse["BadCredentials"] = "email or password incorrect";
+    LoginResponse["Error"] = "cannot login right now, try again soon";
+})(LoginResponse || (LoginResponse = {}));
+var SignupResponse;
+(function (SignupResponse) {
+    SignupResponse["OK"] = "OK";
+    SignupResponse["InvalidCredentials"] = "email or password invalid";
+    SignupResponse["EmailTaken"] = "a user with that email already exists";
+    SignupResponse["Error"] = "cannot sign up right now, try again soon";
+})(SignupResponse || (SignupResponse = {}));
+var Tab;
+(function (Tab) {
+    Tab["Login"] = "login";
+    Tab["Signup"] = "signup";
+    Tab["Play"] = "play";
+    Tab["Create"] = "create";
+    Tab["None"] = "";
+})(Tab || (Tab = {}));
+var ChordShape;
+(function (ChordShape) {
+    ChordShape["Maj"] = "Maj";
+    ChordShape["Maj6"] = "Maj6";
+    ChordShape["Maj7"] = "Maj7";
+    ChordShape["Maj9"] = "Maj9";
+    ChordShape["Add9"] = "Add9";
+    ChordShape["Majb5"] = "Majb5";
+    ChordShape["Maj7b5"] = "Maj7b5";
+    ChordShape["Maj7$5"] = "Maj7$5";
+    ChordShape["Maj7b9"] = "Maj7b9";
+    ChordShape["Maj$9"] = "Maj$9";
+    ChordShape["Majb9"] = "Majb9";
+    ChordShape["Maj7$9"] = "Maj7$9";
+    ChordShape["Maj7$11"] = "Maj7$11";
+    ChordShape["Min"] = "Min";
+    ChordShape["Min6"] = "Min6";
+    ChordShape["Min7"] = "Min7";
+    ChordShape["Min9"] = "Min9";
+    ChordShape["Min$5"] = "Min$5";
+    ChordShape["Min7b5"] = "Min7b5";
+    ChordShape["Min7$5"] = "Min7$5";
+    ChordShape["Min7b9"] = "Min7b9";
+    ChordShape["Min7$9"] = "Min7$9";
+    ChordShape["Min7$11"] = "Min7$11";
+    ChordShape["MinMaj7"] = "MinMaj7";
+    ChordShape["Dom7"] = "Dom7";
+    ChordShape["Dom9"] = "Dom9";
+    ChordShape["Dom7b5"] = "Dom7b5";
+    ChordShape["Dom7$5"] = "Dom7$5";
+    ChordShape["Dom7b9"] = "Dom7b9";
+    ChordShape["Dom7$9"] = "Dom7$9";
+    ChordShape["Dom7$11"] = "Dom7$11";
+    ChordShape["Dom9b5"] = "Dom9b5";
+    ChordShape["Dom9$5"] = "Dom9$5";
+    ChordShape["Aug"] = "Aug";
+    ChordShape["Aug7"] = "Aug7";
+    ChordShape["Aug7$9"] = "Aug7$9";
+    ChordShape["Dim"] = "Dim";
+    ChordShape["Dim7"] = "Dim7";
+    ChordShape["Sus2"] = "Sus2";
+    ChordShape["Sus4"] = "Sus4";
+})(ChordShape || (ChordShape = {}));
+var PresentableChordShape;
+(function (PresentableChordShape) {
+    PresentableChordShape["Maj"] = "";
+    PresentableChordShape["Maj6"] = "6";
+    PresentableChordShape["Maj7"] = "ma7";
+    PresentableChordShape["Maj9"] = "ma9";
+    PresentableChordShape["Add9"] = "add9";
+    PresentableChordShape["Majb5"] = "ma(b5)";
+    PresentableChordShape["Maj7b5"] = "ma7(b5)";
+    PresentableChordShape["Maj7$5"] = "ma7(#5)";
+    PresentableChordShape["Maj7b9"] = "ma7(b9)";
+    PresentableChordShape["Maj$9"] = "ma(#9)";
+    PresentableChordShape["Majb9"] = "ma(b9)";
+    PresentableChordShape["Maj7$9"] = "ma7($9)";
+    PresentableChordShape["Maj7$11"] = "ma7(#11)";
+    PresentableChordShape["Min"] = "-";
+    PresentableChordShape["Min6"] = "-6";
+    PresentableChordShape["Min7"] = "-7";
+    PresentableChordShape["Min9"] = "-9";
+    PresentableChordShape["Min$5"] = "-(#5)";
+    PresentableChordShape["Min7b5"] = "-7(b5)";
+    PresentableChordShape["Min7$5"] = "-7(#5)";
+    PresentableChordShape["Min7b9"] = "-7(b9)";
+    PresentableChordShape["Min7$9"] = "-7(#9)";
+    PresentableChordShape["Min7$11"] = "-7(#11)";
+    PresentableChordShape["MinMaj7"] = "-(maj7)";
+    PresentableChordShape["Dom7"] = "7";
+    PresentableChordShape["Dom9"] = "9";
+    PresentableChordShape["Dom7b5"] = "7(b5)";
+    PresentableChordShape["Dom7$5"] = "7(#5)";
+    PresentableChordShape["Dom7b9"] = "7(b9)";
+    PresentableChordShape["Dom7$9"] = "7(#9)";
+    PresentableChordShape["Dom7$11"] = "7(#11)";
+    PresentableChordShape["Dom9b5"] = "9(b5)";
+    PresentableChordShape["Dom9$5"] = "9(#5)";
+    PresentableChordShape["Aug"] = "aug";
+    PresentableChordShape["Aug7"] = "aug7";
+    PresentableChordShape["Aug7$9"] = "aug7(#9)";
+    PresentableChordShape["Dim"] = "dim";
+    PresentableChordShape["Dim7"] = "dim7";
+    PresentableChordShape["Sus2"] = "sus2";
+    PresentableChordShape["Sus4"] = "sus4";
+})(PresentableChordShape || (PresentableChordShape = {}));
+var Feel;
+(function (Feel) {
+    Feel["Swing"] = "swing";
+})(Feel || (Feel = {}));
+var PlayMode;
+(function (PlayMode) {
+    PlayMode["None"] = "none";
+    PlayMode["Improv"] = "improv";
+    PlayMode["Listening"] = "listening";
+})(PlayMode || (PlayMode = {}));
+var Difficulty;
+(function (Difficulty) {
+    Difficulty["Easy"] = "easy";
+    Difficulty["Hard"] = "hard";
+})(Difficulty || (Difficulty = {}));
+
+
+/***/ }),
+/* 29 */
 /***/ (function(module, exports) {
 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -9069,7 +9228,7 @@ module.exports.Long = Long;
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11174,7 +11333,7 @@ module.exports = Collection;
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11624,155 +11783,6 @@ Object.defineProperty(TopologyBase.prototype, 'type', {
 exports.Store = Store;
 exports.ServerCapabilities = ServerCapabilities;
 exports.TopologyBase = TopologyBase;
-
-
-/***/ }),
-/* 31 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ChartServerError; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return LoginResponse; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return Tab; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return ChordShape; });
-/* unused harmony export PresentableChordShape */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return Feel; });
-/* unused harmony export PlayMode */
-/* unused harmony export Difficulty */
-const AdminRoutes = [
-    "/login",
-    "/signup"
-];
-/* unused harmony export AdminRoutes */
-
-const StandardRoutes = [
-    "/play",
-    "/create"
-];
-/* unused harmony export StandardRoutes */
-
-var ChartServerError;
-(function (ChartServerError) {
-    ChartServerError["ChartCount"] = "There is no more space in the database for charts";
-    ChartServerError["UserChartCount"] = "User has reached chart limit";
-    ChartServerError["TitleTaken"] = "A chart with this name already exists";
-    ChartServerError["Invalid"] = "The chart is invalid";
-})(ChartServerError || (ChartServerError = {}));
-var LoginResponse;
-(function (LoginResponse) {
-    LoginResponse["OK"] = "OK";
-    LoginResponse["BadCredentials"] = "email or password incorrect";
-    LoginResponse["Error"] = "cannot login right now, try again soon";
-})(LoginResponse || (LoginResponse = {}));
-var Tab;
-(function (Tab) {
-    Tab["Login"] = "login";
-    Tab["Signup"] = "signup";
-    Tab["Play"] = "play";
-    Tab["Create"] = "create";
-    Tab["None"] = "";
-})(Tab || (Tab = {}));
-var ChordShape;
-(function (ChordShape) {
-    ChordShape["Maj"] = "Maj";
-    ChordShape["Maj6"] = "Maj6";
-    ChordShape["Maj7"] = "Maj7";
-    ChordShape["Maj9"] = "Maj9";
-    ChordShape["Add9"] = "Add9";
-    ChordShape["Majb5"] = "Majb5";
-    ChordShape["Maj7b5"] = "Maj7b5";
-    ChordShape["Maj7$5"] = "Maj7$5";
-    ChordShape["Maj7b9"] = "Maj7b9";
-    ChordShape["Maj$9"] = "Maj$9";
-    ChordShape["Majb9"] = "Majb9";
-    ChordShape["Maj7$9"] = "Maj7$9";
-    ChordShape["Maj7$11"] = "Maj7$11";
-    ChordShape["Min"] = "Min";
-    ChordShape["Min6"] = "Min6";
-    ChordShape["Min7"] = "Min7";
-    ChordShape["Min9"] = "Min9";
-    ChordShape["Min$5"] = "Min$5";
-    ChordShape["Min7b5"] = "Min7b5";
-    ChordShape["Min7$5"] = "Min7$5";
-    ChordShape["Min7b9"] = "Min7b9";
-    ChordShape["Min7$9"] = "Min7$9";
-    ChordShape["Min7$11"] = "Min7$11";
-    ChordShape["MinMaj7"] = "MinMaj7";
-    ChordShape["Dom7"] = "Dom7";
-    ChordShape["Dom9"] = "Dom9";
-    ChordShape["Dom7b5"] = "Dom7b5";
-    ChordShape["Dom7$5"] = "Dom7$5";
-    ChordShape["Dom7b9"] = "Dom7b9";
-    ChordShape["Dom7$9"] = "Dom7$9";
-    ChordShape["Dom7$11"] = "Dom7$11";
-    ChordShape["Dom9b5"] = "Dom9b5";
-    ChordShape["Dom9$5"] = "Dom9$5";
-    ChordShape["Aug"] = "Aug";
-    ChordShape["Aug7"] = "Aug7";
-    ChordShape["Aug7$9"] = "Aug7$9";
-    ChordShape["Dim"] = "Dim";
-    ChordShape["Dim7"] = "Dim7";
-    ChordShape["Sus2"] = "Sus2";
-    ChordShape["Sus4"] = "Sus4";
-})(ChordShape || (ChordShape = {}));
-var PresentableChordShape;
-(function (PresentableChordShape) {
-    PresentableChordShape["Maj"] = "";
-    PresentableChordShape["Maj6"] = "6";
-    PresentableChordShape["Maj7"] = "ma7";
-    PresentableChordShape["Maj9"] = "ma9";
-    PresentableChordShape["Add9"] = "add9";
-    PresentableChordShape["Majb5"] = "ma(b5)";
-    PresentableChordShape["Maj7b5"] = "ma7(b5)";
-    PresentableChordShape["Maj7$5"] = "ma7(#5)";
-    PresentableChordShape["Maj7b9"] = "ma7(b9)";
-    PresentableChordShape["Maj$9"] = "ma(#9)";
-    PresentableChordShape["Majb9"] = "ma(b9)";
-    PresentableChordShape["Maj7$9"] = "ma7($9)";
-    PresentableChordShape["Maj7$11"] = "ma7(#11)";
-    PresentableChordShape["Min"] = "-";
-    PresentableChordShape["Min6"] = "-6";
-    PresentableChordShape["Min7"] = "-7";
-    PresentableChordShape["Min9"] = "-9";
-    PresentableChordShape["Min$5"] = "-(#5)";
-    PresentableChordShape["Min7b5"] = "-7(b5)";
-    PresentableChordShape["Min7$5"] = "-7(#5)";
-    PresentableChordShape["Min7b9"] = "-7(b9)";
-    PresentableChordShape["Min7$9"] = "-7(#9)";
-    PresentableChordShape["Min7$11"] = "-7(#11)";
-    PresentableChordShape["MinMaj7"] = "-(maj7)";
-    PresentableChordShape["Dom7"] = "7";
-    PresentableChordShape["Dom9"] = "9";
-    PresentableChordShape["Dom7b5"] = "7(b5)";
-    PresentableChordShape["Dom7$5"] = "7(#5)";
-    PresentableChordShape["Dom7b9"] = "7(b9)";
-    PresentableChordShape["Dom7$9"] = "7(#9)";
-    PresentableChordShape["Dom7$11"] = "7(#11)";
-    PresentableChordShape["Dom9b5"] = "9(b5)";
-    PresentableChordShape["Dom9$5"] = "9(#5)";
-    PresentableChordShape["Aug"] = "aug";
-    PresentableChordShape["Aug7"] = "aug7";
-    PresentableChordShape["Aug7$9"] = "aug7(#9)";
-    PresentableChordShape["Dim"] = "dim";
-    PresentableChordShape["Dim7"] = "dim7";
-    PresentableChordShape["Sus2"] = "sus2";
-    PresentableChordShape["Sus4"] = "sus4";
-})(PresentableChordShape || (PresentableChordShape = {}));
-var Feel;
-(function (Feel) {
-    Feel["Swing"] = "swing";
-})(Feel || (Feel = {}));
-var PlayMode;
-(function (PlayMode) {
-    PlayMode["None"] = "none";
-    PlayMode["Improv"] = "improv";
-    PlayMode["Listening"] = "listening";
-})(PlayMode || (PlayMode = {}));
-var Difficulty;
-(function (Difficulty) {
-    Difficulty["Easy"] = "easy";
-    Difficulty["Hard"] = "hard";
-})(Difficulty || (Difficulty = {}));
 
 
 /***/ }),
@@ -12929,7 +12939,7 @@ const ReadPreference = __webpack_require__(1).ReadPreference;
 const MongoError = __webpack_require__(1).MongoError;
 const ObjectID = __webpack_require__(1).ObjectID;
 const Logger = __webpack_require__(1).Logger;
-const Collection = __webpack_require__(29);
+const Collection = __webpack_require__(30);
 const mergeOptionsAndWriteConcern = __webpack_require__(0).mergeOptionsAndWriteConcern;
 const executeOperation = __webpack_require__(0).executeOperation;
 const applyWriteConcern = __webpack_require__(0).applyWriteConcern;
@@ -13909,20 +13919,20 @@ module.exports = Db;
 "use strict";
 /* unused harmony export shallowEqual */
 /* unused harmony export waitAsync */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types__ = __webpack_require__(28);
 
 // export const redirect = (route: string) => {
 //     window.location.replace(`${window.location.origin}/${route}`);
 // };
 const getCurrentTab = () => {
     let windowPathname = window.location.pathname;
-    for (let tab in __WEBPACK_IMPORTED_MODULE_0__types__["e" /* Tab */]) {
-        let currTab = __WEBPACK_IMPORTED_MODULE_0__types__["e" /* Tab */][tab];
+    for (let tab in __WEBPACK_IMPORTED_MODULE_0__types__["f" /* Tab */]) {
+        let currTab = __WEBPACK_IMPORTED_MODULE_0__types__["f" /* Tab */][tab];
         if (new RegExp(currTab).test(windowPathname)) {
             return currTab;
         }
     }
-    return __WEBPACK_IMPORTED_MODULE_0__types__["e" /* Tab */].None;
+    return __WEBPACK_IMPORTED_MODULE_0__types__["f" /* Tab */].None;
 };
 /* unused harmony export getCurrentTab */
 
@@ -16144,7 +16154,7 @@ module.exports.Code = Code;
 "use strict";
 
 
-var Long = __webpack_require__(28);
+var Long = __webpack_require__(29);
 
 var PARSE_STRING_REGEXP = /^(\+|-)?(\d+|(\d*\.\d*))?(E|e)?([-+])?(\d+)?$/;
 var PARSE_INF_REGEXP = /^(\+|-)?(Infinity|inf)$/i;
@@ -20029,8 +20039,8 @@ module.exports = {
 
 const CServer = __webpack_require__(1).Server;
 const Cursor = __webpack_require__(19);
-const TopologyBase = __webpack_require__(30).TopologyBase;
-const Store = __webpack_require__(30).Store;
+const TopologyBase = __webpack_require__(31).TopologyBase;
+const Store = __webpack_require__(31).Store;
 const MongoError = __webpack_require__(1).MongoError;
 const MAX_JS_INT = __webpack_require__(0).MAX_JS_INT;
 const translateOptions = __webpack_require__(0).translateOptions;
@@ -23507,7 +23517,7 @@ const CHANGE_DOMAIN_TYPES = {
 class ChangeStream extends EventEmitter {
   constructor(changeDomain, pipeline, options) {
     super();
-    const Collection = __webpack_require__(29);
+    const Collection = __webpack_require__(30);
     const Db = __webpack_require__(38);
     const MongoClient = __webpack_require__(63);
 
@@ -24929,7 +24939,7 @@ module.exports = { connectOp, logout, validOptions };
 /* harmony export (immutable) */ __webpack_exports__["i"] = voicingContainsNoClusters;
 /* harmony export (immutable) */ __webpack_exports__["h"] = pickClosestKey;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Util__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__types__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__types__ = __webpack_require__(28);
 
 
 const NUMBER_OF_KEYS = 88;
@@ -29356,7 +29366,7 @@ connect.MongoNetworkError = core.MongoNetworkError;
 connect.Admin = __webpack_require__(128);
 connect.MongoClient = __webpack_require__(63);
 connect.Db = __webpack_require__(38);
-connect.Collection = __webpack_require__(29);
+connect.Collection = __webpack_require__(30);
 connect.Server = __webpack_require__(65);
 connect.ReplSet = __webpack_require__(130);
 connect.Mongos = __webpack_require__(129);
@@ -29419,7 +29429,7 @@ var BSON = __webpack_require__(247),
   Decimal128 = __webpack_require__(56),
   Double = __webpack_require__(50),
   Int32 = __webpack_require__(78),
-  Long = __webpack_require__(28),
+  Long = __webpack_require__(29),
   Map = __webpack_require__(77),
   MaxKey = __webpack_require__(57),
   MinKey = __webpack_require__(35),
@@ -32003,12 +32013,12 @@ module.exports = Admin;
 "use strict";
 
 
-const TopologyBase = __webpack_require__(30).TopologyBase;
+const TopologyBase = __webpack_require__(31).TopologyBase;
 const MongoError = __webpack_require__(1).MongoError;
 const CMongos = __webpack_require__(1).Mongos;
 const Cursor = __webpack_require__(19);
 const Server = __webpack_require__(65);
-const Store = __webpack_require__(30).Store;
+const Store = __webpack_require__(31).Store;
 const MAX_JS_INT = __webpack_require__(0).MAX_JS_INT;
 const translateOptions = __webpack_require__(0).translateOptions;
 const filterOptions = __webpack_require__(0).filterOptions;
@@ -32465,8 +32475,8 @@ module.exports = Mongos;
 const Server = __webpack_require__(65);
 const Cursor = __webpack_require__(19);
 const MongoError = __webpack_require__(1).MongoError;
-const TopologyBase = __webpack_require__(30).TopologyBase;
-const Store = __webpack_require__(30).Store;
+const TopologyBase = __webpack_require__(31).TopologyBase;
+const Store = __webpack_require__(31).Store;
 const CReplSet = __webpack_require__(1).ReplSet;
 const MAX_JS_INT = __webpack_require__(0).MAX_JS_INT;
 const translateOptions = __webpack_require__(0).translateOptions;
@@ -53025,7 +53035,7 @@ class PreCompData {
 
 
 var Map = __webpack_require__(77),
-  Long = __webpack_require__(28),
+  Long = __webpack_require__(29),
   Double = __webpack_require__(50),
   Timestamp = __webpack_require__(51),
   ObjectID = __webpack_require__(52),
@@ -53416,7 +53426,7 @@ module.exports.Decimal128 = Decimal128;
 "use strict";
 
 
-var Long = __webpack_require__(28).Long,
+var Long = __webpack_require__(29).Long,
   Double = __webpack_require__(50).Double,
   Timestamp = __webpack_require__(51).Timestamp,
   ObjectID = __webpack_require__(52).ObjectID,
@@ -54204,7 +54214,7 @@ module.exports = deserialize;
 
 
 var writeIEEE754 = __webpack_require__(250).writeIEEE754,
-  Long = __webpack_require__(28).Long,
+  Long = __webpack_require__(29).Long,
   MinKey = __webpack_require__(35).MinKey,
   Map = __webpack_require__(77),
   Binary = __webpack_require__(36).Binary;
@@ -55523,7 +55533,7 @@ exports.writeIEEE754 = writeIEEE754;
 "use strict";
 
 
-var Long = __webpack_require__(28).Long,
+var Long = __webpack_require__(29).Long,
   Double = __webpack_require__(50).Double,
   Timestamp = __webpack_require__(51).Timestamp,
   ObjectID = __webpack_require__(52).ObjectID,
@@ -71262,7 +71272,7 @@ function checkAborted(_this, callback) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_uuid_v4___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_uuid_v4__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bcryptjs__ = __webpack_require__(286);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_bcryptjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_bcryptjs__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_types__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shared_types__ = __webpack_require__(28);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__shared_Constants__ = __webpack_require__(288);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__shared_music_Chart__ = __webpack_require__(289);
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -71305,11 +71315,11 @@ class PreCompApiHelper {
         this.createUserAsync = (newUser) => __awaiter(this, void 0, void 0, function* () {
             let existingUser = yield this._data.getUserByEmailAsync(newUser.email);
             if (existingUser) {
-                return null;
+                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["e" /* SignupResponse */].EmailTaken;
             }
             let userCount = yield this._data.countUsersAsync();
             if (userCount >= 5000) {
-                return null;
+                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["e" /* SignupResponse */].Error;
             }
             let user = {
                 email: newUser.email,
@@ -71341,30 +71351,30 @@ class PreCompApiHelper {
         });
         this.createChartAsync = (chart, userId) => __awaiter(this, void 0, void 0, function* () {
             if (!this._validSong(chart)) {
-                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartServerError */].Invalid;
+                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].Invalid;
             }
             if (yield this.chartTitleExistsAsync(chart.title)) {
-                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartServerError */].TitleTaken;
+                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].TitleTaken;
             }
             let chartCount = yield this._data.countChartsAsync();
             if (chartCount >= 5000) {
-                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartServerError */].ChartCount;
+                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].ChartCount;
             }
             chartCount = yield this._data.countChartsAsync(userId);
             if (chartCount >= 100) {
-                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartServerError */].UserChartCount;
+                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].UserChartCount;
             }
             chart.userId = userId;
-            return yield this._data.insertChartAsync(chart);
+            return (yield this._data.insertChartAsync(chart)) ? __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].OK : __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].Error;
         });
-        this.updateChartAsync = (chartId, chart) => __awaiter(this, void 0, void 0, function* () {
+        this.updateChartAsync = (chart, chartId) => __awaiter(this, void 0, void 0, function* () {
             if (!this._validSong(chart)) {
-                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartServerError */].Invalid;
+                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].Invalid;
             }
             if (yield this.chartTitleExistsAsync(chart.title)) {
-                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartServerError */].TitleTaken;
+                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].TitleTaken;
             }
-            return yield this._data.updateChartAsync(chart, chartId);
+            return (yield this._data.updateChartAsync(chart, chartId)) ? __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].OK : __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].Error;
         });
         this.chartTitleExistsAsync = (title) => __awaiter(this, void 0, void 0, function* () {
             let existingChart = yield this._data.getChartByTitleAsync(title);
@@ -72942,7 +72952,7 @@ const MAX_TITLE_LENGTH = 50;
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Util__ = __webpack_require__(39);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__ = __webpack_require__(87);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__types__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__types__ = __webpack_require__(28);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__domain_Domain__ = __webpack_require__(88);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__domain_ChordClass__ = __webpack_require__(290);
 
@@ -73565,7 +73575,7 @@ Chart.addKeysToBars = (bars, contextualized = false) => {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__ = __webpack_require__(87);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Domain__ = __webpack_require__(88);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Note__ = __webpack_require__(132);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__types__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__types__ = __webpack_require__(28);
 
 
 
@@ -74034,7 +74044,7 @@ Chord.canAddWithoutCluster = (notes, newNote) => {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__PreCompController__ = __webpack_require__(133);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__shared_types__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__shared_types__ = __webpack_require__(28);
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -74053,13 +74063,28 @@ class AdminController extends __WEBPACK_IMPORTED_MODULE_0__PreCompController__["
          * ROUTES
          */
         this._router.post("/signup", (req, res) => __awaiter(this, void 0, void 0, function* () {
-            let user = yield this._api.createUserAsync(req.body);
-            if (!user) {
-                res.status(403);
-                return res.send("User already exists");
+            let result;
+            try {
+                result = yield this._api.createUserAsync(req.body);
             }
-            res.set("X-Session-Token", this._api.encryptSessionToken({ token: user.token }));
-            return res.send(user);
+            catch (err) {
+                res.status(500);
+                return res.json(__WEBPACK_IMPORTED_MODULE_1__shared_types__["e" /* SignupResponse */].Error);
+            }
+            if (typeof result === "string") {
+                switch (result) {
+                    default:
+                    case __WEBPACK_IMPORTED_MODULE_1__shared_types__["e" /* SignupResponse */].Error:
+                        res.status(500);
+                        return res.json(__WEBPACK_IMPORTED_MODULE_1__shared_types__["e" /* SignupResponse */].Error);
+                    case __WEBPACK_IMPORTED_MODULE_1__shared_types__["e" /* SignupResponse */].EmailTaken:
+                    case __WEBPACK_IMPORTED_MODULE_1__shared_types__["e" /* SignupResponse */].InvalidCredentials:
+                        res.status(403);
+                        return res.json(result);
+                }
+            }
+            res.set("X-Session-Token", this._api.encryptSessionToken({ token: result.token }));
+            return res.send(__WEBPACK_IMPORTED_MODULE_1__shared_types__["e" /* SignupResponse */].OK);
         }));
         this._router.patch("/login", (req, res) => __awaiter(this, void 0, void 0, function* () {
             let user;
@@ -74111,6 +74136,7 @@ class AdminController extends __WEBPACK_IMPORTED_MODULE_0__PreCompController__["
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__PreCompController__ = __webpack_require__(133);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__shared_types__ = __webpack_require__(28);
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -74120,36 +74146,111 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 
+
 class ChartsController extends __WEBPACK_IMPORTED_MODULE_0__PreCompController__["a" /* PreCompController */] {
     constructor(api) {
         super(api);
+        this._handleProjectionsAsync = (res, userId) => __awaiter(this, void 0, void 0, function* () {
+            let projections;
+            try {
+                projections = yield this._api.getChartTitleProjectionsAsync(userId);
+            }
+            catch (err) {
+                res.status(500);
+                res.json(null);
+            }
+            res.status(200);
+            return res.json(projections);
+        });
+        this._handleChartResponse = (res, result) => {
+            switch (result) {
+                case __WEBPACK_IMPORTED_MODULE_1__shared_types__["a" /* ChartResponse */].Invalid:
+                    res.status(400);
+                    break;
+                case __WEBPACK_IMPORTED_MODULE_1__shared_types__["a" /* ChartResponse */].Error:
+                    res.status(500);
+                    break;
+                case __WEBPACK_IMPORTED_MODULE_1__shared_types__["a" /* ChartResponse */].TitleTaken:
+                case __WEBPACK_IMPORTED_MODULE_1__shared_types__["a" /* ChartResponse */].ChartCount:
+                case __WEBPACK_IMPORTED_MODULE_1__shared_types__["a" /* ChartResponse */].UserChartCount:
+                    res.status(403);
+                    break;
+                case __WEBPACK_IMPORTED_MODULE_1__shared_types__["a" /* ChartResponse */].OK:
+                    res.status(200);
+                    break;
+            }
+            return res.json(result);
+        };
         this._unauthorizedResponse = __WEBPACK_IMPORTED_MODULE_0__PreCompController__["b" /* UnauthorizedResponse */].Return401;
         /**
          * ROUTES
          */
         this._router.get("/titles", (req, res) => __awaiter(this, void 0, void 0, function* () {
-            return res.json(yield this._api.getChartTitleProjectionsAsync());
+            return yield this._handleProjectionsAsync(res);
         }));
         this._router.get("/user/titles", (req, res) => __awaiter(this, void 0, void 0, function* () {
-            return res.json(yield this._api.getChartTitleProjectionsAsync(this._user._id));
+            return yield this._handleProjectionsAsync(res, this._user._id);
         }));
         this._router.get("/:chartId", (req, res) => __awaiter(this, void 0, void 0, function* () {
             let chartId = this.parseObjectId(req.params.chartId);
-            return res.json(yield this._api.data.getChartAsync(chartId || undefined));
+            let chart;
+            try {
+                chart = yield this._api.data.getChartAsync(chartId || undefined);
+            }
+            catch (err) {
+                res.status(500);
+                return res.json(null);
+            }
+            res.status(chart ? 200 : 404);
+            return res.json(chart);
         }));
         this._router.post("/", (req, res) => __awaiter(this, void 0, void 0, function* () {
-            return res.json(yield this._api.createChartAsync(req.body, this._user._id));
+            let result;
+            try {
+                result = yield this._api.createChartAsync(req.body, this._user._id);
+            }
+            catch (err) {
+                res.status(500);
+                res.json(__WEBPACK_IMPORTED_MODULE_1__shared_types__["a" /* ChartResponse */].Error);
+            }
+            return this._handleChartResponse(res, result || __WEBPACK_IMPORTED_MODULE_1__shared_types__["a" /* ChartResponse */].Error);
         }));
         this._router.put("/:chartId", (req, res) => __awaiter(this, void 0, void 0, function* () {
             let chartId = this.parseObjectId(req.params.chartId);
-            return res.json(yield this._api.data.updateChartAsync(req.body, chartId || undefined));
+            let result;
+            try {
+                result = yield this._api.updateChartAsync(req.body, chartId || undefined);
+            }
+            catch (err) {
+                res.status(500);
+                res.json(__WEBPACK_IMPORTED_MODULE_1__shared_types__["a" /* ChartResponse */].Error);
+            }
+            return this._handleChartResponse(res, result || __WEBPACK_IMPORTED_MODULE_1__shared_types__["a" /* ChartResponse */].Error);
         }));
         this._router.delete("/:chartId", (req, res) => __awaiter(this, void 0, void 0, function* () {
             let chartId = this.parseObjectId(req.params.chartId);
-            return res.json(yield this._api.data.deleteChartAsync(chartId || undefined));
+            let deleteCount = 0;
+            try {
+                deleteCount = yield this._api.data.deleteChartAsync(chartId || undefined);
+            }
+            catch (err) {
+                res.status(500);
+                return res.json(0);
+            }
+            res.status(200);
+            return res.json(deleteCount);
         }));
         this._router.get("/by-title/:title", (req, res) => __awaiter(this, void 0, void 0, function* () {
-            return res.json(yield this._api.data.getChartByTitleAsync(req.params.title));
+            let chart;
+            try {
+                chart = yield this._api.data.getChartByTitleAsync(req.params.title);
+            }
+            catch (err) {
+                res.status(500);
+                return res.json(null);
+            }
+            res.status(chart ? 200 : 404);
+            return res.json(chart);
         }));
     }
 }

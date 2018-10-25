@@ -4,7 +4,7 @@ import { BarEditingModal } from "../../views/BarEditingModal/BarEditingModal";
 import { MAX_TITLE_LENGTH } from '../../../shared/Constants';
 import * as Util from "../../../shared/Util";
 import * as Api from "../../../shared/Api";
-import { ISong, IChartBar, ChordShape, Tab, NoteName, TimeSignature, ChartServerError } from "../../../shared/types";
+import { ISong, IChartBar, ChordShape, Tab, NoteName, TimeSignature, ChartResponse } from "../../../shared/types";
 import Chart from "../../../shared/music/Chart";
 import $ from "jquery";
 import "./CreateViewController.css";
@@ -289,19 +289,18 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         let result = await promise;
 
         switch (result) {
-            case true:
-                redirect(Tab.Create);
-                break;
-            case ChartServerError.TitleTaken:
-                this.setState({ errorMessage: "Song title exists" });
-                break;
-            case ChartServerError.Invalid:
-            case ChartServerError.ChartCount:
-            case ChartServerError.UserChartCount:
-            case false:
+            case ChartResponse.OK:
+                return redirect(Tab.Create);
+
+            case ChartResponse.TitleTaken:
+                return this.setState({ errorMessage: result });
+
+            case ChartResponse.Invalid:
+            case ChartResponse.ChartCount:
+            case ChartResponse.UserChartCount:
+            case ChartResponse.Error:
             default:
-                this.setState({ errorMessage: "There was an error saving your song" });
-                break;
+                return this.setState({ errorMessage: ChartResponse.Error });
         }
     }
 
@@ -406,7 +405,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     private _refreshSongTitlesAsync = async() => {
         let titles = await Api.getUserSongTitles();
 
-        if (Util.length(titles) === 0) {
+        if (!titles || Util.length(titles) === 0) {
             this._onNewSong();
         } else {
             this.setState({ userSongTitles: titles });
