@@ -4,6 +4,7 @@ import * as MusicHelper from "../music/MusicHelper";
 import { IChartBar, Feel, NoteName, Tempo, IMusicIdx, IChordStretch, IChordSegment, ChordName, ChordShape, RelativeNoteName, TimeSignature } from "../types";
 import { Domain } from "./domain/Domain";
 import { Chord } from "./domain/ChordClass";
+import { BAR_LIMIT } from "../Constants";
 
 class Chart {
     private _songId?: Mongo.ObjectId | string;
@@ -140,7 +141,7 @@ class Chart {
     }
 
     public static validBaseBars = (baseBars: IChartBar[]) => {
-        if (!Array.isArray(baseBars) || baseBars.length === 0 || baseBars.length > 200) {
+        if (!Array.isArray(baseBars) || baseBars.length === 0 || baseBars.length > BAR_LIMIT) {
             return false;
         }
 

@@ -1,6 +1,6 @@
 import * as Mongo from "mongodb";
 import { IDataHelper, IMockDataHelperOptions, IUser, ISong } from "../../types";
-import { USER_COUNT_LIMIT, CHART_COUNT_LIMIT, USER_CHART_COUNT_LIMIT } from "../../Constants";
+import { USER_LIMIT, CHART_LIMIT, USER_CHART_LIMIT } from "../../Constants";
 
 import bars251 from "../bars-251";
 import barsByeBye from "../barsByeByeBlackbird";
@@ -57,9 +57,9 @@ export default class MockDataHelper implements IDataHelper {
 
     constructor(options: IMockDataHelperOptions) {
         this._throwError = !!options.throwError;
-        this._userCount = options.userCountLimit ? USER_COUNT_LIMIT : 1;
-        this._chartCount = options.chartCountLimit ? CHART_COUNT_LIMIT : this._allCharts.length;
-        this._userChartCount = options.userChartCountLimit ? USER_CHART_COUNT_LIMIT : this._userCharts.length;
+        this._userCount = options.userCountLimit ? USER_LIMIT : 1;
+        this._chartCount = options.chartCountLimit ? CHART_LIMIT : this._allCharts.length;
+        this._userChartCount = options.userChartCountLimit ? USER_CHART_LIMIT : this._userCharts.length;
     }
 
     public countUsersAsync = () => {

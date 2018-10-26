@@ -7,6 +7,7 @@ import { Chord } from "../../../shared/music/domain/ChordClass";
 import { MAX_TITLE_LENGTH } from '../../../shared/Constants';
 import Chart from "../../../shared/music/Chart";
 import { ISong, IMusicIdx, NoteName, Tempo, ChordName, PresentableChordShape, IChartBar, IChordSegment } from "../../../shared/types";
+import { BAR_LIMIT } from "../../../shared/Constants";
 import "./ChartViewer.css";
 import $ from "jquery";
 
@@ -342,18 +343,26 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     public renderBarButtonContent(i: number, hideDelete = false) { 
+        let precedingAddButton = !this._atBarLimit && (
+            <Button style={{ width: "10%", padding: 0 }} onClick={() => this._onAddBar(i)} > 
+                <Glyphicon glyph="plus" style={{ margin: "auto" }} />
+            </Button>
+        );
+
+        let followingAddButton = !this._atBarLimit && (
+            <Button style={{ width: "10%", padding: 0 }} onClick={() => this._onAddBar(i + 1)}>
+                <Glyphicon glyph="plus" />
+            </Button>
+        );
+
         return (
-            <div className="bar-buttons" >
-                <Button style={{ width: "10%", padding: 0 }} onClick={() => this._onAddBar(i)} > 
-                    <Glyphicon glyph="plus" style={{ margin: "auto" }} />
-                </Button>
+            <div className="bar-buttons" style={{ justifyContent: this._atBarLimit ? "space-around" : "space-between" }} >
+                {precedingAddButton}
                 <div style={{ width: "70%", display: "flex", flexDirection: "column" }} >
                     <Button style={{ padding: 0 }} onClick={() => this._onEditBar(i)}>Edit</Button>
                     {!hideDelete && <Button style={{ padding: 0 }} bsStyle="danger" onClick={() => this._onDeleteBar(i)}>Delete</Button>}
                 </div>
-                <Button style={{ width: "10%", padding: 0 }} onClick={() => this._onAddBar(i + 1)}>
-                    <Glyphicon glyph="plus" />
-                </Button>
+                {followingAddButton}
             </div>
         );
     }
@@ -505,6 +514,16 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     /**
      * HELPERS
      */
+
+    private get _atBarLimit() {
+        let { chart } = this.props;
+
+        if (!chart) {
+            return false;
+        }
+
+        return chart.bars.length >= BAR_LIMIT;
+    }
 
     private _getSegment = (bar: IChartBar, beatIdx: number): [ IChordSegment | undefined, number | undefined ] => {
 

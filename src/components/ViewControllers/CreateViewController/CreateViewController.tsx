@@ -9,6 +9,7 @@ import Chart from "../../../shared/music/Chart";
 import $ from "jquery";
 import "./CreateViewController.css";
 import { Button, ButtonGroup, Glyphicon, Modal } from "react-bootstrap";
+import { USER_CHART_LIMIT } from "../../../shared/Constants";
 
 export interface ICreateVCProps {
     StateHelper: any;
@@ -87,9 +88,13 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     }
 
     public renderSongList() {
+        let atChartLimit = this._titlesCount >= USER_CHART_LIMIT;
+
         let buttonSection = (
             <div id="song-list-header" >
-                <Button 
+                <Button
+                    title={atChartLimit ? "Users are limited to 100 charts" : undefined} 
+                    disabled={atChartLimit}
                     bsStyle="success" 
                     bsSize="large"
                     onClick={this._onNewSong} >
@@ -239,6 +244,10 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         );
     }
 
+    /**
+     * HANDLERS
+     */
+
     private _onNewSong = () => {
         this.setState({ 
             editingSong: {},
@@ -297,16 +306,6 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         this.setState(stateUpdate);
     }
 
-    private _consolidateSong = (): ISong => {
-        let { editingSong } = this.state;
-        return {
-            title: (editingSong as ISong).title,
-            originalContext: (this._editingChart as Chart).context,
-            originalTempo: [120, 4],
-            barsBase: (this._editingChart as Chart).barsBase
-        };
-    }
-
     private _onSaveChartAsync = async () => {
         let { redirect } = this.props;
         let { updatingChartId } = this.state;
@@ -339,7 +338,12 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
     private _onCancel = () => {
         this._editingChart = undefined;
-        this.setState({ updatingChartId: "", editingSong: undefined, errorMessage: undefined, editingTitle: undefined });
+        this.setState({ 
+            updatingChartId: "", 
+            editingSong: undefined, 
+            errorMessage: undefined, 
+            editingTitle: undefined 
+        });
         this.forceUpdate();
     }
 
@@ -350,22 +354,6 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         }
 
         this._onChooseEditSongAsync(updatingChartId)
-    }
-
-    private _resetChart = (newSong?: boolean) => {
-
-        let { editingSong } = this.state;
-
-        this._editingChart = new Chart(
-            this.forceUpdate.bind(this),
-            editingSong ? editingSong.barsBase : undefined,
-            editingSong ? editingSong.originalContext : undefined,
-            editingSong ? editingSong.originalTempo : [ 120, 4 ]
-        );
-
-        if (newSong) {
-            this._editingChart.addBar(0, this._getInitialBar())
-        }
     }
 
     private _onSongTitleChangeAsync = async () => {
@@ -404,6 +392,68 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
         this.setState({ editingTitle, errorMessage: undefined })
     }   
 
+    private _onChooseEditSongAsync = async (chartId: string) => {
+        let editingSong = await Api.getSongAsync(chartId)
+            
+        if (editingSong) {
+            this.setState({ 
+                editingSong, 
+                updatingChartId: chartId 
+            }, this._resetChart);
+        }
+    }
+
+    private _onDeleteSongAsync = async (chartId: string) => {
+        this.setState({ deleteCandidate: undefined });
+        let deleteCount = await Api.deleteSongAsync(chartId);
+
+        if (deleteCount !== 1) {
+            alert("There was a problem deleting your chart");
+        }
+
+        await this._refreshSongTitlesAsync();
+    }
+
+    /**
+     * HELPERS
+     */
+
+    private get _titlesCount() {
+        let { userSongTitles } = this.state;
+
+        if (!userSongTitles) {
+            return 0;
+        }
+
+        return Util.length(userSongTitles);
+    }
+
+    private _consolidateSong = (): ISong => {
+        let { editingSong } = this.state;
+        return {
+            title: (editingSong as ISong).title,
+            originalContext: (this._editingChart as Chart).context,
+            originalTempo: [120, 4],
+            barsBase: (this._editingChart as Chart).barsBase
+        };
+    }
+
+    private _resetChart = (newSong?: boolean) => {
+
+        let { editingSong } = this.state;
+
+        this._editingChart = new Chart(
+            this.forceUpdate.bind(this),
+            editingSong ? editingSong.barsBase : undefined,
+            editingSong ? editingSong.originalContext : undefined,
+            editingSong ? editingSong.originalTempo : [ 120, 4 ]
+        );
+
+        if (newSong) {
+            this._editingChart.addBar(0, this._getInitialBar())
+        }
+    }
+
     private _updateSongTitle = (title?: string) => {
         let songUpdate = Util.copyObject(this.state.editingSong) as ISong;
 
@@ -417,22 +467,6 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
             editingTitle: undefined, 
             errorMessage: ""
         });
-    }
-
-    private _onChooseEditSongAsync = async (chartId: string) => {
-        let editingSong = await Api.getSongAsync(chartId)
-            
-        if (editingSong) {
-            this.setState({ 
-                editingSong, 
-                updatingChartId: chartId 
-            }, this._resetChart);
-        }
-    }
-
-    private _onDeleteSongAsync = async (chartId: string) => {
-        await Api.deleteSongAsync(chartId);
-        await this._refreshSongTitlesAsync();
     }
 
     private _refreshSongTitlesAsync = async() => {

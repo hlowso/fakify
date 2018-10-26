@@ -2,7 +2,7 @@ import crypto from "crypto";
 import uuidv4 from "uuid/v4";
 import bcrypt from "bcryptjs";
 import { IIncomingUser, ISong, NoteName, Tempo, IChartBar, ISession, ChartResponse, SignupResponse, IUser, IDataHelper } from "../shared/types";
-import { MAX_TITLE_LENGTH, MIN_PASSWORD_LENGTH, EMAIL_REGEX, USER_COUNT_LIMIT, CHART_COUNT_LIMIT, USER_CHART_COUNT_LIMIT } from "../shared/Constants";
+import { MAX_TITLE_LENGTH, MIN_PASSWORD_LENGTH, EMAIL_REGEX, USER_LIMIT, CHART_LIMIT, USER_CHART_LIMIT } from "../shared/Constants";
 import Chart from "../shared/music/Chart";
 import * as Mongo from "mongodb";
 
@@ -80,7 +80,7 @@ export class ApiHelper {
 
         let userCount = await this._data.countUsersAsync();
 
-        if (userCount >= USER_COUNT_LIMIT) {
+        if (userCount >= USER_LIMIT) {
             return SignupResponse.Error;
         }
 
@@ -144,13 +144,13 @@ export class ApiHelper {
 
         let chartCount = await this._data.countChartsAsync();
 
-        if (chartCount >= CHART_COUNT_LIMIT) {
+        if (chartCount >= CHART_LIMIT) {
             return ChartResponse.ChartLimit;
         }
 
         chartCount = await this._data.countChartsAsync(userId);
 
-        if (chartCount >= USER_CHART_COUNT_LIMIT) {
+        if (chartCount >= USER_CHART_LIMIT) {
             return ChartResponse.UserChartLimit;
         }
 
@@ -180,7 +180,7 @@ export class ApiHelper {
         }
 
         for (let prop in chart) {
-            if ([ "title", "originalContext", "originalTempo", "barsBase" ].indexOf(prop) === -1) {
+            if ([ "title", "originalContext", "originalTempo", "barsBase", "_id", "userId" ].indexOf(prop) === -1) {
                 return false;
             }
         }
