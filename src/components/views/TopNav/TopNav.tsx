@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import * as Util from "../../../shared/Util";
 import { Link } from "react-router-dom";
-import * as Api from "../../../shared/Api"; 
+import * as Api from "../../../shared/Api";
+import { containerStyles } from "./TopNavMobileStyles";
 import "./TopNav.css";
 
 export interface INavUser {
@@ -24,8 +25,9 @@ class TopNav extends Component<ITopNavProps, {}> {
     }
 
     public render() {
+        let { isMobile } = this.props;
         return (
-            <header className="nav-container">
+            <header className="nav-container" style={ isMobile ? containerStyles : undefined } >
                 <span className="nav-brand">Fakify</span>
                 {this.renderTabList()}
                 {this.renderUserSection()}

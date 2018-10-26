@@ -1,11 +1,12 @@
-import React, { Component } from "react";
+import React, { Component, CSSProperties } from "react";
 import { Link, Redirect } from "react-router-dom";
 import * as Api from "../../../shared/Api";
 import { LoginResponse } from "../../../shared/types";
+import { loginViewStyle, mobileHeaderStyle, mobileInputStyle, mobileSubmitStyle } from "./LoginViewMobileStyles";
 import "./LoginViewController.css";
 
 export interface ILoginVCProps {
-
+    isMobile?: boolean;
 }
 
 export interface ILoginVCState {
@@ -27,6 +28,8 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
     }
 
     public render() {
+        let { isMobile } = this.props;
+
         let { 
             currentEmail, 
             currentPassword, 
@@ -34,72 +37,152 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
             accessGranted 
         } = this.state;
 
+        let emailLabel = !isMobile && (
+            <td>
+                <label>Email:</label>
+            </td>
+        );
+
+        let passwordLabel = !isMobile && (
+            <td>
+                <label>Password:</label>   
+            </td>
+        );
+
+        let emailInput = (
+            <input 
+                style={isMobile ? mobileInputStyle : undefined}
+                type="email"
+                value={currentEmail}
+                name="currentEmail"
+                placeholder="example@gmail.com"
+                onChange={this._handleInputChange}
+            />
+        );
+
+        let passwordInput = (
+            <input
+                style={isMobile ? mobileInputStyle : undefined}
+                type="password"
+                value={currentPassword}
+                name="currentPassword"
+                placeholder="password"
+                onChange={this._handleInputChange}
+            />
+        );
+
+        let submitInput = (
+            <input
+                style={isMobile ? mobileSubmitStyle: undefined}
+                type="submit"
+                value="Login"
+            />
+        );
+
+        let signupLink = (
+            <Link to="/signup">Don't have an account?</Link>
+        );
+
+        let errorElem = !!errorMessage && (
+            <span className="error">{errorMessage}</span>
+        );
+
+        let content = (
+            isMobile 
+                ? this.renderContentMobile(emailInput, passwordInput, submitInput, signupLink, errorElem)
+                : this.renderContentDesktop(emailLabel, emailInput, passwordLabel, passwordInput, submitInput, signupLink, errorElem)
+        );
+
         return accessGranted 
                 ? <Redirect to="/play" /> 
                 : (
-                    <div id="login-view">
-                        <div className="login-container header-container">
+                    <div id="login-view" style={isMobile ? loginViewStyle : undefined} >
+                        <div className="login-container header-container" style={isMobile ? mobileHeaderStyle : undefined}>
                             <h1>Login</h1>                
                         </div>
-                        <div className="login-container form-container">
-                            <form onSubmit={this._handleSubmitAsync}>
-                                <table style={{width: "100%"}}>
-                                    <col style={{width: "30%"}} />
-                                    <col style={{width: "70%"}} />
-                                    
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <label>Email:</label>
-                                            </td>
-                                            <td>
-                                                <input 
-                                                    type="email"
-                                                    value={currentEmail}
-                                                    name="currentEmail"
-                                                    placeholder="example@gmail.com"
-                                                    onChange={this._handleInputChange}
-                                                />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <label>Password:</label>   
-                                            </td>
-                                            <td>
-                                                <input
-                                                    type="password"
-                                                    value={currentPassword}
-                                                    name="currentPassword"
-                                                    placeholder="password"
-                                                    onChange={this._handleInputChange}
-                                                />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td />
-                                            <td>
-                                                <input
-                                                    type="submit"
-                                                    value="Login"
-                                                />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                            <div>
-                                                <Link to="/signup">Don't have an account?</Link>
-                                            </div>
-                                            </td>
-                                            <td>
-                                                {errorMessage && <span className="error">{errorMessage}</span>}
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </form>
-                        </div>
+                        {content}
                     </div>
+        );
+    }
+
+    public renderContentMobile(
+        emailInput: JSX.Element, 
+        passwordInput: JSX.Element, 
+        submitInput: JSX.Element, 
+        signupLink: JSX.Element, 
+        errorElem: JSX.Element | boolean
+    ) {
+        let styles = { 
+            display: "flex", 
+            flexDirection: "column",
+            alignItems: "center",
+            backgroundColor: "#666",
+            width: "100%",
+            height: "400px",
+            marginTop: 20, 
+            paddingTop: 40
+        } as CSSProperties;
+
+        return (
+            <div style={styles}>
+                {emailInput}
+                {passwordInput}
+                {submitInput}
+                {errorElem}
+                {signupLink}
+            </div>
+        );
+    }
+
+    public renderContentDesktop(
+        emailLabel: JSX.Element | boolean, 
+        emailInput: JSX.Element, 
+        passwordLabel: JSX.Element | boolean, 
+        passwordInput: JSX.Element, 
+        submitInput: JSX.Element, 
+        signupLink: JSX.Element, 
+        errorElem: JSX.Element | boolean
+    ) {
+        return (
+            <div className="login-container form-container">
+                <form onSubmit={this._handleSubmitAsync}>
+                    <table style={{width: "100%"}}>
+                        <col style={{width: "30%"}} />
+                        <col style={{width: "70%"}} />
+                        
+                        <tbody>
+                            <tr>
+                                {emailLabel}
+                                <td>
+                                    {emailInput}
+                                </td>
+                            </tr>
+                            <tr>
+                                {passwordLabel}
+                                <td>
+                                    {passwordInput}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td />
+                                <td>
+                                    {submitInput} 
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div>
+                                        {signupLink}
+                                    </div>
+                                </td>
+                                <td>
+                                    {errorElem}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
         );
     }
 
