@@ -6,7 +6,8 @@ import bars251 from "../bars-251";
 import barsByeBye from "../barsByeByeBlackbird";
 import bars7_4 from "../bars7_4WithCs";
 
-const user0Id = new Mongo.ObjectId("507f1f77bcf86cd799439011");
+export const password = "password12"
+export const user0Id = new Mongo.ObjectId("507f1f77bcf86cd799439011");
 
 export default class MockDataHelper implements IDataHelper {
 
@@ -17,7 +18,7 @@ export default class MockDataHelper implements IDataHelper {
     private _user0: IUser = { 
         _id: user0Id, 
         email: "test@automation.com", 
-        passhash: "garbage", 
+        passhash: "$2a$10$b1h3UH5N6qHBcSfkKQwAIe0ndQVtYIp0JujrgttYLzl6OofCYL24O", 
         token: "secret_token", 
         userId: "user0" 
     };
@@ -118,7 +119,7 @@ export default class MockDataHelper implements IDataHelper {
     }
 
     public getChartAsync = (_id?: Mongo.ObjectId) => {
-        let chart = this._allCharts.find(c => c._id === _id);
+        let chart = this._allCharts.find(c => (c._id as Mongo.ObjectId).equals(_id as Mongo.ObjectId));
         return this._return(chart || null);
     }
 
@@ -131,12 +132,12 @@ export default class MockDataHelper implements IDataHelper {
         return this._return(!!chart);
     }
 
-    public updateChartAsync = (chart: ISong, _id?: Mongo.ObjectId) => {
-        return this._return(this._allCharts.some(c => c._id === _id));
+    public updateChartAsync = (chart: ISong, _id?: Mongo.ObjectId, userId?: Mongo.ObjectId) => {
+        return this._return(this._allCharts.some(c => (c._id as Mongo.ObjectId).equals(_id as Mongo.ObjectID) && (c.userId as Mongo.ObjectId).equals(userId as Mongo.ObjectId)));
     }
 
-    public deleteChartAsync = (_id?: Mongo.ObjectId) => {
-        return this._return(this._allCharts.some(c => c._id === _id) ? 1 : 0);
+    public deleteChartAsync = (_id?: Mongo.ObjectId, userId?: Mongo.ObjectId) => {
+        return this._return(this._allCharts.some(c => (c._id as Mongo.ObjectId).equals(_id as Mongo.ObjectID) && (c.userId as Mongo.ObjectId).equals(userId as Mongo.ObjectId)) ? 1 : 0 );
     }
 
     /**

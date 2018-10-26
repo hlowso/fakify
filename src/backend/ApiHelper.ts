@@ -86,7 +86,7 @@ export class ApiHelper {
 
         let user: IUser = { 
             email: newUser.email, 
-            passhash: bcrypt.hashSync(newUser.password, 10), 
+            passhash: await bcrypt.hash(newUser.password, 10), 
             token: uuidv4() 
         };
 
@@ -99,7 +99,7 @@ export class ApiHelper {
         return user;
     }
 
-    public loginUserAsync = async (returningUser: IIncomingUser) => {
+    public loginUserAsync = async (returningUser: IIncomingUser): Promise<IUser | null> => {
         let existingUser = await this._data.getUserByEmailAsync(returningUser.email);   
 
         if (!existingUser) {
@@ -118,7 +118,7 @@ export class ApiHelper {
             return null;
         }
 
-        return { ...existingUser, token: newToken};
+        return { ...existingUser, token: newToken} as IUser;
     }
 
     // CHARTS
@@ -138,20 +138,20 @@ export class ApiHelper {
             return ChartResponse.Invalid;
         }
 
-        if (await this.chartTitleExistsAsync(chart.title as string)) {
+        if (await this._data.getChartByTitleAsync(chart.title as string)) {
             return ChartResponse.TitleTaken;
         }
 
         let chartCount = await this._data.countChartsAsync();
 
         if (chartCount >= CHART_COUNT_LIMIT) {
-            return ChartResponse.ChartCount;
+            return ChartResponse.ChartLimit;
         }
 
         chartCount = await this._data.countChartsAsync(userId);
 
         if (chartCount >= USER_CHART_COUNT_LIMIT) {
-            return ChartResponse.UserChartCount;
+            return ChartResponse.UserChartLimit;
         }
 
         chart.userId = userId;
@@ -159,26 +159,18 @@ export class ApiHelper {
         return (await this._data.insertChartAsync(chart)) ? ChartResponse.OK : ChartResponse.Error;
     }
 
-    public updateChartAsync = async (chart: ISong, chartId?: Mongo.ObjectId, ): Promise<ChartResponse> => {
+    public updateChartAsync = async (chart: ISong, chartId?: Mongo.ObjectId, userId?: Mongo.ObjectId): Promise<ChartResponse> => {
         if (!this._validSong(chart)) {
             return ChartResponse.Invalid;
         }
 
-        if (await this.chartTitleExistsAsync(chart.title as string)) {
+        let existingChart = await this._data.getChartByTitleAsync(chart.title as string);
+
+        if (existingChart && !(existingChart._id as Mongo.ObjectId).equals(chartId as Mongo.ObjectId)) {
             return ChartResponse.TitleTaken;
         }
 
-        return (await this._data.updateChartAsync(chart, chartId)) ? ChartResponse.OK : ChartResponse.Error;
-    }
-
-    public chartTitleExistsAsync = async (title: string): Promise<boolean> => {
-        let existingChart = await this._data.getChartByTitleAsync(title);
-
-        if (existingChart) {
-            return true;
-        }
-
-        return false;
+        return (await this._data.updateChartAsync(chart, chartId, userId)) ? ChartResponse.OK : ChartResponse.Unauthorized;
     }
 
     // TODO: validSong() should live elsewhere...

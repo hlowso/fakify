@@ -55,7 +55,7 @@ export class ChartsController extends PreCompController {
             let result: ChartResponse | undefined;
 
             try {
-                result = await this._api.updateChartAsync(req.body as ISong, chartId || undefined);
+                result = await this._api.updateChartAsync(req.body as ISong, chartId || undefined, (this._user as IUser)._id as Mongo.ObjectId);
             } catch (err) {
                 res.status(500);
                 res.json(ChartResponse.Error);
@@ -69,7 +69,7 @@ export class ChartsController extends PreCompController {
             let deleteCount = 0;
 
             try {
-                deleteCount = await this._api.data.deleteChartAsync(chartId || undefined)
+                deleteCount = await this._api.data.deleteChartAsync(chartId || undefined, (this._user as IUser)._id as Mongo.ObjectId)
             } catch (err) {
                 res.status(500);
                 return res.json(0);
@@ -120,8 +120,8 @@ export class ChartsController extends PreCompController {
                 break;
 
             case ChartResponse.TitleTaken:
-            case ChartResponse.ChartCount:
-            case ChartResponse.UserChartCount:
+            case ChartResponse.ChartLimit:
+            case ChartResponse.UserChartLimit:
                 res.status(403);
                 break;
             

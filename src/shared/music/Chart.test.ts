@@ -5,6 +5,7 @@ import _4_chord_bars from "../test-data/bars-4-chords";
 import bars7_4 from "../test-data/bars-7-4-bar";
 import bars7_4WithCs from "../test-data/bars7_4WithCs";
 import barsByeByeBlackBird from "../test-data/barsByeByeBlackbird";
+import barsInvalidDueToTooManyBeatsInOneBar from "../test-data/barsInvalid";
 import { chordStretches251InBbMajor } from "../test-data/chordStretches251InBbMajor";
 import { Feel, IChartBar, IChordStretch, IChordSegment } from "../types";
 
@@ -24,6 +25,10 @@ test("valid time signature returns true when time signature is valid", () => {
 
 test("validBaseBars returns true when passed an array with a single valid 7 / 4 bar", () => {
 	expect(Chart.validBaseBars(bars7_4 as IChartBar[])).toBeTruthy();
+});
+
+test("validBaseBars returns false when passed an array in which 1 bar has too many beats in chordSegments for the bar's time signature", () => {
+	expect(Chart.validBaseBars(barsInvalidDueToTooManyBeatsInOneBar as IChartBar[])).toBeFalsy();
 });
 
 test("chordStretches are generated properly", () => {

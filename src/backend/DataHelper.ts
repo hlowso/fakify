@@ -184,16 +184,16 @@ export class DataHelper implements IDataHelper {
         });
     }
 
-    public updateChartAsync = (chart: ISong, _id?: Mongo.ObjectId): Promise<boolean> => {
+    public updateChartAsync = (chart: ISong, _id?: Mongo.ObjectId, userId?: Mongo.ObjectId): Promise<boolean> => {
         let { title, originalContext, originalTempo, barsBase } = chart;
         let updateSet = { $set: { title, originalContext, originalTempo, barsBase } };
 
         return new Promise((resolve, reject) => {
-            if (!_id) {
+            if (!_id || !userId) {
                 resolve(false);
             }
 
-            this._chartColl.updateOne({ _id }, updateSet, (err, response) => {
+            this._chartColl.updateOne({ _id, userId }, updateSet, (err, response) => {
                 if (err !== null) {
                     reject(err);
                 }
@@ -203,13 +203,13 @@ export class DataHelper implements IDataHelper {
         });
     }
 
-    public deleteChartAsync = (_id?: Mongo.ObjectId): Promise<number> => {
+    public deleteChartAsync = (_id?: Mongo.ObjectId, userId?: Mongo.ObjectId): Promise<number> => {
         return new Promise((resolve, reject) => {
-            if (!_id) {
-                reject("chartId cannot be falsey");
+            if (!_id || !userId) {
+                resolve(0);
             }
 
-            this._chartColl.deleteOne({ _id }, (err, response) => {
+            this._chartColl.deleteOne({ _id, userId }, (err, response) => {
                 if (err !== null) {
                     reject(err);
                 }

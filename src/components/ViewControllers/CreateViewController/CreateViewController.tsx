@@ -328,8 +328,9 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                 return this.setState({ errorMessage: result });
 
             case ChartResponse.Invalid:
-            case ChartResponse.ChartCount:
-            case ChartResponse.UserChartCount:
+            case ChartResponse.ChartLimit:
+            case ChartResponse.UserChartLimit:
+            case ChartResponse.Unauthorized:
             case ChartResponse.Error:
             default:
                 return this.setState({ errorMessage: ChartResponse.Error });

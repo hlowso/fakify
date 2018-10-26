@@ -8240,10 +8240,11 @@ const StandardRoutes = [
 var ChartResponse;
 (function (ChartResponse) {
     ChartResponse["OK"] = "OK";
-    ChartResponse["ChartCount"] = "There is no more space in the database for charts";
-    ChartResponse["UserChartCount"] = "User has reached chart limit";
+    ChartResponse["ChartLimit"] = "There is no more space in the database for charts";
+    ChartResponse["UserChartLimit"] = "User has reached chart limit";
     ChartResponse["TitleTaken"] = "A chart with this name already exists";
     ChartResponse["Invalid"] = "The chart is invalid";
+    ChartResponse["Unauthorized"] = "User is not authorized to access this chart";
     ChartResponse["Error"] = "Cannot create or update charts right now, try again soon";
 })(ChartResponse || (ChartResponse = {}));
 var LoginResponse;
@@ -33367,8 +33368,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_express___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_express__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_body_parser__ = __webpack_require__(201);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_body_parser___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_body_parser__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__PreCompData__ = __webpack_require__(246);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PreCompApiHelper__ = __webpack_require__(282);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_DataHelper__ = __webpack_require__(246);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_ApiHelper__ = __webpack_require__(282);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__controllers_api_AdminController__ = __webpack_require__(291);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__controllers_api_ChartsController__ = __webpack_require__(292);
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -33402,7 +33403,7 @@ const exitHandler = (data, options, exitCode) => {
          */
         const { PORT, MONGO_SERVER, MONGO_USER, MONGO_PASSWORD, MONGO_DATABASE_NAME, SESSION_SECRET } = Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"});
         // Create database helper
-        const data = new __WEBPACK_IMPORTED_MODULE_2__PreCompData__["a" /* PreCompData */](MONGO_SERVER, MONGO_USER, MONGO_PASSWORD, MONGO_DATABASE_NAME);
+        const data = new __WEBPACK_IMPORTED_MODULE_2_DataHelper__["a" /* DataHelper */](MONGO_SERVER, MONGO_USER, MONGO_PASSWORD, MONGO_DATABASE_NAME);
         try {
             yield data.connectAsync();
         }
@@ -33411,7 +33412,7 @@ const exitHandler = (data, options, exitCode) => {
             return;
         }
         // Create api helper
-        const api = new __WEBPACK_IMPORTED_MODULE_3__PreCompApiHelper__["a" /* PreCompApiHelper */](data, SESSION_SECRET);
+        const api = new __WEBPACK_IMPORTED_MODULE_3_ApiHelper__["a" /* ApiHelper */](data, SESSION_SECRET);
         // Setup server
         const server = __WEBPACK_IMPORTED_MODULE_0_express___default()();
         server.use(__WEBPACK_IMPORTED_MODULE_0_express___default.a.static('public'));
@@ -52851,7 +52852,7 @@ module.exports = function (str, opts) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mongodb__ = __webpack_require__(117);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mongodb___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_mongodb__);
 
-class PreCompData {
+class DataHelper {
     constructor(server, user, password, dbName) {
         this.connectAsync = () => {
             return new Promise((resolve, reject) => {
@@ -52903,7 +52904,7 @@ class PreCompData {
                     if (err !== null) {
                         reject(err);
                     }
-                    resolve(response);
+                    resolve(response.insertedCount === 1);
                 });
             });
         };
@@ -52913,7 +52914,7 @@ class PreCompData {
                     if (err != null) {
                         reject(err);
                     }
-                    resolve(response);
+                    resolve(response.matchedCount === 1);
                 });
             });
         };
@@ -52957,6 +52958,9 @@ class PreCompData {
         };
         this.getChartByTitleAsync = (title) => {
             return new Promise((resolve, reject) => {
+                if (!title || typeof title !== "string") {
+                    resolve(null);
+                }
                 this._chartColl.findOne({ title }, (err, chart) => {
                     if (err !== null) {
                         reject(err);
@@ -52975,14 +52979,14 @@ class PreCompData {
                 });
             });
         };
-        this.updateChartAsync = (chart, _id) => {
+        this.updateChartAsync = (chart, _id, userId) => {
             let { title, originalContext, originalTempo, barsBase } = chart;
             let updateSet = { $set: { title, originalContext, originalTempo, barsBase } };
             return new Promise((resolve, reject) => {
-                if (!_id) {
+                if (!_id || !userId) {
                     resolve(false);
                 }
-                this._chartColl.updateOne({ _id }, updateSet, (err, response) => {
+                this._chartColl.updateOne({ _id, userId }, updateSet, (err, response) => {
                     if (err !== null) {
                         reject(err);
                     }
@@ -52990,12 +52994,12 @@ class PreCompData {
                 });
             });
         };
-        this.deleteChartAsync = (_id) => {
+        this.deleteChartAsync = (_id, userId) => {
             return new Promise((resolve, reject) => {
-                if (!_id) {
-                    reject("chartId cannot be falsey");
+                if (!_id || !userId) {
+                    resolve(0);
                 }
-                this._chartColl.deleteOne({ _id }, (err, response) => {
+                this._chartColl.deleteOne({ _id, userId }, (err, response) => {
                     if (err !== null) {
                         reject(err);
                     }
@@ -53015,7 +53019,7 @@ class PreCompData {
         return `mongodb://${this._user}:${this._password}@${this._mongoServer}/${this._dbName}`;
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = PreCompData;
+/* harmony export (immutable) */ __webpack_exports__["a"] = DataHelper;
 
 ;
 
@@ -71302,11 +71306,11 @@ function getDecryptor(secret) {
     };
     return decrypt;
 }
-class PreCompApiHelper {
+class ApiHelper {
     constructor(data, secret) {
         // USERS
         this.createUserAsync = (newUser) => __awaiter(this, void 0, void 0, function* () {
-            if (newUser.password.length < __WEBPACK_IMPORTED_MODULE_4__shared_Constants__["c" /* MIN_PASSWORD_LENGTH */] || !__WEBPACK_IMPORTED_MODULE_4__shared_Constants__["a" /* EMAIL_REGEX */].test(newUser.email)) {
+            if (newUser.password.length < __WEBPACK_IMPORTED_MODULE_4__shared_Constants__["d" /* MIN_PASSWORD_LENGTH */] || !__WEBPACK_IMPORTED_MODULE_4__shared_Constants__["b" /* EMAIL_REGEX */].test(newUser.email)) {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["e" /* SignupResponse */].InvalidCredentials;
             }
             let existingUser = yield this._data.getUserByEmailAsync(newUser.email);
@@ -71314,15 +71318,18 @@ class PreCompApiHelper {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["e" /* SignupResponse */].EmailTaken;
             }
             let userCount = yield this._data.countUsersAsync();
-            if (userCount >= 5000) {
+            if (userCount >= __WEBPACK_IMPORTED_MODULE_4__shared_Constants__["f" /* USER_COUNT_LIMIT */]) {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["e" /* SignupResponse */].Error;
             }
             let user = {
                 email: newUser.email,
-                passhash: __WEBPACK_IMPORTED_MODULE_2_bcryptjs___default.a.hashSync(newUser.password, 10),
+                passhash: yield __WEBPACK_IMPORTED_MODULE_2_bcryptjs___default.a.hash(newUser.password, 10),
                 token: __WEBPACK_IMPORTED_MODULE_1_uuid_v4___default()()
             };
-            yield this._data.insertUserAsync(user);
+            let success = yield this._data.insertUserAsync(user);
+            if (!success) {
+                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["e" /* SignupResponse */].Error;
+            }
             return user;
         });
         this.loginUserAsync = (returningUser) => __awaiter(this, void 0, void 0, function* () {
@@ -71334,7 +71341,10 @@ class PreCompApiHelper {
                 return null;
             }
             let newToken = __WEBPACK_IMPORTED_MODULE_1_uuid_v4___default()();
-            yield this._data.updateUserTokenAsync(existingUser.email, newToken);
+            let success = yield this._data.updateUserTokenAsync(existingUser.email, newToken);
+            if (!success) {
+                return null;
+            }
             return Object.assign({}, existingUser, { token: newToken });
         });
         // CHARTS
@@ -71349,35 +71359,29 @@ class PreCompApiHelper {
             if (!this._validSong(chart)) {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].Invalid;
             }
-            if (yield this.chartTitleExistsAsync(chart.title)) {
+            if (yield this._data.getChartByTitleAsync(chart.title)) {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].TitleTaken;
             }
             let chartCount = yield this._data.countChartsAsync();
-            if (chartCount >= 5000) {
-                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].ChartCount;
+            if (chartCount >= __WEBPACK_IMPORTED_MODULE_4__shared_Constants__["a" /* CHART_COUNT_LIMIT */]) {
+                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].ChartLimit;
             }
             chartCount = yield this._data.countChartsAsync(userId);
-            if (chartCount >= 100) {
-                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].UserChartCount;
+            if (chartCount >= __WEBPACK_IMPORTED_MODULE_4__shared_Constants__["e" /* USER_CHART_COUNT_LIMIT */]) {
+                return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].UserChartLimit;
             }
             chart.userId = userId;
             return (yield this._data.insertChartAsync(chart)) ? __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].OK : __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].Error;
         });
-        this.updateChartAsync = (chart, chartId) => __awaiter(this, void 0, void 0, function* () {
+        this.updateChartAsync = (chart, chartId, userId) => __awaiter(this, void 0, void 0, function* () {
             if (!this._validSong(chart)) {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].Invalid;
             }
-            if (yield this.chartTitleExistsAsync(chart.title)) {
+            let existingChart = yield this._data.getChartByTitleAsync(chart.title);
+            if (existingChart && !existingChart._id.equals(chartId)) {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].TitleTaken;
             }
-            return (yield this._data.updateChartAsync(chart, chartId)) ? __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].OK : __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].Error;
-        });
-        this.chartTitleExistsAsync = (title) => __awaiter(this, void 0, void 0, function* () {
-            let existingChart = yield this._data.getChartByTitleAsync(title);
-            if (existingChart) {
-                return true;
-            }
-            return false;
+            return (yield this._data.updateChartAsync(chart, chartId, userId)) ? __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].OK : __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].Unauthorized;
         });
         // TODO: validSong() should live elsewhere...
         this._validSong = (chart) => {
@@ -71390,7 +71394,7 @@ class PreCompApiHelper {
                 }
             }
             let { title, originalContext, originalTempo, barsBase } = chart;
-            if (typeof title !== "string" || title.length > __WEBPACK_IMPORTED_MODULE_4__shared_Constants__["b" /* MAX_TITLE_LENGTH */]) {
+            if (typeof title !== "string" || title.length > __WEBPACK_IMPORTED_MODULE_4__shared_Constants__["c" /* MAX_TITLE_LENGTH */]) {
                 return false;
             }
             if (!__WEBPACK_IMPORTED_MODULE_5__shared_music_Chart__["a" /* default */].validNoteName(originalContext)) {
@@ -71425,7 +71429,7 @@ class PreCompApiHelper {
         return this._data;
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = PreCompApiHelper;
+/* harmony export (immutable) */ __webpack_exports__["a"] = ApiHelper;
 
 
 
@@ -72937,13 +72941,22 @@ module.exports = __webpack_require__(287);
 
 "use strict";
 const MAX_TITLE_LENGTH = 50;
-/* harmony export (immutable) */ __webpack_exports__["b"] = MAX_TITLE_LENGTH;
+/* harmony export (immutable) */ __webpack_exports__["c"] = MAX_TITLE_LENGTH;
 
 const MIN_PASSWORD_LENGTH = 8;
-/* harmony export (immutable) */ __webpack_exports__["c"] = MIN_PASSWORD_LENGTH;
+/* harmony export (immutable) */ __webpack_exports__["d"] = MIN_PASSWORD_LENGTH;
 
 const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-/* harmony export (immutable) */ __webpack_exports__["a"] = EMAIL_REGEX;
+/* harmony export (immutable) */ __webpack_exports__["b"] = EMAIL_REGEX;
+
+const USER_COUNT_LIMIT = 5000;
+/* harmony export (immutable) */ __webpack_exports__["f"] = USER_COUNT_LIMIT;
+
+const CHART_COUNT_LIMIT = 5000;
+/* harmony export (immutable) */ __webpack_exports__["a"] = CHART_COUNT_LIMIT;
+
+const USER_CHART_COUNT_LIMIT = 100;
+/* harmony export (immutable) */ __webpack_exports__["e"] = USER_CHART_COUNT_LIMIT;
 
 
 
@@ -74173,8 +74186,8 @@ class ChartsController extends __WEBPACK_IMPORTED_MODULE_0__PreCompController__[
                     res.status(500);
                     break;
                 case __WEBPACK_IMPORTED_MODULE_1__shared_types__["a" /* ChartResponse */].TitleTaken:
-                case __WEBPACK_IMPORTED_MODULE_1__shared_types__["a" /* ChartResponse */].ChartCount:
-                case __WEBPACK_IMPORTED_MODULE_1__shared_types__["a" /* ChartResponse */].UserChartCount:
+                case __WEBPACK_IMPORTED_MODULE_1__shared_types__["a" /* ChartResponse */].ChartLimit:
+                case __WEBPACK_IMPORTED_MODULE_1__shared_types__["a" /* ChartResponse */].UserChartLimit:
                     res.status(403);
                     break;
                 case __WEBPACK_IMPORTED_MODULE_1__shared_types__["a" /* ChartResponse */].OK:
@@ -74221,7 +74234,7 @@ class ChartsController extends __WEBPACK_IMPORTED_MODULE_0__PreCompController__[
             let chartId = this.parseObjectId(req.params.chartId);
             let result;
             try {
-                result = yield this._api.updateChartAsync(req.body, chartId || undefined);
+                result = yield this._api.updateChartAsync(req.body, chartId || undefined, this._user._id);
             }
             catch (err) {
                 res.status(500);
@@ -74233,7 +74246,7 @@ class ChartsController extends __WEBPACK_IMPORTED_MODULE_0__PreCompController__[
             let chartId = this.parseObjectId(req.params.chartId);
             let deleteCount = 0;
             try {
-                deleteCount = yield this._api.data.deleteChartAsync(chartId || undefined);
+                deleteCount = yield this._api.data.deleteChartAsync(chartId || undefined, this._user._id);
             }
             catch (err) {
                 res.status(500);

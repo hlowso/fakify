@@ -12,8 +12,8 @@ export interface IDataHelper {
     getChartAsync: (_id?: Mongo.ObjectId) => Promise<ISong | null>;
     getChartByTitleAsync: (title: string) => Promise<ISong | null>;
     insertChartAsync: (chart: ISong) => Promise<boolean>;
-    updateChartAsync: (chart: ISong, _id?: Mongo.ObjectId) => Promise<boolean>;
-    deleteChartAsync: (_id?: Mongo.ObjectId) => Promise<number>;
+    updateChartAsync: (chart: ISong, _id?: Mongo.ObjectId, userId?: Mongo.ObjectId) => Promise<boolean>;
+    deleteChartAsync: (_id?: Mongo.ObjectId, userId?: Mongo.ObjectId) => Promise<number>;
 }
 
 export interface IMockDataHelperOptions {
@@ -54,10 +54,11 @@ export const StandardRoutes = [
 
 export enum ChartResponse {
     OK = "OK",
-    ChartCount = "There is no more space in the database for charts",
-    UserChartCount = "User has reached chart limit",
+    ChartLimit = "There is no more space in the database for charts",
+    UserChartLimit = "User has reached chart limit",
     TitleTaken = "A chart with this name already exists",
     Invalid = "The chart is invalid",
+    Unauthorized = "User is not authorized to access this chart",
     Error = "Cannot create or update charts right now, try again soon"
 }
 
