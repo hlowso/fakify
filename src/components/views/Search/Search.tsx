@@ -143,6 +143,7 @@ export class Search extends Component<ISearchProps, ISearchState> {
                 query &&
                 typeof title === "string" && 
                 typeof query === "string" && 
+                query.trim() &&
                 title.toLowerCase().startsWith(query.trim().toLowerCase())
             );
 
