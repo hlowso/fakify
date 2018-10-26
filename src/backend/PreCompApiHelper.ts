@@ -2,7 +2,7 @@ import crypto from "crypto";
 import uuidv4 from "uuid/v4";
 import bcrypt from "bcryptjs";
 import { IIncomingUser, ISong, NoteName, Tempo, IChartBar, ISession, ChartResponse, SignupResponse, IUser, IDataHelper } from "../shared/types";
-import { MAX_TITLE_LENGTH, MIN_PASSWORD_LENGTH, EMAIL_REGEX } from "../shared/Constants";
+import { MAX_TITLE_LENGTH, MIN_PASSWORD_LENGTH, EMAIL_REGEX, USER_COUNT_LIMIT, CHART_COUNT_LIMIT, USER_CHART_COUNT_LIMIT } from "../shared/Constants";
 import Chart from "../shared/music/Chart";
 import * as Mongo from "mongodb";
 
@@ -80,7 +80,7 @@ export class PreCompApiHelper {
 
         let userCount = await this._data.countUsersAsync();
 
-        if (userCount >= 5000) {
+        if (userCount >= USER_COUNT_LIMIT) {
             return SignupResponse.Error;
         }
 
@@ -144,13 +144,13 @@ export class PreCompApiHelper {
 
         let chartCount = await this._data.countChartsAsync();
 
-        if (chartCount >= 5000) {
+        if (chartCount >= CHART_COUNT_LIMIT) {
             return ChartResponse.ChartCount;
         }
 
         chartCount = await this._data.countChartsAsync(userId);
 
-        if (chartCount >= 100) {
+        if (chartCount >= USER_CHART_COUNT_LIMIT) {
             return ChartResponse.UserChartCount;
         }
 

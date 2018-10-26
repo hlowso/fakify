@@ -16,6 +16,13 @@ export interface IDataHelper {
     deleteChartAsync: (_id?: Mongo.ObjectId) => Promise<number>;
 }
 
+export interface IMockDataHelperOptions {
+    throwError?: boolean;
+    userCountLimit?: boolean;
+    chartCountLimit?: boolean;
+    userChartCountLimit?: boolean;
+}
+
 export interface ISession {
     token: string;
 }
