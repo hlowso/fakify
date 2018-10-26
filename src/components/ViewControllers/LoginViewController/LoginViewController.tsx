@@ -2,7 +2,7 @@ import React, { Component, CSSProperties } from "react";
 import { Link, Redirect } from "react-router-dom";
 import * as Api from "../../../shared/Api";
 import { LoginResponse } from "../../../shared/types";
-import { loginViewStyle, mobileHeaderStyle, mobileInputStyle, mobileSubmitStyle } from "./LoginViewMobileStyles";
+import { loginViewStyle, mobileHeaderStyle, mobileInputStyle, mobileSubmitStyle, mobileSignupLinkStyle, mobileErrorStyle } from "./LoginViewMobileStyles";
 import "./LoginViewController.css";
 
 export interface ILoginVCProps {
@@ -22,7 +22,7 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
         this.state = {
             currentEmail: "",
             currentPassword: "",
-            errorMessage: "",
+            errorMessage: "foooooooo",
             accessGranted: false
         };
     }
@@ -71,20 +71,26 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
             />
         );
 
-        let submitInput = (
-            <input
+        let submitInput = isMobile ? (
+            <button
                 style={isMobile ? mobileSubmitStyle: undefined}
-                type="submit"
+                onClick={isMobile ? this._handleSubmitAsync : undefined}
+            >
+                Login
+            </button>
+        ) : (
+            <input
+                type={isMobile ? undefined : "submit"}
                 value="Login"
             />
         );
 
         let signupLink = (
-            <Link to="/signup">Don't have an account?</Link>
+            <Link to="/signup" style={ isMobile ? mobileSignupLinkStyle : undefined } >Don't have an account?</Link>
         );
 
         let errorElem = !!errorMessage && (
-            <span className="error">{errorMessage}</span>
+            <span className="error" style={ isMobile ? mobileErrorStyle : undefined } >{errorMessage}</span>
         );
 
         let content = (
@@ -118,17 +124,21 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
             alignItems: "center",
             backgroundColor: "#666",
             width: "100%",
-            height: "400px",
-            marginTop: 20, 
-            paddingTop: 40
+            height: "300px",
+            marginTop: 5, 
+            paddingTop: 30
         } as CSSProperties;
 
         return (
             <div style={styles}>
                 {emailInput}
                 {passwordInput}
-                {submitInput}
-                {errorElem}
+                <div style={{ width: "80%", display: "flex", justifyContent: "space-between" }}>
+                    {submitInput}
+                    <div style={{ width: "50%", display: "flex", paddingLeft: 30 }} >
+                        {errorElem}
+                    </div>
+                </div>
                 {signupLink}
             </div>
         );
@@ -195,16 +205,16 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
         this.setState(stateUpdate);
     }
 
-    private _handleSubmitAsync = async (event: React.FormEvent<any>) => {
-        event.preventDefault();
+    private _handleSubmitAsync = async (event?: React.FormEvent<any>, ) => {
+        if (event) event.preventDefault();
 
         let { 
             currentEmail,
             currentPassword
-         } = event.target as any;
+         } = this.state;
 
-        let email = currentEmail.value,
-            password = currentPassword.value;
+        let email = currentEmail as string,
+            password = currentPassword as string;
 
         if (password.length === 0) {
             return this.setState({ errorMessage: "password cannot be empty" });
