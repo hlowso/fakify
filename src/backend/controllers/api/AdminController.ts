@@ -1,9 +1,9 @@
 import { UnauthorizedResponse, PreCompController } from "../PreCompController";
-import { PreCompApiHelper } from "../../PreCompApiHelper";
+import { ApiHelper } from "ApiHelper";
 import { IIncomingUser, IUser, LoginResponse, SignupResponse } from "../../../shared/types";
 
 export class AdminController extends PreCompController {
-    constructor(api: PreCompApiHelper) {
+    constructor(api: ApiHelper) {
 
         super(api);
         this._unauthorizedResponse = UnauthorizedResponse.Ignore;

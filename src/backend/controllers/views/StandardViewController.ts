@@ -1,9 +1,9 @@
 import path from "path";
 import { UnauthorizedResponse, PreCompController } from "../PreCompController";
-import { PreCompApiHelper } from "../../PreCompApiHelper";
+import { ApiHelper } from "ApiHelper";
 
 export class StandardViewController extends PreCompController {
-    constructor(api: PreCompApiHelper) {
+    constructor(api: ApiHelper) {
 
         super(api);
         this._unauthorizedResponse = UnauthorizedResponse.GoToLogin;

@@ -1,11 +1,11 @@
 import { UnauthorizedResponse, PreCompController } from "../PreCompController";
-import { PreCompApiHelper } from "../../PreCompApiHelper";
+import { ApiHelper } from "ApiHelper";
 import * as Mongo from "mongodb";
 import { Response } from "express";
 import { IUser, ISong, ChartResponse, ITitles } from "../../../shared/types";
 
 export class ChartsController extends PreCompController {
-    constructor(api: PreCompApiHelper) {
+    constructor(api: ApiHelper) {
 
         super(api);
         this._unauthorizedResponse = UnauthorizedResponse.Return401;

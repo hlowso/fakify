@@ -30,7 +30,7 @@ function getDecryptor(secret: string) {
     return decrypt;
 }
 
-export class PreCompApiHelper {
+export class ApiHelper {
     private _data: IDataHelper;
 
     public encryptSessionToken: (sessionToken?: ISession) => string | undefined;

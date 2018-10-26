@@ -1,5 +1,5 @@
 import path from "path";
-import { PreCompApiHelper } from "../PreCompApiHelper";
+import { ApiHelper } from "ApiHelper";
 import { Router } from "express";
 import { IUser, ISession } from "../../shared/types";
 import * as Mongo from "mongodb";
@@ -12,13 +12,13 @@ export enum UnauthorizedResponse {
 
 export class PreCompController {
 
-    protected _api: PreCompApiHelper;
+    protected _api: ApiHelper;
     protected _router: Router;    
     protected _unauthorizedResponse: UnauthorizedResponse;
     protected _user: IUser | null;
     protected _sessionToken?: ISession;
 
-    constructor(api: PreCompApiHelper) {
+    constructor(api: ApiHelper) {
 
         this._api = api;
         this._router = Router();

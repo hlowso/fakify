@@ -1,8 +1,8 @@
 import express from "express";
 // import cookieSession from "cookie-session";
 import bodyParser from "body-parser";
-import { DataHelper } from "./PreCompData";
-import { PreCompApiHelper } from "./PreCompApiHelper";
+import { DataHelper } from "DataHelper";
+import { ApiHelper } from "ApiHelper";
 
 import { AdminController } from "./controllers/api/AdminController";
 import { ChartsController } from "./controllers/api/ChartsController";
@@ -49,7 +49,7 @@ const exitHandler = (data: DataHelper, options: any, exitCode: number) => {
     }
 
     // Create api helper
-    const api = new PreCompApiHelper(data, SESSION_SECRET as string);
+    const api = new ApiHelper(data, SESSION_SECRET as string);
 
     // Setup server
     const server = express();
