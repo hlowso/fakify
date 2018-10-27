@@ -6,10 +6,17 @@
     flex-direction: column;
 }
 
-#signup-view .mobile-header,
-#login-view .mobile-header {
-    padding: 10px;
-    margin-bottom: 20px;
+#signup-view .header-container.mobile-header,
+#login-view .header-container.mobile-header {
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+}
+
+#signup-view .header-container.mobile-header h1,
+#login-view .header-container.mobile-header h1 {
+    width: 100%;
+    margin: 0;
 }
 
 #signup-view .mobile-input,
