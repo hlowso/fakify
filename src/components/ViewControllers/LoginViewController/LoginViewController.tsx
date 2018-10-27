@@ -2,7 +2,7 @@ import React, { Component, CSSProperties } from "react";
 import { Link, Redirect } from "react-router-dom";
 import * as Api from "../../../shared/Api";
 import { LoginResponse } from "../../../shared/types";
-import { loginViewStyle, mobileHeaderStyle, mobileInputStyle, mobileSubmitStyle, mobileSignupLinkStyle, mobileErrorStyle } from "./LoginViewMobileStyles";
+import "./AdminViewMobile.css";
 import "./LoginViewController.css";
 
 export interface ILoginVCProps {
@@ -14,6 +14,7 @@ export interface ILoginVCState {
     currentPassword?: string;
     errorMessage?: string;
     accessGranted?: boolean;
+    isLoggingIn?: boolean;
 }
 
 class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
@@ -22,8 +23,9 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
         this.state = {
             currentEmail: "",
             currentPassword: "",
-            errorMessage: "foooooooo",
-            accessGranted: false
+            errorMessage: "",
+            accessGranted: false,
+            isLoggingIn: false
         };
     }
 
@@ -51,7 +53,7 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
 
         let emailInput = (
             <input 
-                style={isMobile ? mobileInputStyle : undefined}
+                className={isMobile ? "mobile-input" : undefined}
                 type="email"
                 value={currentEmail}
                 name="currentEmail"
@@ -62,7 +64,7 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
 
         let passwordInput = (
             <input
-                style={isMobile ? mobileInputStyle : undefined}
+                className={isMobile ? "mobile-input" : undefined}
                 type="password"
                 value={currentPassword}
                 name="currentPassword"
@@ -73,24 +75,24 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
 
         let submitInput = isMobile ? (
             <button
-                style={isMobile ? mobileSubmitStyle: undefined}
-                onClick={isMobile ? this._handleSubmitAsync : undefined}
+                className={"mobile-button"}
+                onClick={this._handleSubmitAsync}
             >
                 Login
             </button>
         ) : (
             <input
-                type={isMobile ? undefined : "submit"}
+                type="submit"
                 value="Login"
             />
         );
 
         let signupLink = (
-            <Link to="/signup" style={ isMobile ? mobileSignupLinkStyle : undefined } >Don't have an account?</Link>
+            <Link to="/signup" className={ isMobile ? "mobile-link" : undefined } >Don't have an account?</Link>
         );
 
-        let errorElem = !!errorMessage && (
-            <span className="error" style={ isMobile ? mobileErrorStyle : undefined } >{errorMessage}</span>
+        let errorElem = (
+            <div className={`error ${isMobile ? "mobile-error" : undefined}` } style={{ margin: isMobile ? 0 : 40 }} >{!!errorMessage ? errorMessage : ""}</div>
         );
 
         let content = (
@@ -102,8 +104,8 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
         return accessGranted 
                 ? <Redirect to="/play" /> 
                 : (
-                    <div id="login-view" style={isMobile ? loginViewStyle : undefined} >
-                        <div className="login-container header-container" style={isMobile ? mobileHeaderStyle : undefined}>
+                    <div id="login-view" className={isMobile ? "mobile-admin-view" : undefined} >
+                        <div className={ `login-container header-container ${isMobile ? "mobile-header" : undefined}` }>
                             <h1>Login</h1>                
                         </div>
                         {content}
@@ -118,6 +120,7 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
         signupLink: JSX.Element, 
         errorElem: JSX.Element | boolean
     ) {
+        let { isLoggingIn } = this.state;
         let styles = { 
             display: "flex", 
             flexDirection: "column",
@@ -125,22 +128,26 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
             backgroundColor: "#666",
             width: "100%",
             height: "300px",
-            marginTop: 5, 
+            marginTop: 15, 
             paddingTop: 30
         } as CSSProperties;
 
         return (
-            <div style={styles}>
-                {emailInput}
-                {passwordInput}
-                <div style={{ width: "80%", display: "flex", justifyContent: "space-between" }}>
-                    {submitInput}
-                    <div style={{ width: "50%", display: "flex", paddingLeft: 30 }} >
-                        {errorElem}
+            isLoggingIn 
+                ? (
+                    <div style={styles} >
+                        {this.renderLoggingInMessage()}
                     </div>
-                </div>
-                {signupLink}
-            </div>
+                )
+                : (
+                    <div style={styles}>
+                        {emailInput}
+                        {passwordInput}
+                        {submitInput}
+                        {errorElem}
+                        {signupLink}
+                    </div>
+                )   
         );
     }
 
@@ -153,45 +160,61 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
         signupLink: JSX.Element, 
         errorElem: JSX.Element | boolean
     ) {
+        let { isLoggingIn } = this.state;
+
         return (
             <div className="login-container form-container">
-                <form onSubmit={this._handleSubmitAsync}>
-                    <table style={{width: "100%"}}>
-                        <col style={{width: "30%"}} />
-                        <col style={{width: "70%"}} />
-                        
-                        <tbody>
-                            <tr>
-                                {emailLabel}
-                                <td>
-                                    {emailInput}
-                                </td>
-                            </tr>
-                            <tr>
-                                {passwordLabel}
-                                <td>
-                                    {passwordInput}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td />
-                                <td>
-                                    {submitInput} 
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div>
-                                        {signupLink}
-                                    </div>
-                                </td>
-                                <td>
-                                    {errorElem}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </form>
+            {
+                isLoggingIn
+                    ? this.renderLoggingInMessage()
+                    : (
+                        <form onSubmit={this._handleSubmitAsync}>
+                            <table style={{width: "100%"}}>
+                                <col style={{width: "30%"}} />
+                                <col style={{width: "70%"}} />
+                                
+                                <tbody>
+                                    <tr>
+                                        {emailLabel}
+                                        <td>
+                                            {emailInput}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        {passwordLabel}
+                                        <td>
+                                            {passwordInput}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td />
+                                        <td>
+                                            {submitInput} 
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div>
+                                                {signupLink}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {errorElem}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    )
+            }
+            </div>
+        );
+    }
+
+    public renderLoggingInMessage() {
+        return (
+            <div style={{ color: "white", fontSize: "150%", padding: 30 }}>
+                <span>logging in...</span>
             </div>
         );
     }
@@ -221,18 +244,19 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
         }
 
         let returningUser = { email, password };
+        this.setState({ isLoggingIn: true });
         let res = await Api.loginAsync(returningUser);
 
         switch (res) {
             case LoginResponse.BadCredentials: 
             case LoginResponse.Error:
-                return this.setState({ errorMessage: res as string });
+                return this.setState({ errorMessage: res as string, isLoggingIn: false });
 
             case LoginResponse.OK:
-                return this.setState({ accessGranted: true });
+                return this.setState({ accessGranted: true, isLoggingIn: false });
 
             default:
-                return this.setState({ errorMessage: LoginResponse.Error });
+                return this.setState({ errorMessage: LoginResponse.Error, isLoggingIn: false });
         }
     }
 };

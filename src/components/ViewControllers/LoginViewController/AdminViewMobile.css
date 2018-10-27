@@ -1,0 +1,42 @@
+#signup-view .mobile-admin-view
+#login-view .mobile-admin-view {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#signup-view .mobile-header,
+#login-view .mobile-header {
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+#signup-view .mobile-input,
+#login-view .mobile-input {
+    width: 80%;
+    margin: 0px;
+    margin-top: 10px;
+}
+
+#signup-view .mobile-button, 
+#login-view .mobile-button {
+    width: 80%;
+    margin: 0px;
+    margin-top: 10px;
+    background-color: white;
+    height: 40px;
+    border-radius: 5px;
+}
+
+#signup-view .mobile-link,
+#login-view .mobile-link {
+    margin-top: 20px;
+}
+
+#signup-view .mobile-error,
+#login-view .mobile-error {
+    align-self: center;
+    padding: 10px;
+    height: 40px;
+}
