@@ -1,14 +1,16 @@
-#signup-view .mobile-admin-view
-#login-view .mobile-admin-view {
+#signup-view.mobile-admin-view,
+#login-view.mobile-admin-view {
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
 #signup-view .header-container.mobile-header,
 #login-view .header-container.mobile-header {
     width: 100%;
+    max-width: 400px;
     margin: 0;
     padding: 20px;
 }

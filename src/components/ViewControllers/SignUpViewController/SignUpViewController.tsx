@@ -137,7 +137,10 @@ class SignUpViewController extends Component<ISignUpVCProps, ISignUpVCState> {
             alignItems: "center",
             backgroundColor: "#666",
             width: "100%",
+            maxWidth: "400px",
             height: "350px",
+            borderRadius: "5px",
+            margin: 0,
             marginTop: 15, 
             paddingTop: 30
         };

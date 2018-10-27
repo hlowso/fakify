@@ -127,7 +127,10 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
             alignItems: "center",
             backgroundColor: "#666",
             width: "100%",
+            maxWidth: "400px",
             height: "300px",
+            borderRadius: "5px",
+            margin: 0,
             marginTop: 15, 
             paddingTop: 30
         } as CSSProperties;
