@@ -4,6 +4,7 @@ import * as Api from "../../shared/Api";
 import { IUser, Tab } from "../../shared/types";
 
 export interface IAuthenticatorProps {
+    isMobile: boolean;
     setUser: (user: IUser) => void;
     redirect: (tab: Tab) => void;
 }
@@ -29,7 +30,7 @@ class Authenticator extends Component<IAuthenticatorProps, IAuthenticatorState> 
 
         return authenticating 
             ? this.renderAuthenticatingMessage()
-            : <AppRouter />;
+            : <AppRouter isMobile={this.props.isMobile} />;
     }
 
     public renderAuthenticatingMessage = () => (

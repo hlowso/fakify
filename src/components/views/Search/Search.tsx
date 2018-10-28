@@ -33,7 +33,7 @@ export class Search extends Component<ISearchProps, ISearchState> {
         let matchElems = this.renderMatchElements();
 
         return (
-            <div id="search" style={{ display: "flex", flexDirection: "column", width: "40%" }} >
+            <div id="search" style={{ display: "flex", flexDirection: "column", width: "40%", minWidth: 250 }} >
                 <InputGroup style={{ width: "100%" }} >
                     <FormControl 
                         placeholder="Search for a chart" 

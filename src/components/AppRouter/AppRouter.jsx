@@ -94,6 +94,7 @@ class AppRouter extends Component {
     }
 
     render() {
+        let { isMobile } = this.props;
         let { loading, sessionManager, redirectDestination } = this.state;
 
         let SoundActions = {
@@ -115,6 +116,7 @@ class AppRouter extends Component {
         };
 
         let PlayVCProps = {
+            isMobile,
             SoundActions,
             StateHelper,            
             sessionManager,
@@ -122,6 +124,7 @@ class AppRouter extends Component {
         };
 
         let CreateVCProps = {
+            isMobile,
             StateHelper,
             redirect: this._redirect
         };

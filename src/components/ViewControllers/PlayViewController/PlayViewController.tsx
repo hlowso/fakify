@@ -19,6 +19,7 @@ import $ from "jquery";
 
 export interface IPlayVCProps {
     // TODO: get proper types for all this
+    isMobile: boolean;
     SoundActions: any;
     StateHelper: any;
     sessionManager: SessionManager | ImprovSessionManager | ListeningSessionManager;
@@ -141,7 +142,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
     **************/
 
     public render() {
-        let { sessionManager } = this.props;
+        let { sessionManager, isMobile } = this.props;
         let { 
             songTitles, 
             selectedSong, 
@@ -165,7 +166,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         return (
             <div id="play-view">
                 <div>
-                    <MenuBar 
+                    <MenuBar
+                        isMobile={isMobile} 
                         openMIDISettingsModal={() => this.setState({ settingsModalOpen: true })} 
                         songTitles={songTitles as { [chartId: string]: string }} 
                         onSongTitleClick={this.onSongListItemClick} />
