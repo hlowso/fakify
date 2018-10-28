@@ -1,9 +1,12 @@
 import React, { Component } from "react";
 import * as Util from "../../../shared/Util";
 import { Link } from "react-router-dom";
+import Cx from "classnames";
+// import { Button, ButtonGroup } from "react-bootstrap";
 import * as Api from "../../../shared/Api";
 import { containerStyles } from "./TopNavMobileStyles";
 import "./TopNav.css";
+import "./TopNavMobile.css";
 
 export interface INavUser {
     email: string;
@@ -28,20 +31,37 @@ class TopNav extends Component<ITopNavProps, {}> {
         let { isMobile } = this.props;
         return (
             <header className="nav-container" style={ isMobile ? containerStyles : undefined } >
-                <span className="nav-brand">Fakify</span>
+                {this.renderBrand()}
                 {this.renderTabList()}
                 {this.renderUserSection()}
             </header>
         );
     }
 
+    public renderBrand() {
+        let { isMobile } = this.props;
+        return !isMobile && (
+            <span className="nav-brand">Fakify</span>
+        );
+    }
+
     public renderTabList() {
-        let { user } = this.props;
+        let { user, isMobile } = this.props;
         let activeTab = Util.getCurrentTab();
-        
+
+        let playClasses = Cx({
+            "play-link-button": true,
+            "active": activeTab === "play"
+        });
+
+        let createClasses = Cx({
+            "create-link-button": true,
+            "active": activeTab === "create"
+        });
+
         return !Util.objectIsEmpty(user) && (
-            <div id="tab-list" >
-                <button className={activeTab === "play" ? "active" : undefined} >
+            <div id="tab-list" className={isMobile ? "mobile" : undefined} >
+                <button className={playClasses} >
                     <Link to="/play" style={{
                         display: "block",
                         height: '100%',
@@ -54,7 +74,7 @@ class TopNav extends Component<ITopNavProps, {}> {
                         Play
                     </Link>
                 </button>
-                <button className={activeTab === "create" ? "active" : undefined} >
+                <button className={createClasses} >
                     <Link to="/create" style={{
                         display: "block",
                         height: '100%',
@@ -71,19 +91,34 @@ class TopNav extends Component<ITopNavProps, {}> {
         );
     }
 
-    public renderUserSection = () => {
-        let { user } = this.props;
+    public renderUserSection() {
+        let { isMobile } = this.props;
 
-        return user && user.email && (
-            <div id="nav-user-section">
-                <span className="user-email" >{user.email}</span>
+        return (
+            <div id="nav-user-section" className={isMobile ? "mobile" : undefined}>
+                {this.renderEmail()}
                 <Link
                     to="/login" 
                     id="logout-link" 
                     onClick={this._onClickLogout} 
                 >
-                    Log Out
+                    <span style={{ float: "right" }}>Log Out</span>
                 </Link>
+            </div>
+        );
+    }
+
+    public renderEmail() {
+        let { user, isMobile } = this.props;
+
+        let emailClasses = Cx({
+            "user-email": true,
+            "mobile": isMobile
+        });
+
+        return user && (
+            <div className={emailClasses} >
+                <span style={{ float: "right" }}>{user.email}</span>
             </div>
         );
     }

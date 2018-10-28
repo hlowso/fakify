@@ -1,0 +1,35 @@
+#tab-list.mobile {
+    padding-left: 0px;
+}
+
+#tab-list.mobile button {
+    margin-right: 0;
+    border-radius: 0px;
+    border-left: none;
+    width: 80px;
+}
+
+#tab-list.mobile button.create-link-button {
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+#nav-user-section.mobile {
+    width: 40%;
+    display: flex;
+    margin-right: 10px;
+    flex-direction: column;
+    align-content: right;
+}
+
+#nav-user-section.mobile #logout-link {
+    margin: 0;
+    font-size: 130%;
+}
+
+.user-email.mobile {
+    width: 100%;
+    overflow-x: hidden;
+    font-size: 85%;
+    letter-spacing: -1px;
+}
