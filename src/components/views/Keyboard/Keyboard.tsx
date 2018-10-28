@@ -6,6 +6,8 @@ import { NoteName, IMidiMessage } from "../../../shared/types";
 import "./Keyboard.css";
 
 export interface IKeyboardProps {
+    lowestKey: number;
+    highestKey: number;
     showKeyChanges: boolean;
     depressedKeys: number[];
     currentKeyBasePitches: number[];
@@ -46,10 +48,11 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
     }
 
     public renderKeys = (): JSX.Element => {
+        let { lowestKey, highestKey } = this.props;
         let upperElements = [],
             lowerElements = [];
 
-        for (let note = MusicHelper.LOWEST_A; note < MusicHelper.LOWEST_A + 88; note ++) {
+        for (let note = lowestKey; note < highestKey; note ++) {
             let noteNameIndex = note % 12;
             let noteName = MusicHelper.NOTE_NAMES[noteNameIndex];
             let isBlackKey = this._BLACK_KEY_INDICES.indexOf(noteNameIndex) !== -1;
@@ -75,6 +78,7 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
     }
 
     public getWhiteKey = (note: number, noteName: NoteName) => {
+        let { lowestKey, highestKey } = this.props;
         let upperStyle = {
             width: this._WIDER_UPPER_WHITE_KEY_WIDTH, 
             height: this._KEY_HEIGHT
@@ -94,10 +98,10 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
             upperStyle.width = this._NARROWER_UPPER_WHITE_KEY_WIDTH;
         }
 
-        if (note === MusicHelper.LOWEST_A) {
+        if (note === lowestKey) {
             upperStyle.width = this._WIDER_UPPER_WHITE_KEY_WIDTH;
         }
-        if (note === MusicHelper.HIGHEST_C) {
+        if (note === highestKey) {
             upperStyle.width = this._LOWER_WHITE_KEY_WIDTH;
         }
 

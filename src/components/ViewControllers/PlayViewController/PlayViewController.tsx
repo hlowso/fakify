@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 
 import MenuBar from "../../views/MenuBar/MenuBar";
-// import SongListPanel from "../../views/SongListPanel/SongListPanel";
 import ChartViewer from "../../views/ChartViewer/ChartViewer";
 import Keyboard from "../../views/Keyboard/Keyboard";
 import SettingsModal from "../../views/SettingsModal/SettingsModal";
@@ -12,6 +11,7 @@ import { StorageHelper } from "../../../shared/StorageHelper";
 import { SessionManager, ImprovSessionManager, ListeningSessionManager } from "../../../shared/music/SessionManager";
 import Chart from "../../../shared/music/Chart";
 
+import "./PlayViewControllerMobile.css";
 import "./PlayViewController.css";
 import { ISong, NoteName, PlayMode, Tempo, IMusicIdx, IChartBar } from "../../../shared/types";
 import { Dashboard } from "../../views/Dashboard/Dashboard";
@@ -162,9 +162,11 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         let rangeStartNote = inSession ? (sessionManager as ListeningSessionManager).rangeStartNote : MusicHelper.LOWEST_A;
         let rangeEndNote = inSession ? (sessionManager as ListeningSessionManager).rangeEndNote : MusicHelper.HIGHEST_C;
         let showKeyChanges = true;
+        let lowestKey = isMobile ? 45 : MusicHelper.LOWEST_A;
+        let highestKey = isMobile ? 72 : MusicHelper.LOWEST_A + 88;
 
         return (
-            <div id="play-view">
+            <div id="play-view" className={isMobile ? "mobile" : undefined}>
                 <div>
                     <MenuBar
                         isMobile={isMobile} 
@@ -174,6 +176,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                 </div>
                 <div className="chart-container" >
                     <ChartViewer
+                        isMobile={isMobile}
                         editingMode={false}
                         hiddenKeyboard={hideKeyboard}
                         song={selectedSong as ISong}
@@ -187,6 +190,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                         loadingChart={loadingSelectedSong}
                         highlightAllOutOfRange={selectAllBarsHovered} />
                     <Dashboard 
+                        isMobile={isMobile}
                         inSession={inSession}
                         chartIsLoaded={chartIsLoaded}
                         context={chartIsLoaded ? this._chart.context : undefined}
@@ -209,6 +213,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                         userShouldPlay={userShouldPlay}
                         firstNoteColor={this._firstNoteColor} /> */}
                 {!hideKeyboard && <Keyboard
+                    lowestKey={lowestKey}
+                    highestKey={highestKey}
                     showKeyChanges={showKeyChanges} 
                     depressedKeys={this.props.StateHelper.getCurrentUserKeysDepressed()} 
                     currentKeyBasePitches={currNoteClasses.map(n => n.basePitch)} 

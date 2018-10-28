@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, CSSProperties } from "react";
 import * as Cx from "classnames";
 import { Button, Glyphicon, FormControl, FormGroup } from "react-bootstrap";
 import * as Util from "../../../shared/Util";
@@ -9,9 +9,11 @@ import Chart from "../../../shared/music/Chart";
 import { ISong, IMusicIdx, NoteName, Tempo, ChordName, PresentableChordShape, IChartBar, IChordSegment } from "../../../shared/types";
 import { BAR_LIMIT } from "../../../shared/Constants";
 import "./ChartViewer.css";
+import "./ChartViewerMobile.css";
 import $ from "jquery";
 
 export interface IChartViewerProps {
+    isMobile?: boolean;
     editingMode?: boolean;
     editingTitle?: string;
     song?: ISong;
@@ -49,62 +51,75 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     public render(): JSX.Element {
-        let { song, chart, sessionFailed, loadingChart, editingMode, hiddenKeyboard } = this.props;
+        let { isMobile, song, chart, sessionFailed, loadingChart, editingMode } = this.props;
 
         let noChartData = Util.objectIsEmpty(chart) || (!editingMode && Util.objectIsEmpty(song));
         let content: JSX.Element[] | JSX.Element;
         let dynamicStyle = {} as any;
 
         if (loadingChart) {
-
-            content = <h2 style={{ textAlign: "center" }} >loading chart...</h2>;
-
+            content = this.renderLoadingChartMessage();
         } else if (noChartData) {
-
-            content = (
-                <div>
-                    <h2 style={{ textAlign: "center" }} >No chart loaded.</h2>
-                    <p style={{ textAlign: "center", fontSize: "130%" }} >Search for a chart or click the browse icon to get started.</p>
-                </div>
-            );
-
+            content = this.renderNoChartDataMessage();
         } else if (sessionFailed) {
-
-            content = (
-                <div style={{ textAlign: "center" }}>
-                    <h2  key={1} >
-                        An error occured while playing your chart :(
-                    </h2>
-                    <a onClick={this._resetChart} key={2} style={{ fontSize: "150%" }} >Reset Chart</a>
-                </div>
-            );
-                
+            content = this.renderSessionFailedMessage();
         } else {
-
-            let $playView = $("#play-view");
-            let $menuBar = $("#menu-bar");
-            let $keyboard = $("#keyboard");
-
-            let keyboardHeight = hiddenKeyboard ? 0 : ($keyboard ? $keyboard.height() : 0);
-
-            if ($playView && $menuBar) {
-                dynamicStyle.height = ($playView.height() as number) - ($menuBar.height() as number) - (keyboardHeight as number); 
-            }
-
-            content = [
-                <header className="chart-header" key={0} onMouseEnter={this._onBarLeave} >
-                    {this.renderTitle()}
-                </header>,
-                <section className="chart-body" key={1} onMouseEnter={this._onBarLeave} >
-                    {this.renderProgressionLines()}
-                </section>
-            ];
+            content = this.renderChartComponents(dynamicStyle);
         }
 
         return (
-            <div id="chart-viewer" style={dynamicStyle} >
+            <div id="chart-viewer" className={isMobile ? "mobile" : undefined} style={dynamicStyle} >
                 {content}
             </div>
+        );
+    }
+
+    public renderChartComponents(dynamicStyle: CSSProperties) {
+        let { hiddenKeyboard } = this.props;
+
+        let $playView = $("#play-view");
+        let $menuBar = $("#menu-bar");
+        let $keyboard = $("#keyboard");
+
+        let keyboardHeight = hiddenKeyboard ? 0 : ($keyboard ? $keyboard.height() : 0);
+
+        if ($playView && $menuBar) {
+            dynamicStyle.height = ($playView.height() as number) - ($menuBar.height() as number) - (keyboardHeight as number); 
+        }
+
+        return [
+            <header className="chart-header" key={0} onMouseEnter={this._onBarLeave} >
+                {this.renderTitle()}
+            </header>,
+            <section className="chart-body" key={1} onMouseEnter={this._onBarLeave} >
+                {this.renderProgressionLines()}
+            </section>
+        ];
+    }
+
+    public renderSessionFailedMessage() {
+        return (
+            <div style={{ textAlign: "center" }}>
+                <h2  key={1} >
+                    An error occured while playing your chart :(
+                </h2>
+                <a onClick={this._resetChart} key={2} style={{ fontSize: "150%" }} >Reset Chart</a>
+            </div>
+        );
+    }
+
+    public renderNoChartDataMessage() {
+        return (
+            <div>
+                <h2 style={{ textAlign: "center" }} >No chart loaded.</h2>
+                <p style={{ textAlign: "center", fontSize: "130%" }} >Search for a chart or click the browse icon to get started.</p>
+            </div>
+        );
+    }
+
+    public renderLoadingChartMessage() {
+        return (
+            <h2 style={{ textAlign: "center" }} >loading chart...</h2>
         );
     }
 

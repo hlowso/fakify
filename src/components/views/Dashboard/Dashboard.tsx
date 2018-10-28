@@ -5,6 +5,7 @@ import * as MusicHelper from "../../../shared/music/MusicHelper";
 import { NoteName, Tempo } from "../../../shared/types";
 
 export interface IDashboardProps {
+    isMobile?: boolean;
     inSession?: boolean;
     chartIsLoaded?: boolean;
     context?: NoteName;
@@ -31,9 +32,10 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
     }
 
     public render() {
-        let { chartIsLoaded, hiddenKeyboard } = this.props;
+        let { chartIsLoaded, hiddenKeyboard, isMobile } = this.props;
 
         let dynamicStyle = {
+            minWidth: isMobile ? undefined : 760,
             height: chartIsLoaded ? 40 : 20,
             bottom: hiddenKeyboard ? 0 : 160
         };

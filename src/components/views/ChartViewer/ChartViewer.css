@@ -29,21 +29,6 @@
     border-bottom: solid black 1px;
 }
 
-#chart-viewer .left-hand-settings {
-    display: flex;
-    flex-direction: column;
-}
-
-#chart-viewer .left-hand-settings-row {
-    display: flex;
-    justify-content: space-between;
-}
-
-#chart-viewer .left-hand-settings-right {
-    margin-left: 5px;
-    width: 75px;
-}
-
 #chart-viewer .chart-body {
     display: flex;
     width: 100%;
