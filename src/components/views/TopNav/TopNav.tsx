@@ -39,8 +39,8 @@ class TopNav extends Component<ITopNavProps, {}> {
     }
 
     public renderBrand() {
-        let { isMobile } = this.props;
-        return !isMobile && (
+        let { user, isMobile } = this.props;
+        return (!isMobile || !user) && (
             <span className="nav-brand">Fakify</span>
         );
     }
@@ -92,9 +92,9 @@ class TopNav extends Component<ITopNavProps, {}> {
     }
 
     public renderUserSection() {
-        let { isMobile } = this.props;
+        let { user, isMobile } = this.props;
 
-        return (
+        return !!user && (
             <div id="nav-user-section" className={isMobile ? "mobile" : undefined}>
                 {this.renderEmail()}
                 <Link
