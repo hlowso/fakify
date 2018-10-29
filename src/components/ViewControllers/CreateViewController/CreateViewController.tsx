@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import ChartViewer from "../../views/ChartViewer/ChartViewer";
 import { BarEditingModal } from "../../views/BarEditingModal/BarEditingModal";
-import { MAX_TITLE_LENGTH } from '../../../shared/Constants';
+import { MAX_TITLE_LENGTH, BAR_LIMIT } from '../../../shared/Constants';
 import * as Util from "../../../shared/Util";
 import * as Api from "../../../shared/Api";
 import { ISong, IChartBar, ChordShape, Tab, NoteName, TimeSignature, ChartResponse, ITitles, ISongTitle } from "../../../shared/types";
@@ -215,9 +215,10 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
                 isMobile={isMobile}
                 isOpen={true}
                 close={() => this.setState({ isAddingBar: false, isUpdatingBar: false })}
+                originalBar={this._editingChart.bars[editBar.barIdx]}
                 editingBar={editBar as IChartBar}
-                onAddNeighbour={isMobile ? this._onAddBar : undefined}
-                onDeleteBar={isMobile ? () => this._onDeleteBar((editBar as IChartBar).barIdx) : undefined}
+                onAddNeighbour={isMobile && this._editingChart.bars.length < BAR_LIMIT ? this._onAddBar : undefined}
+                onDeleteBar={isMobile && this._editingChart.bars.length > 1 ? () => this._onDeleteBar((editBar as IChartBar).barIdx) : undefined}
                 onEdit={updatedEditingBar => this.setState({ editBar: updatedEditingBar })}
                 onSave={this._onSaveBar}
                 currentContext={this._editingChart.context}
@@ -296,11 +297,8 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     }
 
     private _onSaveBar = () => {
+        let { isMobile } = this.props;
         let { editBar, isAddingBar, isUpdatingBar } = this.state;
-        let stateUpdate: ICreateVCState = {
-            isAddingBar: false,
-            isUpdatingBar: false
-        }
 
         if (editBar) {
             if (isAddingBar) {
@@ -311,7 +309,14 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
             }   
         }
 
-        this.setState(stateUpdate);
+        if (!isMobile) {
+            this.setState({
+                isAddingBar: false,
+                isUpdatingBar: false
+            });
+        } else {
+            this.setState({ editBar: Util.copyObject((this._editingChart as Chart).bars[(editBar as IChartBar).barIdx])});
+        }
     }
 
     private _onSaveChartAsync = async () => {

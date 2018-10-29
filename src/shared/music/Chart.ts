@@ -21,6 +21,38 @@ class Chart {
     private _durationInSubbeats: number;
     private _rangeDurationInSubbeats: number;
 
+    public static barsAreEqual = (b1: IChartBar, b2: IChartBar, ignoreKeysAndSubbeats = true) => {
+        let s = JSON.stringify;
+
+        if (!ignoreKeysAndSubbeats) {
+            return s(b1) === s(b2);
+        }
+
+        if (b1.barIdx !== b2.barIdx) {
+            return false;
+        }
+
+        if (s(b1.timeSignature) !== s(b2.timeSignature)) {
+            return false;
+        }
+
+        if (b1.chordSegments.length !== b2.chordSegments.length) {
+            return false;
+        }
+
+        for (let i = 0; i < b1.chordSegments.length; i ++) {
+            if (b1.chordSegments[i].beatIdx !== b2.chordSegments[i].beatIdx) {
+                return false;
+            }
+            
+            if (s(b1.chordSegments[i].chordName) !== s(b2.chordSegments[i].chordName)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static validTempo = (tempo: Tempo) => {
         if (!Array.isArray(tempo) || tempo.length !== 2) {
             return false;

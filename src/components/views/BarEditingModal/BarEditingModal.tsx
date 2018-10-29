@@ -4,6 +4,7 @@ import { Modal, Button, Glyphicon, ButtonGroup, DropdownButton, MenuItem } from 
 import * as Util from "../../../shared/Util";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
 import { Domain } from "../../../shared/music/domain/Domain";
+import Chart from '../../../shared/music/Chart';
 import { IChartBar, IChordSegment, ChordShape, ChordName, NoteName, PresentableChordShape } from "../../../shared/types";
 import "./BarEditingModal.css";
 
@@ -15,6 +16,7 @@ export interface IBarEditingModalProps {
     onSave: () => void;
     onAddNeighbour?: (barIdx: number) => void;
     onDeleteBar?: () => void;
+    originalBar: IChartBar;
     editingBar: IChartBar;
     currentContext: NoteName;
 };
@@ -52,16 +54,34 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
     }
 
     public renderFooterButtons() {
-        let { isMobile, onAddNeighbour, onDeleteBar, editingBar } = this.props;
+        let { isMobile, onAddNeighbour, onDeleteBar, originalBar, editingBar, close } = this.props;
 
         if (!editingBar) {
             return;
         }
 
+        let noChange = Chart.barsAreEqual(originalBar, editingBar);
+
+        let mainButton = (
+            noChange
+                ? (
+                    <Button onClick={() => close()} >
+                        Done
+                    </Button>
+                )
+                : (
+                    <Button bsStyle="primary" onClick={() => this._onSave()} >
+                        Save
+                    </Button>
+                )
+        );
+
         return (
-            <div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
                 {isMobile && onAddNeighbour && (
-                    <Button onClick={() => (onAddNeighbour as (barIdx: number) => void)(editingBar.barIdx)} >
+                    <Button
+                        disabled={!noChange} 
+                        onClick={() => (onAddNeighbour as (barIdx: number) => void)(editingBar.barIdx)} >
                         <span>
                             Add<br/>Bar<br/>Before
                         </span>
@@ -72,11 +92,11 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
                         Delete
                     </Button>
                 )}
-                <Button bsStyle="primary" onClick={() => this.props.onSave()} >
-                    Save
-                </Button>
+                {mainButton}
                 {isMobile && onAddNeighbour && (
-                    <Button onClick={() => (onAddNeighbour as (barIdx: number) => void)(editingBar.barIdx + 1)} >
+                    <Button
+                        disabled={!noChange} 
+                        onClick={() => (onAddNeighbour as (barIdx: number) => void)(editingBar.barIdx + 1)} >
                         <span>
                             Add<br/>Bar<br/>After
                         </span>
@@ -235,6 +255,20 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
         }
 
         return shapeOptions;
+    }
+
+    /**
+     * HANDLERS
+     */
+
+    private _onSave = () => {
+        let { onSave } = this.props;
+
+        if (!onSave) {
+            return;
+        }
+
+        onSave();
     }
 
     private _onAddChord = (beatIdx: number) => {
