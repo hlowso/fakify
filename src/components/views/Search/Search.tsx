@@ -80,7 +80,7 @@ export class Search extends Component<ISearchProps, ISearchState> {
      */
 
     private _onChange = (evt: React.SyntheticEvent<any>) => {
-        this.setState({ query: (evt.target as any).value });
+        this.setState({ query: (evt.target as any).value, showAll: false });
     }
 
     private _onSongTitleClick = (songId: string) => {
