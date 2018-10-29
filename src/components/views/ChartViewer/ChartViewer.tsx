@@ -370,16 +370,8 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             </Button>
         );
 
-        let { isMobile } = this.props;
-
-        let lowerButton = (
-            isMobile
-                ? (
-                    <Button style={{ padding: 0 }} onClick={() => this.setState({ hoveredBarIdx: undefined })} >Cancel</Button>
-                )
-                : !hideDelete && (
-                    <Button style={{ padding: 0 }} bsStyle="danger" onClick={() => this._onDeleteBar(i)}>Delete</Button>
-                )
+        let lowerButton = !hideDelete && (
+            <Button style={{ padding: 0 }} bsStyle="danger" onClick={() => this._onDeleteBar(i)}>Delete</Button>
         );
 
         return (
@@ -452,7 +444,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
         if (isMobile) {
             if (editingMode) {
-                this.setState({ hoveredBarIdx: barIdx });
+                this._onEditBar(barIdx);
             }
         } else {
             if (!editingMode && onBarClick) {
@@ -462,10 +454,18 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     private _onBarEnter = (barIdx: number) => {
+        let { isMobile } = this.props;
+        if (isMobile) {
+            return;
+        }
         this.setState({ hoveredBarIdx: barIdx });
     }
 
     private _onBarLeave = (event: React.SyntheticEvent<any>) => {
+        let { isMobile } = this.props;
+        if (isMobile) {
+            return;
+        }
         this.setState({ hoveredBarIdx: undefined });
     }
 

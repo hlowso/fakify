@@ -160,9 +160,11 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     }
 
     public renderEditingChart() {
+        let { isMobile } = this.props;
         let { editingSong, isAddingBar, isUpdatingBar } = this.state;
         return (
             <ChartViewer
+                isMobile={isMobile}
                 editingMode={true}
                 song={editingSong}
                 chart={this._editingChart}
@@ -202,16 +204,20 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     }
 
     public renderBarEditingModal() {
+        let { isMobile } = this.props;
         let { isUpdatingBar, isAddingBar, editBar} = this.state;
-        if (!this._editingChart) {
+        if (!this._editingChart || !editBar) {
             return;
         }
 
         return (isUpdatingBar || isAddingBar) && (
             <BarEditingModal 
+                isMobile={isMobile}
                 isOpen={true}
                 close={() => this.setState({ isAddingBar: false, isUpdatingBar: false })}
                 editingBar={editBar as IChartBar}
+                onAddNeighbour={isMobile ? this._onAddBar : undefined}
+                onDeleteBar={isMobile ? () => this._onDeleteBar((editBar as IChartBar).barIdx) : undefined}
                 onEdit={updatedEditingBar => this.setState({ editBar: updatedEditingBar })}
                 onSave={this._onSaveBar}
                 currentContext={this._editingChart.context}
@@ -266,17 +272,14 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
             return;
         }
 
+        let bar: IChartBar | undefined;
+
         if (barIdx === 0) {
-            this.setState({
-                isAddingBar: true,
-                editBar: this._getInitialBar(
-                    this._editingChart.context, 
-                    this._editingChart.bars[0].timeSignature
-                )
-            });
-        } else {
-            this._editingChart.addBar(barIdx);
+            bar = this._getInitialBar(this._editingChart.context, this._editingChart.bars[0].timeSignature);
         }
+
+        this._editingChart.addBar(barIdx, bar);
+        this.setState({ isAddingBar: false, isUpdatingBar: false, editBar: undefined })
     }
 
     private _onEditBar = (barIdx: number) => {
@@ -289,6 +292,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
     private _onDeleteBar = (barIdx: number) => {
         (this._editingChart as Chart).deleteBar(barIdx);
+        this.setState({ editBar: undefined });
     }
 
     private _onSaveBar = () => {

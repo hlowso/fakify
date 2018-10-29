@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Cx from "classnames";
 import { Modal, Button, Glyphicon, ButtonGroup, DropdownButton, MenuItem } from "react-bootstrap";
 import * as Util from "../../../shared/Util";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
@@ -7,10 +8,13 @@ import { IChartBar, IChordSegment, ChordShape, ChordName, NoteName, PresentableC
 import "./BarEditingModal.css";
 
 export interface IBarEditingModalProps {
+    isMobile: boolean;
     isOpen: boolean;
     close: () => void;
     onEdit: (updatedBar: IChartBar) => void;
     onSave: () => void;
+    onAddNeighbour?: (barIdx: number) => void;
+    onDeleteBar?: () => void;
     editingBar: IChartBar;
     currentContext: NoteName;
 };
@@ -28,10 +32,11 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
     }
 
     public render() {
-        let { isOpen, close, editingBar } = this.props;
-        
+        let { isOpen, close, editingBar, isMobile } = this.props;
+        let classes = Cx("bar-editing-modal", isMobile ? "mobile" : `chords-${editingBar.timeSignature[0]}`);
+
         return (
-            <Modal dialogClassName={`bar-editing-modal-${editingBar.timeSignature[0]}`} show={isOpen} onHide={close}>
+            <Modal dialogClassName={classes} show={isOpen} onHide={close}>
                 <Modal.Header closeButton={true} >
                     <h2>Bar {editingBar.barIdx + 1}</h2>
                 </Modal.Header>
@@ -40,12 +45,45 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
                     {this.renderChordsSection()}
                 </Modal.Body>
                 <Modal.Footer>
-                   <Button bsStyle="primary" style={{ marginTop: 10 }} onClick={() => this.props.onSave()} >
-                        Save
-                    </Button>
+                    {this.renderFooterButtons()}
                 </Modal.Footer>
             </Modal>
         );
+    }
+
+    public renderFooterButtons() {
+        let { isMobile, onAddNeighbour, onDeleteBar, editingBar } = this.props;
+
+        if (!editingBar) {
+            return;
+        }
+
+        return (
+            <div>
+                {isMobile && onAddNeighbour && (
+                    <Button onClick={() => (onAddNeighbour as (barIdx: number) => void)(editingBar.barIdx)} >
+                        <span>
+                            Add<br/>Bar<br/>Before
+                        </span>
+                    </Button>
+                )}
+                {isMobile && onDeleteBar && (
+                    <Button bsStyle="danger" onClick={() => (onDeleteBar as () => void)()}>
+                        Delete
+                    </Button>
+                )}
+                <Button bsStyle="primary" onClick={() => this.props.onSave()} >
+                    Save
+                </Button>
+                {isMobile && onAddNeighbour && (
+                    <Button onClick={() => (onAddNeighbour as (barIdx: number) => void)(editingBar.barIdx + 1)} >
+                        <span>
+                            Add<br/>Bar<br/>After
+                        </span>
+                    </Button>
+                )}
+            </div>
+        )
     }
 
     /**
@@ -95,7 +133,8 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
      */
 
     public renderChordsSection() {
-        let { timeSignature, chordSegments } = this.props.editingBar;
+        let { editingBar } = this.props;
+        let { timeSignature, chordSegments } = editingBar;
         let editingChords: JSX.Element[] = [];
 
         for (let beatIdx = 0; beatIdx < timeSignature[0]; beatIdx ++) {
@@ -111,7 +150,7 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
                         ? this.renderEditableChord(chordName, beatIdx)
                         : (
                             <Button style={{ padding: 3, height: "30px" }} onClick={() => this._onAddChord(beatIdx)} >
-                                Add Chord&nbsp;<Glyphicon glyph="plus" />
+                                <Glyphicon glyph="plus" />
                             </Button>
                         )
                     }
@@ -121,7 +160,7 @@ export class BarEditingModal extends Component<IBarEditingModalProps, IBarEditin
 
         return (
             <div style={{ marginTop: 10, display: "flex", flexDirection: "column" }} >
-                <div style={{ display: "flex", justifyContent: "space-between" }} >
+                <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap" }} >
                     {editingChords}
                 </div>
             </div>

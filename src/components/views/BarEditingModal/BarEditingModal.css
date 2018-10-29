@@ -1,33 +1,28 @@
-.bar-editing-modal-2 {
+.bar-editing-modal.chords-2 {
     width: 500px;
 }
 
-.bar-editing-modal-3 {
+.bar-editing-modal.chords-3 {
     width: 600px;
 }
 
-.bar-editing-modal-4 {
+.bar-editing-modal.chords-4 {
     width: 700px;
 }
 
-.bar-editing-modal-5 {
+.bar-editing-modal.chords-5 {
     width: 800px;
 }
 
-.bar-editing-modal-6 {
+.bar-editing-modal.chords-6 {
     width: 900px;
 }
 
-.bar-editing-modal-7 {
+.bar-editing-modal.chords-7 {
     width: 1000px;
 }
 
-.bar-editing-modal-2 .dropdown-menu,
-.bar-editing-modal-3 .dropdown-menu,
-.bar-editing-modal-4 .dropdown-menu,
-.bar-editing-modal-5 .dropdown-menu,
-.bar-editing-modal-6 .dropdown-menu,
-.bar-editing-modal-7 .dropdown-menu {
+.bar-editing-modal .dropdown-menu {
     max-height: 200px;
     overflow-y: auto;
 }
