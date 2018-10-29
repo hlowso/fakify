@@ -40,6 +40,7 @@
 #chart-viewer .bar-container {
     display: flex;
     cursor: pointer;
+    min-width: 25%;
 }
 
 #chart-viewer .bar-container.will-be-within-range {

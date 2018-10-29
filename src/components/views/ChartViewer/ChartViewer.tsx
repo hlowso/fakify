@@ -149,7 +149,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                         style={{
                             marginTop: 25, 
                             width: editingTitleLength === 0 ? 300 : Math.max(editingTitleLength * (editingTitleLength >= 30 ? 15 : 30), 100),
-                            fontSize: editingTitleLength >= 30 ? "200%" : "300%",
+                            fontSize: editingTitleLength >= 30 ? (isMobile ? "105%" : "200%") : (isMobile ? "160%" : "300%"),
                             textAlign: "center"
                         }}
                     />
