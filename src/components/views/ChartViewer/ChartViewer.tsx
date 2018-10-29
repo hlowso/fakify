@@ -442,14 +442,10 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     private _onBarClick = (barIdx: number) => {
         let { onBarClick, isMobile, editingMode } = this.props;
 
-        if (isMobile) {
-            if (editingMode) {
-                this._onEditBar(barIdx);
-            }
-        } else {
-            if (!editingMode && onBarClick) {
-                onBarClick(barIdx);
-            }
+        if (isMobile && editingMode) {
+            this._onEditBar(barIdx);
+        } else if (!editingMode && onBarClick) {
+            onBarClick(barIdx);
         }
     }
 
