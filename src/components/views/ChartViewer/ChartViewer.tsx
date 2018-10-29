@@ -251,7 +251,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             <div 
                 key={i}
                 className={this._getBarContainerClasses(i, rangeStartIdx, rangeEndIdx, !!isCurrentlyPlayingBar)}
-                onClick={editingMode ? undefined : () => this._onBarClick(i)}
+                onClick={() => this._onBarClick(i)}
                 onMouseEnter={() => this._onBarEnter(i)}
                 onMouseLeave={this._onBarLeave}
                 style={{ 
@@ -370,12 +370,24 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             </Button>
         );
 
+        let { isMobile } = this.props;
+
+        let lowerButton = (
+            isMobile
+                ? (
+                    <Button style={{ padding: 0 }} onClick={() => this.setState({ hoveredBarIdx: undefined })} >Cancel</Button>
+                )
+                : !hideDelete && (
+                    <Button style={{ padding: 0 }} bsStyle="danger" onClick={() => this._onDeleteBar(i)}>Delete</Button>
+                )
+        );
+
         return (
             <div className="bar-buttons" style={{ justifyContent: this._atBarLimit ? "space-around" : "space-between" }} >
                 {precedingAddButton}
                 <div style={{ width: "70%", display: "flex", flexDirection: "column" }} >
                     <Button style={{ padding: 0 }} onClick={() => this._onEditBar(i)}>Edit</Button>
-                    {!hideDelete && <Button style={{ padding: 0 }} bsStyle="danger" onClick={() => this._onDeleteBar(i)}>Delete</Button>}
+                    {lowerButton}
                 </div>
                 {followingAddButton}
             </div>
@@ -436,9 +448,16 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     private _onBarClick = (barIdx: number) => {
-        let { onBarClick } = this.props;
-        if (onBarClick) {
-            onBarClick(barIdx);
+        let { onBarClick, isMobile, editingMode } = this.props;
+
+        if (isMobile) {
+            if (editingMode) {
+                this.setState({ hoveredBarIdx: barIdx });
+            }
+        } else {
+            if (!editingMode && onBarClick) {
+                onBarClick(barIdx);
+            }
         }
     }
 

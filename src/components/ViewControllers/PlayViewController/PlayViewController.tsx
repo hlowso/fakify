@@ -17,6 +17,8 @@ import { ISong, NoteName, PlayMode, Tempo, IMusicIdx, IChartBar } from "../../..
 import { Dashboard } from "../../views/Dashboard/Dashboard";
 import $ from "jquery";
 
+const noSleep = new (require("nosleep.js") as any)();
+
 export interface IPlayVCProps {
     // TODO: get proper types for all this
     isMobile: boolean;
@@ -245,6 +247,13 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         if (!this._chart) {
             return;
         }
+
+        let { isMobile } = this.props;
+
+        if (isMobile) {
+            noSleep.enable();
+        }
+
         let { playMode } = this.state;
         this.props.SoundActions.playRangeLoop(this._chart, playMode);
     }
@@ -252,7 +261,14 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
     private _stopSession = () => {
         if (!this._chart) {
             return;
-        }    
+        } 
+    
+        let { isMobile } = this.props;
+
+        if (isMobile) {
+            noSleep.disable();
+        }
+        
         this.props.SoundActions.killTake();
     }
 
@@ -479,5 +495,10 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
     }
     
 }
+
+// function enableNoSleep() {
+//     noSleep.enable();
+//     document.removeEventListener('click', enableNoSleep, false);
+// }
 
 export default PlayViewController;
