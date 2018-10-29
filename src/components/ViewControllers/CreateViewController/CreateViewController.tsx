@@ -12,6 +12,7 @@ import { Button, ButtonGroup, Glyphicon, Modal } from "react-bootstrap";
 import { USER_CHART_LIMIT } from "../../../shared/Constants";
 
 export interface ICreateVCProps {
+    isMobile: boolean;
     StateHelper: any;
     redirect: (tab: Tab) => void;
 }
@@ -118,6 +119,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     }
 
     public renderSongListItems() {
+        let { isMobile } = this.props;
         let { userSongTitles } = this.state;
 
         if (!userSongTitles) {
@@ -137,16 +139,18 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
         return listItems.map(titleItem => (
             <div className="user-title" >
-                <ButtonGroup style={{ width: "100%", height: "100%"  }}>
+                <ButtonGroup style={{ width: "100%", height: "100%", fontSize: isMobile ? "90%" : "130%"  }}>
                     <Button 
                         onClick={() => this._onChooseEditSongAsync(titleItem.chartId)}
-                        style={{ width: "95%", fontSize: "130%", height: "100%" }}
+                        style={{ width: "85%", height: "100%" }}
                     >
-                        {titleItem.title}
+                        <div style={{ maxWidth: "100%", overflowX: "auto" }} >
+                            {titleItem.title}
+                        </div> 
                     </Button>
                     <Button 
                         onClick={() => this.setState({ deleteCandidate: titleItem })}
-                        bsStyle="danger" style={{ width: "5%", height: "100%" }}
+                        bsStyle="danger" style={{ height: "100%" }}
                     >
                         <Glyphicon glyph="trash"/>
                     </Button>

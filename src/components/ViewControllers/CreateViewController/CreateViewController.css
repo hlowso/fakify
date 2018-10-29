@@ -7,6 +7,7 @@
 #create-view .central-container { 
     display: flex;
     width: 1040px; 
+    max-width: 100%;
     min-height: 385px;
     background-color: #ddd;
     justify-content: center; 
