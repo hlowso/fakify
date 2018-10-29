@@ -198,7 +198,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
         if (bars && bars.length > 0) {
             let prevBar: IChartBar | undefined;
-            let currLineHas2Bars = Array.isArray(lastBarsInLines) ? lastBarsInLines[0] === 1 : false;
+            let barCountInLine = Array.isArray(lastBarsInLines) ? lastBarsInLines[0] + 1 : 4;
 
             bars.forEach((bar, i) => {
                 let isLastInLine = lineCount === 3;
@@ -208,7 +208,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                     lastBarsInLines.shift();
                 }
 
-                lineBars.push(this.renderBar(bar, prevBar, isLastInLine, currLineHas2Bars));
+                lineBars.push(this.renderBar(bar, prevBar, isLastInLine, barCountInLine));
 
                 if (isLastInLine) {
                     lines.push(this.renderProgressionLine(lineBars));
@@ -219,11 +219,11 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                 }
 
                 prevBar = bar;
-                currLineHas2Bars = Array.isArray(lastBarsInLines) && 
+                barCountInLine = Array.isArray(lastBarsInLines) && 
                                     lastBarsInLines.length > 0 && 
                                     isLastInLine 
-                                        ? i + 2 === lastBarsInLines[0] 
-                                        : currLineHas2Bars;
+                                        ? lastBarsInLines[0] - i 
+                                        : barCountInLine;
 
             });
         }
@@ -235,7 +235,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         return lines;
     }
 
-    public renderBar(bar: IChartBar, prevBar: IChartBar | undefined, isLastInLine: boolean, currLineHas2Bars: boolean) {
+    public renderBar(bar: IChartBar, prevBar: IChartBar | undefined, isLastInLine: boolean, barCountInLine: number) {
 
         let { editingMode, chart, sessionIdx } = this.props;
         let { linesAreGrouped, hoveredBarIdx } = this.state;
@@ -256,7 +256,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                 onMouseLeave={this._onBarLeave}
                 style={{ 
                     opacity: editingMode ? 1 : (isWithinRange ? 1 : 0.2),
-                    width: linesAreGrouped ? `${this._getCurrRenderBarWidthPercent(i, currLineHas2Bars)}%` : undefined,
+                    width: linesAreGrouped ? `${this._getCurrRenderBarWidthPercent(i, barCountInLine)}%` : undefined,
                     minWidth: linesAreGrouped ? undefined : "25%",
                     borderRight: isLastInLine || i === rangeStartIdx - 1 ? undefined : "solid black 1px",
                     borderLeft: i === rangeStartIdx && i !== 0 ? "solid black 1px" : undefined,
@@ -593,14 +593,14 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
         });
     }
 
-    private _getCurrRenderBarWidthPercent = (i: number, currLineHas2Bars: boolean) => {
+    private _getCurrRenderBarWidthPercent = (i: number, barCountInLine: number) => {
         let { linesAreGrouped } = this.state;
 
         if (!linesAreGrouped) {
             return 0;
         }
 
-        return currLineHas2Bars ? 50 : 25;
+        return 100 / barCountInLine;
     }
 
     /**
@@ -608,7 +608,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
      */
 
     public componentDidMount() {
-        this._initializeBarLines();
+        this._updateBarLines();
     }
 
     public componentDidUpdate(prevProps: IChartViewerProps, prevState: IChartViewerState) {
@@ -624,14 +624,14 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             }
         }
 
-        this._initializeBarLines();
+        this._updateBarLines();
     }
 
     private _resetLineGroups = () => {
         this.setState({ linesAreGrouped: false, lastInLineIndices: undefined });
     }
 
-    private _initializeBarLines = () => {
+    private _updateBarLines = () => {
         let { chart } = this.props;
 
         if (chart && chart.bars) {
@@ -642,6 +642,8 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
             } else if (!this.state.linesAreGrouped) {
                 this._groupBarsIntoLines();
+            } else {
+                this._shrinkChordsIfNecessary()
             }
         }
     }
@@ -669,7 +671,17 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
             let barWidth = $(this).width() as number;
 
-            if (barWidth > chartWidth / 4) {
+            if (barWidth > chartWidth / 2) {
+
+                if (currGroup.length > 0) {
+                    lastInLineIndices.push(currGroup[currGroup.length - 1]);
+                }
+
+                lastInLineIndices.push(barIdx);
+                currGroup = [];
+                return;
+
+            } else if (barWidth > chartWidth / 4) {
 
                 switch(currGroup.length) {
                     case 0:
@@ -704,6 +716,32 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             lastInLineIndices,
             linesAreGrouped: true
         });
+    }
+
+    private _shrinkChordsIfNecessary = () => {
+        let updateMade = false;
+
+        $(".bar-container").each(function(barIdx) {
+
+            let $bar = $(this) as JQuery<HTMLElement>;
+            let currInnerWidth = 0;
+
+            $bar.children().each(function() {
+                currInnerWidth += $(this).width() as number;
+            });
+
+            if (currInnerWidth > ($bar.width() as number)) {
+                let $chords = $bar.find(".bar-chord-group");
+                let currFontSize = parseFloat($chords.css("font-size"));
+
+                $chords.css("font-size", `${currFontSize - 0.5}px`);
+                updateMade = true;
+            }
+        });
+
+        if (updateMade) {
+            this.forceUpdate();
+        }
     }
 };
 

@@ -6,6 +6,7 @@ import { NoteName, IMidiMessage } from "../../../shared/types";
 import "./Keyboard.css";
 
 export interface IKeyboardProps {
+    isMobile: boolean;
     lowestKey: number;
     highestKey: number;
     showKeyChanges: boolean;
@@ -40,8 +41,14 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
     }
 
     public render(): JSX.Element {
+        let { isMobile } = this.props;
+
+        let dynamicStyle = {
+            height: isMobile ? 100 : 160
+        };
+
         return (
-            <div id="keyboard">
+            <div id="keyboard" style={dynamicStyle} >
                 {this.renderKeys()}
             </div>
         );

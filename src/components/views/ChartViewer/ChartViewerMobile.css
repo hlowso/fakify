@@ -1,3 +1,7 @@
 #chart-viewer.mobile {
     width: 95%;
 }
+
+#chart-viewer.mobile .bar-chord-group {
+    font-size: 100%;
+}

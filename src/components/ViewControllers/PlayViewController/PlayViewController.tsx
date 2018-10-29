@@ -213,6 +213,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                         userShouldPlay={userShouldPlay}
                         firstNoteColor={this._firstNoteColor} /> */}
                 {!hideKeyboard && <Keyboard
+                    isMobile={isMobile}
                     lowestKey={lowestKey}
                     highestKey={highestKey}
                     showKeyChanges={showKeyChanges} 

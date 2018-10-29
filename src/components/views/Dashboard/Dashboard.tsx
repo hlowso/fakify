@@ -36,8 +36,9 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
 
         let dynamicStyle = {
             minWidth: isMobile ? undefined : 760,
+            width: isMobile ? "100%" : undefined,
             height: chartIsLoaded ? 40 : 20,
-            bottom: hiddenKeyboard ? 0 : 160
+            bottom: hiddenKeyboard ? 0 : isMobile ? 100 : 160
         };
 
         return (
@@ -127,7 +128,12 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
     }
 
     public renderLegend() {
-        let { chartIsLoaded, hiddenKeyboard } = this.props;
+        let { chartIsLoaded, hiddenKeyboard, isMobile } = this.props;
+
+        if (isMobile) {
+            return;
+        }
+
         let dynamicStyle = hiddenKeyboard ? { width: 20, height: 20 } : undefined; 
         let content = !hiddenKeyboard && (
             <span style={{ display: "flex" }}>
