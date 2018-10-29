@@ -15,7 +15,7 @@ export class StorageHelper {
         return StorageHelper._get(StorageHelper._keys.SELECTED_SONG_ID);
     }
     
-    public static setSelectedSongId = (selectedSongId: string) => {
+    public static setSelectedSongId = (selectedSongId?: string) => {
         StorageHelper._set(StorageHelper._keys.SELECTED_SONG_ID, selectedSongId);
     }
     
@@ -91,7 +91,7 @@ export class StorageHelper {
         return window.localStorage[StorageHelper._getStorageKey(keySuffix)];
     }
     
-    private static _set = (keySuffix: string, value: string) => {
+    private static _set = (keySuffix: string, value?: string) => {
         window.localStorage[StorageHelper._getStorageKey(keySuffix)] = value;
     }
 }    

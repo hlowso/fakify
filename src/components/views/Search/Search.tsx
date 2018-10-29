@@ -5,7 +5,7 @@ import "./Search.css";
 
 export interface ISearchProps {
     songTitles: { [songId: string]: string };
-    onSongTitleClick: (songId: string) => void;
+    onSongTitleClick: (songId?: string) => void;
 }
 
 export interface ISearchState {
@@ -83,7 +83,7 @@ export class Search extends Component<ISearchProps, ISearchState> {
         this.setState({ query: (evt.target as any).value, showAll: false });
     }
 
-    private _onSongTitleClick = (songId: string) => {
+    private _onSongTitleClick = (songId?: string) => {
         this.props.onSongTitleClick(songId);
         this.setState({ query: "", showAll: false });
     }
@@ -161,6 +161,8 @@ export class Search extends Component<ISearchProps, ISearchState> {
         let matches = this._getCurrentMatches();
         if (Array.isArray(matches) && matches.length > 0) {
             this._onSongTitleClick(matches[0].chartId as string);
+        } else {
+            this._onSongTitleClick();
         }
     }
 

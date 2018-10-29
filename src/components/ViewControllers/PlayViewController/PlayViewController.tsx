@@ -39,7 +39,7 @@ export interface IPlayVCState {
 }
 
 class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
-    private _chart: Chart;
+    private _chart?: Chart;
     private _firstNoteColor = "mediumslateblue";
 
     constructor(props: IPlayVCProps) {
@@ -195,10 +195,10 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                         isMobile={isMobile}
                         inSession={inSession}
                         chartIsLoaded={chartIsLoaded}
-                        context={chartIsLoaded ? this._chart.context : undefined}
+                        context={chartIsLoaded ? (this._chart as Chart).context : undefined}
                         hiddenKeyboard={hideKeyboard}
                         onKeyChange={this._recontextualize}
-                        tempo={chartIsLoaded ? this._chart.tempo : undefined}
+                        tempo={chartIsLoaded ? (this._chart as Chart).tempo : undefined}
                         onTempoChange={this._resetTempo}
                         start={this._startSession}
                         stop={this._stopSession} 
@@ -320,7 +320,14 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
     private _resetChart = () => {
         this._stopSession();
-        let { _id, barsBase, originalTempo, originalContext } = this.state.selectedSong as ISong;
+
+        let { selectedSong } = this.state;
+
+        if (!selectedSong) {
+            return;
+        }
+
+        let { _id, barsBase, originalTempo, originalContext } = selectedSong as ISong;
 
         let chartSettings = StorageHelper.getChartSettings(_id as string);
         let playMode = StorageHelper.getPlayMode();
@@ -405,8 +412,14 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         SONG LIST PANEL   
     **********************/
 
-    public onSongListItemClick = (selectedSongId: string) => {
+    public onSongListItemClick = (selectedSongId?: string) => {
         StorageHelper.setSelectedSongId(selectedSongId);
+
+        if (!selectedSongId) {
+            this._chart = undefined;
+            return this.setState({ selectedSong: undefined });
+        }
+
         this.loadSongAsync(selectedSongId);
     }
 
