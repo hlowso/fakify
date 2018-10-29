@@ -124,7 +124,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     public renderTitle = () => {
-        let { editingMode, song, chartTitleError, editingTitle, onEditTitle } = this.props;
+        let { isMobile, editingMode, song, chartTitleError, editingTitle, onEditTitle } = this.props;
 
         let isEditingTitle = typeof editingTitle === "string" && editingMode && onEditTitle;
         let editingTitleLength = isEditingTitle ? (editingTitle as string).length : 0;
@@ -160,7 +160,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                 <span 
                     className="song-title"
                     onClick={editingMode && onEditTitle ? () => (onEditTitle as () => void)() : undefined}
-                    style={{ cursor: editingMode ? "pointer" : undefined }}
+                    style={{ cursor: editingMode ? "pointer" : undefined, fontSize: isMobile ? "160%" : "300%" }}
                     onMouseEnter={this._onBarLeave}
                 >
                     {song.title}

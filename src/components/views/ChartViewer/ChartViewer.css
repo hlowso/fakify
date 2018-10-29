@@ -10,11 +10,12 @@
 #chart-viewer .chart-header {
     display: flex;
     justify-content: center;
-    height: 20%;
+    min-height: 20%;
+    overflow-wrap: break-word;
 }
 
 #chart-viewer .song-title {
-    font-size: 300%;
+    max-width: 100%;
     margin: 10px;
     text-decoration: underline;
 }
