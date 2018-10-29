@@ -28,7 +28,8 @@
 
 #create-view #song-list-header {
     height: 15%;
-    padding: 20px;
+    padding-top: 20px;
+    padding-left: 5px;
 }
 
 #create-view #song-list {
