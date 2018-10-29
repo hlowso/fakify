@@ -101,7 +101,7 @@ export class Search extends Component<ISearchProps, ISearchState> {
     }
 
     private _onBrowse = () => {
-        this.setState({ showAll: true });
+        this.setState({ query: "", showAll: true });
     }
 
     private _onLeaveBrowse = (evt: React.FocusEvent<Button>) => {
@@ -162,5 +162,24 @@ export class Search extends Component<ISearchProps, ISearchState> {
         if (Array.isArray(matches) && matches.length > 0) {
             this._onSongTitleClick(matches[0].chartId as string);
         }
+    }
+
+    private _makeMatchesVisible = () => {
+        let { query, showAll } = this.state;
+        let zIndex = "";
+
+        if (query || showAll) {
+            zIndex = "-1";
+        } 
+
+        (document.querySelector(".chart-container") as any).style.zIndex = zIndex;
+    }
+
+    /**
+     * LIFE CYCLE
+     */
+
+    public componentDidUpdate() {
+        this._makeMatchesVisible();
     }
 }
