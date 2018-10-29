@@ -3,6 +3,7 @@ import { Button, Glyphicon } from "react-bootstrap";
 import "./Dashboard.css";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
 import { NoteName, Tempo } from "../../../shared/types";
+import NoSleep from "react-no-sleep";
 
 export interface IDashboardProps {
     isMobile?: boolean;
@@ -121,9 +122,19 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
         }
 
         return (
-            <Button className="play-button" onClick={inSession ? this._onStop : this._onPlay} >
-                <Glyphicon glyph={inSession ? "stop" : "play"} />
-            </Button>
+            <NoSleep >
+                {({ isOn, enable, disable }: any) => (
+                    <Button 
+                        className="play-button" 
+                        onClick={(
+                            inSession 
+                                ? (evt: React.SyntheticEvent<any>) => { disable(evt); this._onStop(); }
+                                : (evt: React.SyntheticEvent<any>) => { enable(evt); this._onPlay(); }
+                        )} >
+                        <Glyphicon glyph={inSession ? "stop" : "play"} />
+                    </Button>
+                )}
+            </NoSleep>
         );
     }
 
