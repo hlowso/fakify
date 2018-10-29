@@ -133,8 +133,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             return;
         }
 
-        let titleLengthFactor = 50 / Math.max(10, editingTitleLength);
-        let fontSizeAddition = (titleLengthFactor < 1 ? Math.pow(titleLengthFactor, 2) : titleLengthFactor) * (isMobile ? 10 : 22);
+        let fontSize = `${(isMobile ? (editingTitleLength < 20 ? 50 : 35) : 120) + ((50 - editingTitleLength) * (isMobile ? 1 : 3))}%`; 
         
         return (
             isEditingTitle 
@@ -152,7 +151,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                         style={{
                             marginTop: 25, 
                             width: editingTitleLength === 0 ? 300 : Math.max(editingTitleLength * 30, 100),
-                            fontSize: isMobile ? `${35 + fontSizeAddition}%` : `${120+ fontSizeAddition}%`,
+                            fontSize,
                             textAlign: "center"
                         }}
                     />
