@@ -90,8 +90,8 @@ class SettingsModal extends Component<ISettingsModalProps, ISettingsModalState> 
                     {this.renderHideKeyboard()}
                 </Modal.Body>
                 <Modal.Footer>
-                   <Button bsStyle="primary" style={{ marginTop: 10 }} onClick={() => close()} >
-                        Save
+                   <Button style={{ marginTop: 10 }} onClick={() => close()} >
+                        Done
                     </Button>
                 </Modal.Footer>
             </Modal>
