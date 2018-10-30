@@ -4,7 +4,7 @@ import Chart from "../music/Chart";
 import Score from "../music/Score";
 import { ChordName, IScoreBar, IChartBar, NoteName, IChordSegment, IKeyStrokeRecord, IMusicIdx, ISubbeatTimeMap, IImprovReport, IListeningReport, IStroke, IExercise, Tempo } from "../types";
 import soundfonts from "./soundfontsIndex";
-import { CompV1, GenerateExercise } from "../music/composers/index";
+import { CompV1, CompAsync, GenerateExercise } from "../music/composers/index";
 import { Scale } from "./domain/ScaleClass";
 import { Chord } from "./domain/ChordClass";
 
@@ -16,6 +16,7 @@ export class SessionManager {
     protected _audioContext: any;
     protected _chart: Chart;
     protected _score: Score;
+    protected _nextScore: Score;
     protected _queueTimes: ISubbeatTimeMap;
     protected _startTime = NaN;
     protected _userKeyStrokes: IKeyStrokeRecord[] = [];
@@ -173,10 +174,24 @@ export class SessionManager {
      */
 
     protected _compileMusic() {
-        let score = CompV1(this._chart, this._score);
-        score.changeVolume("piano", this._pianoVolFactor);
-        score.changeVolume("doubleBass", this._bassVolFactor);
-        score.changeVolume("drums", this._drumsVolFactor);
+        let score: Score | undefined;
+        if (this._nextScore) {
+            score = this._nextScore;
+        } else {
+            score = CompV1(this._chart, this._score);
+            score.changeVolume("piano", this._pianoVolFactor);
+            score.changeVolume("doubleBass", this._bassVolFactor);
+            score.changeVolume("drums", this._drumsVolFactor);
+        }
+
+        CompAsync(this._chart, score)
+            .then(newScore => {
+                newScore.changeVolume("piano", this._pianoVolFactor);
+                newScore.changeVolume("doubleBass", this._bassVolFactor);
+                newScore.changeVolume("drums", this._drumsVolFactor);
+                this._nextScore = newScore;
+            });
+        
         return score;
     }
 

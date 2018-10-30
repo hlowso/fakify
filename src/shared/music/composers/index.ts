@@ -13,6 +13,10 @@ export const CompV1 = (chart: Chart, prevScore?: Score): Score => {
     }
 }
 
+export function CompAsync(chart: Chart, prevScore?: Score): Promise<Score> {
+    return new Promise((resolve, reject) => resolve(CompV1(chart, prevScore)));
+}
+
 const _getSwingAccompaniment = (chart: Chart, prevScore?: Score): Score => {
     let prevPianoMusic: IMusicBar[] | undefined;
     let prevBassMusic: IMusicBar[] | undefined;
