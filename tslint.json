@@ -18,7 +18,8 @@
     "array-type": false,
     "max-classes-per-file": false,
     "no-empty-interface": false,
-    "member-ordering": false
+    "member-ordering": false,
+    "no-var-requires": false
   },
   "linterOptions": {
     "exclude": [

@@ -3,7 +3,40 @@ import { Button, Glyphicon } from "react-bootstrap";
 import "./Dashboard.css";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
 import { NoteName, Tempo } from "../../../shared/types";
-import NoSleep from "react-no-sleep";
+
+/**
+ * NO SLEEP
+ */
+
+const NoSleep = require("nosleep.js");
+let noSleep = new NoSleep();
+let noSleepEnabled = false;
+
+// Courtesy of https://stackoverflow.com/questions/16863917/check-if-class-exists-somewhere-in-parent-vanilla-js
+// returns true if the element or one of its parents has the class classname
+function ancestorHasClass(element: Element, classname: string): boolean {
+    if (element.className.split(' ').indexOf(classname)>=0) return true;
+    return !!element.parentElement && ancestorHasClass((element as Element).parentElement as Element, classname);
+}
+
+function enableNoSleep(evt: Event) {
+    let toggleCondition = (
+        evt instanceof KeyboardEvent && evt.code === "Space" || 
+        (
+            evt instanceof MouseEvent && 
+            !!evt.target && ancestorHasClass(evt.target as Element, "play-button")
+        )
+    );
+
+    if (toggleCondition) {
+        noSleepEnabled ? noSleep.disable() : noSleep.enable();
+        noSleepEnabled = !noSleepEnabled;
+    }
+}
+
+/**
+ * COMPONENT
+ */
 
 export interface IDashboardProps {
     isMobile?: boolean;
@@ -122,19 +155,11 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
         }
 
         return (
-            <NoSleep >
-                {({ isOn, enable, disable }: any) => (
-                    <Button 
-                        className="play-button" 
-                        onClick={(
-                            inSession 
-                                ? (evt: React.SyntheticEvent<any>) => { disable(evt); this._onStop(); }
-                                : (evt: React.SyntheticEvent<any>) => { enable(evt); this._onPlay(); }
-                        )} >
-                        <Glyphicon glyph={inSession ? "stop" : "play"} />
-                    </Button>
-                )}
-            </NoSleep>
+            <Button 
+                className="play-button" 
+                onClick={inSession ? this._onStop : this._onPlay } >
+                <Glyphicon glyph={inSession ? "stop" : "play"} />
+            </Button>
         );
     }
 
@@ -222,5 +247,20 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
         if (chartIsLoaded && stop) {
             stop();
         }
+    }
+
+    /**
+     * LIFE CYCLE
+     */
+
+    public componentDidMount() {
+        window.addEventListener("click", enableNoSleep, false);
+        window.addEventListener("keyup", enableNoSleep, false);
+    }
+
+    public componentWillUnmount() {
+        window.removeEventListener("click", enableNoSleep, false);
+        window.removeEventListener("keyup", enableNoSleep, false);
+        noSleep.disable();
     }
 }
