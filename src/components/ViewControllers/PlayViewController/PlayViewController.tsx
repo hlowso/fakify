@@ -261,9 +261,13 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             return;
         } 
 
+        this._disableNoSleep();
+        this.props.SoundActions.killTake();
+    }
+
+    private _disableNoSleep = () => {
         noSleep.disable();
         noSleepEnabled = false;
-        this.props.SoundActions.killTake();
     }
 
     private _recontextualize = (newKeyContext: NoteName) => {
@@ -521,7 +525,7 @@ function ancestorHasClass(element: Element, classname: string): boolean {
 }
 
 function enableNoSleep(evt: Event) {
-    let toggleCondition = (
+    let enableCondition = !noSleepEnabled && (
         evt instanceof KeyboardEvent && evt.code === "Space" || 
         (
             evt instanceof MouseEvent && 
@@ -529,8 +533,8 @@ function enableNoSleep(evt: Event) {
         )
     );
 
-    if (toggleCondition) {
-        noSleepEnabled ? noSleep.disable() : noSleep.enable();
-        noSleepEnabled = !noSleepEnabled;
+    if (enableCondition) {
+        noSleep.enable();
+        noSleepEnabled = true;
     }
 }
