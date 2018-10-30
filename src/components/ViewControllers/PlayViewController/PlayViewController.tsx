@@ -205,7 +205,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                         tempo={chartIsLoaded ? (this._chart as Chart).tempo : undefined}
                         onTempoChange={this._resetTempo}
                         start={this._startSession}
-                        stop={this._stopSession} 
+                        stop={() => { isStoppingSessionWithStopButtonOrSpaceBar = true; this._stopSession(); }} 
                         onSelectAllBars={this._onSelectAllBars}
                         onSelectAllBarsHoverChange={this._onToggleSelectAllBarsHover} />
                 </div>
@@ -460,9 +460,12 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             return;
         }
 
-        sessionManager && sessionManager.inSession 
-            ? this._stopSession() 
-            : this._startSession();
+        if (sessionManager && sessionManager.inSession) {
+            isStoppingSessionWithStopButtonOrSpaceBar = true;
+            this._stopSession(); 
+        } else {
+            this._startSession();
+        }
 
         this.setState({ spaceClickDone: false });
     }
@@ -516,6 +519,7 @@ export default PlayViewController;
 const NoSleep = require("nosleep.js");
 let noSleep = new NoSleep();
 let noSleepEnabled = false;
+let isStoppingSessionWithStopButtonOrSpaceBar = false;
 
 // Courtesy of https://stackoverflow.com/questions/16863917/check-if-class-exists-somewhere-in-parent-vanilla-js
 // returns true if the element or one of its parents has the class classname
@@ -525,8 +529,12 @@ function ancestorHasClass(element: Element, classname: string): boolean {
 }
 
 function enableNoSleep(evt: Event) {
-    let enableCondition = !noSleepEnabled && (
-        evt instanceof KeyboardEvent && evt.code === "Space" || 
+    let enableCondition = !noSleepEnabled && !isStoppingSessionWithStopButtonOrSpaceBar && (
+        (
+            evt instanceof KeyboardEvent && 
+            evt.code === "Space" &&
+            (evt.target as Element).tagName !== "INPUT"
+        ) || 
         (
             evt instanceof MouseEvent && 
             !!evt.target && ancestorHasClass(evt.target as Element, "play-button")
@@ -537,4 +545,6 @@ function enableNoSleep(evt: Event) {
         noSleep.enable();
         noSleepEnabled = true;
     }
+
+    isStoppingSessionWithStopButtonOrSpaceBar = false;
 }
