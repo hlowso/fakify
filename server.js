@@ -73379,6 +73379,30 @@ class Chart {
         this._runExternalUpdate();
     }
 }
+Chart.barsAreEqual = (b1, b2, ignoreKeysAndSubbeats = true) => {
+    let s = JSON.stringify;
+    if (!ignoreKeysAndSubbeats) {
+        return s(b1) === s(b2);
+    }
+    if (b1.barIdx !== b2.barIdx) {
+        return false;
+    }
+    if (s(b1.timeSignature) !== s(b2.timeSignature)) {
+        return false;
+    }
+    if (b1.chordSegments.length !== b2.chordSegments.length) {
+        return false;
+    }
+    for (let i = 0; i < b1.chordSegments.length; i++) {
+        if (b1.chordSegments[i].beatIdx !== b2.chordSegments[i].beatIdx) {
+            return false;
+        }
+        if (s(b1.chordSegments[i].chordName) !== s(b2.chordSegments[i].chordName)) {
+            return false;
+        }
+    }
+    return true;
+};
 Chart.validTempo = (tempo) => {
     if (!Array.isArray(tempo) || tempo.length !== 2) {
         return false;
