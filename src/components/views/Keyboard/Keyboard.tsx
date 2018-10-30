@@ -27,11 +27,10 @@ export interface IKeyboardState {
 class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
     private _BLACK_KEY_INDICES = [1, 3, 6, 8, 10];
     private _KEY_HEIGHT = "70px";
-    private _KEY_WIDTH_FACTOR = 1;
-    private _WIDER_UPPER_WHITE_KEY_WIDTH = `${this._KEY_WIDTH_FACTOR * 25}px`;
-    private _NARROWER_UPPER_WHITE_KEY_WIDTH = `${this._KEY_WIDTH_FACTOR * 15}px`;
-    private _LOWER_WHITE_KEY_WIDTH = `${this._KEY_WIDTH_FACTOR * 35}px`;
-    private _BLACK_KEY_WIDTH = `${this._KEY_WIDTH_FACTOR * 20}px`;
+    private _WIDER_UPPER_WHITE_KEY_WIDTH = 25; 
+    private _NARROWER_UPPER_WHITE_KEY_WIDTH = 15; 
+    private _LOWER_WHITE_KEY_WIDTH = 35; 
+    private _BLACK_KEY_WIDTH = 20; 
 
     constructor(props: IKeyboardProps) {
         super(props);
@@ -55,11 +54,11 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
     }
 
     public renderKeys = (): JSX.Element => {
-        let { lowestKey, highestKey } = this.props;
+        let { lowestKey, highestKey, isMobile } = this.props;
         let upperElements = [],
             lowerElements = [];
 
-        for (let note = lowestKey; note < highestKey; note ++) {
+        for (let note = lowestKey; note <= highestKey; note ++) {
             let noteNameIndex = note % 12;
             let noteName = MusicHelper.NOTE_NAMES[noteNameIndex];
             let isBlackKey = this._BLACK_KEY_INDICES.indexOf(noteNameIndex) !== -1;
@@ -72,12 +71,16 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
             }
         }
 
+        let dynamicStyle = {
+            height: isMobile ? 50 : 80
+        };
+
         return (
             <div className="keys" onMouseLeave={() => this.onPianoKeyUp()}>
-                <div className="upper-keys">
+                <div className="upper-keys" style={dynamicStyle}>
                     {upperElements}
                 </div>
-                <div className="lower-keys">
+                <div className="lower-keys" style={dynamicStyle}>
                     {lowerElements}
                 </div>
             </div>
@@ -87,12 +90,12 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
     public getWhiteKey = (note: number, noteName: NoteName) => {
         let { lowestKey, highestKey } = this.props;
         let upperStyle = {
-            width: this._WIDER_UPPER_WHITE_KEY_WIDTH, 
+            flexGrow: this._WIDER_UPPER_WHITE_KEY_WIDTH, 
             height: this._KEY_HEIGHT
         };
 
         let lowerStyle = {
-            width: this._LOWER_WHITE_KEY_WIDTH, 
+            flexGrow: this._LOWER_WHITE_KEY_WIDTH, 
             height: this._KEY_HEIGHT
         }
 
@@ -102,14 +105,14 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
                 MusicHelper.NOTE_NAMES[9]
             ].indexOf(noteName) !== -1
         ) {
-            upperStyle.width = this._NARROWER_UPPER_WHITE_KEY_WIDTH;
+            upperStyle.flexGrow = this._NARROWER_UPPER_WHITE_KEY_WIDTH;
         }
 
         if (note === lowestKey) {
-            upperStyle.width = this._WIDER_UPPER_WHITE_KEY_WIDTH;
+            upperStyle.flexGrow = this._WIDER_UPPER_WHITE_KEY_WIDTH;
         }
         if (note === highestKey) {
-            upperStyle.width = this._LOWER_WHITE_KEY_WIDTH;
+            upperStyle.flexGrow = this._LOWER_WHITE_KEY_WIDTH;
         }
 
         return {
@@ -120,7 +123,7 @@ class Keyboard extends Component<IKeyboardProps, IKeyboardState> {
 
     public getBlackKey = (note: number, noteName: NoteName): JSX.Element => {
         let blackKeyStyle = {
-            width: this._BLACK_KEY_WIDTH, 
+            flexGrow: this._BLACK_KEY_WIDTH, 
             height: this._KEY_HEIGHT
         };
 

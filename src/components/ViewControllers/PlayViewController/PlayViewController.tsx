@@ -162,8 +162,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         let rangeStartNote = inSession ? (sessionManager as ListeningSessionManager).rangeStartNote : MusicHelper.LOWEST_A;
         let rangeEndNote = inSession ? (sessionManager as ListeningSessionManager).rangeEndNote : MusicHelper.HIGHEST_C;
         let showKeyChanges = true;
-        let lowestKey = isMobile ? 45 : MusicHelper.LOWEST_A;
-        let highestKey = isMobile ? 72 : MusicHelper.LOWEST_A + 88;
+        let lowestKey = isMobile ? (window.innerWidth > 700 ? 33 : 45) : MusicHelper.LOWEST_A;
+        let highestKey = isMobile ? (window.innerWidth > 550 ? 84 : 72) : MusicHelper.LOWEST_A + 87;
 
         return (
             <div id="play-view" className={isMobile ? "mobile" : undefined}>
