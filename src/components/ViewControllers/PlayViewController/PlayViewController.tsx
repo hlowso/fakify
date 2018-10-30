@@ -112,27 +112,27 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             }
         });
 
-        if (!$currBar) {
+        if (!$currBar || !$chart) {
             return;
         }
 
-        let doUpdate = false;
         let currBarY = $currBar.offset().top;
-        let chartUpperLimit = $chart.offset().top + 100;
-        let chartLowerLimit = $chart.offset().top + $chart.height() - 100;
+        let chartUpperLimit = $chart.offset().top + 150;
+        let chartLowerLimit = $chart.offset().top + $chart.height() - 150;
+
+        if (chartUpperLimit >= chartLowerLimit) {
+            return;
+        }
 
         let chartScrollTop = $chart[0].scrollTop;
         let chartScrollBottom = $chart[0].scrollHeight - $chart.height();
+        let distanceFromLimitToSweetSpot = (chartLowerLimit - chartUpperLimit) / 2;
 
         if (currBarY < chartUpperLimit && chartScrollTop !== 0) {
-            $chart[0].scrollTop -= 100;
-            doUpdate = true;
+            $chart[0].scrollTop -= (chartUpperLimit - currBarY) + distanceFromLimitToSweetSpot;
+            this.forceUpdate();
         } else if (currBarY > chartLowerLimit && chartScrollTop !== chartScrollBottom) {
-            $chart[0].scrollTop += 100;
-            doUpdate = true;
-        }
-
-        if (doUpdate) {
+            $chart[0].scrollTop += (currBarY - chartLowerLimit) + distanceFromLimitToSweetSpot;
             this.forceUpdate();
         }
     }
