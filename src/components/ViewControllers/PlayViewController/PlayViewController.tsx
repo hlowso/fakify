@@ -80,6 +80,9 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
         window.addEventListener("keydown", this._onKeyDown);
         window.addEventListener("keyup", this._onKeyUp);
+
+        window.addEventListener("click", enableNoSleep, false);
+        window.addEventListener("keyup", enableNoSleep, false);
     }
 
     public componentWillUnmount() {
@@ -87,6 +90,9 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
         window.removeEventListener("keydown", this._onKeyDown);
         window.removeEventListener("keyup", this._onKeyUp);
+
+        window.removeEventListener("click", enableNoSleep, false);
+        window.removeEventListener("keyup", enableNoSleep, false);
     }
 
     public componentDidUpdate() {
@@ -254,7 +260,9 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         if (!this._chart) {
             return;
         } 
-        
+
+        noSleep.disable();
+        noSleepEnabled = false;
         this.props.SoundActions.killTake();
     }
 
@@ -496,3 +504,33 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 }
 
 export default PlayViewController;
+
+/**
+ * NO SLEEP
+ */
+
+const NoSleep = require("nosleep.js");
+let noSleep = new NoSleep();
+let noSleepEnabled = false;
+
+// Courtesy of https://stackoverflow.com/questions/16863917/check-if-class-exists-somewhere-in-parent-vanilla-js
+// returns true if the element or one of its parents has the class classname
+function ancestorHasClass(element: Element, classname: string): boolean {
+    if (element.className.split(' ').indexOf(classname)>=0) return true;
+    return !!element.parentElement && ancestorHasClass((element as Element).parentElement as Element, classname);
+}
+
+function enableNoSleep(evt: Event) {
+    let toggleCondition = (
+        evt instanceof KeyboardEvent && evt.code === "Space" || 
+        (
+            evt instanceof MouseEvent && 
+            !!evt.target && ancestorHasClass(evt.target as Element, "play-button")
+        )
+    );
+
+    if (toggleCondition) {
+        noSleepEnabled ? noSleep.disable() : noSleep.enable();
+        noSleepEnabled = !noSleepEnabled;
+    }
+}
