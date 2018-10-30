@@ -18,7 +18,9 @@ export class SessionManager {
     protected _score: Score;
     protected _nextScore: Score;
     protected _queueTimes: ISubbeatTimeMap;
+    protected _nextQueueTimes: ISubbeatTimeMap;
     protected _startTime = NaN;
+    protected _nextStartTime = NaN;
     protected _userKeyStrokes: IKeyStrokeRecord[] = [];
     protected _rangeLength: number;
     protected _chorusIdx = -1;
@@ -184,15 +186,15 @@ export class SessionManager {
             score.changeVolume("drums", this._drumsVolFactor);
         }
 
-        CompAsync(this._chart, score)
-            .then(newScore => {
-                newScore.changeVolume("piano", this._pianoVolFactor);
-                newScore.changeVolume("doubleBass", this._bassVolFactor);
-                newScore.changeVolume("drums", this._drumsVolFactor);
-                this._nextScore = newScore;
-            });
-        
+        this._compileAndSetNextScoreAsync();
         return score;
+    }
+
+    protected async _compileAndSetNextScoreAsync(prevScore?: Score) {
+        this._nextScore = await CompAsync(this._chart, prevScore);
+        this._nextScore.changeVolume("piano", this._pianoVolFactor);
+        this._nextScore.changeVolume("doubleBass", this._bassVolFactor);
+        this._nextScore.changeVolume("drums", this._drumsVolFactor);
     }
 
     /**
@@ -269,12 +271,30 @@ export class SessionManager {
         return true;
     }
 
-    // TODO refactor this bish...
     private _resetQueueTimes = () => {
+        if (Number.isFinite(this._nextStartTime) && !!this._nextQueueTimes) {
+            this._startTime = this._nextStartTime;
+            this._queueTimes = this._nextQueueTimes;
+        } else {
+            this._setQueueTimes();
+        }
+
+        this._calculateNextQueueTimesAsync();
+    }
+
+    private _calculateNextQueueTimesAsync = async () => {
+        await new Promise(resolve => {
+            this._setQueueTimes(false);
+            resolve();
+        });
+    }
+
+    // TODO refactor this bish...
+    private _setQueueTimes = (current = true) => {
         // Set the global start time if necessary
         let startTime;
         if (!this.inSession) {
-            this._startTime = startTime = this._audioContext.currentTime;
+            startTime = this._audioContext.currentTime;
         } else {
             startTime = this._queueTimes[this._chart.rangeEndIdx + 1][0];
         }
@@ -282,18 +302,18 @@ export class SessionManager {
         let _subbeatDuration = this.subbeatDuration;
         let durationOfLastBarInRange = this._chart.lastBarInRange.durationInSubbeats as number;
         let durationOfFirstBarInRange = this._chart.firstBarInRange.durationInSubbeats as number;
-        this._queueTimes = {};
+        let queueTimes: ISubbeatTimeMap = {};
 
         // Start with the last bar of the chart (for handling user spills)
         let time = startTime - _subbeatDuration * durationOfLastBarInRange;
-        this._queueTimes[this._chart.rangeStartIdx - 1] = {};
+        queueTimes[this._chart.rangeStartIdx - 1] = {};
         
         for (
             let subbeatIdx = 0; 
             subbeatIdx < durationOfLastBarInRange; 
             subbeatIdx ++
         ) {
-            this._queueTimes[this._chart.rangeStartIdx - 1][subbeatIdx] = time;
+            queueTimes[this._chart.rangeStartIdx - 1][subbeatIdx] = time;
             time += _subbeatDuration;
         }
 
@@ -304,20 +324,28 @@ export class SessionManager {
                 queueTimeBar[subbeatIdx] = time;
                 time += _subbeatDuration;
             }
-            this._queueTimes[idx] = queueTimeBar;
+            queueTimes[idx] = queueTimeBar;
         });
 
         // And end with the next bar after the end of the range
         // (again for handling user spills)
-        this._queueTimes[this._chart.rangeEndIdx + 1] = {};
+        queueTimes[this._chart.rangeEndIdx + 1] = {};
 
         for (
             let subbeatIdx = 0; 
             subbeatIdx < durationOfFirstBarInRange; 
             subbeatIdx ++
         ) {
-            this._queueTimes[this._chart.rangeEndIdx + 1][subbeatIdx] = time;
+            queueTimes[this._chart.rangeEndIdx + 1][subbeatIdx] = time;
             time += _subbeatDuration;
+        }
+
+        if (current) {
+            this._startTime = startTime;
+            this._queueTimes = queueTimes;
+        } else {
+            this._nextStartTime = startTime;
+            this._nextQueueTimes = queueTimes;
         }
     }
 
