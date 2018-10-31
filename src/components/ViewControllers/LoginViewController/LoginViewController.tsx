@@ -42,6 +42,12 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
             accessGranted 
         } = this.state;
 
+        let message = (
+            <div className="message" >
+                Log in or sign up to create your own charts
+            </div>
+        );
+
         let emailLabel = !isMobile && (
             <td>
                 <label>Email:</label>
@@ -115,6 +121,7 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
                         <div className={ `login-container header-container ${isMobile ? "mobile-header" : undefined}` }>
                             <h1>Login</h1>                
                         </div>
+                        {message}
                         {content}
                         {this.renderHelpModal()}
                     </div>

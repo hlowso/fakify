@@ -49,7 +49,7 @@ class SignUpViewController extends Component<ISignUpVCProps, ISignUpVCState> {
 
         let message = (
             <div className="message" >
-                Sign up to create your own charts
+                Log in or sign up to create your own charts
             </div>
         );
 
