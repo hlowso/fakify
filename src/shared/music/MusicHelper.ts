@@ -58,6 +58,9 @@ export const getPresentableNoteName = (noteName: NoteName, keyContext = ""): str
     let noteNameChoices = /b/g.test(noteName) ? noteName.split("|") : [noteName, noteName];
 
     if (!keyContext || keyContext === "F" || /b/g.test(keyContext)) {
+        if (noteName === "B|Cb" && keyContext !== "G#|Ab" && keyContext !== "C#|Db" && keyContext !== "F#|Gb") {
+            return noteNameChoices[0];
+        }
         return noteNameChoices[1];
     }
     return noteNameChoices[0]; 
