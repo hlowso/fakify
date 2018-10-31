@@ -13,9 +13,9 @@ export interface INavUser {
 }
 
 export interface ITopNavProps {
+    path: string;
     user: INavUser | null;
     setUser: (user?: INavUser) => void;
-    redirect: (tab: string) => void;
     isMobile: boolean;
 }
 
@@ -92,18 +92,36 @@ class TopNav extends Component<ITopNavProps, {}> {
     }
 
     public renderUserSection() {
-        let { user, isMobile } = this.props;
+        let { user, isMobile, path } = this.props;
 
-        return !!user && (
+        if (path === "/login" || path === "/signup") {
+            return;
+        }
+
+        let content = !!user ? (
+            <Link
+                to="/login" 
+                id="logout-link" 
+                onClick={this._onClickLogout} 
+            >
+                <span style={{ float: "right" }}>Log Out</span>
+            </Link>
+        ) : (
+            <div style={{ color: "white" }}>
+                <Link to="/login" >
+                    <span style={{ fontSize: "130%" }}>Log In</span>
+                </Link>
+                &#47;
+                <Link to="/signup" >
+                    <span style={{ fontSize: "130%" }}>Sign Up</span>
+                </Link>
+            </div>
+        );
+
+        return (
             <div id="nav-user-section" className={isMobile ? "mobile" : undefined}>
                 {this.renderEmail()}
-                <Link
-                    to="/login" 
-                    id="logout-link" 
-                    onClick={this._onClickLogout} 
-                >
-                    <span style={{ float: "right" }}>Log Out</span>
-                </Link>
+                {content}
             </div>
         );
     }

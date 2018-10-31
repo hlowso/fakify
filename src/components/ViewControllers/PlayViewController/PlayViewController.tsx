@@ -13,15 +13,14 @@ import Chart from "../../../shared/music/Chart";
 
 import "./PlayViewControllerMobile.css";
 import "./PlayViewController.css";
-import { ISong, NoteName, PlayMode, Tempo, IMusicIdx, IChartBar } from "../../../shared/types";
+import { ISong, NoteName, PlayMode, Tempo, IMusicIdx, IChartBar, ISoundActions, IStateHelper } from "../../../shared/types";
 import { Dashboard } from "../../views/Dashboard/Dashboard";
 import $ from "jquery";
 
 export interface IPlayVCProps {
-    // TODO: get proper types for all this
     isMobile: boolean;
-    SoundActions: any;
-    StateHelper: any;
+    SoundActions: ISoundActions;
+    StateHelper: IStateHelper;
     sessionManager: SessionManager | ImprovSessionManager | ListeningSessionManager;
 }
 
@@ -59,21 +58,11 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
     ******************/
 
     public componentDidMount() {
-        let { SoundActions } = this.props;
-        let midiInputId = StorageHelper.getMidiInputId();
         let selectedSongId = StorageHelper.getSelectedSongId();
         let hideKeyboard = StorageHelper.getHideKeyboard();
 
         if (hideKeyboard !== this.state.hideKeyboard) {
             this.setState({ hideKeyboard });
-        }
-
-        if (midiInputId) {
-            let connectionSuccessful = SoundActions.connectToMidiInput(midiInputId);
-            if (!connectionSuccessful) {
-                StorageHelper.setMidiInputId("");
-            }
-            this.setState({ settingsModalOpen: !connectionSuccessful });
         }
 
         this.loadSongTitlesAsync(selectedSongId);

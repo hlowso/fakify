@@ -1,21 +1,46 @@
 import React, { Component } from "react";
 import { Switch, Route, Redirect } from "react-router";
-import WebAudioFontPlayer from "webaudiofont";
-import uuid from "uuid";
+import TopNav, { INavUser } from "../views/TopNav/TopNav";
+import LoginViewController from "../ViewControllers/LoginViewController/LoginViewController";
+import SignUpViewController from "../ViewControllers/SignUpViewController/SignUpViewController";
 import PlayViewController from "../ViewControllers/PlayViewController/PlayViewController";
 import CreateViewController from "../ViewControllers/CreateViewController/CreateViewController";
 import { StorageHelper } from "../../shared/StorageHelper";
-import * as MusicHelper from "../../shared/music/MusicHelper";
 import { 
     SessionManager, 
     ImprovSessionManager, 
     ListeningSessionManager 
 } from "../../shared/music/SessionManager";
 import * as Util from "../../shared/Util";
+import * as Api from "../../shared/Api";
 import soundfonts from "../../shared/music/soundfontsIndex";
+import Chart from "../../shared/music/Chart";
+import { PlayMode, IMidiMessage, IKeyStrokeRecord } from "src/shared/types";
 
-class AppRouter extends Component {
-    constructor(props) {
+const WebAudioFontPlayer = require("webaudiofont");
+
+export interface IAppRouterProps {
+    isMobile: boolean;
+}
+
+export interface IAppRouterState {
+    user?: INavUser | null;
+    loading?: boolean;
+    audioContext?: AudioContext | null;
+    fontPlayer?: any;
+    userPlayer?: any;
+    userInstrument?: string;
+    sessionManager?: SessionManager | ImprovSessionManager | ListeningSessionManager | null; 
+    userEnvelopes?: any;
+    redirectDestination?: string;
+    onUserSessionKeyStroke?: (keyStrokeRecord: IKeyStrokeRecord) => {};
+    pianoVolume?: number;
+    bassVolume?: number;
+    drumsVolume?: number;
+}
+
+class AppRouter extends Component<IAppRouterProps, IAppRouterState> {
+    constructor(props: IAppRouterProps) {
         super(props);
 
         // So the state of the AppRouter will be the global state
@@ -25,7 +50,6 @@ class AppRouter extends Component {
 
         this.state = {
             loading: true,
-            midiAccess: null,
             audioContext: null,
             fontPlayer: null,
             userPlayer: null,
@@ -33,26 +57,17 @@ class AppRouter extends Component {
             sessionManager: null,
             userEnvelopes: {},
             redirectDestination: "",
-            onUserSessionKeyStroke: (keyStrokeRecord) => {},
             pianoVolume: 10,
             bassVolume: 10,
             drumsVolume: 10
         };
     }
 
-    componentWillMount() {
-        let midiInputId = StorageHelper.getMidiInputId();
-
-        this._audioInitAsync()
+    public componentWillMount() {
+        this._authenticateAsync()
+            .then(() => this._audioInitAsync())
             .then(() => this._loadInstrumentsAsync())
-            .then(() => this.setMidiAccessAsync())
             .then(() => {
-                if (midiInputId) {
-                    let connectionSuccessful = this.connectToMidiInput(midiInputId);
-                    if (!connectionSuccessful) {
-                        StorageHelper.setMidiInputId("");
-                    }
-                }
                 this.setState({ loading: false });
             });
 
@@ -60,7 +75,7 @@ class AppRouter extends Component {
         let bassVolume = StorageHelper.getVolume("bass");
         let drumsVolume = StorageHelper.getVolume("drums");
 
-        let stateUpdate = {};
+        let stateUpdate: IAppRouterState = {};
 
         if (Number.isInteger(pianoVolume) && pianoVolume <= 10 && pianoVolume >= 0) {
             stateUpdate.pianoVolume = pianoVolume;
@@ -77,7 +92,7 @@ class AppRouter extends Component {
         this.setState(stateUpdate);
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    public componentDidUpdate(prevProps: IAppRouterProps, prevState: IAppRouterState) {
         let { redirectDestination, pianoVolume, bassVolume, drumsVolume } = this.state;
         
         if (redirectDestination) {
@@ -93,14 +108,32 @@ class AppRouter extends Component {
         } 
     }
 
-    render() {
+    public render() {
         let { isMobile } = this.props;
-        let { loading, sessionManager, redirectDestination } = this.state;
+        let { redirectDestination, user } = this.state;
+
+        return redirectDestination
+            ? (
+                <Redirect to={`/${redirectDestination}`} />
+            )
+            : (
+                <div id="app-router">
+                    <TopNav 
+                        path={window.location.pathname}
+                        isMobile={isMobile} 
+                        user={user || null} 
+                        setUser={this.setUser} />
+                    {this.renderRouter()}
+                </div>
+            );
+    }
+
+    public renderRouter() {
+
+        let { isMobile } = this.props;
+        let { loading, sessionManager } = this.state;
 
         let SoundActions = {
-            setMidiContextAsync: this.setMidiContextAsync,
-            setMidiAccessAsync: this.setMidiAccessAsync,
-            connectToMidiInput: this.connectToMidiInput,
             playRangeLoop: this.playRangeLoop,
             killTake: this.killTake,
             playUserMidiMessage: this.playUserMidiMessage,
@@ -109,18 +142,14 @@ class AppRouter extends Component {
 
         let StateHelper = {
             getState: () => this.state,
-            getMidiAccess: this.getMidiAccess,
-            setMidiAccess: this.setMidiAccess,
-            getCurrentUserKeysDepressed: this.getCurrentUserKeysDepressed,
-            subscribeToUserSessionKeyStroke: handler => this.setState({ onUserSessionKeyStroke: handler })
+            getCurrentUserKeysDepressed: this.getCurrentUserKeysDepressed
         };
 
         let PlayVCProps = {
             isMobile,
+            StateHelper,
             SoundActions,
-            StateHelper,            
-            sessionManager,
-            redirect: this._redirect
+            sessionManager: sessionManager as SessionManager | ImprovSessionManager | ListeningSessionManager
         };
 
         let CreateVCProps = {
@@ -132,28 +161,29 @@ class AppRouter extends Component {
         return loading
                 ? <h1>loading...</h1> 
                 : (
-                    redirectDestination
-                        ? (
-                            <Redirect to={redirectDestination} />
-                        )
-                        : (
-                            <Switch>
-                                <Route 
-                                    exact
-                                    path="/play" 
-                                    render={ () => <PlayViewController {...PlayVCProps}/> }
-                                />
-                                <Route 
-                                    exact
-                                    path="/create" 
-                                    render={ () => <CreateViewController {...CreateVCProps}/> }
-                                />
-                                <Route 
-                                    path="/" 
-                                    render={ () => <Redirect to="/play" /> }
-                                />
-                            </Switch>
-                        )
+                    <main style={{ height: window.innerHeight - 85 }} >
+                        <Switch>
+                            <Route 
+                                exact={true} 
+                                path='/signup' 
+                                render={() => <SignUpViewController isMobile={isMobile} />} />
+                            <Route 
+                                exact={true} 
+                                path='/login'
+                                render={() => <LoginViewController isMobile={isMobile} />} />
+                            <Route 
+                                exact={true}
+                                path="/play" 
+                                render={ () => <PlayViewController {...PlayVCProps} />} />
+                            <Route 
+                                exact={true}
+                                path="/create" 
+                                render={ () => <CreateViewController {...CreateVCProps}/> } />
+                            <Route 
+                                path="/" 
+                                render={ () => <Redirect to="/play" /> } />
+                        </Switch>
+                    </main>
                 );
     }
 
@@ -161,25 +191,29 @@ class AppRouter extends Component {
         STATE HELPER   
     *******************/
 
-    setMidiAccess = midiAccess => {
-        this.setState({ midiAccess });
-    }
+    // setMidiAccess = midiAccess => {
+    //     this.setState({ midiAccess });
+    // }
 
-    getMidiAccess = () => {
-        return this.state.midiAccess;
-    }
+    // getMidiAccess = () => {
+    //     return this.state.midiAccess;
+    // }
 
-    getCurrentUserKeysDepressed = () => {
+    public getCurrentUserKeysDepressed = () => {
         return Object.keys(this.state.userEnvelopes).map(key => Number(key));
+    }
+
+    public setUser = (user?: INavUser) => {
+        this.setState({ user });
     }
 
     /********************
         SOUND ACTIONS   
     ********************/
 
-    _audioInitAsync = () => {
+    private _audioInitAsync = () => {
         return new Promise((resolve, reject) => {
-            let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            let audioContext = new ((window as any).AudioContext || (window as any).webkitAudioContext)();
             let userPlayer = new WebAudioFontPlayer();
             let fontPlayer = new WebAudioFontPlayer();
 
@@ -191,7 +225,7 @@ class AppRouter extends Component {
         });
     }
 
-    _loadInstrumentAsync = instrument => {
+    private _loadInstrumentAsync = (instrument: string) => {
         let { audioContext, userPlayer, fontPlayer } = this.state;
         let font = soundfonts[instrument];
 
@@ -207,56 +241,56 @@ class AppRouter extends Component {
         });
     }
 
-    _loadInstrumentsAsync = () => {
+    private _loadInstrumentsAsync = () => {
         return Promise.all(Object.keys(soundfonts).map(instrument => this._loadInstrumentAsync(instrument)));
     }
 
-    setMidiAccessAsync = () => {
-        return new Promise((resolve, reject) => {
-            if (!navigator.requestMIDIAccess) {
-                resolve();
-            }
+    // setMidiAccessAsync = () => {
+    //     return new Promise((resolve, reject) => {
+    //         if (!navigator.requestMIDIAccess) {
+    //             resolve();
+    //         }
 
-            navigator.requestMIDIAccess()
-            .then(midiAccess => { 
-                this.setState({ midiAccess }, resolve);
-            });
-        });
-    }
+    //         navigator.requestMIDIAccess()
+    //         .then(midiAccess => { 
+    //             this.setState({ midiAccess }, resolve);
+    //         });
+    //     });
+    // }
 
-    connectToMidiInput = inputId => {
-        if (!inputId) return false;
+    // connectToMidiInput = inputId => {
+    //     if (!inputId) return false;
 
-        let { midiAccess } = this.state;
-        if (!midiAccess) return false;
+    //     let { midiAccess } = this.state;
+    //     if (!midiAccess) return false;
 
-        let inputs = midiAccess.inputs.values();  
-        let connectionSuccessful = false;  
+    //     let inputs = midiAccess.inputs.values();  
+    //     let connectionSuccessful = false;  
 
-        for( 
-            let input = inputs.next(); 
-            input && !input.done; 
-            input = inputs.next()
-        ) {
-            if (inputId === input.value.id) {
-                input.value.onmidimessage = this.playUserMidiMessage;
-                connectionSuccessful = true;
-            } else {
-                input.value.onmidimessage = null;
-            }
-        }
+    //     for( 
+    //         let input = inputs.next(); 
+    //         input && !input.done; 
+    //         input = inputs.next()
+    //     ) {
+    //         if (inputId === input.value.id) {
+    //             input.value.onmidimessage = this.playUserMidiMessage;
+    //             connectionSuccessful = true;
+    //         } else {
+    //             input.value.onmidimessage = null;
+    //         }
+    //     }
 
-        return connectionSuccessful;
-    }
+    //     return connectionSuccessful;
+    // }
 
-    playUserMidiMessage = message => {
-        let { userPlayer, userInstrument, audioContext, userEnvelopes, sessionManager } = this.state;
+    public playUserMidiMessage = (message: IMidiMessage) => {
+        let { userPlayer, userInstrument, audioContext, userEnvelopes } = this.state;
         let { data } = message;
         let type = data[0], note = data[1], velocity = data[2] / 127;
-        let userEnvelopesUpdate = Util.copyObject(userEnvelopes);
+        let userEnvelopesClone = Util.copyObject(userEnvelopes);
         let existingEnvelope = userEnvelopes[note];
 
-        let noteOff = (existingEnvelop, userEnvelopesUpdate, clearAll = false) => {
+        let noteOff = (existingEnvelop: any, userEnvelopesUpdate: any, clearAll = false) => {
             // note is NaN when this function is being triggered by a 
             // mouse event
             if (clearAll || isNaN(note)) {
@@ -275,15 +309,15 @@ class AppRouter extends Component {
             case 1: 
                 // This is the case where a user drags the cursor
                 // across the keys with the mouse button held down
-                noteOff(existingEnvelope, userEnvelopesUpdate, true);
+                noteOff(existingEnvelope, userEnvelopesClone, true);
 
             case 144:
                 if (velocity) {
-                    let { currentTime, destination } = audioContext;
-                    userEnvelopesUpdate[note] = userPlayer.queueWaveTable(
+                    let { currentTime, destination } = audioContext as any;
+                    userEnvelopesClone[note] = userPlayer.queueWaveTable(
                         audioContext, 
                         destination, 
-                        window[soundfonts[userInstrument].variable], 
+                        window[soundfonts[userInstrument as string].variable], 
                         currentTime, 
                         note,
                         1000,
@@ -296,34 +330,34 @@ class AppRouter extends Component {
                     );
                 }
                 else {
-                    noteOff(existingEnvelope, userEnvelopesUpdate);
+                    noteOff(existingEnvelope, userEnvelopesClone);
                 }
                 break;
 
             case 128:
-                noteOff(existingEnvelope, userEnvelopesUpdate);
+                noteOff(existingEnvelope, userEnvelopesClone);
                 break;
 
             default:
                 console.log("PRECOMP - unknown midi message type:", type);
         }
 
-        this.setState({ userEnvelopes: userEnvelopesUpdate });
+        this.setState({ userEnvelopes: userEnvelopesClone });
     }
 
-    onUserKeyStroke = (note, time, velocity) => {
+    public onUserKeyStroke = (note: number, time: number, velocity: number) => {
         let { 
             sessionManager,
             onUserSessionKeyStroke 
         } = this.state;
 
-        if (sessionManager && sessionManager.inSession) {
+        if (sessionManager && sessionManager.inSession && onUserSessionKeyStroke) {
             let record = sessionManager.recordUserKeyStroke(note, time, velocity);
             onUserSessionKeyStroke(record);
         }
     }
 
-    playRangeLoop = (chart, playMode) => {
+    public playRangeLoop = (chart: Chart, playMode?: PlayMode) => {
         this.killTake();
         let { audioContext, fontPlayer, pianoVolume, bassVolume, drumsVolume } = this.state;
         
@@ -345,16 +379,16 @@ class AppRouter extends Component {
             fontPlayer, 
             chart,
             this.forceUpdate.bind(this),
-            pianoVolume / 10,
-            bassVolume / 10,
-            drumsVolume / 10
+            (pianoVolume as number) / 10,
+            (bassVolume as number) / 10,
+            (drumsVolume as number) / 10
         );
 
         sessionManager.start();
         this.setState({ sessionManager });
     }
 
-    killTake = () => {
+    public killTake = () => {
         let { sessionManager } = this.state;
         if (sessionManager) {
             sessionManager.stop();
@@ -362,7 +396,7 @@ class AppRouter extends Component {
         this.setState({ sessionManager: null });
     }
 
-    setVolume = (instrument, vol) => {
+    public setVolume = (instrument: string, vol: number) => {
         switch(instrument) {
             default:
             case "piano": 
@@ -378,7 +412,15 @@ class AppRouter extends Component {
         MISCELLANEOUS   
     ********************/
 
-    _redirect = tab => {
+   private _authenticateAsync = async () => {
+        let user = await Api.authenticateAsync();
+        if (user) {
+            let navUser = { email: user.email };
+            this.setState({ user: navUser });
+        }
+    }
+
+    private _redirect = (tab: string) => {
         this.setState({ redirectDestination: `/${tab}` });
     }
 };

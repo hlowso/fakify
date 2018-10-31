@@ -1,4 +1,17 @@
 import * as Mongo from "mongodb";
+import Chart from "./music/Chart";
+
+export interface IStateHelper {
+    getState: () => any;
+    getCurrentUserKeysDepressed: () => number[];
+}
+
+export interface ISoundActions {
+    playRangeLoop: (chart: Chart, playMode?: PlayMode) => void;
+    killTake: () => void;
+    playUserMidiMessage: (message: IMidiMessage) => void;
+    setVolume: (instrument: string, vol: number) => void;
+}
 
 export interface IDataHelper {
     countUsersAsync: () => Promise<number>;
