@@ -44,7 +44,7 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
 
         let message = (
             <div className="message" >
-                Log in or sign up to create your own charts
+                Log in or sign up to create your own charts. It's free!
             </div>
         );
 
