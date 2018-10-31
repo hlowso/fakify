@@ -1,5 +1,6 @@
 import React, { Component, CSSProperties } from "react";
 import { Link, Redirect } from "react-router-dom";
+import { Modal, Button } from "react-bootstrap";
 import * as Api from "../../../shared/Api";
 import { LoginResponse } from "../../../shared/types";
 import "./AdminViewMobile.css";
@@ -10,6 +11,7 @@ export interface ILoginVCProps {
 }
 
 export interface ILoginVCState {
+    showHelpModal?: boolean;
     currentEmail?: string;
     currentPassword?: string;
     errorMessage?: string;
@@ -21,6 +23,7 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
     constructor(props: ILoginVCProps) {
         super(props);
         this.state = {
+            showHelpModal: false,
             currentEmail: "",
             currentPassword: "",
             errorMessage: "",
@@ -87,6 +90,10 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
             />
         );
 
+        let forgotLink = (
+            <a style={{ cursor: "pointer" }} onClick={() => this.setState({ showHelpModal: true }) } >Forgot your password?</a>
+        );
+
         let signupLink = (
             <Link to="/signup" className={ isMobile ? "mobile-link" : undefined } >Don't have an account?</Link>
         );
@@ -97,8 +104,8 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
 
         let content = (
             isMobile 
-                ? this.renderContentMobile(emailInput, passwordInput, submitInput, signupLink, errorElem)
-                : this.renderContentDesktop(emailLabel, emailInput, passwordLabel, passwordInput, submitInput, signupLink, errorElem)
+                ? this.renderContentMobile(emailInput, passwordInput, submitInput, forgotLink, signupLink, errorElem)
+                : this.renderContentDesktop(emailLabel, emailInput, passwordLabel, passwordInput, submitInput, forgotLink,  signupLink, errorElem)
         );
 
         return accessGranted 
@@ -109,6 +116,7 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
                             <h1>Login</h1>                
                         </div>
                         {content}
+                        {this.renderHelpModal()}
                     </div>
         );
     }
@@ -117,7 +125,8 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
         emailInput: JSX.Element, 
         passwordInput: JSX.Element, 
         submitInput: JSX.Element, 
-        signupLink: JSX.Element, 
+        forgotLink: JSX.Element, 
+        signupLink: JSX.Element,
         errorElem: JSX.Element | boolean
     ) {
         let { isLoggingIn } = this.state;
@@ -148,6 +157,7 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
                         {passwordInput}
                         {submitInput}
                         {errorElem}
+                        {forgotLink}
                         {signupLink}
                     </div>
                 )   
@@ -160,6 +170,7 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
         passwordLabel: JSX.Element | boolean, 
         passwordInput: JSX.Element, 
         submitInput: JSX.Element, 
+        forgotLink: JSX.Element,
         signupLink: JSX.Element, 
         errorElem: JSX.Element | boolean
     ) {
@@ -198,6 +209,7 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
                                     <tr>
                                         <td>
                                             <div>
+                                                {forgotLink}
                                                 {signupLink}
                                             </div>
                                         </td>
@@ -220,6 +232,31 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
                 <span>logging in...</span>
             </div>
         );
+    }
+
+    public renderHelpModal() {
+        return (
+            <Modal show={this.state.showHelpModal} onHide={this._onHideModal} >
+                <Modal.Header closeButton={true} >
+                    <h2>Help</h2>
+                </Modal.Header>
+                <Modal.Body>
+                    <p style={{ fontSize: "130%" }}>
+                        For help resetting a password, or any other inquiries/comments, 
+                        feel free to contact me at h.canderleigh@gmail.com or 1 438 990 5125
+                    </p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={this._onHideModal}>
+                        Done
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+
+    private _onHideModal = () => {
+        this.setState({ showHelpModal: false });
     }
 
     private _handleInputChange = (event: React.ChangeEvent<any>) => {
