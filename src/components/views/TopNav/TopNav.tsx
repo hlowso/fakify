@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import * as Util from "../../../shared/Util";
 import { Link } from "react-router-dom";
 import Cx from "classnames";
-// import { Button, ButtonGroup } from "react-bootstrap";
 import * as Api from "../../../shared/Api";
 import { containerStyles } from "./TopNavMobileStyles";
 import "./TopNav.css";
@@ -15,7 +14,6 @@ export interface INavUser {
 export interface ITopNavProps {
     path: string;
     user: INavUser | null;
-    setUser: (user?: INavUser) => void;
     isMobile: boolean;
 }
 
@@ -39,8 +37,8 @@ class TopNav extends Component<ITopNavProps, {}> {
     }
 
     public renderBrand() {
-        let { user, isMobile } = this.props;
-        return (!isMobile || !user) && (
+        let { isMobile } = this.props;
+        return !isMobile && (
             <span className="nav-brand">Fakify</span>
         );
     }
@@ -59,7 +57,7 @@ class TopNav extends Component<ITopNavProps, {}> {
             "active": activeTab === "create"
         });
 
-        return !Util.objectIsEmpty(user) && (
+        return (
             <div id="tab-list" className={isMobile ? "mobile" : undefined} >
                 <button className={playClasses} >
                     <Link to="/play" style={{
@@ -75,7 +73,7 @@ class TopNav extends Component<ITopNavProps, {}> {
                     </Link>
                 </button>
                 <button className={createClasses} >
-                    <Link to="/create" style={{
+                    <Link to={!!user ? "/create" : "/login"} style={{
                         display: "block",
                         height: '100%',
                         width: '100%',
@@ -99,13 +97,12 @@ class TopNav extends Component<ITopNavProps, {}> {
         }
 
         let content = !!user ? (
-            <Link
-                to="/login" 
+            <a
                 id="logout-link" 
                 onClick={this._onClickLogout} 
             >
                 <span style={{ float: "right" }}>Log Out</span>
-            </Link>
+            </a>
         ) : (
             <div style={{ color: "white" }}>
                 <Link to="/login" >
@@ -142,8 +139,8 @@ class TopNav extends Component<ITopNavProps, {}> {
     }
 
     private _onClickLogout = async (event: React.SyntheticEvent<any>) => {
-        this.props.setUser();
         await Api.logoutAsync();
+        window.location.reload();
     }
 }
 

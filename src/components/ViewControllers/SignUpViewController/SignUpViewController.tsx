@@ -47,6 +47,12 @@ class SignUpViewController extends Component<ISignUpVCProps, ISignUpVCState> {
             signupSuccessful 
         } = this.state;
 
+        let message = (
+            <div className="message" >
+                Sign up to create your own charts
+            </div>
+        );
+
         let emailLabel =  (
             <td>
                 <label>Email:</label>
@@ -113,7 +119,7 @@ class SignUpViewController extends Component<ISignUpVCProps, ISignUpVCState> {
                         <div className={`signup-container header-container ${isMobile ? "mobile-header" : undefined}`}>
                             <h1>Sign Up</h1>
                         </div>
-                    
+                        {message}
                         {
                             !isMobile
                                 ? this.renderContentDesktop(emailLabel, emailInput, passwordLabel, passwordInput, confirmPasswordLabel, confirmPasswordInput, loginLink, errorMessageElem)
@@ -272,7 +278,7 @@ class SignUpViewController extends Component<ISignUpVCProps, ISignUpVCState> {
                     return this.setState({ errorMessage: res });
 
                 case SignupResponse.OK: 
-                    return this.setState({ signupSuccessful: true });
+                    return window.location.replace("/play");
 
                 default:
                     return this.setState({ errorMessage: SignupResponse.Error });

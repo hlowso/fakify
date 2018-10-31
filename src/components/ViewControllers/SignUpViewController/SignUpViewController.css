@@ -4,6 +4,22 @@
     margin-top: 20px;
 }
 
+#signup-view .message {
+    margin-top: 10px;
+    text-align: center;
+    color: white;
+    border-top: solid 1px lime;
+    border-bottom: solid 1px lime;
+    font-size: 150%;
+    display: flex;
+    margin-bottom: 10px;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 60px;
+    background-color: indianred;
+}
+
 #signup-view .form-container {
     padding: 45px 15px 15px;
 

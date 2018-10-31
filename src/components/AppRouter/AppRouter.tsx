@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Switch, Route, Redirect } from "react-router";
-import TopNav, { INavUser } from "../views/TopNav/TopNav";
+import { INavUser } from "../views/TopNav/TopNav";
 import LoginViewController from "../ViewControllers/LoginViewController/LoginViewController";
 import SignUpViewController from "../ViewControllers/SignUpViewController/SignUpViewController";
 import PlayViewController from "../ViewControllers/PlayViewController/PlayViewController";
@@ -12,7 +12,6 @@ import {
     ListeningSessionManager 
 } from "../../shared/music/SessionManager";
 import * as Util from "../../shared/Util";
-import * as Api from "../../shared/Api";
 import soundfonts from "../../shared/music/soundfontsIndex";
 import Chart from "../../shared/music/Chart";
 import { PlayMode, IMidiMessage, IKeyStrokeRecord } from "src/shared/types";
@@ -21,10 +20,10 @@ const WebAudioFontPlayer = require("webaudiofont");
 
 export interface IAppRouterProps {
     isMobile: boolean;
+    user?: INavUser;
 }
 
 export interface IAppRouterState {
-    user?: INavUser | null;
     loading?: boolean;
     audioContext?: AudioContext | null;
     fontPlayer?: any;
@@ -32,7 +31,6 @@ export interface IAppRouterState {
     userInstrument?: string;
     sessionManager?: SessionManager | ImprovSessionManager | ListeningSessionManager | null; 
     userEnvelopes?: any;
-    redirectDestination?: string;
     onUserSessionKeyStroke?: (keyStrokeRecord: IKeyStrokeRecord) => {};
     pianoVolume?: number;
     bassVolume?: number;
@@ -56,7 +54,6 @@ class AppRouter extends Component<IAppRouterProps, IAppRouterState> {
             userInstrument: "piano",
             sessionManager: null,
             userEnvelopes: {},
-            redirectDestination: "",
             pianoVolume: 10,
             bassVolume: 10,
             drumsVolume: 10
@@ -64,8 +61,7 @@ class AppRouter extends Component<IAppRouterProps, IAppRouterState> {
     }
 
     public componentWillMount() {
-        this._authenticateAsync()
-            .then(() => this._audioInitAsync())
+        this._audioInitAsync()
             .then(() => this._loadInstrumentsAsync())
             .then(() => {
                 this.setState({ loading: false });
@@ -93,12 +89,8 @@ class AppRouter extends Component<IAppRouterProps, IAppRouterState> {
     }
 
     public componentDidUpdate(prevProps: IAppRouterProps, prevState: IAppRouterState) {
-        let { redirectDestination, pianoVolume, bassVolume, drumsVolume } = this.state;
+        let { pianoVolume, bassVolume, drumsVolume } = this.state;
         
-        if (redirectDestination) {
-            this.setState({ redirectDestination: "" });
-        }
-
         if(
             prevState.pianoVolume !== pianoVolume ||
             prevState.bassVolume !== bassVolume ||
@@ -109,28 +101,8 @@ class AppRouter extends Component<IAppRouterProps, IAppRouterState> {
     }
 
     public render() {
-        let { isMobile } = this.props;
-        let { redirectDestination, user } = this.state;
 
-        return redirectDestination
-            ? (
-                <Redirect to={`/${redirectDestination}`} />
-            )
-            : (
-                <div id="app-router">
-                    <TopNav 
-                        path={window.location.pathname}
-                        isMobile={isMobile} 
-                        user={user || null} 
-                        setUser={this.setUser} />
-                    {this.renderRouter()}
-                </div>
-            );
-    }
-
-    public renderRouter() {
-
-        let { isMobile } = this.props;
+        let { isMobile, user } = this.props;
         let { loading, sessionManager } = this.state;
 
         let SoundActions = {
@@ -154,8 +126,7 @@ class AppRouter extends Component<IAppRouterProps, IAppRouterState> {
 
         let CreateVCProps = {
             isMobile,
-            StateHelper,
-            redirect: this._redirect
+            StateHelper
         };
 
         return loading
@@ -178,7 +149,7 @@ class AppRouter extends Component<IAppRouterProps, IAppRouterState> {
                             <Route 
                                 exact={true}
                                 path="/create" 
-                                render={ () => <CreateViewController {...CreateVCProps}/> } />
+                                render={ () => !!user ? <CreateViewController {...CreateVCProps}/> : <Redirect to="/login" />} />
                             <Route 
                                 path="/" 
                                 render={ () => <Redirect to="/play" /> } />
@@ -201,10 +172,6 @@ class AppRouter extends Component<IAppRouterProps, IAppRouterState> {
 
     public getCurrentUserKeysDepressed = () => {
         return Object.keys(this.state.userEnvelopes).map(key => Number(key));
-    }
-
-    public setUser = (user?: INavUser) => {
-        this.setState({ user });
     }
 
     /********************
@@ -408,21 +375,6 @@ class AppRouter extends Component<IAppRouterProps, IAppRouterState> {
         }
     }
 
-    /********************
-        MISCELLANEOUS   
-    ********************/
-
-   private _authenticateAsync = async () => {
-        let user = await Api.authenticateAsync();
-        if (user) {
-            let navUser = { email: user.email };
-            this.setState({ user: navUser });
-        }
-    }
-
-    private _redirect = (tab: string) => {
-        this.setState({ redirectDestination: `/${tab}` });
-    }
 };
 
 export default AppRouter;

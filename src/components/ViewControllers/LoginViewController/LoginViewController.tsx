@@ -256,7 +256,7 @@ class LoginViewController extends Component<ILoginVCProps, ILoginVCState> {
                 return this.setState({ errorMessage: res as string, isLoggingIn: false });
 
             case LoginResponse.OK:
-                return this.setState({ accessGranted: true, isLoggingIn: false });
+                return window.location.replace("/play");
 
             default:
                 return this.setState({ errorMessage: LoginResponse.Error, isLoggingIn: false });

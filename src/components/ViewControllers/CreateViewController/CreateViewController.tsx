@@ -4,7 +4,7 @@ import { BarEditingModal } from "../../views/BarEditingModal/BarEditingModal";
 import { MAX_TITLE_LENGTH, BAR_LIMIT } from '../../../shared/Constants';
 import * as Util from "../../../shared/Util";
 import * as Api from "../../../shared/Api";
-import { ISong, IChartBar, ChordShape, Tab, NoteName, TimeSignature, ChartResponse, ITitles, ISongTitle } from "../../../shared/types";
+import { ISong, IChartBar, ChordShape, NoteName, TimeSignature, ChartResponse, ITitles, ISongTitle } from "../../../shared/types";
 import Chart from "../../../shared/music/Chart";
 import $ from "jquery";
 import "./CreateViewController.css";
@@ -14,7 +14,6 @@ import { USER_CHART_LIMIT } from "../../../shared/Constants";
 export interface ICreateVCProps {
     isMobile: boolean;
     StateHelper: any;
-    redirect: (tab: Tab) => void;
 }
 
 export interface ICreateVCState {
@@ -320,7 +319,6 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     }
 
     private _onSaveChartAsync = async () => {
-        let { redirect } = this.props;
         let { updatingChartId } = this.state;
         let newSong = this._consolidateSong();
 
@@ -334,7 +332,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
 
         switch (result) {
             case ChartResponse.OK:
-                return redirect(Tab.Create);
+                return window.location.reload();
 
             case ChartResponse.TitleTaken:
                 return this.setState({ errorMessage: result });
