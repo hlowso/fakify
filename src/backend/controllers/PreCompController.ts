@@ -1,4 +1,3 @@
-import path from "path";
 import { ApiHelper } from "ApiHelper";
 import { Router } from "express";
 import { IUser, ISession } from "../../shared/types";
@@ -29,14 +28,11 @@ export class PreCompController {
             this._sessionToken = api.decryptSessionTokenEncryption(req.get("X-Session-Token"));
 
             if (this._sessionToken) {
-                this._user = await this._api.data.getUserByTokenAsync((this._sessionToken as ISession).token);
+                this._user = await this._api.data.getUserByTokenAsync(this._sessionToken.token);
             }
 
             if (!this._user) {
                 switch (this._unauthorizedResponse) {
-
-                    case UnauthorizedResponse.GoToLogin: 
-                        return res.sendFile(path.resolve(__dirname, "build/index.html"));
 
                     case UnauthorizedResponse.Ignore:
                         await next();

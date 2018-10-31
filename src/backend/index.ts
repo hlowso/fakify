@@ -1,15 +1,11 @@
 import express from "express";
-// import cookieSession from "cookie-session";
 import bodyParser from "body-parser";
 import { DataHelper } from "DataHelper";
 import { ApiHelper } from "ApiHelper";
 
 import { AdminController } from "./controllers/api/AdminController";
 import { ChartsController } from "./controllers/api/ChartsController";
-// import { AdminViewController } from "./controllers/views/AdminViewController";
-// import { StandardViewController } from "./controllers/views/StandardViewController";
-
-// import { AdminRoutes, StandardRoutes } from "../shared/types";
+import { ChartsPrivateController } from "./controllers/api/ChartsPrivateController";
 
 const exitHandler = (data: DataHelper, options: any, exitCode: number) => {
     data.close();
@@ -73,10 +69,6 @@ const exitHandler = (data: DataHelper, options: any, exitCode: number) => {
         }
     });
 
-    // Set routes
-    // server.use(AdminRoutes, new AdminViewController(api).router);
-    // server.use(StandardRoutes, new StandardViewController(api).router);
-
     let apiRouter = express.Router();
 
     apiRouter.use("/admin",
@@ -84,7 +76,8 @@ const exitHandler = (data: DataHelper, options: any, exitCode: number) => {
     );
 
     apiRouter.use("/songs", 
-        new ChartsController(api).router
+        new ChartsController(api).router,
+        new ChartsPrivateController(api).router
     );
 
     server.use("/api", apiRouter);
