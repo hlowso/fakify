@@ -202,15 +202,6 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                         onSelectAllBars={this._onSelectAllBars}
                         onSelectAllBarsHoverChange={this._onToggleSelectAllBarsHover} />
                 </div>
-                
-                    {/* <TrainingWindow  
-                        startSession={this._startSession} 
-                        stopSession={this._stopSession} 
-                        setPlayMode={this._setPlayMode} 
-                        playMode={playMode} 
-                        report={report} 
-                        userShouldPlay={userShouldPlay}
-                        firstNoteColor={this._firstNoteColor} /> */}
                 {!hideKeyboard && <Keyboard
                     isMobile={isMobile}
                     lowestKey={lowestKey}
@@ -300,10 +291,6 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
         this.setState({ selectAllBarsHovered: hovering });        
     }
-
-    // private _setPlayMode = (playMode: PlayMode) => {
-    //     this.setState({ playMode });
-    // }
 
     /************
         MUSIC
