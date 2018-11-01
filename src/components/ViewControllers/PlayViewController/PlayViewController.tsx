@@ -72,6 +72,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
         window.addEventListener("click", enableNoSleep, false);
         window.addEventListener("keyup", enableNoSleep, false);
+
+        window.addEventListener("blur", this._stopSession);
     }
 
     public componentWillUnmount() {
@@ -82,6 +84,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
         window.removeEventListener("click", enableNoSleep, false);
         window.removeEventListener("keyup", enableNoSleep, false);
+
+        window.removeEventListener("blur", this._stopSession);
     }
 
     public componentDidUpdate() {
