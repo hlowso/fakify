@@ -1,7 +1,7 @@
 import * as Util from "../../Util";
 import { Note } from "./Note";
 import { LOWEST_A, HIGHEST_C } from "./../MusicHelper";
-import { NoteName, RelativeNoteName } from "../../types";
+import { NoteName, RelativeNoteName, INoteChange } from "../../types";
 
 export class Domain {
     public static NOTE_NAMES: NoteName[] = ["C", "C#|Db", "D", "D#|Eb", "E", "F", "F#|Gb", "G", "G#|Ab", "A", "A#|Bb", "B|Cb"]; 
@@ -22,7 +22,7 @@ export class Domain {
         return Domain.NOTE_NAMES.indexOf(noteName);
     }
 
-    public static applyExtension = (noteClasses: Note[], extension?: NoteName[]) => {
+    public static applyExtension = (noteClasses: Note[], extension?: INoteChange[]) => {
 
         let newNoteClasses = noteClasses.map(note => note.clone());
 
@@ -30,15 +30,20 @@ export class Domain {
             return newNoteClasses;
         }
 
-        extension.forEach((name, pos) => {
+        extension.forEach((change, pos) => {
 
+            // First check if name is already one of the notes in the domain
+            let newNoteIdx = noteClasses.findIndex(n => n.name === change.target);
             let exisitngNoteIdx = newNoteClasses.findIndex(note => note.position === pos);
 
             if (exisitngNoteIdx !== -1) {
                 newNoteClasses.splice(exisitngNoteIdx, 1);
             }
 
-            newNoteClasses.push(new Note(name, pos, true));            
+            if (newNoteIdx === -1) {
+                newNoteClasses.push(new Note(change.target as NoteName, pos, true));            
+            }
+
         });
 
         newNoteClasses.sort((a, b) => a.basePitch - b.basePitch);
@@ -113,6 +118,10 @@ export class Domain {
         return positions.sort((a, b) => a - b);
     }
 
+    public noteClassAtPos(pos: number) {
+        return this._noteClasses.find(n => n.position === pos);
+    }
+
     public pitchToPosition(pitch: number) {
         let noteClass = this._noteClasses.find(n => n.basePitch === Util.mod(pitch, 12));
 
@@ -179,7 +188,7 @@ export class Domain {
         return null;
     }
 
-    public mutate(extension: NoteName[]) {
+    public mutate(extension: INoteChange[]) {
         this._noteClasses = Domain.applyExtension(this._noteClasses, extension);
         this._buildFromNoteClasses();
     }

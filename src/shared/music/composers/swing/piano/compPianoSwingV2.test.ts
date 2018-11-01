@@ -8,6 +8,7 @@ import C_Blues_bars from "../../../../test-data/bars-c-blues";
 import barsJustForFun from "../../../../test-data/bars-just-for-fun";
 import bars7_4_full from "../../../../test-data/bars-7-4-full-bar";
 import barsByeBye from "../../../../test-data/barsByeByeBlackbird";
+import barsWitchcraft from "../../../../test-data/barsWitchcraft";
 import { compPianoSwingV2 } from "./compPianoSwingV2";
 import { IChartBar, Feel, IChordStretch, IMusicBar, IStroke } from "../../../../types";
 
@@ -19,6 +20,7 @@ const chart7_4Full = new Chart(() => {}, bars7_4_full as IChartBar[], "A#|Bb", [
 const chart251Multi = new Chart(() => {}, _251_multichord_bars as IChartBar[], "B|Cb", [ 120, 4 ], Feel.Swing);
 const shortByeBye = new Chart(() => {}, barsByeBye as IChartBar[], "F", [ 120, 4 ], Feel.Swing, 3, 17);
 const chartByeBye = new Chart(() => {}, barsByeBye as IChartBar[], "F", [ 120, 4 ], Feel.Swing);
+const chartWitchcraft = new Chart(() => {}, barsWitchcraft, "F", [ 120, 4 ], Feel.Swing);
 
 
 test("generates at least 1 voicing per chord stretch", () => {
@@ -82,7 +84,8 @@ test("piano music is valid", () => {
 		chart251Multi,
 		chart7_4Full,
 		_251_chart,
-		C_Blues_chart
+		C_Blues_chart,
+		chartWitchcraft
 	];
 
 	for (let chart of charts) {

@@ -72,6 +72,14 @@ const chordData: IChordDatum[] = [
         testScaleBase: "F",
         testScaleNotes: [ "F", "G", "A", "A#|Bb", "C", "D", "E" ],
         testScaleNotesPostExtension: [ "F#|Gb", "G", "A", "A#|Bb", "C", "D", "E" ]
+    },
+    {
+        chordName: [ "A", ChordShape.Min$5 ],
+        reqNotes: [ "C", "F" ],
+        notes: [ "A", "C", "F" ],
+        testScaleBase: "F",
+        testScaleNotes: [ "F", "G", "A", "A#|Bb", "C", "D", "E" ],
+        testScaleNotesPostExtension: [ "F", "G", "A", "A#|Bb", "C", "D"]
     }
 ];
 
@@ -194,6 +202,8 @@ function noteClassesTest(domain: Domain, pitches: NoteName[]) {
 
     let correctNoteClasses = !domain.noteClasses.some(noteFailure);
 
-    return correctNoteClasses && pitches.length === domain.noteClasses.length;
+    let uniques = Util.uniqueReduction(domain.noteClasses);
+
+    return correctNoteClasses && pitches.length === domain.noteClasses.length && uniques.length === domain.noteClasses.length;
 
 }

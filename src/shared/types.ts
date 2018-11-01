@@ -354,5 +354,10 @@ export interface IShapeInfo {
     shape: ChordShape;
     baseIntervals: number[];
     relativeTonicPositions: RelativeNoteName[]; 
-    extension?: RelativeNoteName[];
+    extension?: INoteChange[];
+}
+
+export interface INoteChange {
+    target: RelativeNoteName | NoteName;
+    origin?: RelativeNoteName | NoteName;
 }

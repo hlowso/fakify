@@ -2,151 +2,151 @@ import * as Util from "../../Util";
 import { contextualize, voicingContainsNoClusters } from '../../music/MusicHelper';
 import { Domain } from "./Domain";
 import { Note } from "./Note";
-import { NoteName, ChordName, ChordShape, IShapeInfo, RelativeNoteName } from "../../types";
+import { NoteName, ChordName, ChordShape, IShapeInfo, RelativeNoteName, INoteChange } from "../../types";
 import { Scale } from "./ScaleClass";
 
 export class Chord extends Domain {
     public static shapeToInfo = (shape: ChordShape): IShapeInfo => {
         let infoBase: IShapeInfo;
-        let extension: RelativeNoteName[] = [];
+        let extension: INoteChange[] = [];
         switch (shape) {
-
+    
             /**
              * MAJOR
              */
-
+    
             case ChordShape.Maj:
                 return {
                     shape,
                     baseIntervals: [0, 4, 7],
                     relativeTonicPositions: ["1", "4", "5"]
                 };
-
+    
             case ChordShape.Maj6:
                 infoBase = Chord.shapeToInfo(ChordShape.Maj);
-                extension[13] = "6";
+                extension[13] = { target: "6" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Maj7:
                 return {
                     shape,
                     baseIntervals: [0, 4, 7, 11],
                     relativeTonicPositions: ["1", "4"]
                 };
-
+    
             case ChordShape.Maj9:
                 infoBase = Chord.shapeToInfo(ChordShape.Maj7);
-                extension[9] = "2";
+                extension[9] = { target: "2" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Add9:
                 infoBase = Chord.shapeToInfo(ChordShape.Maj);
-                extension[9] = "2";
+                extension[9] = { target: "2" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Majb5:
                 infoBase = Chord.shapeToInfo(ChordShape.Maj);
-                extension[5] = "T";
+                extension[5] = { target: "T", origin: "5" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Maj7b5:
                 infoBase = Chord.shapeToInfo(ChordShape.Maj7);
-                extension[5] = "T";
+                extension[5] = { target: "T", origin: "5" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Maj7$5:
                 infoBase = Chord.shapeToInfo(ChordShape.Maj7);
-                extension[5] = "U";
+                extension[5] = { target: "U", origin: "5" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Maj7b9:
                 infoBase = Chord.shapeToInfo(ChordShape.Maj7);
-                extension[9] = "H";
+                extension[9] = { target: "H", origin: "2" };
                 return { ...infoBase, extension };
             
             case ChordShape.Maj$9:
                 infoBase = Chord.shapeToInfo(ChordShape.Maj);
-                extension[9] = "N";
+                extension[9] = { target: "N", origin: "2" };
                 return { ...infoBase, extension };
             
             case ChordShape.Majb9:
                 infoBase = Chord.shapeToInfo(ChordShape.Maj);
-                extension[9] = "H";
+                extension[9] = { target: "H", origin: "2" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Maj7$9:
                 infoBase = Chord.shapeToInfo(ChordShape.Maj7);
-                extension[9] = "N";
+                extension[9] = { target: "N", origin: "2" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Maj7$11:
                 infoBase = Chord.shapeToInfo(ChordShape.Maj7);
-                extension[11] = "T";
+                extension[11] = { target: "T", origin: "4" };
                 return { ...infoBase, extension };
-
+    
             /**
              * MINOR
              */
-
+    
             case ChordShape.Min:
                 return {
                     shape,
                     baseIntervals: [0, 3, 7],
                     relativeTonicPositions: ["2", "3", "6"]
                 };
-
+    
             case ChordShape.Min6: 
                 infoBase = Chord.shapeToInfo(ChordShape.Min);
-                extension[13] = "6";
+                extension[13] = { target: "6" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Min7:
                 return {
                     shape,
                     baseIntervals: [0, 3, 7, 10],
                     relativeTonicPositions: ["2", "3", "6"]
                 };
-
+    
             case ChordShape.Min9: 
                 infoBase = Chord.shapeToInfo(ChordShape.Min7);
-                extension[9] = "2";
+                extension[9] = { target: "2" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Min11: 
                 infoBase = Chord.shapeToInfo(ChordShape.Min7);
-                extension[11] = "4";
+                extension[11] = { target: "4" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Min$5: 
                 infoBase = Chord.shapeToInfo(ChordShape.Min);
-                extension[5] = "U";
+                extension[5] = { target: "U", origin: "5" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Min7b5: 
                 infoBase = Chord.shapeToInfo(ChordShape.Min7);
-                extension[5] = "T";
+                extension[5] = { target: "T", origin: "5" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Min7$5: 
                 infoBase = Chord.shapeToInfo(ChordShape.Min7);
-                extension[5] = "U";
+                extension[5] = { target: "U", origin: "5" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Min7b9: 
                 infoBase = Chord.shapeToInfo(ChordShape.Min7);
-                extension[9] = "H";
+                extension[9] = { target: "H", origin: "2" };
                 return { ...infoBase, extension };   
                 
             case ChordShape.Min7$11: 
                 infoBase = Chord.shapeToInfo(ChordShape.Min7);
-                extension[11] = "T";
+                extension[11] = { target: "T", origin: "4"};
                 return { ...infoBase, extension };
-
+    
             case ChordShape.MinMaj7:
                 infoBase = Chord.shapeToInfo(ChordShape.Min7);
-                extension[7] = "7";
+                extension[7] = { target: "7", origin: "J" };
                 return { ...infoBase, extension };
-
+    
             /**
              * DOMINANT
              */
@@ -157,110 +157,110 @@ export class Chord extends Domain {
                     baseIntervals: [0, 4, 7, 10],
                     relativeTonicPositions: ["5"]
                 };
-
+    
             case ChordShape.Dom9:
                 infoBase = Chord.shapeToInfo(ChordShape.Dom7);
-                extension[9] = "2";
+                extension[9] = { target: "2" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Dom11:
                 infoBase = Chord.shapeToInfo(ChordShape.Dom7);
-                extension[11] = "4";
+                extension[11] = { target: "4" };
                 return { ...infoBase, extension };
             
             case ChordShape.Dom7b5:
                 infoBase = Chord.shapeToInfo(ChordShape.Dom7);
-                extension[5] = "T";
+                extension[5] = { target: "T", origin: "5" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Dom7$5:
                 infoBase = Chord.shapeToInfo(ChordShape.Dom7);
-                extension[5] = "U";
+                extension[5] = { target: "U", origin: "5" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Dom7b9:
                 infoBase = Chord.shapeToInfo(ChordShape.Dom7);
-                extension[9] = "H";
+                extension[9] = { target: "H", origin: "2" };
                 return { ...infoBase, extension };
             
             case ChordShape.Dom7$9:
                 infoBase = Chord.shapeToInfo(ChordShape.Dom7);
-                extension[9] = "N";
+                extension[9] = { target: "N", origin: "2" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Dom7$11:
                 infoBase = Chord.shapeToInfo(ChordShape.Dom7);
-                extension[11] = "T";
+                extension[11] = { target: "T", origin: "4" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Dom9b5:
                 infoBase = Chord.shapeToInfo(ChordShape.Dom7);
-                extension[9] = "2";
-                extension[5] = "T";
+                extension[9] = { target: "2" };
+                extension[5] = { target: "T", origin: "5" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Dom9$5:
                 infoBase = Chord.shapeToInfo(ChordShape.Dom7);
-                extension[9] = "2";
-                extension[5] = "U";
+                extension[9] = { target: "2" };
+                extension[5] = { target: "U", origin: "5"};
                 return { ...infoBase, extension };
-
+    
             /**
              * AUGMENTED
              */
-
+    
             case ChordShape.Aug:
                 infoBase = Chord.shapeToInfo(ChordShape.Maj);
-                extension[5] = "U";
+                extension[5] = { target: "U", origin: "5"};
                 return { ...infoBase, extension };
             
             case ChordShape.Aug7:
                 infoBase = Chord.shapeToInfo(ChordShape.Maj);
-                extension[5] = "U";
-                extension[7] = "J";
+                extension[5] = { target: "U", origin: "5" };
+                extension[7] = { target: "J", origin: "7" };
                 return { ...infoBase, extension };
-
+    
             case ChordShape.Aug7$9:
                 infoBase = Chord.shapeToInfo(ChordShape.Maj);
-                extension[5] = "U";
-                extension[7] = "J";
-                extension[9] = "N";
+                extension[5] = { target: "U", origin: "5" };
+                extension[7] = { target: "J", origin: "7" };
+                extension[9] = { target: "N", origin: "2" };
                 return { ...infoBase, extension };
-
+    
             /**
              * DIMINISHED
              */
-
+    
             case ChordShape.Dim:
                 return {
                     shape,
                     baseIntervals: [0, 3, 6],
                     relativeTonicPositions: ["7"]
                 };
-
+    
             case ChordShape.Dim7:
                 infoBase = Chord.shapeToInfo(ChordShape.Dim);
-                extension[7] = "6";
+                extension[7] = { target: "6", origin: "J" };
                 return { ...infoBase, extension };
             
             /**
              * SUSPENDED
              */
-
+    
             case ChordShape.Sus2:
                 return {
                     shape,
                     baseIntervals: [0, 2, 7],
                     relativeTonicPositions: ["1", "2", "4", "5", "6"]
                 };
-
+    
             case ChordShape.Sus4:
                 return {
                     shape,
                     baseIntervals: [0, 5, 7],
                     relativeTonicPositions: ["1", "2", "3", "5", "6"]
                 };
-
+    
             default: 
                 throw new Error(`PRECOMP - error: unkown ChordShape ${shape}`);
         }
@@ -299,9 +299,10 @@ export class Chord extends Domain {
         return voicingContainsNoClusters(newNotes.map(n => n.pitch));
     }
 
+    private _chordName: ChordName;
     private _suitableKeys: NoteName[]; 
     private _order: number;
-    private _extension?: NoteName[];
+    private _extension?: INoteChange[];
     private _clusterIndexOrder: [number, number, number];    
 
     constructor(chordName: ChordName) {
@@ -329,21 +330,41 @@ export class Chord extends Domain {
             return new Note(pitch, pos, required);
         });
 
-        let contextualizedExtension = (
+        let contextualizedExtension: INoteChange[] | undefined = (
             extension
-                ? extension.map(name => contextualize(name, baseNoteName as NoteName))
+                ? extension.map(change => ({ 
+                    target: contextualize(change.target as RelativeNoteName, baseNoteName as NoteName),
+                    origin: change.origin ? contextualize(change.origin as RelativeNoteName, baseNoteName as NoteName) : undefined
+                }))
                 : undefined
         );
 
         let noteClasses =  Domain.applyExtension(baseNotes, contextualizedExtension);
         super(noteClasses);
 
+        this._chordName = chordName;
         this._extension = contextualizedExtension;
         this._suitableKeys = Chord.getSuitableKeys(chordName) as NoteName[];
         this._order = this.noteClasses.reduce((highest, note) => note.position > highest ? note.position : highest, 0);
 
         // Set the order in which cluster notes should be dealt with
         this._clusterIndexOrder = [1, 2, 0];
+    }
+
+    /**
+     * PUBLIC
+     */
+
+    public get order() {
+        return this._order;
+    }
+
+    public get suitableKeys() {
+        return this._suitableKeys;
+    }
+
+    public get chordName() {
+        return this._chordName;
     }
 
     public applyExtensionToScale(scale: Scale) {
@@ -356,21 +377,28 @@ export class Chord extends Domain {
         let scaleTonic = scale.getTonicPitch();
         let posDiff = scale.getPitchPositionDiff(chordTonic, scaleTonic);
 
-        if (isNaN(posDiff)) {
+        if (!Number.isInteger(posDiff)) {
             return scale;
         }
 
-        let scaleExtension: NoteName[] = [];      
+        let scaleExtension: INoteChange[] = [];      
 
-        this._extension.forEach((name, pos) => {
+        this._extension.forEach((change, pos) => {
 
-            let scaleChangePos = pos + posDiff;
+            // if scaleExtension contains a note name that is already in scale, but the 
+            // position of the note name in scaleExtension is different to the position 
+            // of the same note in scale, then the position in scale for that note will 
+            // be changed in favor of scale extension. SO, if the scale does contain the
+            // target name, but does not contain the origin name, ignore the change.
+            if (!(scale.hasNote(change.target as NoteName) && !!change.origin && !scale.hasNote(change.origin as NoteName))) {
+                let scaleChangePos = pos + posDiff;
 
-            if (scaleChangePos > 7 || scaleChangePos < 1) {
-                scaleChangePos = Util.mod(scaleChangePos, 7);
-            } 
+                if (scaleChangePos > 7 || scaleChangePos < 1) {
+                    scaleChangePos = Util.mod(scaleChangePos, 7);
+                } 
 
-            scaleExtension[scaleChangePos] = name;
+                scaleExtension[scaleChangePos] = change;
+            }
         });
 
         scale.mutate(scaleExtension);
@@ -393,6 +421,10 @@ export class Chord extends Domain {
         }
         return Domain.getPitchInstance(target, lowestFifth.pitch, above);
     }
+
+    /**
+     * PRIVATE
+     */
 
     private _generateVoicing(target: number, firstChoices: Note[] = []) {
 
@@ -571,13 +603,5 @@ export class Chord extends Domain {
             }
         }
         return null;
-    }
-
-    get order() {
-        return this._order;
-    }
-
-    get suitableKeys() {
-        return this._suitableKeys;
     }
 }

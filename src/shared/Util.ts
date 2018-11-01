@@ -145,3 +145,14 @@ export const vectorSum = (arr1: number[], arr2: number[]) => {
 
     return arr1.map((a, i) => a + arr2[i]);
 }
+
+export function uniqueReduction<T>(arr: T[]) {
+    let reduction = (acc: T[], curr: T) => {
+        if (acc.indexOf(curr) === -1) {
+            return [ ...acc, curr ];
+        }
+        return acc;
+    }
+
+    return arr.reduce(reduction, []);
+}
