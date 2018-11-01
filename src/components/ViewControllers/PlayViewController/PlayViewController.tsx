@@ -51,6 +51,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             hideKeyboard: false,
             selectAllBarsHovered: false     
         };
+
+        this.onClickPlayButton = this.onClickPlayButton.bind(this);
     }
 
     /*****************
@@ -70,8 +72,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         window.addEventListener("keydown", this._onKeyDown);
         window.addEventListener("keyup", this._onKeyUp);
 
-        window.addEventListener("click", enableNoSleep, false);
-        window.addEventListener("keyup", enableNoSleep, false);
+        window.addEventListener("click", this.onClickPlayButton, false);
 
         window.addEventListener("blur", this._stopSession);
     }
@@ -82,8 +83,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         window.removeEventListener("keydown", this._onKeyDown);
         window.removeEventListener("keyup", this._onKeyUp);
 
-        window.removeEventListener("click", enableNoSleep, false);
-        window.removeEventListener("keyup", enableNoSleep, false);
+        window.removeEventListener("click", this.onClickPlayButton, false);
 
         window.removeEventListener("blur", this._stopSession);
     }
@@ -151,7 +151,6 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             selectAllBarsHovered
         } = this.state;
 
-        // let selectedSongId = selectedSong ? (selectedSong as ISong)._id: null;
         let inSession = sessionManager && sessionManager.inSession;
         let sessionFailed = sessionManager && sessionManager.failure;
         let chartIsLoaded = !!this._chart && !sessionFailed;
@@ -197,8 +196,6 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                         onKeyChange={this._recontextualize}
                         tempo={chartIsLoaded ? (this._chart as Chart).tempo : undefined}
                         onTempoChange={this._resetTempo}
-                        start={this._startSession}
-                        stop={() => { isStoppingSessionWithStopButtonOrSpaceBar = true; this._stopSession(); }} 
                         onSelectAllBars={this._onSelectAllBars}
                         onSelectAllBarsHoverChange={this._onToggleSelectAllBarsHover} />
                 </div>
@@ -245,13 +242,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             return;
         } 
 
-        this._disableNoSleep();
-        this.props.SoundActions.killTake();
-    }
-
-    private _disableNoSleep = () => {
         noSleep.disable();
-        noSleepEnabled = false;
+        this.props.SoundActions.killTake();
     }
 
     private _recontextualize = (newKeyContext: NoteName) => {
@@ -428,6 +420,10 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             return;
         }
 
+        if (!noSleepEnabled()) {
+            noSleep.enable();
+        }
+
         this.setState({ 
             spaceClickDone: true 
         });
@@ -441,7 +437,6 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         }
 
         if (sessionManager && sessionManager.inSession) {
-            isStoppingSessionWithStopButtonOrSpaceBar = true;
             this._stopSession(); 
         } else {
             this._startSession();
@@ -487,6 +482,22 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
 
         this.setState(stateUpdate, stateCallback)
     }
+
+    // It seems that the window itself needs to subscribe to the function that calls noSleep.enable(),
+    // so I've added the on play button click handler here
+    private onClickPlayButton(evt: Event) {
+        if(!evt.target || !ancestorHasClass(evt.target as Element, "play-button")) {
+            return;
+        }
+    
+        if (!!this.props.sessionManager && this.props.sessionManager.inSession) {
+            noSleep.disable();
+            this._stopSession();
+        } else {
+            noSleep.enable();
+            this._startSession();
+        }
+    }
     
 }
 
@@ -498,8 +509,6 @@ export default PlayViewController;
 
 const NoSleep = require("nosleep.js");
 let noSleep = new NoSleep();
-let noSleepEnabled = false;
-let isStoppingSessionWithStopButtonOrSpaceBar = false;
 
 // Courtesy of https://stackoverflow.com/questions/16863917/check-if-class-exists-somewhere-in-parent-vanilla-js
 // returns true if the element or one of its parents has the class classname
@@ -508,23 +517,6 @@ function ancestorHasClass(element: Element, classname: string): boolean {
     return !!element.parentElement && ancestorHasClass((element as Element).parentElement as Element, classname);
 }
 
-function enableNoSleep(evt: Event) {
-    let enableCondition = !noSleepEnabled && !isStoppingSessionWithStopButtonOrSpaceBar && (
-        (
-            evt instanceof KeyboardEvent && 
-            evt.code === "Space" &&
-            (evt.target as Element).tagName !== "INPUT"
-        ) || 
-        (
-            evt instanceof MouseEvent && 
-            !!evt.target && ancestorHasClass(evt.target as Element, "play-button")
-        )
-    );
-
-    if (enableCondition) {
-        noSleep.enable();
-        noSleepEnabled = true;
-    }
-
-    isStoppingSessionWithStopButtonOrSpaceBar = false;
+function noSleepEnabled() {
+    return !!noSleep.noSleepTimer || (noSleep.noSleepVideo && !noSleep.noSleepVideo.paused);
 }

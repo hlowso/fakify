@@ -17,8 +17,6 @@ export interface IDashboardProps {
     onKeyChange?: (context: NoteName) => void;
     tempo?: Tempo;
     onTempoChange?: (tempo: Tempo) => void;
-    start?: () => void;
-    stop?: () => void;
     onSelectAllBars?: () => void;
     onSelectAllBarsHoverChange?: (hovering: boolean) => void;
 }
@@ -126,8 +124,7 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
 
         return (
             <Button 
-                className="play-button" 
-                onClick={inSession ? this._onStop : this._onPlay } >
+                className="play-button"  >
                 <Glyphicon glyph={inSession ? "stop" : "play"} />
             </Button>
         );
@@ -202,20 +199,6 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
         let { onKeyChange, chartIsLoaded } = this.props;
         if (chartIsLoaded && onKeyChange) {
             onKeyChange(key);
-        }
-    }
-
-    private _onPlay = () => {
-        let { start, chartIsLoaded } = this.props;
-        if (chartIsLoaded && start) {
-            start();
-        }
-    }
-
-    private _onStop = () => {
-        let { stop, chartIsLoaded } = this.props;
-        if (chartIsLoaded && stop) {
-            stop();
         }
     }
 }
