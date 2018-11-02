@@ -192,6 +192,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                         inSession={inSession}
                         chartIsLoaded={chartIsLoaded}
                         context={chartIsLoaded ? (this._chart as Chart).context : undefined}
+                        contextQuality={chartIsLoaded ? (this._chart as Chart).contextQuality : undefined}
                         hiddenKeyboard={hideKeyboard}
                         onKeyChange={this._recontextualize}
                         tempo={chartIsLoaded ? (this._chart as Chart).tempo : undefined}

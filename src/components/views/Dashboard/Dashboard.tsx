@@ -13,6 +13,7 @@ export interface IDashboardProps {
     inSession?: boolean;
     chartIsLoaded?: boolean;
     context?: NoteName;
+    contextQuality?: "Major" | "Minor" | null;
     hiddenKeyboard?: boolean;
     onKeyChange?: (context: NoteName) => void;
     tempo?: Tempo;
@@ -152,7 +153,7 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
     }
 
     public renderKeySelect() {
-        let { chartIsLoaded, context } = this.props;
+        let { chartIsLoaded, context, contextQuality } = this.props;
 
         if (!chartIsLoaded) {
             return;
@@ -160,9 +161,6 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
         
         return (
             <div style={{ display: "flex", alignSelf: "center" }} >
-                <div>
-                    Key:&nbsp;
-                </div>
                 <select 
                     value={context}
                     onChange={event => this._resetKey((event.target.value as NoteName))}
@@ -170,6 +168,9 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
                 >
                     {this.renderKeyOptions()}
                 </select> 
+                <div>
+                    &nbsp;{contextQuality || ""}
+                </div>
             </div>
         );
     }

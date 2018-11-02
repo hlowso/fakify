@@ -6,6 +6,13 @@ import { Domain } from "./domain/Domain";
 import { Chord } from "./domain/ChordClass";
 import { BAR_LIMIT, MAX_TITLE_LENGTH } from "../Constants";
 
+interface IKeyCount {
+    key: NoteName | RelativeNoteName;
+    count: number;
+    asMajorCount: number;
+    asRelativeMajorCount: number;
+};
+
 class Chart {
     private _songId?: Mongo.ObjectId | string;
     private _barsBase: IChartBar[];
@@ -232,113 +239,149 @@ class Chart {
     }
     
     public static addKeysToBars = (bars: IChartBar[], contextualized = false) => {
-        if (bars.length > 0) {
-            let noteSet: (RelativeNoteName | NoteName)[] = Domain.RELATIVE_NOTE_NAMES;
-            if (contextualized) {
-                noteSet = Domain.NOTE_NAMES;
-            }
-    
-            interface IStretchKeyPossibilities {
-                keys: (RelativeNoteName | NoteName)[];
-                segmentCount: number;
-            }
-    
-            let keyStretches: IStretchKeyPossibilities[] = [];        
-            let possibleChordKeys: Array<(RelativeNoteName | NoteName)[]> = [];
-            let keyStretchPossibilities: IStretchKeyPossibilities[] = [];
-            let currentStretchPossibility: IStretchKeyPossibilities;
-    
-            // Get the possible keys per chord segment
-            bars.forEach(barBase => {
-                barBase.chordSegments.forEach(segment => { 
-                    possibleChordKeys = [ 
-                        ...possibleChordKeys, 
-                        Chord.getSuitableKeys(segment.chordName as ChordName) as (RelativeNoteName | NoteName)[] 
-                    ]; 
-                }); 
-            }); 
+        if (!Array.isArray(bars) || bars.length === 0) {
+            return;
+        }
 
-            // Get the possible keys per key stretch
-            currentStretchPossibility = { keys: possibleChordKeys[0], segmentCount: 1 };
-            for (let i = 1; i < possibleChordKeys.length; i ++) {
-                let chordKeys = possibleChordKeys[i];
-                let keyOverlap = currentStretchPossibility.keys.filter(key => chordKeys.indexOf(key) !== -1);
-    
-                if (keyOverlap.length === 0) {
-                    keyStretchPossibilities.push(currentStretchPossibility);
-                    currentStretchPossibility = { keys: chordKeys, segmentCount: 1 };
-                } else {
-                    currentStretchPossibility.keys = keyOverlap;
-                    currentStretchPossibility.segmentCount ++;
+        let noteSet: (RelativeNoteName | NoteName)[] = Domain.RELATIVE_NOTE_NAMES;
+        if (contextualized) {
+            noteSet = Domain.NOTE_NAMES;
+        }
+
+        interface IStretchKeyPossibilities {
+            keys: (RelativeNoteName | NoteName)[];
+            segmentCount: number;
+        }
+
+        let keyStretches: IStretchKeyPossibilities[] = [];        
+        let possibleChordKeys: Array<(RelativeNoteName | NoteName)[]> = [];
+        let keyStretchPossibilities: IStretchKeyPossibilities[] = [];
+        let currentStretchPossibility: IStretchKeyPossibilities;
+
+        let topKeyCount = Chart.getMostCommonSuitableKey(bars);
+        let topKey = topKeyCount.key;
+
+        // Get the possible keys per chord segment
+        bars.forEach(barBase => {
+            barBase.chordSegments.forEach(segment => { 
+                possibleChordKeys = [ 
+                    ...possibleChordKeys, 
+                    Chord.getSuitableKeys(segment.chordName as ChordName) as (RelativeNoteName | NoteName)[] 
+                ]; 
+            }); 
+        }); 
+
+        // Get the possible keys per key stretch
+        currentStretchPossibility = { 
+            keys: possibleChordKeys[0].indexOf(topKey) !== -1 ? [topKey] : possibleChordKeys[0], 
+            segmentCount: 1 
+        };
+
+        for (let i = 1; i < possibleChordKeys.length; i ++) {
+            let chordKeys = possibleChordKeys[i];
+            let keyOverlap = currentStretchPossibility.keys.filter(key => chordKeys.indexOf(key) !== -1);
+
+            if (keyOverlap.length === 0) {
+                keyStretchPossibilities.push(currentStretchPossibility);
+                currentStretchPossibility = { 
+                    keys: chordKeys.indexOf(topKey) !== -1 ? [ topKey ] : chordKeys, 
+                    segmentCount: 1 
+                };
+            } else {
+                currentStretchPossibility.keys = keyOverlap;
+                currentStretchPossibility.segmentCount ++;
+            }
+        }
+
+        keyStretchPossibilities.push(currentStretchPossibility);
+
+        // Now pick the best key possibility per key stretch
+        currentStretchPossibility = keyStretchPossibilities[0];
+        let stretchIdx = 0;
+        let segmentCount = 0;
+        let tonicFound: RelativeNoteName | NoteName | undefined;
+        let tonicFoundForSixth: RelativeNoteName | NoteName | undefined;
+        
+        bars.forEach(barBase => {
+            barBase.chordSegments.forEach(segment => { 
+                let { chordName } = segment;
+                let base = (chordName as ChordName)[0] as RelativeNoteName | NoteName;
+                let minorThirdAboveBase = noteSet[Util.mod(noteSet.indexOf(base) + 4, 12)];
+
+                if (currentStretchPossibility.keys.indexOf(base) !== -1) {
+                    tonicFound = base;
+                }
+
+                if (currentStretchPossibility.keys.indexOf(minorThirdAboveBase) !== -1) {
+                    tonicFoundForSixth = minorThirdAboveBase;
+                }
+
+                segmentCount ++;
+
+                if (segmentCount === currentStretchPossibility.segmentCount) {
+                    if (tonicFound) {
+                        keyStretches.push({ keys: [tonicFound], segmentCount });
+                    } else if (tonicFoundForSixth) {
+                        keyStretches.push({ keys: [tonicFoundForSixth], segmentCount })
+                    } else {
+
+                        let chosenKey: NoteName | RelativeNoteName;
+                        if (keyStretches.length > 0) {
+                            let prevKey = keyStretches[keyStretches.length - 1].keys[0];
+                            chosenKey = MusicHelper.pickClosestKey(prevKey, currentStretchPossibility.keys) as NoteName | RelativeNoteName;
+                        } else {
+                            chosenKey = currentStretchPossibility.keys[0];
+                        }
+                        keyStretches.push({ keys: [chosenKey], segmentCount });
+                    }
+
+                    stretchIdx ++;
+                    currentStretchPossibility = keyStretchPossibilities[stretchIdx];
+                    segmentCount = 0;
+                    tonicFound = undefined;
+                    tonicFoundForSixth = undefined;
+                }
+            }); 
+        });
+
+        // Add the key attribute to each segment
+        stretchIdx = 0;
+        segmentCount = 0;
+        bars.forEach(barBase => {
+            barBase.chordSegments.forEach(segment => {
+                segment.key = keyStretches[stretchIdx].keys[0];
+                segmentCount ++;
+
+                if (segmentCount === keyStretches[stretchIdx].segmentCount) {
+                    stretchIdx ++;
+                    segmentCount = 0;
+                }
+            });
+        });
+    }
+
+    public static getMostCommonSuitableKey(bars: IChartBar[]) {
+        let keyCounts = bars.reduce((keyCountsAcc, currBar) => {
+            for (let seg of currBar.chordSegments) {
+                for (let key of Chord.getSuitableKeys(seg.chordName as ChordName)) {
+                    let keyCountIdx = keyCountsAcc.findIndex(k => k.key === key);
+                    let isMajor = (seg.chordName as ChordName)[0] === key;
+                    let isMinor = (seg.chordName as ChordName)[0] === Domain.getRelativeMinor(key as NoteName | RelativeNoteName);
+
+                    if (keyCountIdx === -1) {
+                        keyCountsAcc.push({ key, count: 1, asMajorCount: isMajor ? 1 : 0, asRelativeMajorCount: isMinor ? 1 : 0 }) 
+                    } else {
+                        keyCountsAcc[keyCountIdx].count ++;
+                        keyCountsAcc[keyCountIdx].asMajorCount += isMajor ? 1 : 0;
+                        keyCountsAcc[keyCountIdx].asRelativeMajorCount += isMinor ? 1 : 0;
+                    }
                 }
             }
-    
-            keyStretchPossibilities.push(currentStretchPossibility);
-    
-            // Now pick the best key possibility per key stretch
-            currentStretchPossibility = keyStretchPossibilities[0];
-            let stretchIdx = 0;
-            let segmentCount = 0;
-            let tonicFound: RelativeNoteName | NoteName | undefined;
-            let tonicFoundForSixth: RelativeNoteName | NoteName | undefined;
-            
-            bars.forEach(barBase => {
-                barBase.chordSegments.forEach(segment => { 
-                    let { chordName } = segment;
-                    let base = (chordName as ChordName)[0] as RelativeNoteName | NoteName;
-                    let minorThirdAboveBase = noteSet[Util.mod(noteSet.indexOf(base) + 4, 12)];
-    
-                    if (currentStretchPossibility.keys.indexOf(base) !== -1) {
-                        tonicFound = base;
-                    }
-    
-                    if (currentStretchPossibility.keys.indexOf(minorThirdAboveBase) !== -1) {
-                        tonicFoundForSixth = minorThirdAboveBase;
-                    }
-    
-                    segmentCount ++;
-    
-                    if (segmentCount === currentStretchPossibility.segmentCount) {
-                        if (tonicFound) {
-                            keyStretches.push({ keys: [tonicFound], segmentCount });
-                        } else if (tonicFoundForSixth) {
-                            keyStretches.push({ keys: [tonicFoundForSixth], segmentCount })
-                        } else {
+            return keyCountsAcc;
+        }, [] as IKeyCount[]);
 
-                            let chosenKey: NoteName | RelativeNoteName;
-                            if (keyStretches.length > 0) {
-                                let prevKey = keyStretches[keyStretches.length - 1].keys[0];
-                                chosenKey = MusicHelper.pickClosestKey(prevKey, currentStretchPossibility.keys) as NoteName | RelativeNoteName;
-                            } else {
-                                chosenKey = currentStretchPossibility.keys[0];
-                            }
-                            keyStretches.push({ keys: [chosenKey], segmentCount });
-                        }
-
-                        stretchIdx ++;
-                        currentStretchPossibility = keyStretchPossibilities[stretchIdx];
-                        segmentCount = 0;
-                        tonicFound = undefined;
-                        tonicFoundForSixth = undefined;
-                    }
-                }); 
-            });
-    
-            // Add the key attribute to each segment
-            stretchIdx = 0;
-            segmentCount = 0;
-            bars.forEach(barBase => {
-                barBase.chordSegments.forEach(segment => {
-                    segment.key = keyStretches[stretchIdx].keys[0];
-                    segmentCount ++;
-    
-                    if (segmentCount === keyStretches[stretchIdx].segmentCount) {
-                        stretchIdx ++;
-                        segmentCount = 0;
-                    }
-                });
-            });
-        }
+        keyCounts.sort((a, b) => b.count - a.count);
+        return keyCounts[0];
     }
 
     constructor(
@@ -380,6 +423,136 @@ class Chart {
         if (externalUpdate) {
             externalUpdate();
         }
+    }
+
+    /**
+     * GETTERS
+     */
+
+    get songId() {
+        return this._songId;
+    }
+
+    get bars(): IChartBar[] {
+        return this._bars;
+    }
+
+    get barsInRange(): IChartBar[] {
+        return this._bars.filter(
+            (bar: IChartBar, idx: number) => this.barIdxIsInRange(idx)
+        );
+    }
+
+    get chordStretches() {
+        return this._chordStretches;
+    }
+
+    get chordStretchesInRange() {
+        return this._chordStretchesInRange;
+    }
+
+    get context(): NoteName {
+        return this._context;
+    }
+
+    get tempo() {
+        return this._tempo;
+    }
+
+    get feel() {
+        return this._feel;
+    }
+
+    get rangeStartIdx(): number {
+        return this._rangeStartIdx;
+    }
+
+    get rangeEndIdx(): number {
+        return this._rangeEndIdx;
+    }
+
+    get firstBarInRange(): IChartBar {
+        return this._bars[this._rangeStartIdx];
+    }
+
+    get lastBarInRange(): IChartBar {
+        return this._bars[this._rangeEndIdx];
+    }
+
+    get durationInSubbeats() {
+        return this._durationInSubbeats;
+    }
+
+    get suitableFeels() {
+        if (!this._barsBase) {
+            return [];
+        }
+
+        let swingIsSuitableReduction = (suitableSoFar: boolean, bar: IChartBar) => { 
+            return (
+                suitableSoFar && 
+                (bar.timeSignature[1] === 4 || (bar.timeSignature[1] === 8 && bar.timeSignature[0] % 2) === 0)
+            );
+        };
+
+        let swingIsSuitable = this._barsBase.reduce(swingIsSuitableReduction, true);
+
+        return (
+            swingIsSuitable
+                ? [Feel.Swing]
+                : []
+        );
+    }
+
+    get barsBase() {
+        this._stripBarsBase();
+        return this._barsBase;
+    }
+
+    get contextQuality(): "Major" | "Minor" | null {
+        for (let bar of this._bars) {
+            for (let seg of bar.chordSegments) {
+                let { key, chordName } = seg;
+
+                if (key === this._context || Domain.getRelativeMinor(key as NoteName | RelativeNoteName) === this._context) {
+                    return Chord.getSuitableKeys(chordName as ChordName).indexOf(this._context) !== -1 ? "Major" : "Minor";
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * SETTERS
+     */
+
+    set context(newContext: NoteName) {
+        this._context = newContext;
+        this._resetBarsAndChordStretches();
+        this._runExternalUpdate();
+    }
+
+    set tempo(newTempo: Tempo | undefined) {
+        this._tempo = newTempo;
+        this._runExternalUpdate();
+    }
+
+    set feel(newFeel: Feel | undefined) {
+        this._feel = newFeel;
+        this._resetBarsAndChordStretches();
+        this._runExternalUpdate();
+    }
+
+    set rangeStartIdx(newIdx: number) {
+        this._rangeStartIdx = newIdx;
+        this._buildChordStretches();
+        this._runExternalUpdate();
+    }
+
+    set rangeEndIdx(newIdx: number) {
+        this._rangeEndIdx = newIdx;
+        this._buildChordStretches();
+        this._runExternalUpdate();
     }
 
     public forEachBarInRange = (callback: (bar: IChartBar, idx: number) => void) => {
@@ -673,38 +846,13 @@ class Chart {
             return;
         }
 
-        interface IKeyCount {
-            key: NoteName;
-            count: number;
-            asMajorCount: number;
-            asRelativeMajorCount: number;
-        };
-
-        let keyCounts = this._bars.reduce((keyCountsAcc, currBar) => {
-            for (let seg of currBar.chordSegments) {
-                let keyCountIdx = keyCountsAcc.findIndex(k => k.key === seg.key);
-                let isMajor = (seg.chordName as ChordName)[0] === seg.key;
-                let isMinor = (seg.chordName as ChordName)[0] === Domain.getRelativeMinor(seg.key as NoteName);
-
-                if (keyCountIdx === -1) {
-                    keyCountsAcc.push({ key: seg.key as NoteName, count: 1, asMajorCount: isMajor ? 1 : 0, asRelativeMajorCount: isMinor ? 1 : 0 }) 
-                } else {
-                    keyCountsAcc[keyCountIdx].count ++;
-                    keyCountsAcc[keyCountIdx].asMajorCount += isMajor ? 1 : 0;
-                    keyCountsAcc[keyCountIdx].asRelativeMajorCount += isMinor ? 1 : 0;
-                }
-            }
-            return keyCountsAcc;
-        }, [] as IKeyCount[]);
-
-        keyCounts.sort((a, b) => b.count - a.count);
-        let topKeyCount = keyCounts[0];
+        let topKeyCount = Chart.getMostCommonSuitableKey(this._bars);
 
         this._context = (
             topKeyCount.asMajorCount >= topKeyCount.asRelativeMajorCount 
-                ? topKeyCount.key 
+                ? topKeyCount.key
                 : Domain.getRelativeMinor(topKeyCount.key)
-        );
+        ) as NoteName;
 
         this._barsBase = MusicHelper.contextualizeOrDecontextualizeBars(this._bars, this._context, true);
         this._stripBarsBase();
@@ -752,123 +900,6 @@ class Chart {
         if (this._externalUpdate) {
             this._externalUpdate();
         }
-    }
-
-    /**
-     * GETTERS
-     */
-
-    get songId() {
-        return this._songId;
-    }
-
-    get bars(): IChartBar[] {
-        return this._bars;
-    }
-
-    get barsInRange(): IChartBar[] {
-        return this._bars.filter(
-            (bar: IChartBar, idx: number) => this.barIdxIsInRange(idx)
-        );
-    }
-
-    get chordStretches() {
-        return this._chordStretches;
-    }
-
-    get chordStretchesInRange() {
-        return this._chordStretchesInRange;
-    }
-
-    get context(): NoteName {
-        return this._context;
-    }
-
-    get tempo() {
-        return this._tempo;
-    }
-
-    get feel() {
-        return this._feel;
-    }
-
-    get rangeStartIdx(): number {
-        return this._rangeStartIdx;
-    }
-
-    get rangeEndIdx(): number {
-        return this._rangeEndIdx;
-    }
-
-    get firstBarInRange(): IChartBar {
-        return this._bars[this._rangeStartIdx];
-    }
-
-    get lastBarInRange(): IChartBar {
-        return this._bars[this._rangeEndIdx];
-    }
-
-    get durationInSubbeats() {
-        return this._durationInSubbeats;
-    }
-
-    get suitableFeels() {
-        if (!this._barsBase) {
-            return [];
-        }
-
-        let swingIsSuitableReduction = (suitableSoFar: boolean, bar: IChartBar) => { 
-            return (
-                suitableSoFar && 
-                (bar.timeSignature[1] === 4 || (bar.timeSignature[1] === 8 && bar.timeSignature[0] % 2) === 0)
-            );
-        };
-
-        let swingIsSuitable = this._barsBase.reduce(swingIsSuitableReduction, true);
-
-        return (
-            swingIsSuitable
-                ? [Feel.Swing]
-                : []
-        );
-    }
-
-    get barsBase() {
-        this._stripBarsBase();
-        return this._barsBase;
-    }
-
-    /**
-     * SETTERS
-     */
-
-    set context(newContext: NoteName) {
-        this._context = newContext;
-        this._resetBarsAndChordStretches();
-        this._runExternalUpdate();
-    }
-
-    set tempo(newTempo: Tempo | undefined) {
-        this._tempo = newTempo;
-        this._runExternalUpdate();
-    }
-
-    set feel(newFeel: Feel | undefined) {
-        this._feel = newFeel;
-        this._resetBarsAndChordStretches();
-        this._runExternalUpdate();
-    }
-
-    set rangeStartIdx(newIdx: number) {
-        this._rangeStartIdx = newIdx;
-        this._buildChordStretches();
-        this._runExternalUpdate();
-    }
-
-    set rangeEndIdx(newIdx: number) {
-        this._rangeEndIdx = newIdx;
-        this._buildChordStretches();
-        this._runExternalUpdate();
     }
 }
 
