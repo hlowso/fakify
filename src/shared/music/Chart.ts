@@ -1,10 +1,10 @@
 import * as Mongo from "mongodb";
 import * as Util from "../Util";
 import * as MusicHelper from "../music/MusicHelper";
-import { IChartBar, Feel, NoteName, Tempo, IMusicIdx, IChordStretch, IChordSegment, ChordName, ChordShape, RelativeNoteName, TimeSignature } from "../types";
+import { IChartBar, Feel, NoteName, Tempo, IMusicIdx, IChordStretch, IChordSegment, ChordName, ChordShape, RelativeNoteName, TimeSignature, ISong } from "../types";
 import { Domain } from "./domain/Domain";
 import { Chord } from "./domain/ChordClass";
-import { BAR_LIMIT } from "../Constants";
+import { BAR_LIMIT, MAX_TITLE_LENGTH } from "../Constants";
 
 class Chart {
     private _songId?: Mongo.ObjectId | string;
@@ -138,15 +138,14 @@ class Chart {
             }
 
             for (let prop in segment) {
-                if (prop !== "beatIdx" && prop !== "chordName" && prop !== "key") {
+                if (prop !== "beatIdx" && prop !== "chordName") {
                     return false;
                 }
             }
 
-            let { beatIdx, chordName, key } = segment;
+            let { beatIdx, chordName } = segment;
             beatIdx = beatIdx as number;
             chordName = chordName as ChordName;
-            key = key as RelativeNoteName;
 
             if (!Number.isInteger(beatIdx)) {
                 return false;
@@ -161,10 +160,6 @@ class Chart {
             prevBeatIdx = beatIdx;
 
             if (!Chart.validRelativeChordName(chordName)) {
-                return false;
-            }
-
-            if (!Chart.validRelativeNoteName(key)) {
                 return false;
             }
         }
@@ -199,6 +194,38 @@ class Chart {
             if (!Chart.validChordSegments(chordSegments, timeSignature)) {
                 return false;
             }
+        }
+
+        return true;
+    }
+
+    public static validChart = (chart: ISong) => {
+        if (typeof chart !== "object") {
+            return false;
+        }
+
+        for (let prop in chart) {
+            if ([ "title", "originalContext", "originalTempo", "barsBase", "_id", "userId" ].indexOf(prop) === -1) {
+                return false;
+            }
+        }
+
+        let { title, originalContext, originalTempo, barsBase } = chart;
+
+        if (typeof title !== "string" || title.length > MAX_TITLE_LENGTH) {
+            return false;
+        }
+
+        if (!Chart.validNoteName(originalContext as NoteName)) {
+            return false;
+        }
+
+        if (!Chart.validTempo(originalTempo as Tempo)) {
+            return false;
+        }
+
+        if (!Chart.validBaseBars(barsBase as IChartBar[])) {
+            return false;
         }
 
         return true;

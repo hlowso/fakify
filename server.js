@@ -71408,7 +71408,7 @@ class ApiHelper {
             return titleProjections;
         });
         this.createChartAsync = (chart, userId) => __awaiter(this, void 0, void 0, function* () {
-            if (!this._validSong(chart)) {
+            if (!__WEBPACK_IMPORTED_MODULE_5__shared_music_Chart__["a" /* default */].validChart(chart)) {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].Invalid;
             }
             if (yield this._data.getChartByTitleAsync(chart.title)) {
@@ -71426,7 +71426,7 @@ class ApiHelper {
             return (yield this._data.insertChartAsync(chart)) ? __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].OK : __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].Error;
         });
         this.updateChartAsync = (chart, chartId, userId) => __awaiter(this, void 0, void 0, function* () {
-            if (!this._validSong(chart)) {
+            if (!__WEBPACK_IMPORTED_MODULE_5__shared_music_Chart__["a" /* default */].validChart(chart)) {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].Invalid;
             }
             let existingChart = yield this._data.getChartByTitleAsync(chart.title);
@@ -71435,31 +71435,6 @@ class ApiHelper {
             }
             return (yield this._data.updateChartAsync(chart, chartId, userId)) ? __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].OK : __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].Unauthorized;
         });
-        // TODO: validSong() should live elsewhere...
-        this._validSong = (chart) => {
-            if (typeof chart !== "object") {
-                return false;
-            }
-            for (let prop in chart) {
-                if (["title", "originalContext", "originalTempo", "barsBase", "_id", "userId"].indexOf(prop) === -1) {
-                    return false;
-                }
-            }
-            let { title, originalContext, originalTempo, barsBase } = chart;
-            if (typeof title !== "string" || title.length > __WEBPACK_IMPORTED_MODULE_4__shared_Constants__["d" /* MAX_TITLE_LENGTH */]) {
-                return false;
-            }
-            if (!__WEBPACK_IMPORTED_MODULE_5__shared_music_Chart__["a" /* default */].validNoteName(originalContext)) {
-                return false;
-            }
-            if (!__WEBPACK_IMPORTED_MODULE_5__shared_music_Chart__["a" /* default */].validTempo(originalTempo)) {
-                return false;
-            }
-            if (!__WEBPACK_IMPORTED_MODULE_5__shared_music_Chart__["a" /* default */].validBaseBars(barsBase)) {
-                return false;
-            }
-            return true;
-        };
         this._data = data;
         let encrypt = getEncryptor(secret);
         let decrypt = getDecryptor(secret);
@@ -73487,14 +73462,13 @@ Chart.validChordSegments = (chordSegments, timeSignature) => {
             return false;
         }
         for (let prop in segment) {
-            if (prop !== "beatIdx" && prop !== "chordName" && prop !== "key") {
+            if (prop !== "beatIdx" && prop !== "chordName") {
                 return false;
             }
         }
-        let { beatIdx, chordName, key } = segment;
+        let { beatIdx, chordName } = segment;
         beatIdx = beatIdx;
         chordName = chordName;
-        key = key;
         if (!Number.isInteger(beatIdx)) {
             return false;
         }
@@ -73506,9 +73480,6 @@ Chart.validChordSegments = (chordSegments, timeSignature) => {
         }
         prevBeatIdx = beatIdx;
         if (!Chart.validRelativeChordName(chordName)) {
-            return false;
-        }
-        if (!Chart.validRelativeNoteName(key)) {
             return false;
         }
     }
@@ -73535,6 +73506,30 @@ Chart.validBaseBars = (baseBars) => {
         if (!Chart.validChordSegments(chordSegments, timeSignature)) {
             return false;
         }
+    }
+    return true;
+};
+Chart.validChart = (chart) => {
+    if (typeof chart !== "object") {
+        return false;
+    }
+    for (let prop in chart) {
+        if (["title", "originalContext", "originalTempo", "barsBase", "_id", "userId"].indexOf(prop) === -1) {
+            return false;
+        }
+    }
+    let { title, originalContext, originalTempo, barsBase } = chart;
+    if (typeof title !== "string" || title.length > __WEBPACK_IMPORTED_MODULE_5__Constants__["d" /* MAX_TITLE_LENGTH */]) {
+        return false;
+    }
+    if (!Chart.validNoteName(originalContext)) {
+        return false;
+    }
+    if (!Chart.validTempo(originalTempo)) {
+        return false;
+    }
+    if (!Chart.validBaseBars(barsBase)) {
+        return false;
     }
     return true;
 };

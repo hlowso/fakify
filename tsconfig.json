@@ -33,7 +33,13 @@
     "public",
     "src/backend",
     "src/native",
+    "src/shared/test-data",
+    "src/migration",
+    "server.js",
+    "migrate.js",
     "webpack.config.server.ts",
-    "**/*.test.ts"
+    "webpack.config.migrate.ts",
+    "**/*.test.ts",
+    "App.js"
   ]
 }

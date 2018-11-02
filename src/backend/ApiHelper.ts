@@ -1,8 +1,8 @@
 import crypto from "crypto";
 import uuidv4 from "uuid/v4";
 import bcrypt from "bcryptjs";
-import { IIncomingUser, ISong, NoteName, Tempo, IChartBar, ISession, ChartResponse, SignupResponse, IUser, IDataHelper } from "../shared/types";
-import { MAX_TITLE_LENGTH, MIN_PASSWORD_LENGTH, EMAIL_REGEX, USER_LIMIT, CHART_LIMIT, USER_CHART_LIMIT } from "../shared/Constants";
+import { IIncomingUser, ISong, ISession, ChartResponse, SignupResponse, IUser, IDataHelper } from "../shared/types";
+import { MIN_PASSWORD_LENGTH, EMAIL_REGEX, USER_LIMIT, CHART_LIMIT, USER_CHART_LIMIT } from "../shared/Constants";
 import Chart from "../shared/music/Chart";
 import * as Mongo from "mongodb";
 
@@ -134,7 +134,7 @@ export class ApiHelper {
     }
 
     public createChartAsync = async (chart: ISong, userId: Mongo.ObjectId): Promise<ChartResponse> => {
-        if (!this._validSong(chart)) {
+        if (!Chart.validChart(chart)) {
             return ChartResponse.Invalid;
         }
 
@@ -160,7 +160,7 @@ export class ApiHelper {
     }
 
     public updateChartAsync = async (chart: ISong, chartId?: Mongo.ObjectId, userId?: Mongo.ObjectId): Promise<ChartResponse> => {
-        if (!this._validSong(chart)) {
+        if (!Chart.validChart(chart)) {
             return ChartResponse.Invalid;
         }
 
@@ -171,38 +171,5 @@ export class ApiHelper {
         }
 
         return (await this._data.updateChartAsync(chart, chartId, userId)) ? ChartResponse.OK : ChartResponse.Unauthorized;
-    }
-
-    // TODO: validSong() should live elsewhere...
-    private _validSong = (chart: ISong) => {
-        if (typeof chart !== "object") {
-            return false;
-        }
-
-        for (let prop in chart) {
-            if ([ "title", "originalContext", "originalTempo", "barsBase", "_id", "userId" ].indexOf(prop) === -1) {
-                return false;
-            }
-        }
-
-        let { title, originalContext, originalTempo, barsBase } = chart;
-
-        if (typeof title !== "string" || title.length > MAX_TITLE_LENGTH) {
-            return false;
-        }
-
-        if (!Chart.validNoteName(originalContext as NoteName)) {
-            return false;
-        }
-
-        if (!Chart.validTempo(originalTempo as Tempo)) {
-            return false;
-        }
-
-        if (!Chart.validBaseBars(barsBase as IChartBar[])) {
-            return false;
-        }
-
-        return true;
     }
 }
