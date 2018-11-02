@@ -51,6 +51,10 @@ export class Domain {
         return newNoteClasses;
     }
 
+    public static getRelativeMinor(key: NoteName) {
+        return Domain.NOTE_NAMES[ Util.mod(Domain.NOTE_NAMES.indexOf(key) - 3, 12 )];
+    }
+
     protected _notes: Note[];
     protected _noteClasses: Note[];
   

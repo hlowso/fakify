@@ -669,42 +669,49 @@ class Chart {
     // This can be used when the _bars attribute is already contextualized and its keys
     // have already been determined using _addKeysToBars
     private _setContextAndBaseBarsFromBars = () => {
-        if (this._bars.length > 0) {
-            let firstMajorKey = this._bars[0].chordSegments[0].key as NoteName;
-            let firstMinorKey = Domain.NOTE_NAMES[ Util.mod(Domain.NOTE_NAMES.indexOf(firstMajorKey) - 3, 12 )];
-
-            let context; 
-
-            barLoop: for (let bar of this._bars) {
-                for (let segment of bar.chordSegments) {
-                    if (segment.key === firstMajorKey && (segment.chordName as ChordName)[0] === firstMajorKey) {
-                        context = firstMajorKey;
-                        break barLoop;
-                    }
-                }
-            }
-
-            if (!context) {
-                barLoop: for (let bar of this._bars) {
-                    for (let segment of bar.chordSegments) {
-                        if (segment.key === firstMinorKey && (segment.chordName as ChordName)[0] === firstMinorKey) {
-                            context = firstMajorKey;
-                            break barLoop;
-                        }
-                    }
-                }
-            }
-
-            if (!context) {
-                context = (this._bars[0].chordSegments[0].chordName as ChordName)[0] as NoteName;
-            }
-
-            this._context = context as NoteName;
-            this._barsBase = MusicHelper.contextualizeOrDecontextualizeBars(this._bars, context as NoteName, true);
-            this._stripBarsBase();
+        if (!Array.isArray(this._bars) || this._bars.length === 0) {
+            return;
         }
+
+        interface IKeyCount {
+            key: NoteName;
+            count: number;
+            asMajorCount: number;
+            asRelativeMajorCount: number;
+        };
+
+        let keyCounts = this._bars.reduce((keyCountsAcc, currBar) => {
+            for (let seg of currBar.chordSegments) {
+                let keyCountIdx = keyCountsAcc.findIndex(k => k.key === seg.key);
+                let isMajor = (seg.chordName as ChordName)[0] === seg.key;
+                let isMinor = (seg.chordName as ChordName)[0] === Domain.getRelativeMinor(seg.key as NoteName);
+
+                if (keyCountIdx === -1) {
+                    keyCountsAcc.push({ key: seg.key as NoteName, count: 1, asMajorCount: isMajor ? 1 : 0, asRelativeMajorCount: isMinor ? 1 : 0 }) 
+                } else {
+                    keyCountsAcc[keyCountIdx].count ++;
+                    keyCountsAcc[keyCountIdx].asMajorCount += isMajor ? 1 : 0;
+                    keyCountsAcc[keyCountIdx].asRelativeMajorCount += isMinor ? 1 : 0;
+                }
+            }
+            return keyCountsAcc;
+        }, [] as IKeyCount[]);
+
+        keyCounts.sort((a, b) => b.count - a.count);
+        let topKeyCount = keyCounts[0];
+
+        this._context = (
+            topKeyCount.asMajorCount >= topKeyCount.asRelativeMajorCount 
+                ? topKeyCount.key 
+                : Domain.getRelativeMinor(topKeyCount.key)
+        );
+
+        this._barsBase = MusicHelper.contextualizeOrDecontextualizeBars(this._bars, this._context, true);
+        this._stripBarsBase();
     }
 
+    // Prepares barsBase to be sent to server by stripping it of all 
+    // superfluous properties
     private _stripBarsBase = () => {
         if (!Array.isArray(this._barsBase)) {
             return;
@@ -715,6 +722,7 @@ class Chart {
             delete this._barsBase[barIdx]["durationInSubbeats"];
 
             for (let segIdx = 0; segIdx < this._barsBase[barIdx].chordSegments.length; segIdx ++) {
+                delete this._barsBase[barIdx].chordSegments[segIdx]["key"];
                 delete this._barsBase[barIdx].chordSegments[segIdx]["subbeatIdx"];
                 delete this._barsBase[barIdx].chordSegments[segIdx]["durationInSubbeats"];
                 delete this._barsBase[barIdx].chordSegments[segIdx]["subbeatsBeforeChange"];
