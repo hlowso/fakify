@@ -330,6 +330,8 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             rangeEndIdx,
             _id
         ); 
+
+        console.log(JSON.stringify(this._chart.barsBase, null, 2));
     }
 
     /*******************

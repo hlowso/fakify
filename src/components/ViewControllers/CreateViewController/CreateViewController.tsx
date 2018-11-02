@@ -361,7 +361,7 @@ class CreateViewController extends Component<ICreateVCProps, ICreateVCState> {
     private _onStartOver = () => {
         let { updatingChartId } = this.state;
         if (!updatingChartId) {
-            return;
+            return this._onNewSong();
         }
 
         this._onChooseEditSongAsync(updatingChartId)

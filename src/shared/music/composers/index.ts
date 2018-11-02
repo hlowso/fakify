@@ -26,11 +26,19 @@ const _getSwingAccompaniment = (chart: Chart, prevScore?: Score): Score => {
         prevBassMusic = (prevScore.getPart("doubleBass") as IPart).music;
     }
 
-    return new Score([
+    let parts = [
         compSwingPianoV2(chart, prevPianoMusic),
         compBassSwingV2(chart, prevBassMusic),
         ...compDrumsSwingV1(chart)
-    ]);
+    ];
+
+    for (let part of parts) {
+        if(!Score.validPart(part)) {
+            throw new Error("Invalid part produced by comping function");
+        }
+    }
+
+    return new Score(parts);
 }
 
 export const GenerateExercise = (chart: Chart, instrument = "piano", difficulty = Difficulty.Easy): IExercise => {

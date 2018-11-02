@@ -43,6 +43,11 @@ export class Chord extends Domain {
                 infoBase = Chord.shapeToInfo(ChordShape.Maj);
                 extension[9] = { target: "2" };
                 return { ...infoBase, extension };
+
+            case ChordShape.b9:
+                infoBase = Chord.shapeToInfo(ChordShape.Maj);
+                extension[9] = { target: "H" };
+                return { ...infoBase, extension };
     
             case ChordShape.Majb5:
                 infoBase = Chord.shapeToInfo(ChordShape.Maj);
@@ -260,6 +265,28 @@ export class Chord extends Domain {
                     baseIntervals: [0, 5, 7],
                     relativeTonicPositions: ["1", "2", "3", "5", "6"]
                 };
+
+            case ChordShape.Sus27:
+                infoBase = Chord.shapeToInfo(ChordShape.Sus2);
+                extension[7] = { target: "J", origin: "7" };
+                return { ...infoBase, extension };
+
+            case ChordShape.Sus47:
+                infoBase = Chord.shapeToInfo(ChordShape.Sus4);
+                extension[7] = { target: "J", origin: "7" };
+                return { ...infoBase, extension };
+
+            case ChordShape.Sus29:
+                infoBase = Chord.shapeToInfo(ChordShape.Sus2);
+                extension[7] = { target: "J", origin: "7" };
+                extension[9] = { target: "2" };
+                return { ...infoBase, extension };
+
+            case ChordShape.Sus49:
+                infoBase = Chord.shapeToInfo(ChordShape.Sus4);
+                extension[7] = { target: "J", origin: "7" };
+                extension[9] = { target: "2" };
+                return { ...infoBase, extension };
     
             default: 
                 throw new Error(`PRECOMP - error: unkown ChordShape ${shape}`);

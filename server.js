@@ -4827,7 +4827,7 @@ function isignored (namespace) {
     return true
   }
 
-  var str = Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).NO_DEPRECATION || ''
+  var str = Object({"PORT":"5001","MONGO_SERVER":"ds161529.mlab.com:61529","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"fakify-prod","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).NO_DEPRECATION || ''
 
   // namespace ignored
   return containsNamespace(str, namespace)
@@ -4844,7 +4844,7 @@ function istraced (namespace) {
     return true
   }
 
-  var str = Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).TRACE_DEPRECATION || ''
+  var str = Object({"PORT":"5001","MONGO_SERVER":"ds161529.mlab.com:61529","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"fakify-prod","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).TRACE_DEPRECATION || ''
 
   // namespace traced
   return containsNamespace(str, namespace)
@@ -8275,6 +8275,7 @@ var ChordShape;
     ChordShape["Maj7"] = "Maj7";
     ChordShape["Maj9"] = "Maj9";
     ChordShape["Add9"] = "Add9";
+    ChordShape["b9"] = "b9";
     ChordShape["Majb5"] = "Majb5";
     ChordShape["Maj7b5"] = "Maj7b5";
     ChordShape["Maj7$5"] = "Maj7$5";
@@ -8312,51 +8313,60 @@ var ChordShape;
     ChordShape["Dim7"] = "Dim7";
     ChordShape["Sus2"] = "Sus2";
     ChordShape["Sus4"] = "Sus4";
+    ChordShape["Sus47"] = "Sus47";
+    ChordShape["Sus27"] = "Sus27";
+    ChordShape["Sus29"] = "Sus29";
+    ChordShape["Sus49"] = "Sus49";
 })(ChordShape || (ChordShape = {}));
 var PresentableChordShape;
 (function (PresentableChordShape) {
     PresentableChordShape["Maj"] = "";
     PresentableChordShape["Maj6"] = "6";
-    PresentableChordShape["Maj7"] = "ma7";
-    PresentableChordShape["Maj9"] = "ma9";
+    PresentableChordShape["Maj7"] = "maj7";
+    PresentableChordShape["Maj9"] = "maj9";
     PresentableChordShape["Add9"] = "add9";
-    PresentableChordShape["Majb5"] = "ma(b5)";
-    PresentableChordShape["Maj7b5"] = "ma7(b5)";
-    PresentableChordShape["Maj7$5"] = "ma7(#5)";
-    PresentableChordShape["Maj7b9"] = "ma7(b9)";
-    PresentableChordShape["Maj$9"] = "ma(#9)";
-    PresentableChordShape["Majb9"] = "ma(b9)";
-    PresentableChordShape["Maj7$9"] = "ma7($9)";
-    PresentableChordShape["Maj7$11"] = "ma7(#11)";
+    PresentableChordShape["b9"] = "\u266D9";
+    PresentableChordShape["Majb5"] = "maj\u266D5";
+    PresentableChordShape["Maj7b5"] = "maj7\u266D5";
+    PresentableChordShape["Maj7$5"] = "maj7 #5";
+    PresentableChordShape["Maj7b9"] = "maj7\u266D9";
+    PresentableChordShape["Maj$9"] = "maj #9";
+    PresentableChordShape["Majb9"] = "maj\u266D9";
+    PresentableChordShape["Maj7$9"] = "maj7 #9";
+    PresentableChordShape["Maj7$11"] = "maj7 #11";
     PresentableChordShape["Min"] = "-";
     PresentableChordShape["Min6"] = "-6";
     PresentableChordShape["Min7"] = "-7";
     PresentableChordShape["Min9"] = "-9";
     PresentableChordShape["Min11"] = "-11";
-    PresentableChordShape["Min$5"] = "-(#5)";
-    PresentableChordShape["Min7b5"] = "-7(b5)";
-    PresentableChordShape["Min7$5"] = "-7(#5)";
-    PresentableChordShape["Min7b9"] = "-7(b9)";
-    PresentableChordShape["Min7$9"] = "-7(#9)";
-    PresentableChordShape["Min7$11"] = "-7(#11)";
-    PresentableChordShape["MinMaj7"] = "-(maj7)";
+    PresentableChordShape["Min$5"] = "- #5";
+    PresentableChordShape["Min7b5"] = "-7\u266D5";
+    PresentableChordShape["Min7$5"] = "-7 #5";
+    PresentableChordShape["Min7b9"] = "-7\u266D9";
+    PresentableChordShape["Min7$9"] = "-7 #9";
+    PresentableChordShape["Min7$11"] = "-7 #11";
+    PresentableChordShape["MinMaj7"] = "- (maj7)";
     PresentableChordShape["Dom7"] = "7";
     PresentableChordShape["Dom9"] = "9";
     PresentableChordShape["Dom11"] = "11";
-    PresentableChordShape["Dom7b5"] = "7(b5)";
-    PresentableChordShape["Dom7$5"] = "7(#5)";
-    PresentableChordShape["Dom7b9"] = "7(b9)";
-    PresentableChordShape["Dom7$9"] = "7(#9)";
-    PresentableChordShape["Dom7$11"] = "7(#11)";
-    PresentableChordShape["Dom9b5"] = "9(b5)";
-    PresentableChordShape["Dom9$5"] = "9(#5)";
+    PresentableChordShape["Dom7b5"] = "7\u266D5";
+    PresentableChordShape["Dom7$5"] = "7 #5";
+    PresentableChordShape["Dom7b9"] = "7\u266D9";
+    PresentableChordShape["Dom7$9"] = "7 #9";
+    PresentableChordShape["Dom7$11"] = "7 #11";
+    PresentableChordShape["Dom9b5"] = "9\u266D5";
+    PresentableChordShape["Dom9$5"] = "9 #5";
     PresentableChordShape["Aug"] = "aug";
     PresentableChordShape["Aug7"] = "aug7";
-    PresentableChordShape["Aug7$9"] = "aug7(#9)";
-    PresentableChordShape["Dim"] = "dim";
-    PresentableChordShape["Dim7"] = "dim7";
+    PresentableChordShape["Aug7$9"] = "aug7 #9";
+    PresentableChordShape["Dim"] = "o";
+    PresentableChordShape["Dim7"] = "o7";
     PresentableChordShape["Sus2"] = "sus2";
     PresentableChordShape["Sus4"] = "sus4";
+    PresentableChordShape["Sus27"] = "7sus2";
+    PresentableChordShape["Sus47"] = "7sus4";
+    PresentableChordShape["Sus29"] = "9sus2";
+    PresentableChordShape["Sus49"] = "9sus4";
 })(PresentableChordShape || (PresentableChordShape = {}));
 var Feel;
 (function (Feel) {
@@ -13924,6 +13934,7 @@ module.exports = Db;
 "use strict";
 /* unused harmony export shallowEqual */
 /* unused harmony export waitAsync */
+/* unused harmony export uniqueReduction */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types__ = __webpack_require__(28);
 
 // export const redirect = (route: string) => {
@@ -14066,6 +14077,15 @@ const vectorSum = (arr1, arr2) => {
 };
 /* unused harmony export vectorSum */
 
+function uniqueReduction(arr) {
+    let reduction = (acc, curr) => {
+        if (acc.indexOf(curr) === -1) {
+            return [...acc, curr];
+        }
+        return acc;
+    };
+    return arr.reduce(reduction, []);
+}
 
 
 /***/ }),
@@ -25338,6 +25358,9 @@ class Domain {
         }
         return positions.sort((a, b) => a - b);
     }
+    noteClassAtPos(pos) {
+        return this._noteClasses.find(n => n.position === pos);
+    }
     pitchToPosition(pitch) {
         let noteClass = this._noteClasses.find(n => n.basePitch === __WEBPACK_IMPORTED_MODULE_0__Util__["e" /* mod */](pitch, 12));
         if (!noteClass) {
@@ -25471,12 +25494,16 @@ Domain.applyExtension = (noteClasses, extension) => {
     if (!extension) {
         return newNoteClasses;
     }
-    extension.forEach((name, pos) => {
+    extension.forEach((change, pos) => {
+        // First check if name is already one of the notes in the domain
+        let newNoteIdx = noteClasses.findIndex(n => n.name === change.target);
         let exisitngNoteIdx = newNoteClasses.findIndex(note => note.position === pos);
         if (exisitngNoteIdx !== -1) {
             newNoteClasses.splice(exisitngNoteIdx, 1);
         }
-        newNoteClasses.push(new __WEBPACK_IMPORTED_MODULE_1__Note__["a" /* Note */](name, pos, true));
+        if (newNoteIdx === -1) {
+            newNoteClasses.push(new __WEBPACK_IMPORTED_MODULE_1__Note__["a" /* Note */](change.target, pos, true));
+        }
     });
     newNoteClasses.sort((a, b) => a.basePitch - b.basePitch);
     return newNoteClasses;
@@ -33429,7 +33456,7 @@ const exitHandler = (data, options, exitCode) => {
         /**
          * SETUP
          */
-        const { PORT, MONGO_SERVER, MONGO_USER, MONGO_PASSWORD, MONGO_DATABASE_NAME, SESSION_SECRET } = Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"});
+        const { PORT, MONGO_SERVER, MONGO_USER, MONGO_PASSWORD, MONGO_DATABASE_NAME, SESSION_SECRET } = Object({"PORT":"5001","MONGO_SERVER":"ds161529.mlab.com:61529","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"fakify-prod","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"});
         // Create database helper
         const data = new __WEBPACK_IMPORTED_MODULE_2_DataHelper__["a" /* DataHelper */](MONGO_SERVER, MONGO_USER, MONGO_PASSWORD, MONGO_DATABASE_NAME);
         try {
@@ -34338,7 +34365,7 @@ function load() {
 
   // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
   if (!r && typeof process !== 'undefined' && 'env' in process) {
-    r = Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).DEBUG;
+    r = Object({"PORT":"5001","MONGO_SERVER":"ds161529.mlab.com:61529","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"fakify-prod","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).DEBUG;
   }
 
   return r;
@@ -34405,7 +34432,7 @@ exports.colors = [6, 2, 3, 4, 5, 1];
  *   $ DEBUG_COLORS=no DEBUG_DEPTH=10 DEBUG_SHOW_HIDDEN=enabled node script.js
  */
 
-exports.inspectOpts = Object.keys(Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"})).filter(function (key) {
+exports.inspectOpts = Object.keys(Object({"PORT":"5001","MONGO_SERVER":"ds161529.mlab.com:61529","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"fakify-prod","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"})).filter(function (key) {
   return /^debug_/i.test(key);
 }).reduce(function (obj, key) {
   // camel-case
@@ -34415,7 +34442,7 @@ exports.inspectOpts = Object.keys(Object({"PORT":"5001","MONGO_SERVER":"ds119930
     .replace(/_([a-z])/g, function (_, k) { return k.toUpperCase() });
 
   // coerce string value into JS value
-  var val = Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"})[key];
+  var val = Object({"PORT":"5001","MONGO_SERVER":"ds161529.mlab.com:61529","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"fakify-prod","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"})[key];
   if (/^(yes|on|true|enabled)$/i.test(val)) val = true;
   else if (/^(no|off|false|disabled)$/i.test(val)) val = false;
   else if (val === 'null') val = null;
@@ -34432,7 +34459,7 @@ exports.inspectOpts = Object.keys(Object({"PORT":"5001","MONGO_SERVER":"ds119930
  *   $ DEBUG_FD=3 node script.js 3>debug.log
  */
 
-var fd = parseInt(Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).DEBUG_FD, 10) || 2;
+var fd = parseInt(Object({"PORT":"5001","MONGO_SERVER":"ds161529.mlab.com:61529","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"fakify-prod","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).DEBUG_FD, 10) || 2;
 
 if (1 !== fd && 2 !== fd) {
   util.deprecate(function(){}, 'except for stderr(2) and stdout(1), any other usage of DEBUG_FD is deprecated. Override debug.log if you want to use a different log function (https://git.io/debug_fd)')()
@@ -34514,9 +34541,9 @@ function save(namespaces) {
   if (null == namespaces) {
     // If you set a process.env field to null or undefined, it gets cast to the
     // string 'null' or 'undefined'. Just delete instead.
-    delete Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).DEBUG;
+    delete Object({"PORT":"5001","MONGO_SERVER":"ds161529.mlab.com:61529","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"fakify-prod","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).DEBUG;
   } else {
-    Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).DEBUG = namespaces;
+    Object({"PORT":"5001","MONGO_SERVER":"ds161529.mlab.com:61529","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"fakify-prod","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).DEBUG = namespaces;
   }
 }
 
@@ -34528,7 +34555,7 @@ function save(namespaces) {
  */
 
 function load() {
-  return Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).DEBUG;
+  return Object({"PORT":"5001","MONGO_SERVER":"ds161529.mlab.com:61529","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"fakify-prod","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).DEBUG;
 }
 
 /**
@@ -35334,7 +35361,7 @@ function isignored (namespace) {
     return true
   }
 
-  var str = Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).NO_DEPRECATION || ''
+  var str = Object({"PORT":"5001","MONGO_SERVER":"ds161529.mlab.com:61529","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"fakify-prod","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).NO_DEPRECATION || ''
 
   // namespace ignored
   return containsNamespace(str, namespace)
@@ -35351,7 +35378,7 @@ function istraced (namespace) {
     return true
   }
 
-  var str = Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).TRACE_DEPRECATION || ''
+  var str = Object({"PORT":"5001","MONGO_SERVER":"ds161529.mlab.com:61529","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"fakify-prod","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).TRACE_DEPRECATION || ''
 
   // namespace traced
   return containsNamespace(str, namespace)
@@ -39944,7 +39971,7 @@ app.init = function init() {
  */
 
 app.defaultConfiguration = function defaultConfiguration() {
-  var env = Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).NODE_ENV || 'development';
+  var env = Object({"PORT":"5001","MONGO_SERVER":"ds161529.mlab.com:61529","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"fakify-prod","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).NODE_ENV || 'development';
 
   // default settings
   this.enable('x-powered-by');
@@ -40605,7 +40632,7 @@ function finalhandler (req, res, options) {
   var opts = options || {}
 
   // get environment
-  var env = opts.env || Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).NODE_ENV || 'development'
+  var env = opts.env || Object({"PORT":"5001","MONGO_SERVER":"ds161529.mlab.com:61529","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"fakify-prod","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).NODE_ENV || 'development'
 
   // get error callback
   var onerror = opts.onerror
@@ -41354,7 +41381,7 @@ Mime.prototype.define = function (map) {
   for (var type in map) {
     var exts = map[type];
     for (var i = 0; i < exts.length; i++) {
-      if (Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).DEBUG_MIME && this.types[exts[i]]) {
+      if (Object({"PORT":"5001","MONGO_SERVER":"ds161529.mlab.com:61529","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"fakify-prod","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).DEBUG_MIME && this.types[exts[i]]) {
         console.warn((this._loading || "define()").replace(/.*\//, ''), 'changes "' + exts[i] + '" extension type from ' +
           this.types[exts[i]] + ' to ' + type);
       }
@@ -55855,9 +55882,9 @@ exports = module.exports = SemVer;
 // The debug function is excluded entirely from the minified version.
 /* nomin */ var debug;
 /* nomin */ if (typeof process === 'object' &&
-    /* nomin */ Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}) &&
-    /* nomin */ Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).NODE_DEBUG &&
-    /* nomin */ /\bsemver\b/i.test(Object({"PORT":"5001","MONGO_SERVER":"ds119930.mlab.com:19930","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"precomp-dev","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).NODE_DEBUG))
+    /* nomin */ Object({"PORT":"5001","MONGO_SERVER":"ds161529.mlab.com:61529","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"fakify-prod","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}) &&
+    /* nomin */ Object({"PORT":"5001","MONGO_SERVER":"ds161529.mlab.com:61529","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"fakify-prod","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).NODE_DEBUG &&
+    /* nomin */ /\bsemver\b/i.test(Object({"PORT":"5001","MONGO_SERVER":"ds161529.mlab.com:61529","MONGO_USER":"hlowso","MONGO_PASSWORD":"buster21","MONGO_DATABASE_NAME":"fakify-prod","SESSION_SECRET":"Listen (doo wah doo) Do you want to know a secret? (doo wah doo)","PRECOMP_LOCAL":"true"}).NODE_DEBUG))
   /* nomin */ debug = function() {
     /* nomin */ var args = Array.prototype.slice.call(arguments, 0);
     /* nomin */ args.unshift('SEMVER');
@@ -73641,15 +73668,31 @@ class Chord extends __WEBPACK_IMPORTED_MODULE_2__Domain__["a" /* Domain */] {
             return new __WEBPACK_IMPORTED_MODULE_3__Note__["a" /* Note */](pitch, pos, required);
         });
         let contextualizedExtension = (extension
-            ? extension.map(name => Object(__WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["f" /* contextualize */])(name, baseNoteName))
+            ? extension.map(change => ({
+                target: Object(__WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["f" /* contextualize */])(change.target, baseNoteName),
+                origin: change.origin ? Object(__WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["f" /* contextualize */])(change.origin, baseNoteName) : undefined
+            }))
             : undefined);
         let noteClasses = __WEBPACK_IMPORTED_MODULE_2__Domain__["a" /* Domain */].applyExtension(baseNotes, contextualizedExtension);
         super(noteClasses);
+        this._chordName = chordName;
         this._extension = contextualizedExtension;
         this._suitableKeys = Chord.getSuitableKeys(chordName);
         this._order = this.noteClasses.reduce((highest, note) => note.position > highest ? note.position : highest, 0);
         // Set the order in which cluster notes should be dealt with
         this._clusterIndexOrder = [1, 2, 0];
+    }
+    /**
+     * PUBLIC
+     */
+    get order() {
+        return this._order;
+    }
+    get suitableKeys() {
+        return this._suitableKeys;
+    }
+    get chordName() {
+        return this._chordName;
     }
     applyExtensionToScale(scale) {
         if (!this._extension) {
@@ -73658,16 +73701,23 @@ class Chord extends __WEBPACK_IMPORTED_MODULE_2__Domain__["a" /* Domain */] {
         let chordTonic = this.getTonicPitch();
         let scaleTonic = scale.getTonicPitch();
         let posDiff = scale.getPitchPositionDiff(chordTonic, scaleTonic);
-        if (isNaN(posDiff)) {
+        if (!Number.isInteger(posDiff)) {
             return scale;
         }
         let scaleExtension = [];
-        this._extension.forEach((name, pos) => {
-            let scaleChangePos = pos + posDiff;
-            if (scaleChangePos > 7 || scaleChangePos < 1) {
-                scaleChangePos = __WEBPACK_IMPORTED_MODULE_0__Util__["e" /* mod */](scaleChangePos, 7);
+        this._extension.forEach((change, pos) => {
+            // if scaleExtension contains a note name that is already in scale, but the 
+            // position of the note name in scaleExtension is different to the position 
+            // of the same note in scale, then the position in scale for that note will 
+            // be changed in favor of scale extension. SO, if the scale does contain the
+            // target name, but does not contain the origin name, ignore the change.
+            if (!(scale.hasNote(change.target) && !!change.origin && !scale.hasNote(change.origin))) {
+                let scaleChangePos = pos + posDiff;
+                if (scaleChangePos > 7 || scaleChangePos < 1) {
+                    scaleChangePos = __WEBPACK_IMPORTED_MODULE_0__Util__["e" /* mod */](scaleChangePos, 7);
+                }
+                scaleExtension[scaleChangePos] = change;
             }
-            scaleExtension[scaleChangePos] = name;
         });
         scale.mutate(scaleExtension);
         return scale;
@@ -73684,6 +73734,9 @@ class Chord extends __WEBPACK_IMPORTED_MODULE_2__Domain__["a" /* Domain */] {
         }
         return __WEBPACK_IMPORTED_MODULE_2__Domain__["a" /* Domain */].getPitchInstance(target, lowestFifth.pitch, above);
     }
+    /**
+     * PRIVATE
+     */
     _generateVoicing(target, firstChoices = []) {
         // STEP 1: Determine pitch range
         let halfWdith = this._order < 9 ? 6 : 9;
@@ -73834,12 +73887,6 @@ class Chord extends __WEBPACK_IMPORTED_MODULE_2__Domain__["a" /* Domain */] {
         }
         return null;
     }
-    get order() {
-        return this._order;
-    }
-    get suitableKeys() {
-        return this._suitableKeys;
-    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Chord;
 
@@ -73858,7 +73905,7 @@ Chord.shapeToInfo = (shape) => {
             };
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj6:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj);
-            extension[13] = "6";
+            extension[13] = { target: "6" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7:
             return {
@@ -73868,43 +73915,47 @@ Chord.shapeToInfo = (shape) => {
             };
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj9:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7);
-            extension[9] = "2";
+            extension[9] = { target: "2" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Add9:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj);
-            extension[9] = "2";
+            extension[9] = { target: "2" };
+            return Object.assign({}, infoBase, { extension });
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].b9:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj);
+            extension[9] = { target: "H" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Majb5:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj);
-            extension[5] = "T";
+            extension[5] = { target: "T", origin: "5" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7b5:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7);
-            extension[5] = "T";
+            extension[5] = { target: "T", origin: "5" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7$5:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7);
-            extension[5] = "U";
+            extension[5] = { target: "U", origin: "5" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7b9:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7);
-            extension[9] = "H";
+            extension[9] = { target: "H", origin: "2" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj$9:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj);
-            extension[9] = "N";
+            extension[9] = { target: "N", origin: "2" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Majb9:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj);
-            extension[9] = "H";
+            extension[9] = { target: "H", origin: "2" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7$9:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7);
-            extension[9] = "N";
+            extension[9] = { target: "N", origin: "2" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7$11:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj7);
-            extension[11] = "T";
+            extension[11] = { target: "T", origin: "4" };
             return Object.assign({}, infoBase, { extension });
         /**
          * MINOR
@@ -73917,7 +73968,7 @@ Chord.shapeToInfo = (shape) => {
             };
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min6:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min);
-            extension[13] = "6";
+            extension[13] = { target: "6" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7:
             return {
@@ -73927,35 +73978,35 @@ Chord.shapeToInfo = (shape) => {
             };
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min9:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7);
-            extension[9] = "2";
+            extension[9] = { target: "2" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min11:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7);
-            extension[11] = "4";
+            extension[11] = { target: "4" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min$5:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min);
-            extension[5] = "U";
+            extension[5] = { target: "U", origin: "5" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7b5:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7);
-            extension[5] = "T";
+            extension[5] = { target: "T", origin: "5" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7$5:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7);
-            extension[5] = "U";
+            extension[5] = { target: "U", origin: "5" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7b9:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7);
-            extension[9] = "H";
+            extension[9] = { target: "H", origin: "2" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7$11:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7);
-            extension[11] = "T";
+            extension[11] = { target: "T", origin: "4" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].MinMaj7:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Min7);
-            extension[7] = "7";
+            extension[7] = { target: "7", origin: "J" };
             return Object.assign({}, infoBase, { extension });
         /**
          * DOMINANT
@@ -73968,59 +74019,59 @@ Chord.shapeToInfo = (shape) => {
             };
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom9:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
-            extension[9] = "2";
+            extension[9] = { target: "2" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom11:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
-            extension[11] = "4";
+            extension[11] = { target: "4" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7b5:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
-            extension[5] = "T";
+            extension[5] = { target: "T", origin: "5" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7$5:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
-            extension[5] = "U";
+            extension[5] = { target: "U", origin: "5" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7b9:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
-            extension[9] = "H";
+            extension[9] = { target: "H", origin: "2" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7$9:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
-            extension[9] = "N";
+            extension[9] = { target: "N", origin: "2" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7$11:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
-            extension[11] = "T";
+            extension[11] = { target: "T", origin: "4" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom9b5:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
-            extension[9] = "2";
-            extension[5] = "T";
+            extension[9] = { target: "2" };
+            extension[5] = { target: "T", origin: "5" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom9$5:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
-            extension[9] = "2";
-            extension[5] = "U";
+            extension[9] = { target: "2" };
+            extension[5] = { target: "U", origin: "5" };
             return Object.assign({}, infoBase, { extension });
         /**
          * AUGMENTED
          */
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Aug:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj);
-            extension[5] = "U";
+            extension[5] = { target: "U", origin: "5" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Aug7:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj);
-            extension[5] = "U";
-            extension[7] = "J";
+            extension[5] = { target: "U", origin: "5" };
+            extension[7] = { target: "J", origin: "7" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Aug7$9:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Maj);
-            extension[5] = "U";
-            extension[7] = "J";
-            extension[9] = "N";
+            extension[5] = { target: "U", origin: "5" };
+            extension[7] = { target: "J", origin: "7" };
+            extension[9] = { target: "N", origin: "2" };
             return Object.assign({}, infoBase, { extension });
         /**
          * DIMINISHED
@@ -74033,7 +74084,7 @@ Chord.shapeToInfo = (shape) => {
             };
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dim7:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dim);
-            extension[7] = "6";
+            extension[7] = { target: "6", origin: "J" };
             return Object.assign({}, infoBase, { extension });
         /**
          * SUSPENDED
@@ -74050,6 +74101,24 @@ Chord.shapeToInfo = (shape) => {
                 baseIntervals: [0, 5, 7],
                 relativeTonicPositions: ["1", "2", "3", "5", "6"]
             };
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Sus27:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Sus2);
+            extension[7] = { target: "J", origin: "7" };
+            return Object.assign({}, infoBase, { extension });
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Sus47:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Sus4);
+            extension[7] = { target: "J", origin: "7" };
+            return Object.assign({}, infoBase, { extension });
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Sus29:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Sus2);
+            extension[7] = { target: "J", origin: "7" };
+            extension[9] = { target: "2" };
+            return Object.assign({}, infoBase, { extension });
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Sus49:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Sus4);
+            extension[7] = { target: "J", origin: "7" };
+            extension[9] = { target: "2" };
+            return Object.assign({}, infoBase, { extension });
         default:
             throw new Error(`PRECOMP - error: unkown ChordShape ${shape}`);
     }
