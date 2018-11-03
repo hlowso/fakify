@@ -3,7 +3,7 @@ import { ISong, IChartBar } from "../../shared/types";
 import * as Util from "../../shared/Util";
 import { ObjectId } from "mongodb";
 
-export const removeKeysFromChordSegments: Migration = async (data) =>  {
+export const stripBars: Migration = async (data) =>  {
     let charts = await data.getChartsAsync() as ISong[];
 
     if (!Array.isArray(charts)) {
@@ -25,8 +25,18 @@ export const removeKeysFromChordSegments: Migration = async (data) =>  {
                 return false;
             }
 
+            for (let prop in bar) {
+                if (prop !== "timeSignature" && prop !== "chordSegments") {
+                    delete bar[prop];
+                }
+            }
+
             bar.chordSegments.forEach(segment => {
-                delete segment.key;
+                for (let prop in segment) {
+                    if (prop !== "beatIdx" && prop !== "chordName") {
+                        delete segment[prop];
+                    }
+                }
             });
         });
 

@@ -11,7 +11,44 @@ const bars = [
           "beatIdx": 0,
           "chordName": [
             "1",
-            "Maj6"
+            "Maj7"
+          ]
+        }
+      ]
+    },
+    {
+      "timeSignature": [
+        4,
+        4
+      ],
+      "chordSegments": [
+        {
+          "beatIdx": 0,
+          "chordName": [
+            "1",
+            "Maj7"
+          ]
+        }
+      ]
+    },
+    {
+      "timeSignature": [
+        4,
+        4
+      ],
+      "chordSegments": [
+        {
+          "beatIdx": 0,
+          "chordName": [
+            "2",
+            "Min7"
+          ]
+        },
+        {
+          "beatIdx": 2,
+          "chordName": [
+            "5",
+            "Dom7"
           ]
         }
       ]
@@ -40,8 +77,8 @@ const bars = [
         {
           "beatIdx": 0,
           "chordName": [
-            "N",
-            "Dim7"
+            "1",
+            "Maj"
           ]
         }
       ]
@@ -57,6 +94,103 @@ const bars = [
           "chordName": [
             "N",
             "Dim7"
+          ]
+        }
+      ]
+    },
+    {
+      "timeSignature": [
+        4,
+        4
+      ],
+      "chordSegments": [
+        {
+          "beatIdx": 0,
+          "chordName": [
+            "2",
+            "Min7"
+          ]
+        },
+        {
+          "beatIdx": 2,
+          "chordName": [
+            "5",
+            "Dom7"
+          ]
+        }
+      ]
+    },
+    {
+      "timeSignature": [
+        4,
+        4
+      ],
+      "chordSegments": [
+        {
+          "beatIdx": 0,
+          "chordName": [
+            "5",
+            "Dom7"
+          ]
+        }
+      ]
+    },
+    {
+      "timeSignature": [
+        4,
+        4
+      ],
+      "chordSegments": [
+        {
+          "beatIdx": 0,
+          "chordName": [
+            "2",
+            "Min"
+          ]
+        }
+      ]
+    },
+    {
+      "timeSignature": [
+        4,
+        4
+      ],
+      "chordSegments": [
+        {
+          "beatIdx": 0,
+          "chordName": [
+            "2",
+            "MinMaj7"
+          ]
+        }
+      ]
+    },
+    {
+      "timeSignature": [
+        4,
+        4
+      ],
+      "chordSegments": [
+        {
+          "beatIdx": 0,
+          "chordName": [
+            "2",
+            "Min7"
+          ]
+        }
+      ]
+    },
+    {
+      "timeSignature": [
+        4,
+        4
+      ],
+      "chordSegments": [
+        {
+          "beatIdx": 0,
+          "chordName": [
+            "2",
+            "Min"
           ]
         }
       ]
@@ -101,7 +235,7 @@ const bars = [
           "beatIdx": 0,
           "chordName": [
             "1",
-            "Maj7"
+            "Maj6"
           ]
         }
       ]
@@ -115,12 +249,20 @@ const bars = [
         {
           "beatIdx": 0,
           "chordName": [
-            "5",
-            "Min7"
+            "1",
+            "Maj6"
           ]
-        },
+        }
+      ]
+    },
+    {
+      "timeSignature": [
+        4,
+        4
+      ],
+      "chordSegments": [
         {
-          "beatIdx": 2,
+          "beatIdx": 0,
           "chordName": [
             "1",
             "Dom7"
@@ -137,38 +279,8 @@ const bars = [
         {
           "beatIdx": 0,
           "chordName": [
-            "4",
-            "Maj7"
-          ]
-        }
-      ]
-    },
-    {
-      "timeSignature": [
-        4,
-        4
-      ],
-      "chordSegments": [
-        {
-          "beatIdx": 0,
-          "chordName": [
-            "4",
-            "Maj7"
-          ]
-        }
-      ]
-    },
-    {
-      "timeSignature": [
-        4,
-        4
-      ],
-      "chordSegments": [
-        {
-          "beatIdx": 0,
-          "chordName": [
-            "4",
-            "Min7"
+            "7",
+            "Dom7"
           ]
         }
       ]
@@ -197,37 +309,7 @@ const bars = [
         {
           "beatIdx": 0,
           "chordName": [
-            "N",
-            "Maj6"
-          ]
-        }
-      ]
-    },
-    {
-      "timeSignature": [
-        4,
-        4
-      ],
-      "chordSegments": [
-        {
-          "beatIdx": 0,
-          "chordName": [
-            "2",
-            "Dom7$5"
-          ]
-        }
-      ]
-    },
-    {
-      "timeSignature": [
-        4,
-        4
-      ],
-      "chordSegments": [
-        {
-          "beatIdx": 0,
-          "chordName": [
-            "5",
+            "6",
             "Dom7"
           ]
         }
@@ -245,12 +327,20 @@ const bars = [
             "2",
             "Min7"
           ]
-        },
+        }
+      ]
+    },
+    {
+      "timeSignature": [
+        4,
+        4
+      ],
+      "chordSegments": [
         {
-          "beatIdx": 2,
+          "beatIdx": 0,
           "chordName": [
-            "5",
-            "Dom7"
+            "2",
+            "Min7"
           ]
         }
       ]
@@ -264,97 +354,7 @@ const bars = [
         {
           "beatIdx": 0,
           "chordName": [
-            "1",
-            "Maj7"
-          ]
-        }
-      ]
-    },
-    {
-      "timeSignature": [
-        4,
-        4
-      ],
-      "chordSegments": [
-        {
-          "beatIdx": 0,
-          "chordName": [
-            "1",
-            "Maj7"
-          ]
-        }
-      ]
-    },
-    {
-      "timeSignature": [
-        4,
-        4
-      ],
-      "chordSegments": [
-        {
-          "beatIdx": 0,
-          "chordName": [
-            "4",
-            "Dom9"
-          ]
-        }
-      ]
-    },
-    {
-      "timeSignature": [
-        4,
-        4
-      ],
-      "chordSegments": [
-        {
-          "beatIdx": 0,
-          "chordName": [
-            "4",
-            "Dom9"
-          ]
-        }
-      ]
-    },
-    {
-      "timeSignature": [
-        4,
-        4
-      ],
-      "chordSegments": [
-        {
-          "beatIdx": 0,
-          "chordName": [
-            "1",
-            "Maj7"
-          ]
-        }
-      ]
-    },
-    {
-      "timeSignature": [
-        4,
-        4
-      ],
-      "chordSegments": [
-        {
-          "beatIdx": 0,
-          "chordName": [
-            "1",
-            "Maj7"
-          ]
-        }
-      ]
-    },
-    {
-      "timeSignature": [
-        4,
-        4
-      ],
-      "chordSegments": [
-        {
-          "beatIdx": 0,
-          "chordName": [
-            "T",
+            "2",
             "Min7b5"
           ]
         }
@@ -369,126 +369,6 @@ const bars = [
         {
           "beatIdx": 0,
           "chordName": [
-            "7",
-            "Dom7b9"
-          ]
-        }
-      ]
-    },
-    {
-      "timeSignature": [
-        4,
-        4
-      ],
-      "chordSegments": [
-        {
-          "beatIdx": 0,
-          "chordName": [
-            "3",
-            "Min7"
-          ]
-        }
-      ]
-    },
-    {
-      "timeSignature": [
-        4,
-        4
-      ],
-      "chordSegments": [
-        {
-          "beatIdx": 0,
-          "chordName": [
-            "3",
-            "Min$5"
-          ]
-        }
-      ]
-    },
-    {
-      "timeSignature": [
-        4,
-        4
-      ],
-      "chordSegments": [
-        {
-          "beatIdx": 0,
-          "chordName": [
-            "3",
-            "Min6"
-          ]
-        }
-      ]
-    },
-    {
-      "timeSignature": [
-        4,
-        4
-      ],
-      "chordSegments": [
-        {
-          "beatIdx": 0,
-          "chordName": [
-            "3",
-            "Min$5"
-          ]
-        }
-      ]
-    },
-    {
-      "timeSignature": [
-        4,
-        4
-      ],
-      "chordSegments": [
-        {
-          "beatIdx": 0,
-          "chordName": [
-            "2",
-            "Min7"
-          ]
-        }
-      ]
-    },
-    {
-      "timeSignature": [
-        4,
-        4
-      ],
-      "chordSegments": [
-        {
-          "beatIdx": 0,
-          "chordName": [
-            "2",
-            "Min$5"
-          ]
-        }
-      ]
-    },
-    {
-      "timeSignature": [
-        4,
-        4
-      ],
-      "chordSegments": [
-        {
-          "beatIdx": 0,
-          "chordName": [
-            "2",
-            "Min7"
-          ]
-        }
-      ]
-    },
-    {
-      "timeSignature": [
-        4,
-        4
-      ],
-      "chordSegments": [
-        {
-          "beatIdx": 0,
-          "chordName": [
             "5",
             "Dom7"
           ]
@@ -505,7 +385,7 @@ const bars = [
           "beatIdx": 0,
           "chordName": [
             "1",
-            "Maj6"
+            "Maj7"
           ]
         }
       ]
@@ -520,7 +400,7 @@ const bars = [
           "beatIdx": 0,
           "chordName": [
             "1",
-            "Maj6"
+            "Maj7"
           ]
         }
       ]
@@ -534,8 +414,8 @@ const bars = [
         {
           "beatIdx": 0,
           "chordName": [
-            "N",
-            "Dim7"
+            "J",
+            "Dom7"
           ]
         }
       ]
@@ -549,8 +429,8 @@ const bars = [
         {
           "beatIdx": 0,
           "chordName": [
-            "N",
-            "Dim7"
+            "6",
+            "Dom7"
           ]
         }
       ]
@@ -617,4 +497,4 @@ const bars = [
     }
   ] as IChartBar[];
 
-export default bars;
+  export default bars;

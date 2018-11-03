@@ -1,5 +1,5 @@
 import { DataHelper } from "../backend/DataHelper";
-import { removeKeysFromChordSegments } from "./migrations/removeKeyFromChordSegments";
+import { stripBars } from "./migrations/stripBars";
 import { Migration } from "migrations/MigrationBase";
 
 (async function() {
@@ -14,7 +14,7 @@ import { Migration } from "migrations/MigrationBase";
 
     // Add migrations here...
     let migrations: { [name: string]: Migration } = {
-        removeKeysFromChordSegments
+        stripBars
     };
 
     if (!MIGRATION) {

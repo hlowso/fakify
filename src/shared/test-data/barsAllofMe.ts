@@ -12,8 +12,7 @@ const bars = [
         "chordName": [
           "1",
           "Maj6"
-        ],
-        "key": "1"
+        ]
       }
     ]
   },
@@ -28,8 +27,7 @@ const bars = [
         "chordName": [
           "1",
           "Maj6"
-        ],
-        "key": "1"
+        ]
       }
     ]
   },
@@ -44,8 +42,7 @@ const bars = [
         "chordName": [
           "3",
           "Dom7"
-        ],
-        "key": "6"
+        ]
       }
     ]
   },
@@ -60,8 +57,7 @@ const bars = [
         "chordName": [
           "3",
           "Dom7"
-        ],
-        "key": "6"
+        ]
       }
     ]
   },
@@ -76,8 +72,7 @@ const bars = [
         "chordName": [
           "6",
           "Dom7"
-        ],
-        "key": "2"
+        ]
       }
     ]
   },
@@ -92,8 +87,7 @@ const bars = [
         "chordName": [
           "6",
           "Dom7"
-        ],
-        "key": "2"
+        ]
       }
     ]
   },
@@ -108,8 +102,7 @@ const bars = [
         "chordName": [
           "2",
           "Min7"
-        ],
-        "key": "J"
+        ]
       }
     ]
   },
@@ -124,8 +117,7 @@ const bars = [
         "chordName": [
           "2",
           "Min7"
-        ],
-        "key": "J"
+        ]
       }
     ]
   },
@@ -140,8 +132,7 @@ const bars = [
         "chordName": [
           "3",
           "Dom7"
-        ],
-        "key": "6"
+        ]
       }
     ]
   },
@@ -156,8 +147,7 @@ const bars = [
         "chordName": [
           "3",
           "Dom7"
-        ],
-        "key": "6"
+        ]
       }
     ]
   },
@@ -172,8 +162,7 @@ const bars = [
         "chordName": [
           "6",
           "Min7"
-        ],
-        "key": "5"
+        ]
       }
     ]
   },
@@ -188,8 +177,7 @@ const bars = [
         "chordName": [
           "6",
           "Min7"
-        ],
-        "key": "5"
+        ]
       }
     ]
   },
@@ -204,8 +192,7 @@ const bars = [
         "chordName": [
           "2",
           "Dom7"
-        ],
-        "key": "5"
+        ]
       }
     ]
   },
@@ -220,8 +207,7 @@ const bars = [
         "chordName": [
           "2",
           "Dom7"
-        ],
-        "key": "5"
+        ]
       }
     ]
   },
@@ -236,8 +222,7 @@ const bars = [
         "chordName": [
           "2",
           "Min7"
-        ],
-        "key": "1"
+        ]
       }
     ]
   },
@@ -252,8 +237,7 @@ const bars = [
         "chordName": [
           "5",
           "Dom7"
-        ],
-        "key": "1"
+        ]
       }
     ]
   },
@@ -268,8 +252,7 @@ const bars = [
         "chordName": [
           "1",
           "Maj6"
-        ],
-        "key": "1"
+        ]
       }
     ]
   },
@@ -284,8 +267,7 @@ const bars = [
         "chordName": [
           "1",
           "Maj6"
-        ],
-        "key": "1"
+        ]
       }
     ]
   },
@@ -300,8 +282,7 @@ const bars = [
         "chordName": [
           "3",
           "Dom7"
-        ],
-        "key": "6"
+        ]
       }
     ]
   },
@@ -316,8 +297,7 @@ const bars = [
         "chordName": [
           "3",
           "Dom7"
-        ],
-        "key": "6"
+        ]
       }
     ]
   },
@@ -332,8 +312,7 @@ const bars = [
         "chordName": [
           "6",
           "Dom7"
-        ],
-        "key": "2"
+        ]
       }
     ]
   },
@@ -348,8 +327,7 @@ const bars = [
         "chordName": [
           "6",
           "Dom7"
-        ],
-        "key": "2"
+        ]
       }
     ]
   },
@@ -364,8 +342,7 @@ const bars = [
         "chordName": [
           "2",
           "Min7"
-        ],
-        "key": "4"
+        ]
       }
     ]
   },
@@ -380,8 +357,7 @@ const bars = [
         "chordName": [
           "2",
           "Min7"
-        ],
-        "key": "4"
+        ]
       }
     ]
   },
@@ -396,8 +372,7 @@ const bars = [
         "chordName": [
           "4",
           "Maj6"
-        ],
-        "key": "4"
+        ]
       }
     ]
   },
@@ -412,8 +387,7 @@ const bars = [
         "chordName": [
           "4",
           "Min6"
-        ],
-        "key": "H"
+        ]
       }
     ]
   },
@@ -428,16 +402,14 @@ const bars = [
         "chordName": [
           "1",
           "Maj7"
-        ],
-        "key": "1"
+        ]
       },
       {
         "beatIdx": 2,
         "chordName": [
           "3",
           "Min7b5"
-        ],
-        "key": "1"
+        ]
       }
     ]
   },
@@ -452,8 +424,7 @@ const bars = [
         "chordName": [
           "6",
           "Dom7"
-        ],
-        "key": "2"
+        ]
       }
     ]
   },
@@ -468,8 +439,7 @@ const bars = [
         "chordName": [
           "2",
           "Min7"
-        ],
-        "key": "1"
+        ]
       }
     ]
   },
@@ -484,8 +454,7 @@ const bars = [
         "chordName": [
           "5",
           "Dom7"
-        ],
-        "key": "1"
+        ]
       }
     ]
   },
@@ -500,8 +469,7 @@ const bars = [
         "chordName": [
           "1",
           "Maj6"
-        ],
-        "key": "1"
+        ]
       }
     ]
   },
@@ -516,8 +484,7 @@ const bars = [
         "chordName": [
           "1",
           "Maj6"
-        ],
-        "key": "1"
+        ]
       }
     ]
   }

@@ -7,13 +7,13 @@ import barsByeBye from "../../../../test-data/barsByeByeBlackbird";
 import barsWitchcraft from "../../../../test-data/barsWitchcraft";
 import bars7_4WithCs from "../../../../test-data/bars7_4WithCs";
 import { compBassSwingV2 } from "./compBassSwingV2";
-import { IChartBar, Feel, IChordStretch, ChordName, IMusicBar } from "../../../../types";
+import { Feel, IChordStretch, ChordName, IMusicBar } from "../../../../types";
 
-const chart251 = new Chart(() => {}, barsBase as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
-const chartByeBye = new Chart(() => {}, barsByeBye as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
-const shortByeBye = new Chart(() => {}, barsByeBye as IChartBar[], "F#|Gb", [ 120, 4 ], Feel.Swing, 7, 7);
-const short7_4WithCs = new Chart(() => {}, bars7_4WithCs as IChartBar[], "C", [ 120, 4 ], Feel.Swing, 3, 3 );
-const chartWitchcraft = new Chart(() => {}, barsWitchcraft, "F", [ 120, 4 ], Feel.Swing);
+const chart251 = new Chart(() => {}, barsBase, "A#|Bb", [ 120, 4 ]);
+const chartByeBye = new Chart(() => {}, barsByeBye, "A#|Bb", [ 120, 4 ]);
+const shortByeBye = new Chart(() => {}, barsByeBye, "F#|Gb", [ 120, 4 ], Feel.Swing, 7, 7);
+const short7_4WithCs = new Chart(() => {}, bars7_4WithCs, "C", [ 120, 4 ], Feel.Swing, 3, 3 );
+const chartWitchcraft = new Chart(() => {}, barsWitchcraft, "F", [ 120, 4 ]);
 
 test("compBassSwingV2 generates at least one tonic or fifth of the current chord per chord stretch", () => {
 

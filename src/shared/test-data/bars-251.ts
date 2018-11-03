@@ -1,4 +1,6 @@
-const _251_multi_bars = [
+import { IChartBar } from "../types";
+
+const bars = [
     {
       "timeSignature": [
         4,
@@ -10,8 +12,7 @@ const _251_multi_bars = [
           "chordName": [
             "2",
             "Min7"
-          ],
-          "key": "1",
+          ]
         }
       ]
     },
@@ -26,8 +27,7 @@ const _251_multi_bars = [
           "chordName": [
             "5",
             "Dom7"
-          ],
-          "key": "1",
+          ]
         }
       ]
     },
@@ -42,8 +42,7 @@ const _251_multi_bars = [
           "chordName": [
             "3",
             "Min7"
-          ],
-          "key": "1",
+          ]
         }
       ]
     },
@@ -58,8 +57,7 @@ const _251_multi_bars = [
           "chordName": [
             "6",
             "Dom7"
-          ],
-          "key": "2",
+          ]
         }
       ]
     },
@@ -74,8 +72,7 @@ const _251_multi_bars = [
           "chordName": [
             "2",
             "Min7"
-          ],
-          "key": "1",
+          ]
         }
       ]
     },
@@ -90,8 +87,7 @@ const _251_multi_bars = [
           "chordName": [
             "5",
             "Dom7"
-          ],
-          "key": "1",
+          ]
         }
       ]
     },
@@ -106,8 +102,7 @@ const _251_multi_bars = [
           "chordName": [
             "1",
             "Maj7"
-          ],
-          "key": "1",
+          ]
         }
       ]
     },
@@ -122,27 +117,24 @@ const _251_multi_bars = [
           "chordName": [
             "6",
             "Min7"
-          ],
-          "key": "1"
+          ]
         },
         {
           "beatIdx": 2,
           "chordName": [
             "2",
             "Min7"
-          ],
-          "key": "1"
+          ]
         },
         {
           "beatIdx": 3,
           "chordName": [
             "5",
             "Dom7"
-          ],
-          "key": "1"
+          ]
         }
       ]
     }
-  ];
-
-export default _251_multi_bars;
+  ] as IChartBar[];
+  
+export default bars;

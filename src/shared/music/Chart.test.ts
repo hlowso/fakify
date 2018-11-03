@@ -5,15 +5,16 @@ import _4_chord_bars from "../test-data/bars-4-chords";
 import bars7_4 from "../test-data/bars-7-4-bar";
 import bars7_4WithCs from "../test-data/bars7_4WithCs";
 import barsByeByeBlackBird from "../test-data/barsByeByeBlackbird";
+import barsByeByeWithKeys from "../test-data/barsByeByeBlackbirdWithKeys";
 import barsInvalidDueToTooManyBeatsInOneBar from "../test-data/barsInvalid";
-import { chordStretches251InBbMajor } from "../test-data/chordStretches251InBbMajor";
-import { Feel, IChartBar, IChordStretch, IChordSegment } from "../types";
+import chordStretches251InBbMajor from "../test-data/chordStretches251InBbMajor";
+import { Feel, IChordStretch } from "../types";
 
-const chart251InBbMajor = new Chart(() => {}, _251_bars as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
-const chart4Chords = new Chart(() => {}, _4_chord_bars as IChartBar[], "F#|Gb", [ 120, 4 ], Feel.Swing);
-const chart251Multi = new Chart(() => {}, _251_bars_multi as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
-const chart251MultiShortened = new Chart(() => {}, _251_bars_multi as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing, 3, 6);
-const chart7_4WithCs = new Chart(() => {}, bars7_4WithCs as IChartBar[], "D#|Eb", [ 120, 4 ], Feel.Swing, 3, 3);
+const chart251InBbMajor = new Chart(() => {}, _251_bars, "A#|Bb", [ 120, 4 ], Feel.Swing);
+const chart4Chords = new Chart(() => {}, _4_chord_bars, "F#|Gb", [ 120, 4 ], Feel.Swing);
+const chart251Multi = new Chart(() => {}, _251_bars_multi, "A#|Bb", [ 120, 4 ], Feel.Swing);
+const chart251MultiShortened = new Chart(() => {}, _251_bars_multi, "A#|Bb", [ 120, 4 ], Feel.Swing, 3, 6);
+const chart7_4WithCs = new Chart(() => {}, bars7_4WithCs, "D#|Eb", [ 120, 4 ], Feel.Swing, 3, 3);
 
 test("valid tempo returns true when tempo is valid", () => {
 	expect(Chart.validTempo([120, 4])).toBe(true);
@@ -24,16 +25,16 @@ test("valid time signature returns true when time signature is valid", () => {
 });
 
 test("validBaseBars returns true when passed an array with a single valid 7 / 4 bar", () => {
-	expect(Chart.validBaseBars(bars7_4 as IChartBar[])).toBeTruthy();
+	expect(Chart.validBaseBars(bars7_4)).toBeTruthy();
 });
 
 test("validBaseBars returns false when passed an array in which 1 bar has too many beats in chordSegments for the bar's time signature", () => {
-	expect(Chart.validBaseBars(barsInvalidDueToTooManyBeatsInOneBar as IChartBar[])).toBeFalsy();
+	expect(Chart.validBaseBars(barsInvalidDueToTooManyBeatsInOneBar)).toBeFalsy();
 });
 
 test("chordStretches are generated properly", () => {
 	let { chordStretches } = chart251InBbMajor;
-	expect(chordStretches).toEqual(chordStretches251InBbMajor as IChordStretch[]);
+	expect(chordStretches).toEqual(chordStretches251InBbMajor);
 });
 
 test("chordStretches have all non zero integer durationInSubbeats values", () => {
@@ -66,25 +67,13 @@ test("chordStretchesInRange have all non zero integer durationInSubbeats values"
 
 test("different chord stretches are generated for chord segments within the same bar", () => {
 	let { chordStretches } = chart4Chords;
-	expect((chordStretches as IChartBar[]).length).toBe(4);
+	expect((chordStretches as IChordStretch[]).length).toBe(4);
 });
 
 test("addKeysToBars properly adds keys to the bars of a relatively dynamic chart", () => {
 
-	let correctBars = barsByeByeBlackBird as IChartBar[];
-
-	let testBars = correctBars.map((bar) => {
-		return {
-			barIdx: bar.barIdx,
-			timeSignature: bar.timeSignature,
-			chordSegments: bar.chordSegments.map(seg => {
-				return {
-					beatIdx: seg.beatIdx,
-					chordName: seg.chordName
-				} as IChordSegment
-			})
-		} as IChartBar;
-	});
+	let correctBars = barsByeByeWithKeys;
+	let testBars = barsByeByeBlackBird;
 
 	Chart.addKeysToBars(testBars, false);
 

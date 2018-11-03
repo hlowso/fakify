@@ -1,7 +1,6 @@
 import { CompV1 } from "./index";
 import Chart from "../Chart";
 import Score from "../Score";
-import { Feel } from "../../types";
 
 import barsAfricanFlower from "../../test-data/barsAfricanFlower";
 import barsAfternoon from "../../test-data/barsAfternoonInParis";
@@ -15,16 +14,16 @@ import barsAllofMe from "../../test-data/barsAllofMe";
 import barsAllofYou from "../../test-data/barsAllofYou";
 
 const charts = [
-    new Chart(() => {}, barsAfricanFlower, "D#|Eb", [ 120, 4 ], Feel.Swing),
-    new Chart(() => {}, barsAfternoon, "C", [ 120, 4 ], Feel.Swing),
-    new Chart(() => {}, barsAiregin, "G#|Ab", [ 120, 4 ], Feel.Swing),
-    new Chart(() => {}, barsAguaDeBeber, "G#|Ab", [ 120, 4 ], Feel.Swing),
-    new Chart(() => {}, barsAlfie, "C", [ 120, 4 ], Feel.Swing),
-    new Chart(() => {}, barsAlice, "C", [ 120, 4 ], Feel.Swing),
-    new Chart(() => {}, barsAllBlues, "G", [ 120, 4 ], Feel.Swing),
-    new Chart(() => {}, barsAllByMyself, "C", [ 120, 4 ], Feel.Swing),
-    new Chart(() => {}, barsAllofMe, "C", [ 120, 4 ], Feel.Swing),
-    new Chart(() => {}, barsAllofYou, "D#|Eb", [ 120, 4 ], Feel.Swing),
+    new Chart(() => {}, barsAfricanFlower, "D#|Eb", [ 120, 4 ]),
+    new Chart(() => {}, barsAfternoon, "C", [ 120, 4 ]),
+    new Chart(() => {}, barsAiregin, "G#|Ab", [ 120, 4 ]),
+    new Chart(() => {}, barsAguaDeBeber, "G#|Ab", [ 120, 4 ]),
+    new Chart(() => {}, barsAlfie, "C", [ 120, 4 ]),
+    new Chart(() => {}, barsAlice, "C", [ 120, 4 ]),
+    new Chart(() => {}, barsAllBlues, "G", [ 120, 4 ]),
+    new Chart(() => {}, barsAllByMyself, "C", [ 120, 4 ]),
+    new Chart(() => {}, barsAllofMe, "C", [ 120, 4 ]),
+    new Chart(() => {}, barsAllofYou, "D#|Eb", [ 120, 4 ]),
 ];
 
 /**

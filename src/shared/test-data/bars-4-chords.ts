@@ -1,6 +1,7 @@
-const _4_chords_bars = [
+import { IChartBar } from "../types";
+
+const bars = [
     {
-      "barIdx": 0,
       "timeSignature": [
         4,
         4
@@ -11,35 +12,31 @@ const _4_chords_bars = [
           "chordName": [
             "1",
             "Maj"
-          ],
-          "key": "1"
+          ]
         },
         {
           "beatIdx": 1,
           "chordName": [
             "3",
             "Min"
-          ],
-          "key": "1"
+          ]
         },
         {
           "beatIdx": 2,
           "chordName": [
             "4",
             "Maj7"
-          ],
-          "key": "1"
+          ]
         },
         {
           "beatIdx": 3,
           "chordName": [
             "5",
             "Dom7"
-          ],
-          "key": "1"
+          ]
         }
       ]
     }
-  ];
+  ] as IChartBar[];
 
-export default _4_chords_bars;
+export default bars;

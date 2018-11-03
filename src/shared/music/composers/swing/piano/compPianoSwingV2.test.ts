@@ -10,18 +10,17 @@ import bars7_4_full from "../../../../test-data/bars-7-4-full-bar";
 import barsByeBye from "../../../../test-data/barsByeByeBlackbird";
 import barsWitchcraft from "../../../../test-data/barsWitchcraft";
 import { compPianoSwingV2 } from "./compPianoSwingV2";
-import { IChartBar, Feel, IChordStretch, IMusicBar, IStroke } from "../../../../types";
+import { Feel, IChordStretch, IMusicBar, IStroke } from "../../../../types";
 
-const _251_chart = new Chart(() => {}, _251_bars as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
-const C_Blues_chart = new Chart(() => {}, C_Blues_bars as IChartBar[], "C", [ 120, 4 ], Feel.Swing);
-const chartJustForFun = new Chart(() => {}, barsJustForFun as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
-const chart4Chords = new Chart(() => {}, _4_chord_bar as IChartBar[], "G", [ 120, 4 ], Feel.Swing);
-const chart7_4Full = new Chart(() => {}, bars7_4_full as IChartBar[], "A#|Bb", [ 120, 4 ], Feel.Swing);
-const chart251Multi = new Chart(() => {}, _251_multichord_bars as IChartBar[], "B|Cb", [ 120, 4 ], Feel.Swing);
-const shortByeBye = new Chart(() => {}, barsByeBye as IChartBar[], "F", [ 120, 4 ], Feel.Swing, 3, 17);
-const chartByeBye = new Chart(() => {}, barsByeBye as IChartBar[], "F", [ 120, 4 ], Feel.Swing);
-const chartWitchcraft = new Chart(() => {}, barsWitchcraft, "F", [ 120, 4 ], Feel.Swing);
-
+const _251_chart = new Chart(() => {}, _251_bars, "A#|Bb", [ 120, 4 ]);
+const C_Blues_chart = new Chart(() => {}, C_Blues_bars, "C", [ 120, 4 ]);
+const chartJustForFun = new Chart(() => {}, barsJustForFun, "A#|Bb", [ 120, 4 ]);
+const chart4Chords = new Chart(() => {}, _4_chord_bar, "G", [ 120, 4 ]);
+const chart7_4Full = new Chart(() => {}, bars7_4_full, "A#|Bb", [ 120, 4 ]);
+const chart251Multi = new Chart(() => {}, _251_multichord_bars, "B|Cb", [ 120, 4 ]);
+const shortByeBye = new Chart(() => {}, barsByeBye, "F", [ 120, 4 ], Feel.Swing, 3, 17);
+const chartByeBye = new Chart(() => {}, barsByeBye, "F", [ 120, 4 ]);
+const chartWitchcraft = new Chart(() => {}, barsWitchcraft, "F", [ 120, 4 ]);
 
 test("generates at least 1 voicing per chord stretch", () => {
 	let testRuns = 50;
@@ -34,7 +33,7 @@ test("generates at least 1 voicing per chord stretch", () => {
 });
 
 test("generates at least 1 voicing per chord stretch when range is shortened", () => {
-	const short251 = new Chart(() => {}, _251_bars as IChartBar[], "E", [ 200, 4 ], Feel.Swing, 3, 6);
+	const short251 = new Chart(() => {}, _251_bars, "E", [ 200, 4 ], Feel.Swing, 3, 6);
 
 	let testRuns = 100;
 	let successfulRuns = compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings(short251, testRuns);

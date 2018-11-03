@@ -1,4 +1,6 @@
-const barsByeByeBlackbird = [
+import { IChartBar } from "../types";
+
+const bars = [
     {
       "timeSignature": [
         4,
@@ -11,7 +13,7 @@ const barsByeByeBlackbird = [
             "1",
             "Maj7"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -27,7 +29,7 @@ const barsByeByeBlackbird = [
             "1",
             "Maj7"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -43,7 +45,7 @@ const barsByeByeBlackbird = [
             "2",
             "Min7"
           ],
-          "key": "1",
+          "key": "1"
         },
         {
           "beatIdx": 2,
@@ -51,7 +53,7 @@ const barsByeByeBlackbird = [
             "5",
             "Dom7"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -67,7 +69,7 @@ const barsByeByeBlackbird = [
             "1",
             "Maj6"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -83,7 +85,7 @@ const barsByeByeBlackbird = [
             "1",
             "Maj"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -99,7 +101,7 @@ const barsByeByeBlackbird = [
             "N",
             "Dim7"
           ],
-          "key": "3",
+          "key": "3"
         }
       ]
     },
@@ -115,7 +117,7 @@ const barsByeByeBlackbird = [
             "2",
             "Min7"
           ],
-          "key": "1",
+          "key": "1"
         },
         {
           "beatIdx": 2,
@@ -123,7 +125,7 @@ const barsByeByeBlackbird = [
             "5",
             "Dom7"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -139,7 +141,7 @@ const barsByeByeBlackbird = [
             "5",
             "Dom7"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -155,7 +157,7 @@ const barsByeByeBlackbird = [
             "2",
             "Min"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -171,7 +173,7 @@ const barsByeByeBlackbird = [
             "2",
             "MinMaj7"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -187,7 +189,7 @@ const barsByeByeBlackbird = [
             "2",
             "Min7"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -203,7 +205,7 @@ const barsByeByeBlackbird = [
             "2",
             "Min"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -219,7 +221,7 @@ const barsByeByeBlackbird = [
             "2",
             "Min7"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -235,7 +237,7 @@ const barsByeByeBlackbird = [
             "5",
             "Dom7"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -251,7 +253,7 @@ const barsByeByeBlackbird = [
             "1",
             "Maj6"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -267,7 +269,7 @@ const barsByeByeBlackbird = [
             "1",
             "Maj6"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -283,7 +285,7 @@ const barsByeByeBlackbird = [
             "1",
             "Dom7"
           ],
-          "key": "4",
+          "key": "4"
         }
       ]
     },
@@ -299,7 +301,7 @@ const barsByeByeBlackbird = [
             "7",
             "Dom7"
           ],
-          "key": "3",
+          "key": "3"
         }
       ]
     },
@@ -315,7 +317,7 @@ const barsByeByeBlackbird = [
             "J",
             "Dom7"
           ],
-          "key": "N",
+          "key": "N"
         }
       ]
     },
@@ -331,7 +333,7 @@ const barsByeByeBlackbird = [
             "6",
             "Dom7"
           ],
-          "key": "2",
+          "key": "2"
         }
       ]
     },
@@ -347,7 +349,7 @@ const barsByeByeBlackbird = [
             "2",
             "Min7"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -363,7 +365,7 @@ const barsByeByeBlackbird = [
             "2",
             "Min7"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -379,7 +381,7 @@ const barsByeByeBlackbird = [
             "2",
             "Min7b5"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -395,7 +397,7 @@ const barsByeByeBlackbird = [
             "5",
             "Dom7"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -411,7 +413,7 @@ const barsByeByeBlackbird = [
             "1",
             "Maj7"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -427,7 +429,7 @@ const barsByeByeBlackbird = [
             "1",
             "Maj7"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -443,7 +445,7 @@ const barsByeByeBlackbird = [
             "J",
             "Dom7"
           ],
-          "key": "N",
+          "key": "N"
         }
       ]
     },
@@ -459,7 +461,7 @@ const barsByeByeBlackbird = [
             "6",
             "Dom7"
           ],
-          "key": "2",
+          "key": "2"
         }
       ]
     },
@@ -475,7 +477,7 @@ const barsByeByeBlackbird = [
             "2",
             "Min7"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -491,7 +493,7 @@ const barsByeByeBlackbird = [
             "5",
             "Dom7"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -507,7 +509,7 @@ const barsByeByeBlackbird = [
             "1",
             "Maj6"
           ],
-          "key": "1",
+          "key": "1"
         }
       ]
     },
@@ -527,6 +529,6 @@ const barsByeByeBlackbird = [
         }
       ]
     }
-  ];
+  ] as IChartBar[];
 
-  export default barsByeByeBlackbird;
+  export default bars;

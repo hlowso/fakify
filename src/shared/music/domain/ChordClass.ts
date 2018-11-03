@@ -412,13 +412,15 @@ export class Chord extends Domain {
 
         this._extension.forEach((change, pos) => {
 
+            // When scaleExtension is passed to scale.mutate,
             // if scaleExtension contains a note name that is already in scale, but the 
             // position of the note name in scaleExtension is different to the position 
             // of the same note in scale, then the position in scale for that note will 
             // be changed in favor of scale extension. SO, if the scale does contain the
             // target name, but does not contain the origin name, ignore the change.
             if (!(scale.hasNote(change.target as NoteName) && !!change.origin && !scale.hasNote(change.origin as NoteName))) {
-                let scaleChangePos = pos + posDiff;
+                let chordPosDiff = pos > 7 ? Util.mod(pos, 8) : (pos - 1);
+                let scaleChangePos = 1 + posDiff + chordPosDiff;
 
                 if (scaleChangePos > 7 || scaleChangePos < 1) {
                     scaleChangePos = Util.mod(scaleChangePos, 7);

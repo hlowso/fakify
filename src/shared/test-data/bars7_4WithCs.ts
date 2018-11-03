@@ -1,7 +1,9 @@
+import { IChartBar } from "../types";
+
 const bars = [
     {
       "timeSignature": [
-        2,
+        7,
         4
       ],
       "chordSegments": [
@@ -11,7 +13,6 @@ const bars = [
             "5",
             "Dom9$5"
           ],
-          "key": "1"
         },
         {
           "beatIdx": 1,
@@ -19,7 +20,6 @@ const bars = [
             "N",
             "Maj7$5"
           ],
-          "key": "J"
         },
         {
           "beatIdx": 2,
@@ -27,7 +27,6 @@ const bars = [
             "J",
             "Maj7b9"
           ],
-          "key": "J"
         },
         {
           "beatIdx": 3,
@@ -35,7 +34,6 @@ const bars = [
             "1",
             "Min7$11"
           ],
-          "key": "J"
         },
         {
           "beatIdx": 4,
@@ -43,7 +41,6 @@ const bars = [
             "J",
             "Dom7$11"
           ],
-          "key": "N"
         },
         {
           "beatIdx": 5,
@@ -51,7 +48,6 @@ const bars = [
             "N",
             "Aug7$9"
           ],
-          "key": "N"
         },
         {
           "beatIdx": 6,
@@ -59,7 +55,6 @@ const bars = [
             "5",
             "Min7$11"
           ],
-          "key": "N"
         }
       ]
     },
@@ -75,7 +70,6 @@ const bars = [
             "6",
             "Maj"
           ],
-          "key": "6"
         }
       ]
     },
@@ -91,7 +85,6 @@ const bars = [
             "6",
             "Maj"
           ],
-          "key": "6"
         }
       ]
     },
@@ -107,7 +100,6 @@ const bars = [
             "6",
             "Maj"
           ],
-          "key": "6"
         }
       ]
     },
@@ -123,7 +115,6 @@ const bars = [
             "6",
             "Maj"
           ],
-          "key": "6"
         }
       ]
     },
@@ -139,7 +130,6 @@ const bars = [
             "6",
             "Maj"
           ],
-          "key": "6"
         }
       ]
     },
@@ -155,7 +145,6 @@ const bars = [
             "6",
             "Maj"
           ],
-          "key": "6"
         }
       ]
     },
@@ -171,7 +160,6 @@ const bars = [
             "6",
             "Maj"
           ],
-          "key": "6"
         }
       ]
     },
@@ -187,10 +175,9 @@ const bars = [
             "6",
             "Maj"
           ],
-          "key": "6"
         }
       ]
     }
-  ];
+  ] as IChartBar[];
 
-export default bars;
+  export default bars;
