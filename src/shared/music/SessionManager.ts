@@ -118,12 +118,7 @@ export class SessionManager {
                 Util.waitFor(getUpdate, this._TIME_CHECKER_RATE)
                     .then(() => {
                         if (!timeout || this.inSession) {
-                            let stepWasSuccessful = this._stepBySegment();
-
-                            if (!stepWasSuccessful) {
-                                throw new Error("Could not step to next segment");
-                            }
-
+                            this._stepBySegment();
                             this._queueCurrSegment();
                             let nextQueueTime = this._nextSegmentQueueTime;
                             let nextQueueTimeMinusPrepTime = nextQueueTime - this._PREP_TIME;
@@ -133,14 +128,7 @@ export class SessionManager {
                             );
                         }
                     })
-                    .catch(err => {
-                        console.error(err);
-                        this._failure = true;
-                        this._startTime = NaN;
-                        this._onUpdate();
-
-                        // TODO: more thorough cleanup might be necessary...
-                    });
+                    .catch(this.handleCompFailure);
             }, timeout);
         };
         queueLoop();
@@ -180,7 +168,13 @@ export class SessionManager {
         if (this._nextScore) {
             score = this._nextScore;
         } else {
-            score = CompV1(this._chart, this._score);
+            try {
+                score = CompV1(this._chart, this._score);
+            } catch(err) {
+                this.handleCompFailure(err);
+                return;
+            }
+
             score.changeVolume("piano", this._pianoVolFactor);
             score.changeVolume("doubleBass", this._bassVolFactor);
             score.changeVolume("drums", this._drumsVolFactor);
@@ -190,11 +184,26 @@ export class SessionManager {
         return score;
     }
 
-    protected async _compileAndSetNextScoreAsync(prevScore?: Score) {
-        this._nextScore = await CompAsync(this._chart, prevScore);
+    private async _compileAndSetNextScoreAsync(prevScore?: Score) {
+        try{
+            this._nextScore = await CompAsync(this._chart, prevScore);
+        } catch(err) {
+            this.handleCompFailure(err);
+            return;
+        }
+
         this._nextScore.changeVolume("piano", this._pianoVolFactor);
         this._nextScore.changeVolume("doubleBass", this._bassVolFactor);
         this._nextScore.changeVolume("drums", this._drumsVolFactor);
+    }
+
+    private handleCompFailure = (err?: Error) => {
+        console.error(err);
+        this._failure = true;
+        this._startTime = NaN;
+        this._onUpdate();
+
+        // TODO: more thorough cleanup might be necessary...
     }
 
     /**
@@ -254,12 +263,7 @@ export class SessionManager {
                 this._chorusIdx ++;
 
                 // Refresh the score
-                try {
-                    this._score = this._compileMusic();
-                } catch (err) {
-                    console.error(err);
-                    return false;
-                }
+                this._score = this._compileMusic() as Score;
 
                 // Reset the queue times
                 this._resetQueueTimes();
@@ -492,7 +496,7 @@ export class ListeningSessionManager extends SessionManager {
     }
 
     protected _compileMusic(): Score {
-        let _accompaniment = super._compileMusic();
+        let _accompaniment = super._compileMusic() as Score;
         this._userPlaying = !this._userPlaying;
 
         if (!this._userPlaying) {

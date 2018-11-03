@@ -14,7 +14,13 @@ export const CompV1 = (chart: Chart, prevScore?: Score): Score => {
 }
 
 export function CompAsync(chart: Chart, prevScore?: Score): Promise<Score> {
-    return new Promise((resolve, reject) => resolve(CompV1(chart, prevScore)));
+    return new Promise((resolve, reject) => { 
+        try {
+            resolve(CompV1(chart, prevScore));
+        } catch(err) {
+            reject(err);
+        }
+    });
 }
 
 const _getSwingAccompaniment = (chart: Chart, prevScore?: Score): Score => {
