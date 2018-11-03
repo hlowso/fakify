@@ -14,20 +14,6 @@ interface IKeyCount {
 };
 
 class Chart {
-    private _songId?: Mongo.ObjectId | string;
-    private _barsBase: IChartBar[];
-    private _bars: IChartBar[];
-    private _chordStretches?: IChordStretch[];
-    private _chordStretchesInRange?: IChordStretch[];
-    private _context: NoteName;
-    private _tempo?: Tempo;
-    private _feel?: Feel;
-    private _externalUpdate?: () => void;
-    private _rangeStartIdx: number;
-    private _rangeEndIdx: number;
-    private _durationInSubbeats: number;
-    private _rangeDurationInSubbeats: number;
-
     public static barsAreEqual = (b1: IChartBar, b2: IChartBar, ignoreKeysAndSubbeats = true) => {
         let s = JSON.stringify;
 
@@ -238,7 +224,7 @@ class Chart {
         return true;
     }
     
-    public static addKeysToBars = (bars: IChartBar[], contextualized = false) => {
+    public static addKeysToBars = (bars: IChartBar[], contextualized = false, topKey = Chart.getMostCommonSuitableKey(bars).key) => {
         if (!Array.isArray(bars) || bars.length === 0) {
             return;
         }
@@ -257,9 +243,6 @@ class Chart {
         let possibleChordKeys: Array<(RelativeNoteName | NoteName)[]> = [];
         let keyStretchPossibilities: IStretchKeyPossibilities[] = [];
         let currentStretchPossibility: IStretchKeyPossibilities;
-
-        let topKeyCount = Chart.getMostCommonSuitableKey(bars);
-        let topKey = topKeyCount.key;
 
         // Get the possible keys per chord segment
         bars.forEach(barBase => {
@@ -384,6 +367,21 @@ class Chart {
         return keyCounts[0];
     }
 
+    private _songId?: Mongo.ObjectId | string;
+    private _barsBase: IChartBar[];
+    private _bars: IChartBar[];
+    private _chordStretches?: IChordStretch[];
+    private _chordStretchesInRange?: IChordStretch[];
+    private _context: NoteName;
+    private _contextQuality: "Major" | "Minor";
+    private _tempo?: Tempo;
+    private _feel?: Feel;
+    private _externalUpdate?: () => void;
+    private _rangeStartIdx: number;
+    private _rangeEndIdx: number;
+    private _durationInSubbeats: number;
+    private _rangeDurationInSubbeats: number;
+
     constructor(
         externalUpdate?: () => void, 
         barsBase: IChartBar[] = [], 
@@ -401,7 +399,9 @@ class Chart {
         this._rangeStartIdx = rangeStartIdx;
         this._rangeEndIdx = rangeEndIdx;
 
-        Chart.addKeysToBars(barsBase, !context);
+        let topKeyCount = Chart.getMostCommonSuitableKey(barsBase);
+        this._contextQuality = topKeyCount.asMajorCount >= topKeyCount.asRelativeMajorCount ? "Major" : "Minor";
+        Chart.addKeysToBars(barsBase, !context, topKeyCount.key);
 
         // If a context has been provided, assume that this Chart is being
         // used in play mode
@@ -509,17 +509,8 @@ class Chart {
         return this._barsBase;
     }
 
-    get contextQuality(): "Major" | "Minor" | null {
-        for (let bar of this._bars) {
-            for (let seg of bar.chordSegments) {
-                let { key, chordName } = seg;
-
-                if (key === this._context || Domain.getRelativeMinor(key as NoteName | RelativeNoteName) === this._context) {
-                    return Chord.getSuitableKeys(chordName as ChordName).indexOf(this._context) !== -1 ? "Major" : "Minor";
-                }
-            }
-        }
-        return null;
+    get contextQuality(): "Major" | "Minor" {
+        return this._contextQuality;
     }
 
     /**
