@@ -399,9 +399,11 @@ class Chart {
         this._rangeStartIdx = rangeStartIdx;
         this._rangeEndIdx = rangeEndIdx;
 
-        let topKeyCount = Chart.getMostCommonSuitableKey(barsBase);
-        this._contextQuality = topKeyCount.asMajorCount >= topKeyCount.asRelativeMajorCount ? "Major" : "Minor";
-        Chart.addKeysToBars(barsBase, !context, topKeyCount.key);
+        if (barsBase.length > 0) {
+            let topKeyCount = Chart.getMostCommonSuitableKey(barsBase);
+            this._contextQuality = topKeyCount.asMajorCount >= topKeyCount.asRelativeMajorCount ? "Major" : "Minor";
+            Chart.addKeysToBars(barsBase, !context, topKeyCount.key);
+        }
 
         // If a context has been provided, assume that this Chart is being
         // used in play mode
