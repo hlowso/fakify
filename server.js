@@ -8304,6 +8304,7 @@ var ChordShape;
     ChordShape["Dom7b9"] = "Dom7b9";
     ChordShape["Dom7$9"] = "Dom7$9";
     ChordShape["Dom7$11"] = "Dom7$11";
+    ChordShape["Dom713"] = "Dom713";
     ChordShape["Dom9b5"] = "Dom9b5";
     ChordShape["Dom9$5"] = "Dom9$5";
     ChordShape["Aug"] = "Aug";
@@ -8354,6 +8355,7 @@ var PresentableChordShape;
     PresentableChordShape["Dom7b9"] = "7\u266D9";
     PresentableChordShape["Dom7$9"] = "7 #9";
     PresentableChordShape["Dom7$11"] = "7 #11";
+    PresentableChordShape["Dom713"] = "7 (13)";
     PresentableChordShape["Dom9b5"] = "9\u266D5";
     PresentableChordShape["Dom9$5"] = "9 #5";
     PresentableChordShape["Aug"] = "aug";
@@ -73256,9 +73258,11 @@ class Chart {
         this._externalUpdate = externalUpdate;
         this._rangeStartIdx = rangeStartIdx;
         this._rangeEndIdx = rangeEndIdx;
-        let topKeyCount = Chart.getMostCommonSuitableKey(barsBase);
-        this._contextQuality = topKeyCount.asMajorCount >= topKeyCount.asRelativeMajorCount ? "Major" : "Minor";
-        Chart.addKeysToBars(barsBase, !context, topKeyCount.key);
+        if (barsBase.length > 0) {
+            let topKeyCount = Chart.getMostCommonSuitableKey(barsBase);
+            this._contextQuality = topKeyCount.asMajorCount >= topKeyCount.asRelativeMajorCount ? "Major" : "Minor";
+            Chart.addKeysToBars(barsBase, !context, topKeyCount.key);
+        }
         // If a context has been provided, assume that this Chart is being
         // used in play mode
         if (context) {
@@ -74063,6 +74067,10 @@ Chord.shapeToInfo = (shape) => {
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7$11:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
             extension[11] = { target: "T", origin: "4" };
+            return Object.assign({}, infoBase, { extension });
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom713:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
+            extension[13] = { target: "6" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom9b5:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);

@@ -12,6 +12,10 @@ import barsAllBlues from "../../test-data/barsAllBlues";
 import barsAllByMyself from "../../test-data/barsAllByMyself";
 import barsAllofMe from "../../test-data/barsAllofMe";
 import barsAllofYou from "../../test-data/barsAllofYou";
+import barsAlltheThings from "../../test-data/barsAllTheThings";
+import barsAloneTogether from "../../test-data/barsAloneTogether";
+import barsAnthro from "../../test-data/barsAnthropology";
+import barsBillie from "../../test-data/barsBilliesBounce";
 
 const charts = [
     new Chart(() => {}, barsAfricanFlower, "D#|Eb", [ 120, 4 ]),
@@ -24,6 +28,10 @@ const charts = [
     new Chart(() => {}, barsAllByMyself, "C", [ 120, 4 ]),
     new Chart(() => {}, barsAllofMe, "C", [ 120, 4 ]),
     new Chart(() => {}, barsAllofYou, "D#|Eb", [ 120, 4 ]),
+    new Chart(() => {}, barsAlltheThings, "G#|Ab", [ 120, 4 ]),
+    new Chart(() => {}, barsAloneTogether, "F", [ 120, 4 ]),
+    new Chart(() => {}, barsAnthro, "A#|Bb", [ 120, 4 ]),
+    new Chart(() => {}, barsBillie, "A#|Bb", [ 120, 4 ])
 ];
 
 /**
