@@ -17,6 +17,7 @@ import barsAloneTogether from "../../test-data/barsAloneTogether";
 import barsAnthro from "../../test-data/barsAnthropology";
 import barsBillie from "../../test-data/barsBilliesBounce";
 import barsBlackOrpheus from "../../test-data/barsBlackOrpheus";
+import barsBlueInGreen from "../../test-data/barsBlueInGreen";
 
 const charts = [
     new Chart(() => {}, barsAfricanFlower, "D#|Eb", [ 120, 4 ]),
@@ -33,7 +34,8 @@ const charts = [
     new Chart(() => {}, barsAloneTogether, "F", [ 120, 4 ]),
     new Chart(() => {}, barsAnthro, "A#|Bb", [ 120, 4 ]),
     new Chart(() => {}, barsBillie, "A#|Bb", [ 120, 4 ]),
-    new Chart(() => {}, barsBlackOrpheus, "C", [ 120, 4 ])
+    new Chart(() => {}, barsBlackOrpheus, "C", [ 120, 4 ]),
+    new Chart(() => {}, barsBlueInGreen, "C", [ 120, 4 ])
 ];
 
 /**
