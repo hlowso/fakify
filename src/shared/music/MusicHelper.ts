@@ -4,8 +4,6 @@ import { NoteName, RelativeNoteName, IChartBar, IChordSegment, Feel, ChordName }
 export const NUMBER_OF_KEYS = 88;
 export const LOWEST_A = 9;
 export const HIGHEST_C = LOWEST_A + NUMBER_OF_KEYS - 1;
-export const LOWER_TEMPO_LIMIT = 40;
-export const UPPER_TEMPO_LIMIT = 210;
 
 export const contextualize = (note: RelativeNoteName, keyContext: NoteName) => {
     return contextualizeOrDecontextualize(note, keyContext) as NoteName;

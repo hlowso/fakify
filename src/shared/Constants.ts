@@ -5,3 +5,5 @@ export const USER_LIMIT = 5000;
 export const CHART_LIMIT = 5000;
 export const USER_CHART_LIMIT = 100;
 export const BAR_LIMIT = 100;
+export const MAX_BPM = 250;
+export const MIN_BPM = 40;

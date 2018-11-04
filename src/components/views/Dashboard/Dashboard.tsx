@@ -3,6 +3,7 @@ import { Button, Glyphicon } from "react-bootstrap";
 import "./Dashboard.css";
 import * as MusicHelper from "../../../shared/music/MusicHelper";
 import { NoteName, Tempo } from "../../../shared/types";
+import { MAX_BPM, MIN_BPM } from "src/shared/Constants";
 
 /**
  * COMPONENT
@@ -82,11 +83,7 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
 
     public renderTempoOptions() {
         let options = [];
-        for (
-                let t = MusicHelper.LOWER_TEMPO_LIMIT; 
-                t <= MusicHelper.UPPER_TEMPO_LIMIT; 
-                t ++
-        ) {
+        for (let t = MAX_BPM; t <= MIN_BPM; t ++) {
             options.push(
                 <option key={t} value={t} >
                     {t}

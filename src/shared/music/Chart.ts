@@ -4,7 +4,7 @@ import * as MusicHelper from "../music/MusicHelper";
 import { IChartBar, Feel, NoteName, Tempo, IMusicIdx, IChordStretch, IChordSegment, ChordName, ChordShape, RelativeNoteName, TimeSignature, ISong } from "../types";
 import { Domain } from "./domain/Domain";
 import { Chord } from "./domain/ChordClass";
-import { BAR_LIMIT, MAX_TITLE_LENGTH } from "../Constants";
+import { BAR_LIMIT, MAX_TITLE_LENGTH, MAX_BPM, MIN_BPM } from "../Constants";
 
 interface IKeyCount {
     key: NoteName | RelativeNoteName;
@@ -51,11 +51,11 @@ class Chart {
             return false;
         }
 
-        if (tempo[0] < MusicHelper.LOWER_TEMPO_LIMIT) {
+        if (tempo[0] < MIN_BPM) {
             return false;
         }
 
-        if (tempo[0] > MusicHelper.UPPER_TEMPO_LIMIT) {
+        if (tempo[0] > MAX_BPM) {
             return false;
         }
 

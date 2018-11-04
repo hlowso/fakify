@@ -73302,7 +73302,7 @@ class Chart {
             }
             return keyCountsAcc;
         }, []);
-        keyCounts.sort((a, b) => b.count - a.count);
+        keyCounts.sort((a, b) => (b.count + Math.max(b.asMajorCount, b.asRelativeMajorCount)) - (a.count + Math.max(a.asMajorCount, a.asRelativeMajorCount)));
         return keyCounts[0];
     }
     /**
