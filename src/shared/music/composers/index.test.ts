@@ -15,9 +15,13 @@ import barsAllofYou from "../../test-data/barsAllofYou";
 import barsAlltheThings from "../../test-data/barsAllTheThings";
 import barsAloneTogether from "../../test-data/barsAloneTogether";
 import barsAnthro from "../../test-data/barsAnthropology";
+import barsBewitched from "../../test-data/barsBewitched";
 import barsBillie from "../../test-data/barsBilliesBounce";
 import barsBlackOrpheus from "../../test-data/barsBlackOrpheus";
+import barsBlueBossa from "../../test-data/barsBlueBossa";
 import barsBlueInGreen from "../../test-data/barsBlueInGreen";
+import barsBodyandSoul from "../../test-data/barsBodyandSoul";
+import barsButNotForMe from "../../test-data/barsButNotForMe";
 
 const charts = [
     new Chart(() => {}, barsAfricanFlower, "D#|Eb", [ 120, 4 ]),
@@ -33,9 +37,13 @@ const charts = [
     new Chart(() => {}, barsAlltheThings, "G#|Ab", [ 120, 4 ]),
     new Chart(() => {}, barsAloneTogether, "F", [ 120, 4 ]),
     new Chart(() => {}, barsAnthro, "A#|Bb", [ 120, 4 ]),
+    new Chart(() => {}, barsBewitched, "C", [ 120, 4 ]),
     new Chart(() => {}, barsBillie, "A#|Bb", [ 120, 4 ]),
     new Chart(() => {}, barsBlackOrpheus, "C", [ 120, 4 ]),
-    new Chart(() => {}, barsBlueInGreen, "C", [ 120, 4 ])
+    new Chart(() => {}, barsBlueBossa, "D#|Eb", [ 120, 4 ]),
+    new Chart(() => {}, barsBlueInGreen, "C", [ 120, 4 ]),
+    new Chart(() => {}, barsBodyandSoul, "C#|Db", [ 120, 4 ]),
+    new Chart(() => {}, barsButNotForMe, "C#|Db", [ 120, 4 ])
 ];
 
 /**

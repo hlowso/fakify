@@ -241,14 +241,12 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
 
         let { editingMode, chart, sessionIdx } = this.props;
         let { linesAreGrouped, hoveredBarIdx } = this.state;
-        let { bars, rangeStartIdx, rangeEndIdx } = chart as Chart;
+        let { rangeStartIdx, rangeEndIdx } = chart as Chart;
         let i = bar.barIdx;
         let prevChordName = prevBar ? prevBar.chordSegments[prevBar.chordSegments.length - 1].chordName : undefined;
         let isCurrentlyPlayingBar = sessionIdx && sessionIdx.barIdx === i;
         let isWithinRange = rangeStartIdx <= i &&
                                 i <= rangeEndIdx;
-        let baseKey = bars[0].chordSegments[0].key; 
-
         return (
             <div 
                 key={i}
@@ -267,7 +265,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             >
                 {this.renderDoubleLine(i, true)}
                 {this.renderTimeSignature(prevBar, bar)}
-                {this.renderBarContent(i, this.renderBarChordElements(bar, !!isCurrentlyPlayingBar, baseKey as string, prevChordName))}
+                {this.renderBarContent(i, this.renderBarChordElements(bar, !!isCurrentlyPlayingBar, (chart as Chart).context, prevChordName))}
                 {this.renderDoubleLine(i, false)}
             </div>
         );
