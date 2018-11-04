@@ -53,7 +53,7 @@ export class Search extends Component<ISearchProps, ISearchState> {
                     </InputGroup.Button>
                     
                 </InputGroup>
-                <div className="matches" style={{ minHeight: Array.isArray(matchElems) ? matchElems.length * this._matchHeight : 0 }} >
+                <div className="matches" style={{ minHeight: Array.isArray(matchElems) ? Math.min(400, matchElems.length * this._matchHeight) : 0 }} >
                     {matchElems}
                 </div>
             </div>
@@ -117,7 +117,7 @@ export class Search extends Component<ISearchProps, ISearchState> {
 
     private _onMatchLeave = (evt: React.MouseEvent<Element>) => {
         let { toElement } = evt.nativeEvent;
-        if (toElement.className.split(" ").indexOf("match") === -1) {
+        if (toElement && toElement.className.split(" ").indexOf("match") === -1) {
             this.setState({ ignoreBlur: false });
         }
     }
