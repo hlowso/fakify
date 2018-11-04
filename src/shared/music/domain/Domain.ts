@@ -56,6 +56,11 @@ export class Domain {
         return set[ Util.mod((set as any).indexOf(key) - 3, 12 )];
     }
 
+    public static getRelativeMajor(key: NoteName | RelativeNoteName) {
+        let set = Domain.NOTE_NAMES.indexOf(key as NoteName) !== -1 ? Domain.NOTE_NAMES : Domain.RELATIVE_NOTE_NAMES;
+        return set[ Util.mod((set as any).indexOf(key) + 3, 12 )];
+    }
+
     protected _notes: Note[];
     protected _noteClasses: Note[];
   

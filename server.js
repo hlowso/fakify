@@ -24965,8 +24965,8 @@ module.exports = { connectOp, logout, validOptions };
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["i"] = voicingContainsNoClusters;
-/* harmony export (immutable) */ __webpack_exports__["h"] = pickClosestKey;
+/* harmony export (immutable) */ __webpack_exports__["g"] = voicingContainsNoClusters;
+/* harmony export (immutable) */ __webpack_exports__["f"] = pickClosestKey;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Util__ = __webpack_require__(39);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__types__ = __webpack_require__(28);
 
@@ -24975,21 +24975,15 @@ const NUMBER_OF_KEYS = 88;
 /* unused harmony export NUMBER_OF_KEYS */
 
 const LOWEST_A = 9;
-/* harmony export (immutable) */ __webpack_exports__["c"] = LOWEST_A;
+/* harmony export (immutable) */ __webpack_exports__["b"] = LOWEST_A;
 
 const HIGHEST_C = LOWEST_A + NUMBER_OF_KEYS - 1;
 /* harmony export (immutable) */ __webpack_exports__["a"] = HIGHEST_C;
 
-const LOWER_TEMPO_LIMIT = 40;
-/* harmony export (immutable) */ __webpack_exports__["b"] = LOWER_TEMPO_LIMIT;
-
-const UPPER_TEMPO_LIMIT = 210;
-/* harmony export (immutable) */ __webpack_exports__["d"] = UPPER_TEMPO_LIMIT;
-
 const contextualize = (note, keyContext) => {
     return contextualizeOrDecontextualize(note, keyContext);
 };
-/* harmony export (immutable) */ __webpack_exports__["f"] = contextualize;
+/* harmony export (immutable) */ __webpack_exports__["d"] = contextualize;
 
 const contextualizeOrDecontextualize = (note, keyContext, decontextualize = false) => {
     let targetReferenceIdx = NOTE_NAMES.indexOf(keyContext);
@@ -25084,7 +25078,7 @@ const contextualizeOrDecontextualizeBars = (barsBase, newKeyContext, decontextua
         return contextualizedBar;
     });
 };
-/* harmony export (immutable) */ __webpack_exports__["g"] = contextualizeOrDecontextualizeBars;
+/* harmony export (immutable) */ __webpack_exports__["e"] = contextualizeOrDecontextualizeBars;
 
 const adjustBarTimes = (bars, feel) => {
     // First add the durationInBeats to each chord segment
@@ -25104,7 +25098,7 @@ const adjustBarTimes = (bars, feel) => {
             return _adjustBarsSwingFeel(bars);
     }
 };
-/* harmony export (immutable) */ __webpack_exports__["e"] = adjustBarTimes;
+/* harmony export (immutable) */ __webpack_exports__["c"] = adjustBarTimes;
 
 // Adjust chart attributes, etc. that have to do with time so that
 // the every quarter note is divided into 3 subbeats. This makes
@@ -25482,7 +25476,7 @@ class Domain {
     }
     _buildFromNoteClasses() {
         this._notes = [];
-        for (let n = __WEBPACK_IMPORTED_MODULE_2__MusicHelper__["c" /* LOWEST_A */]; n <= __WEBPACK_IMPORTED_MODULE_2__MusicHelper__["a" /* HIGHEST_C */]; n++) {
+        for (let n = __WEBPACK_IMPORTED_MODULE_2__MusicHelper__["b" /* LOWEST_A */]; n <= __WEBPACK_IMPORTED_MODULE_2__MusicHelper__["a" /* HIGHEST_C */]; n++) {
             let noteClass = this._noteClasses.find(note => note.basePitch === __WEBPACK_IMPORTED_MODULE_0__Util__["e" /* mod */](n, 12));
             if (noteClass) {
                 this._notes.push(new __WEBPACK_IMPORTED_MODULE_1__Note__["a" /* Note */](n, noteClass.position, noteClass.isRequired));
@@ -33332,25 +33326,31 @@ module.exports = Chunk;
 
 "use strict";
 const MAX_TITLE_LENGTH = 50;
-/* harmony export (immutable) */ __webpack_exports__["d"] = MAX_TITLE_LENGTH;
+/* harmony export (immutable) */ __webpack_exports__["e"] = MAX_TITLE_LENGTH;
 
 const MIN_PASSWORD_LENGTH = 8;
-/* harmony export (immutable) */ __webpack_exports__["e"] = MIN_PASSWORD_LENGTH;
+/* harmony export (immutable) */ __webpack_exports__["g"] = MIN_PASSWORD_LENGTH;
 
 const EMAIL_REGEX = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 /* harmony export (immutable) */ __webpack_exports__["c"] = EMAIL_REGEX;
 
 const USER_LIMIT = 5000;
-/* harmony export (immutable) */ __webpack_exports__["g"] = USER_LIMIT;
+/* harmony export (immutable) */ __webpack_exports__["i"] = USER_LIMIT;
 
 const CHART_LIMIT = 5000;
 /* harmony export (immutable) */ __webpack_exports__["b"] = CHART_LIMIT;
 
 const USER_CHART_LIMIT = 100;
-/* harmony export (immutable) */ __webpack_exports__["f"] = USER_CHART_LIMIT;
+/* harmony export (immutable) */ __webpack_exports__["h"] = USER_CHART_LIMIT;
 
 const BAR_LIMIT = 100;
 /* harmony export (immutable) */ __webpack_exports__["a"] = BAR_LIMIT;
+
+const MAX_BPM = 250;
+/* harmony export (immutable) */ __webpack_exports__["d"] = MAX_BPM;
+
+const MIN_BPM = 40;
+/* harmony export (immutable) */ __webpack_exports__["f"] = MIN_BPM;
 
 
 
@@ -71370,7 +71370,7 @@ class ApiHelper {
     constructor(data, secret) {
         // USERS
         this.createUserAsync = (newUser) => __awaiter(this, void 0, void 0, function* () {
-            if (newUser.password.length < __WEBPACK_IMPORTED_MODULE_4__shared_Constants__["e" /* MIN_PASSWORD_LENGTH */] || !__WEBPACK_IMPORTED_MODULE_4__shared_Constants__["c" /* EMAIL_REGEX */].test(newUser.email)) {
+            if (newUser.password.length < __WEBPACK_IMPORTED_MODULE_4__shared_Constants__["g" /* MIN_PASSWORD_LENGTH */] || !__WEBPACK_IMPORTED_MODULE_4__shared_Constants__["c" /* EMAIL_REGEX */].test(newUser.email)) {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["e" /* SignupResponse */].InvalidCredentials;
             }
             let existingUser = yield this._data.getUserByEmailAsync(newUser.email);
@@ -71378,7 +71378,7 @@ class ApiHelper {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["e" /* SignupResponse */].EmailTaken;
             }
             let userCount = yield this._data.countUsersAsync();
-            if (userCount >= __WEBPACK_IMPORTED_MODULE_4__shared_Constants__["g" /* USER_LIMIT */]) {
+            if (userCount >= __WEBPACK_IMPORTED_MODULE_4__shared_Constants__["i" /* USER_LIMIT */]) {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["e" /* SignupResponse */].Error;
             }
             let user = {
@@ -71427,7 +71427,7 @@ class ApiHelper {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].ChartLimit;
             }
             chartCount = yield this._data.countChartsAsync(userId);
-            if (chartCount >= __WEBPACK_IMPORTED_MODULE_4__shared_Constants__["f" /* USER_CHART_LIMIT */]) {
+            if (chartCount >= __WEBPACK_IMPORTED_MODULE_4__shared_Constants__["h" /* USER_CHART_LIMIT */]) {
                 return __WEBPACK_IMPORTED_MODULE_3__shared_types__["a" /* ChartResponse */].UserChartLimit;
             }
             chart.userId = userId;
@@ -73114,9 +73114,9 @@ class Chart {
         };
         this._resetBars = () => {
             if (this._barsBase) {
-                this._bars = __WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["g" /* contextualizeOrDecontextualizeBars */](this._barsBase, this._context);
+                this._bars = __WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["e" /* contextualizeOrDecontextualizeBars */](this._barsBase, this._context);
                 if (this._feel) {
-                    this._bars = __WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["e" /* adjustBarTimes */](this._bars, this._feel);
+                    this._bars = __WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["c" /* adjustBarTimes */](this._bars, this._feel);
                     this._calculateChartDuration();
                 }
                 this._updateBarIndices();
@@ -73216,7 +73216,7 @@ class Chart {
             this._context = (topKeyCount.asMajorCount >= topKeyCount.asRelativeMajorCount
                 ? topKeyCount.key
                 : __WEBPACK_IMPORTED_MODULE_3__domain_Domain__["a" /* Domain */].getRelativeMinor(topKeyCount.key));
-            this._barsBase = __WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["g" /* contextualizeOrDecontextualizeBars */](this._bars, this._context, true);
+            this._barsBase = __WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["e" /* contextualizeOrDecontextualizeBars */](this._bars, this._context, true);
             this._stripBarsBase();
         };
         // Prepares barsBase to be sent to server by stripping it of all 
@@ -73423,10 +73423,10 @@ Chart.validTempo = (tempo) => {
     if (!Array.isArray(tempo) || tempo.length !== 2) {
         return false;
     }
-    if (tempo[0] < __WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["b" /* LOWER_TEMPO_LIMIT */]) {
+    if (tempo[0] < __WEBPACK_IMPORTED_MODULE_5__Constants__["f" /* MIN_BPM */]) {
         return false;
     }
-    if (tempo[0] > __WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["d" /* UPPER_TEMPO_LIMIT */]) {
+    if (tempo[0] > __WEBPACK_IMPORTED_MODULE_5__Constants__["d" /* MAX_BPM */]) {
         return false;
     }
     if (tempo[1] !== 4) {
@@ -73540,7 +73540,7 @@ Chart.validChart = (chart) => {
         }
     }
     let { title, originalContext, originalTempo, barsBase } = chart;
-    if (typeof title !== "string" || title.length > __WEBPACK_IMPORTED_MODULE_5__Constants__["d" /* MAX_TITLE_LENGTH */]) {
+    if (typeof title !== "string" || title.length > __WEBPACK_IMPORTED_MODULE_5__Constants__["e" /* MAX_TITLE_LENGTH */]) {
         return false;
     }
     if (!Chart.validNoteName(originalContext)) {
@@ -73625,7 +73625,7 @@ Chart.addKeysToBars = (bars, contextualized = false, topKey = Chart.getMostCommo
                     let chosenKey;
                     if (keyStretches.length > 0) {
                         let prevKey = keyStretches[keyStretches.length - 1].keys[0];
-                        chosenKey = __WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["h" /* pickClosestKey */](prevKey, currentStretchPossibility.keys);
+                        chosenKey = __WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["f" /* pickClosestKey */](prevKey, currentStretchPossibility.keys);
                     }
                     else {
                         chosenKey = currentStretchPossibility.keys[0];
@@ -73692,8 +73692,8 @@ class Chord extends __WEBPACK_IMPORTED_MODULE_2__Domain__["a" /* Domain */] {
         });
         let contextualizedExtension = (extension
             ? extension.map(change => ({
-                target: Object(__WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["f" /* contextualize */])(change.target, baseNoteName),
-                origin: change.origin ? Object(__WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["f" /* contextualize */])(change.origin, baseNoteName) : undefined
+                target: Object(__WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["d" /* contextualize */])(change.target, baseNoteName),
+                origin: change.origin ? Object(__WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["d" /* contextualize */])(change.origin, baseNoteName) : undefined
             }))
             : undefined);
         let noteClasses = __WEBPACK_IMPORTED_MODULE_2__Domain__["a" /* Domain */].applyExtension(baseNotes, contextualizedExtension);
@@ -74186,7 +74186,7 @@ Chord.chordNamesAreEqual = (cn1, cn2) => {
 Chord.canAddWithoutCluster = (notes, newNote) => {
     let newNotes = [...notes, newNote];
     newNotes.sort((a, b) => a.pitch - b.pitch);
-    return Object(__WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["i" /* voicingContainsNoClusters */])(newNotes.map(n => n.pitch));
+    return Object(__WEBPACK_IMPORTED_MODULE_1__music_MusicHelper__["g" /* voicingContainsNoClusters */])(newNotes.map(n => n.pitch));
 };
 
 

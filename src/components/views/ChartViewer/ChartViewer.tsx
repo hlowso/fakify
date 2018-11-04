@@ -11,6 +11,7 @@ import { BAR_LIMIT } from "../../../shared/Constants";
 import "./ChartViewer.css";
 import "./ChartViewerMobile.css";
 import $ from "jquery";
+import { Domain } from "src/shared/music/domain/Domain";
 
 export interface IChartViewerProps {
     isMobile?: boolean;
@@ -210,7 +211,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                     lastBarsInLines.shift();
                 }
 
-                lineBars.push(this.renderBar(bar, prevBar, isLastInLine, barCountInLine));
+                lineBars.push(this.renderBar(bar, prevBar, isLastInLine, barCountInLine) as JSX.Element);
 
                 if (isLastInLine) {
                     lines.push(this.renderProgressionLine(lineBars));
@@ -238,15 +239,21 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     public renderBar(bar: IChartBar, prevBar: IChartBar | undefined, isLastInLine: boolean, barCountInLine: number) {
-
         let { editingMode, chart, sessionIdx } = this.props;
+
+        if (!chart) {
+            return;
+        }
+
         let { linesAreGrouped, hoveredBarIdx } = this.state;
-        let { rangeStartIdx, rangeEndIdx } = chart as Chart;
+        let { rangeStartIdx, rangeEndIdx } = chart;
         let i = bar.barIdx;
         let prevChordName = prevBar ? prevBar.chordSegments[prevBar.chordSegments.length - 1].chordName : undefined;
         let isCurrentlyPlayingBar = sessionIdx && sessionIdx.barIdx === i;
         let isWithinRange = rangeStartIdx <= i &&
                                 i <= rangeEndIdx;
+        let presentableChordReference = chart.contextQuality === "Major" ? chart.context : Domain.getRelativeMajor(chart.context);
+        
         return (
             <div 
                 key={i}
@@ -265,7 +272,7 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
             >
                 {this.renderDoubleLine(i, true)}
                 {this.renderTimeSignature(prevBar, bar)}
-                {this.renderBarContent(i, this.renderBarChordElements(bar, !!isCurrentlyPlayingBar, (chart as Chart).context, prevChordName))}
+                {this.renderBarContent(i, this.renderBarChordElements(bar, !!isCurrentlyPlayingBar, presentableChordReference, prevChordName))}
                 {this.renderDoubleLine(i, false)}
             </div>
         );
