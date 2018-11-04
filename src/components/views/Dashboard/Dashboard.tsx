@@ -83,7 +83,7 @@ export class Dashboard extends Component<IDashboardProps, IDashboardState> {
 
     public renderTempoOptions() {
         let options = [];
-        for (let t = MAX_BPM; t <= MIN_BPM; t ++) {
+        for (let t = MIN_BPM; t <= MAX_BPM; t ++) {
             options.push(
                 <option key={t} value={t} >
                     {t}
