@@ -321,8 +321,6 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
             );
         }
 
-        console.log(JSON.stringify(barsBase, null, 2));
-
         this._chart = new Chart(
             this.forceUpdate.bind(this), 
             barsBase, 
