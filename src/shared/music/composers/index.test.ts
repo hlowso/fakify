@@ -23,6 +23,10 @@ import barsBlueInGreen from "../../test-data/barsBlueInGreen";
 import barsBodyandSoul from "../../test-data/barsBodyandSoul";
 import barsButNotForMe from "../../test-data/barsButNotForMe";
 import barsCherokee from "../../test-data/barsCherokee";
+import barsConfirmation from "../../test-data/barsConfirmation";
+import barsDaysOfWine from "../../test-data/barsDaysofWineandRoses";
+import barsDontGetAround from "../../test-data/barsDontGetAroundMuchAnymore";
+import barsFlyMeToTheMoon from "../../test-data/barsFlyMeToTheMoon";
 
 const charts = [
     new Chart(() => {}, barsAfricanFlower, "D#|Eb", [ 120, 4 ]),
@@ -45,7 +49,11 @@ const charts = [
     new Chart(() => {}, barsBlueInGreen, "C", [ 120, 4 ]),
     new Chart(() => {}, barsBodyandSoul, "C#|Db", [ 120, 4 ]),
     new Chart(() => {}, barsButNotForMe, "C#|Db", [ 120, 4 ]),
-    new Chart(() => {}, barsCherokee, "A#|Bb", [ 120, 4 ])
+    new Chart(() => {}, barsCherokee, "A#|Bb", [ 120, 4 ]),
+    new Chart(() => {}, barsConfirmation, "A#|Bb", [ 120, 4 ]),
+    new Chart(() => {}, barsDaysOfWine, "F#|Gb", [ 120, 4 ]),
+    new Chart(() => {}, barsDontGetAround, "C", [ 120, 4 ]),
+    new Chart(() => {}, barsFlyMeToTheMoon, "C", [ 120, 4 ])
 ];
 
 /**

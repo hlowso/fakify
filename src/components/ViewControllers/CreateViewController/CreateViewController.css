@@ -17,6 +17,9 @@
 }
 
 #create-view #song-list-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin: auto;
     background-color: white;
     width: 90%;
@@ -30,11 +33,13 @@
     height: 15%;
     padding-top: 20px;
     padding-left: 5px;
+    width: 90%;
 }
 
 #create-view #song-list {
     height: 85%;
     overflow: auto;
+    width: 90%;
 }
 
 #create-view .user-title {
