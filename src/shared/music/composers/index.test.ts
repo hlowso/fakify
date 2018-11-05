@@ -27,6 +27,12 @@ import barsConfirmation from "../../test-data/barsConfirmation";
 import barsDaysOfWine from "../../test-data/barsDaysofWineandRoses";
 import barsDontGetAround from "../../test-data/barsDontGetAroundMuchAnymore";
 import barsFlyMeToTheMoon from "../../test-data/barsFlyMeToTheMoon";
+import barsFootprints from "../../test-data/barsFootprints";
+import barsFour from "../../test-data/barsFour";
+import barsGiantSteps from "../../test-data/barsGiantSteps";
+import barsHaveYouMet from "../../test-data/barsHaveYouMetMIssJones";
+import barsHowHigh from "../../test-data/barsHowHighTheMoon";
+import barsIHearARhapsody from "../../test-data/barsIHearARhapsody";
 
 const charts = [
     new Chart(() => {}, barsAfricanFlower, "D#|Eb", [ 120, 4 ]),
@@ -53,7 +59,13 @@ const charts = [
     new Chart(() => {}, barsConfirmation, "A#|Bb", [ 120, 4 ]),
     new Chart(() => {}, barsDaysOfWine, "F#|Gb", [ 120, 4 ]),
     new Chart(() => {}, barsDontGetAround, "C", [ 120, 4 ]),
-    new Chart(() => {}, barsFlyMeToTheMoon, "C", [ 120, 4 ])
+    new Chart(() => {}, barsFlyMeToTheMoon, "C", [ 120, 4 ]),
+    new Chart(() => {}, barsFootprints, "C", [ 120, 4 ]),
+    new Chart(() => {}, barsFour, "C", [ 120, 4 ]),
+    new Chart(() => {}, barsGiantSteps, "D#|Eb", [ 120, 4 ]),
+    new Chart(() => {}, barsHaveYouMet, "F", [ 120, 4 ]),
+    new Chart(() => {}, barsHowHigh, "F", [ 120, 4 ]),
+    new Chart(() => {}, barsIHearARhapsody, "D#|Eb", [ 120, 4 ])
 ];
 
 /**

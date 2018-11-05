@@ -8305,6 +8305,7 @@ var ChordShape;
     ChordShape["Dom7$9"] = "Dom7$9";
     ChordShape["Dom7$11"] = "Dom7$11";
     ChordShape["Dom7b5b9"] = "Dom7b5b9";
+    ChordShape["Dom7b5$9"] = "Dom7b5$9";
     ChordShape["Dom7$5$9"] = "Dom7$5$9";
     ChordShape["Dom713"] = "Dom713";
     ChordShape["Dom9b5"] = "Dom9b5";
@@ -8358,6 +8359,7 @@ var PresentableChordShape;
     PresentableChordShape["Dom7$9"] = "7 #9";
     PresentableChordShape["Dom7$11"] = "7 #11";
     PresentableChordShape["Dom7b5b9"] = "7 b5 b9";
+    PresentableChordShape["Dom7b5$9"] = "7 b5 #9";
     PresentableChordShape["Dom7$5$9"] = "7 #5 #9";
     PresentableChordShape["Dom713"] = "7 (13)";
     PresentableChordShape["Dom9b5"] = "9\u266D5";
@@ -74080,6 +74082,11 @@ Chord.shapeToInfo = (shape) => {
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
             extension[5] = { target: "T", origin: "5" };
             extension[9] = { target: "H", origin: "2" };
+            return Object.assign({}, infoBase, { extension });
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7b5$9:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
+            extension[5] = { target: "T", origin: "5" };
+            extension[9] = { target: "N", origin: "2" };
             return Object.assign({}, infoBase, { extension });
         case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7$5$9:
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);

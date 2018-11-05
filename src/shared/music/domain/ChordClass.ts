@@ -204,6 +204,12 @@ export class Chord extends Domain {
                 extension[9] = { target: "H", origin: "2" };
                 return { ...infoBase, extension };
 
+            case ChordShape.Dom7b5$9:
+                infoBase = Chord.shapeToInfo(ChordShape.Dom7);
+                extension[5] = { target: "T", origin: "5" };
+                extension[9] = { target: "N", origin: "2" };
+                return { ...infoBase, extension };
+
             case ChordShape.Dom7$5$9:
                 infoBase = Chord.shapeToInfo(ChordShape.Dom7);
                 extension[5] = { target: "U", origin: "5" };
