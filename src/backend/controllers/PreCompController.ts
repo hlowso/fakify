@@ -1,6 +1,7 @@
 import { ApiHelper } from "ApiHelper";
 import { Router } from "express";
-import { IUser, ISession } from "../../shared/types";
+import { IUser, ISession, ITitles } from "../../shared/types";
+import { Response } from "express";
 import * as Mongo from "mongodb";
 
 export enum UnauthorizedResponse {
@@ -66,5 +67,19 @@ export class PreCompController {
         }
 
         return parsedId || null;
+    }
+
+    protected _handleProjectionsAsync = async (res: Response, userId?: Mongo.ObjectId) => {
+        let projections: ITitles | undefined;
+
+        try {
+            projections = await this._api.getChartTitleProjectionsAsync(userId);
+        } catch (err) {
+            res.status(500);
+            res.json(null);
+        }
+
+        res.status(200);
+        return res.json(projections);
     }
 }

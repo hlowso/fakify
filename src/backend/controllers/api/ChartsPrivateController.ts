@@ -14,6 +14,10 @@ export class ChartsPrivateController extends PreCompController {
          * ROUTES
          */
 
+        this._router.get("/user/titles", async (req, res) => {
+            return await this._handleProjectionsAsync(res, (this._user as IUser)._id as Mongo.ObjectId);
+        });
+
         this._router.post("/", async (req, res) => {
             let result: ChartResponse | undefined;
 

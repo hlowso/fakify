@@ -1,8 +1,6 @@
 import { UnauthorizedResponse, PreCompController } from "../PreCompController";
 import { ApiHelper } from "ApiHelper";
-import * as Mongo from "mongodb";
-import { Response } from "express";
-import { IUser, ISong, ITitles } from "../../../shared/types";
+import { ISong } from "../../../shared/types";
 
 export class ChartsController extends PreCompController {
     constructor(api: ApiHelper) {
@@ -16,10 +14,6 @@ export class ChartsController extends PreCompController {
 
         this._router.get("/titles", async (req, res) => {
             return await this._handleProjectionsAsync(res);
-        });
-
-        this._router.get("/user/titles", async (req, res) => {
-            return await this._handleProjectionsAsync(res, (this._user as IUser)._id as Mongo.ObjectId);
         });
 
         this._router.get("/:chartId", async (req, res) => {
@@ -50,19 +44,5 @@ export class ChartsController extends PreCompController {
             res.status(chart ? 200 : 404);
             return res.json(chart);
         });
-    }
-
-    private _handleProjectionsAsync = async (res: Response, userId?: Mongo.ObjectId) => {
-        let projections: ITitles | undefined;
-
-        try {
-            projections = await this._api.getChartTitleProjectionsAsync(userId);
-        } catch (err) {
-            res.status(500);
-            res.json(null);
-        }
-
-        res.status(200);
-        return res.json(projections);
     }
 }
