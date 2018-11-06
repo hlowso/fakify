@@ -1,8 +1,8 @@
 import { DataHelper } from "../backend/DataHelper";
 import { stripBars } from "./migrations/stripBars";
-import { Migration } from "migrations/MigrationBase";
+import { Migration } from "./migrations/MigrationBase";
 
-(async function() {
+(async () => {
     const { 
         MONGO_SERVER, 
         MONGO_USER, 
@@ -18,10 +18,10 @@ import { Migration } from "migrations/MigrationBase";
     };
 
     if (!MIGRATION) {
-        console.error("UNDEFINED MIGRATION. Pass migration name as argument to 'npm run migration' to run a migration."); 
+        throw new Error("UNDEFINED MIGRATION. Pass migration name as argument to 'npm run migration' to run a migration."); 
         return;       
     } else if(!(MIGRATION in migrations)) {
-        console.error(`INVALID MIGRATION: '${MIGRATION}'.`);
+        throw new Error(`INVALID MIGRATION: '${MIGRATION}'.`);
         return;
     }
 
@@ -30,8 +30,12 @@ import { Migration } from "migrations/MigrationBase";
 
     let success = await migrations[MIGRATION as string](data);
 
-    success ? console.log("MIGRATION SUCCESSFUL") : console.error("MIGRATION FAILED");
-
     data.close();
+
+    if (success) {
+        console.log("MIGRATION SUCCESSFUL");
+    } else {
+        throw new Error("MIGRATION FAILED");
+    }
 })();
 
