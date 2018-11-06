@@ -33,6 +33,29 @@ import barsGiantSteps from "../../test-data/barsGiantSteps";
 import barsHaveYouMet from "../../test-data/barsHaveYouMetMIssJones";
 import barsHowHigh from "../../test-data/barsHowHighTheMoon";
 import barsIHearARhapsody from "../../test-data/barsIHearARhapsody";
+import barsILoveYou from "../../test-data/barsILoveYou";
+import barsIRememberYou from "../../test-data/barsIRememberYou";
+import barsIllRememberApril from "../../test-data/barsIllRememberApril";
+import barsImOldFashioned from "../../test-data/barsImOldFashioned";
+import barsIfIShouldLoseYou from "../../test-data/barsIfIShouldLoseYou";
+import barsInAMellowTone from "../../test-data/barsInAMellowTone";
+import barsSentimental from "../../test-data/barsInASentimentalMood";
+import barsMisty from "../../test-data/barsMisty";
+import barsFunny from "../../test-data/barsMyFunnyValentine";
+import barsOleo from "../../test-data/barsOleo";
+import barsSatin from "../../test-data/barsSatinDoll";
+import barsScrapple from "../../test-data/barsScrappleFromTheApple";
+import barsStella from "../../test-data/barsStellaByStarlight";
+import barsSolar from "../../test-data/barsSolar";
+import barsSomeDay from "../../test-data/barsSomeDayMyPrinceWillCome";
+import barsTakeFive from "../../test-data/barsTakeFive";
+import barsTakeTheATrain from "../../test-data/barsTakeTheATrain";
+import barsTheGirlFromIpanema from "../../test-data/barsTheGirlFromIpanema";
+import barsThereIsNoGreaterLove from "../../test-data/barsThereIsNoGreaterLove";
+import barsThereWillNever from "../../test-data/barsThereWillNeverBeAnotherYou";
+import barsUpJumpedSpring from "../../test-data/barsUpJumpedSpring";
+import barsWhispering from "../../test-data/barsWhispering";
+import barsYesterdays from "../../test-data/barsYesterdays";
 
 const charts = [
     new Chart(() => {}, barsAfricanFlower, "D#|Eb", [ 120, 4 ]),
@@ -65,7 +88,30 @@ const charts = [
     new Chart(() => {}, barsGiantSteps, "D#|Eb", [ 120, 4 ]),
     new Chart(() => {}, barsHaveYouMet, "F", [ 120, 4 ]),
     new Chart(() => {}, barsHowHigh, "F", [ 120, 4 ]),
-    new Chart(() => {}, barsIHearARhapsody, "D#|Eb", [ 120, 4 ])
+    new Chart(() => {}, barsIHearARhapsody, "D#|Eb", [ 120, 4 ]),
+    new Chart(() => {}, barsILoveYou, "F", [ 120, 4 ]),
+    new Chart(() => {}, barsIRememberYou, "F", [ 120, 4 ]),
+    new Chart(() => {}, barsIllRememberApril, "G", [ 120, 4 ]),
+    new Chart(() => {}, barsImOldFashioned, "D", [ 120, 4 ]),
+    new Chart(() => {}, barsIfIShouldLoseYou, "D#|Eb", [ 120, 4 ]),
+    new Chart(() => {}, barsInAMellowTone, "G#|Ab", [ 120, 4 ]),
+    new Chart(() => {}, barsSentimental, "D", [ 120, 4 ]),
+    new Chart(() => {}, barsMisty, "D#|Eb", [ 120, 4 ]),
+    new Chart(() => {}, barsFunny, "C", [ 120, 4 ]),
+    new Chart(() => {}, barsOleo, "A#|Bb", [ 120, 4 ]),
+    new Chart(() => {}, barsSatin, "C", [ 120, 4 ]),
+    new Chart(() => {}, barsScrapple, "F", [ 120, 4 ]),
+    new Chart(() => {}, barsSolar, "C", [ 120, 4 ]),
+    new Chart(() => {}, barsSomeDay, "A#|Bb", [ 120, 4 ]),
+    new Chart(() => {}, barsStella, "A#|Bb", [ 120, 4 ]),
+    new Chart(() => {}, barsTakeFive, "D#|Eb", [ 120, 4 ]),
+    new Chart(() => {}, barsTakeTheATrain, "C", [ 120, 4 ]),
+    new Chart(() => {}, barsTheGirlFromIpanema, "F", [ 120, 4 ]),
+    new Chart(() => {}, barsThereIsNoGreaterLove, "A#|Bb", [ 120, 4 ]),
+    new Chart(() => {}, barsThereWillNever, "A#|Bb", [ 120, 4 ]),
+    new Chart(() => {}, barsUpJumpedSpring, "A#|Bb", [ 120, 4 ]),
+    new Chart(() => {}, barsWhispering, "D#|Eb", [ 120, 4 ]),
+    new Chart(() => {}, barsYesterdays, "D", [ 120, 4 ])
 ];
 
 /**

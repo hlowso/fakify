@@ -8310,6 +8310,7 @@ var ChordShape;
     ChordShape["Dom713"] = "Dom713";
     ChordShape["Dom9b5"] = "Dom9b5";
     ChordShape["Dom9$5"] = "Dom9$5";
+    ChordShape["Dom7b9$11"] = "Dom7b9$11";
     ChordShape["Aug"] = "Aug";
     ChordShape["Aug7"] = "Aug7";
     ChordShape["Aug7$9"] = "Aug7$9";
@@ -8358,12 +8359,13 @@ var PresentableChordShape;
     PresentableChordShape["Dom7b9"] = "7\u266D9";
     PresentableChordShape["Dom7$9"] = "7 #9";
     PresentableChordShape["Dom7$11"] = "7 #11";
-    PresentableChordShape["Dom7b5b9"] = "7 b5 b9";
-    PresentableChordShape["Dom7b5$9"] = "7 b5 #9";
+    PresentableChordShape["Dom7b5b9"] = "7\u266D5\u266D9";
+    PresentableChordShape["Dom7b5$9"] = "7\u266D5 #9";
     PresentableChordShape["Dom7$5$9"] = "7 #5 #9";
     PresentableChordShape["Dom713"] = "7 (13)";
     PresentableChordShape["Dom9b5"] = "9\u266D5";
     PresentableChordShape["Dom9$5"] = "9 #5";
+    PresentableChordShape["Dom7b9$11"] = "7\u266D9 #11";
     PresentableChordShape["Aug"] = "aug";
     PresentableChordShape["Aug7"] = "aug7";
     PresentableChordShape["Aug7$9"] = "aug7 #9";
@@ -74106,6 +74108,11 @@ Chord.shapeToInfo = (shape) => {
             infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
             extension[9] = { target: "2" };
             extension[5] = { target: "U", origin: "5" };
+            return Object.assign({}, infoBase, { extension });
+        case __WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7b9$11:
+            infoBase = Chord.shapeToInfo(__WEBPACK_IMPORTED_MODULE_4__types__["b" /* ChordShape */].Dom7);
+            extension[9] = { target: "H", origin: "2" };
+            extension[11] = { target: "T", origin: "5" };
             return Object.assign({}, infoBase, { extension });
         /**
          * AUGMENTED
