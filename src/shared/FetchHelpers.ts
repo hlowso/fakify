@@ -2,16 +2,31 @@ import { StorageHelper } from "./StorageHelper";
 import { Method } from "./types";
 
 const sendRequestAsync = async (path: string, method: Method, payload: any, ignoreUnauthorized = false) => {
-    let url = (
-        process.env.REACT_APP_DEPLOY_BUILD
-            ? "https://fakify.herokuapp.com"
-            : ""
-    ) + path;
+    let url = "";
+    let credentials: "same-origin" | "omit" | "include" | undefined;
+    let mode: "navigate" | "same-origin" | "no-cors" | "cors" | undefined;
+
+    switch (process.env.REACT_APP_DEPLOY_BUILD) {
+        default:
+        case "LOCAL":
+        case "PROD":
+            url = "";
+            credentials = "same-origin";
+            break;
+            
+        case "DEV":
+            url = "https://fakify.herokuapp.com";
+            credentials = "include";
+            mode = "cors";
+            break;
+    }
+
+    url += path;
 
     let options: RequestInit = {
         method,
-        credentials: process.env.REACT_APP_DEPLOY_BUILD ? "include" : "same-origin",
-        mode: process.env.REACT_APP_DEPLOY_BUILD ? "cors" : undefined,    
+        credentials,
+        mode,    
         headers: {
             'content-type': 'application/json',
             'X-Session-Token': StorageHelper.getSessionToken()

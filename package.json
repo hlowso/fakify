@@ -44,7 +44,7 @@
     "build-server": "node_modules/webpack/bin/webpack.js --config src/backend/webpack.config.server.ts",
     "build-migrate": "node_modules/webpack/bin/webpack.js --config src/migration/webpack.config.migrate.ts",
     "migration": "npm run build-migrate && node migrate.js",
-    "deploy-static": "REACT_APP_DEPLOY_BUILD=true npm run build && netlify deploy --prod",
+    "deploy-static": "REACT_APP_DEPLOY_BUILD=DEV npm run build && netlify deploy --prod",
     "deploy-api": "IS_HEROKU=true npm run build-server && git add . && git commit -m 'rebuilt server' && git push heroku master",
     "deploy": "npm run deploy-api && npm run deploy-static"
   },
