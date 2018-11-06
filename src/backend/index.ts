@@ -50,7 +50,7 @@ const exitHandler = (data: DataHelper, options: any, exitCode: number) => {
     // Setup server
     const server = express();
 
-    server.use(express.static('public'));
+    server.use(express.static('build'));
     server.use(bodyParser.json());
 
     // Enable CORS
