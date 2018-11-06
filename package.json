@@ -20,7 +20,7 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
-    "react-scripts-ts": "^2.8.0",
+    "react-scripts-ts": "^4.0.8",
     "reactstrap": "^6.0.1",
     "tsconfig-paths-webpack-plugin": "^3.2.0",
     "typescript": "^3.1.1",
@@ -65,12 +65,14 @@
     "@types/react-native": "^0.57.2",
     "@types/react-router-dom": "^4.2.7",
     "@types/uuid": "^3.4.3",
+    "react-devtools-core": "^3.2.2",
     "concurrently": "^4.0.1",
     "jasmine": "^3.1.0",
     "jest": "^23.6.0",
     "rimraf": "^2.6.2",
     "ts-jest": "^23.10.1",
-    "wdio-jasmine-framework": "^0.3.4"
+    "wdio-jasmine-framework": "^0.3.4",
+    "webpack-cli": "^3.1.2"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -90,5 +92,11 @@
         "tsConfig": "tsconfig.test.json"
       }
     }
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
