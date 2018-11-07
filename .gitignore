@@ -31,4 +31,5 @@ yarn-error.log*
 netlify.toml
 netlifyctl-debug.log
 
+server.js
 migrate.js
