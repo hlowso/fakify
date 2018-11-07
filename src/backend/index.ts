@@ -7,6 +7,8 @@ import { AdminController } from "./controllers/api/AdminController";
 import { ChartsController } from "./controllers/api/ChartsController";
 import { ChartsPrivateController } from "./controllers/api/ChartsPrivateController";
 
+import path from "path";
+
 const exitHandler = (data: DataHelper, options: any, exitCode: number) => {
     data.close();
     if (options.exit) {
@@ -50,7 +52,6 @@ const exitHandler = (data: DataHelper, options: any, exitCode: number) => {
     // Setup server
     const server = express();
 
-    server.use(express.static('build'));
     server.use(bodyParser.json());
 
     // Enable CORS
@@ -81,6 +82,11 @@ const exitHandler = (data: DataHelper, options: any, exitCode: number) => {
     );
 
     server.use("/api", apiRouter);
+
+    server.use(express.static(path.resolve(__dirname, "/build")));
+    server.use("/", (req, res) => {
+        return res.sendFile(path.resolve(__dirname, "/build"))
+    });
 
     server.listen(PORT, () => console.log(`Precomp listening on port ${PORT}!`));
 
