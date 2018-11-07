@@ -24,27 +24,12 @@ const exitHandler = (data: DataHelper, options: any, exitCode: number) => {
 
     let { 
         PORT,
-        TEST_PORT, 
         MONGO_SERVER, 
         MONGO_USER, 
         MONGO_PASSWORD, 
         MONGO_DATABASE_NAME,
-        DEV_MONGO_SERVER, 
-        DEV_MONGO_USER, 
-        DEV_MONGO_PASSWORD, 
-        DEV_MONGO_DATABASE_NAME,
         SESSION_SECRET 
     } = process.env;
-
-    let flag = process.argv[2];
-
-    if (flag === "--test") {
-        PORT = TEST_PORT;
-        MONGO_SERVER = DEV_MONGO_SERVER;
-        MONGO_USER = DEV_MONGO_USER;
-        MONGO_PASSWORD = DEV_MONGO_PASSWORD;
-        MONGO_DATABASE_NAME = DEV_MONGO_DATABASE_NAME;
-    }
 
     // Create database helper
     const data = new DataHelper(
@@ -71,20 +56,20 @@ const exitHandler = (data: DataHelper, options: any, exitCode: number) => {
     server.use(bodyParser.json());
 
     // Enable CORS
-    server.use((req, res, next) => {
-        res.header("Access-Control-Allow-Origin", "https://fakify.netlify.com");
-        res.header("Access-Control-Allow-Headers", "origin, x-requested-with, content-type, accept, set-cookie, x-session-token");
-        res.header("Access-Control-Expose-Headers", "x-session-token");        
-        res.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, HEAD, OPTIONS");
-        res.header("Access-Control-Allow-Credentials", "true");
+    // server.use((req, res, next) => {
+    //     res.header("Access-Control-Allow-Origin", "https://fakify.netlify.com");
+    //     res.header("Access-Control-Allow-Headers", "origin, x-requested-with, content-type, accept, set-cookie, x-session-token");
+    //     res.header("Access-Control-Expose-Headers", "x-session-token");        
+    //     res.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, HEAD, OPTIONS");
+    //     res.header("Access-Control-Allow-Credentials", "true");
 
-        if (req.method === "OPTIONS") {
-            res.status(204);
-            res.json();
-        } else {
-            next();
-        }
-    });
+    //     if (req.method === "OPTIONS") {
+    //         res.status(204);
+    //         res.json();
+    //     } else {
+    //         next();
+    //     }
+    // });
 
     let apiRouter = express.Router();
 
