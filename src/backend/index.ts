@@ -23,18 +23,27 @@ const exitHandler = (data: DataHelper, options: any, exitCode: number) => {
      */
 
     let { 
-        PORT, 
+        PORT,
+        TEST_PORT, 
         MONGO_SERVER, 
         MONGO_USER, 
         MONGO_PASSWORD, 
         MONGO_DATABASE_NAME,
+        DEV_MONGO_SERVER, 
+        DEV_MONGO_USER, 
+        DEV_MONGO_PASSWORD, 
+        DEV_MONGO_DATABASE_NAME,
         SESSION_SECRET 
     } = process.env;
 
-    let chosenPort = process.argv[2];
+    let flag = process.argv[2];
 
-    if (chosenPort) {
-        PORT = chosenPort;
+    if (flag === "--test") {
+        PORT = TEST_PORT;
+        MONGO_SERVER = DEV_MONGO_SERVER;
+        MONGO_USER = DEV_MONGO_USER;
+        MONGO_PASSWORD = DEV_MONGO_PASSWORD;
+        MONGO_DATABASE_NAME = DEV_MONGO_DATABASE_NAME;
     }
 
     // Create database helper
