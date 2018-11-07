@@ -60,7 +60,7 @@ class AppRouter extends Component<IAppRouterProps, IAppRouterState> {
         };
     }
 
-    public componentWillMount() {
+    public componentDidMount() {
         this._audioInitAsync()
             .then(() => this._loadInstrumentsAsync())
             .then(() => {
@@ -129,6 +129,8 @@ class AppRouter extends Component<IAppRouterProps, IAppRouterState> {
             StateHelper
         };
 
+        let selectedSongId = StorageHelper.getSelectedSongId();
+
         return loading
                 ? <h1>loading...</h1> 
                 : (
@@ -137,22 +139,30 @@ class AppRouter extends Component<IAppRouterProps, IAppRouterState> {
                             <Route 
                                 exact={true} 
                                 path='/signup' 
-                                render={() => <SignUpViewController isMobile={isMobile} />} />
+                                render={ () => <SignUpViewController isMobile={isMobile} />} />
                             <Route 
                                 exact={true} 
                                 path='/login'
-                                render={() => <LoginViewController isMobile={isMobile} />} />
+                                render={ () => <LoginViewController isMobile={isMobile} />} />
                             <Route 
                                 exact={true}
                                 path="/play" 
-                                render={ () => <PlayViewController {...PlayVCProps} />} />
+                                render={ (props) => !!selectedSongId ? <Redirect to={`/play/${selectedSongId}`} /> : <PlayViewController {...PlayVCProps} {...props} /> } />
+                            <Route 
+                                exact={true}
+                                path="/play/:songId"
+                                render={ (props) => <PlayViewController {...PlayVCProps} {...props} />} />
                             <Route 
                                 exact={true}
                                 path="/create" 
                                 render={ () => !!user ? <CreateViewController {...CreateVCProps}/> : <Redirect to="/login" />} />
-                            <Route 
+                            <Route
+                                exact={true} 
                                 path="/" 
                                 render={ () => <Redirect to="/play" /> } />
+                            <Route
+                                path="/"
+                                render={ () => <h1 style={{ textAlign: "center" }}>NOT FOUND :(</h1> } />
                         </Switch>
                     </main>
                 );

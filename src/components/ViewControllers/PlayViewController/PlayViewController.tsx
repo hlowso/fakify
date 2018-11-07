@@ -22,6 +22,12 @@ export interface IPlayVCProps {
     SoundActions: ISoundActions;
     StateHelper: IStateHelper;
     sessionManager: SessionManager | ImprovSessionManager | ListeningSessionManager;
+
+    // From Route...
+    history?: any;
+    location?: any;
+    match?: any;
+    staticContext?: any;
 }
 
 export interface IPlayVCState {
@@ -60,14 +66,18 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
     ******************/
 
     public componentDidMount() {
-        let selectedSongId = StorageHelper.getSelectedSongId();
         let hideKeyboard = StorageHelper.getHideKeyboard();
 
         if (hideKeyboard !== this.state.hideKeyboard) {
             this.setState({ hideKeyboard });
         }
 
-        this.loadSongTitlesAsync(selectedSongId);
+        let songId: string | undefined;
+        if (this.props.match && this.props.match.params) {
+            songId = this.props.match.params.songId;
+        }
+
+        this.loadSongTitlesAsync(songId);
 
         window.addEventListener("keydown", this._onKeyDown);
         window.addEventListener("keyup", this._onKeyUp);
@@ -384,14 +394,22 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
     **********************/
 
     public onSongListItemClick = (selectedSongId?: string) => {
-        StorageHelper.setSelectedSongId(selectedSongId);
+        let { history } = this.props;
 
         if (!selectedSongId) {
             this._chart = undefined;
             return this.setState({ selectedSong: undefined });
         }
 
-        this.loadSongAsync(selectedSongId);
+        let newPath = `/play/${selectedSongId}`;
+        StorageHelper.setSelectedSongId(selectedSongId);
+
+        if (history) {
+            this.loadSongAsync(selectedSongId);
+            return history.push(newPath);
+        }
+
+        return window.location.replace(newPath);
     }
 
     /**

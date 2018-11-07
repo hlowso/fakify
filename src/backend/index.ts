@@ -52,6 +52,7 @@ const exitHandler = (data: DataHelper, options: any, exitCode: number) => {
     // Setup server
     const server = express();
 
+    server.use(express.static(path.join(__dirname, "build")));
     server.use(bodyParser.json());
 
     // Enable CORS
@@ -83,10 +84,12 @@ const exitHandler = (data: DataHelper, options: any, exitCode: number) => {
 
     server.use("/api", apiRouter);
 
-    let pathToIndex = path.join(__dirname, "build", "index.html");
+    let pathToApp = path.join(__dirname, "build", "index.html");
 
-    server.use(/\/.*/, (req, res) => {
-        return res.sendFile(pathToIndex);
+    // Catch all other requests and return the app which will generate a
+    // "Not Found" message
+    server.get(/\/.*/, (req, res) => {
+        return res.sendFile(pathToApp);
     });
 
     server.listen(PORT, () => console.log(`Fakify listening on port ${PORT}!`));
