@@ -30,7 +30,8 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
     let maxSubbeatWait: number;
     let subbeatWait: number;
     let remainderOfCurrStretch = 0;
-    let remainderOfCurrStretchPlusNextStretch: number;
+    let durationIntoNextStretch: number;
+    let remainderOfCurrStretchPlusSomeOfNextStretch: number;
     let stretchIdx = -1;
     let buffer: number | undefined = 0;
 
@@ -82,17 +83,15 @@ export const compPianoSwingV2 = (chart: Chart, prevMusic?: IMusicBar[]): IPart =
         
         // It is assumed that the current stretch has been voiced
         // (initially, remainderOfCurrStretch is set to 0 and stretchIdx is set to -1
-        // so that remainderOfCurrStretchPlusNextStretch will be the duration of only the 
+        // so that remainderOfCurrStretchPlusSomeOfNextStretch will be the duration of only some of the 
         // first stretch)
         
         currTwoBarDuration = getCurrTwoBarDuration(barsInRange, musicIdx ? musicIdx.barIdx : chart.rangeStartIdx);
-        remainderOfCurrStretchPlusNextStretch = remainderOfCurrStretch + getStretchDuration(chordStretchesInRange, stretchIdx + 1);
+        durationIntoNextStretch = Math.floor(getStretchDuration(chordStretchesInRange, stretchIdx + 1) / 2);
+        remainderOfCurrStretchPlusSomeOfNextStretch = remainderOfCurrStretch + durationIntoNextStretch;
         
-        // Get the maximum possible wait time in subbeats/
-        // Subtract 2 from remainder of curr stretch plus next because the next voicing
-        // must land at or before the second last subbeat of the next stretch in order
-        // for it to count for that stretch
-        maxSubbeatWait = Math.min(currTwoBarDuration, remainderOfCurrStretchPlusNextStretch - 2);
+        // Get the maximum possible wait time in subbeats
+        maxSubbeatWait = Math.min(currTwoBarDuration, remainderOfCurrStretchPlusSomeOfNextStretch);
         subbeatWait = getMaxDuration(maxSubbeatWait, absSubbeatIdx, buffer);
         buffer = undefined;
         setMaxStrokeDuration(maxStrokeDurationBars, subbeatWait, musicIdx);

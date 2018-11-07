@@ -359,6 +359,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
                     ? i
                     : rangeStartIdx
         );
+        
         let rangeEndIdxUpdate = (
             withinRange
                 ? i
