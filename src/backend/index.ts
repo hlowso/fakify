@@ -22,7 +22,7 @@ const exitHandler = (data: DataHelper, options: any, exitCode: number) => {
      * SETUP
      */
 
-    const { 
+    let { 
         PORT, 
         MONGO_SERVER, 
         MONGO_USER, 
@@ -30,6 +30,12 @@ const exitHandler = (data: DataHelper, options: any, exitCode: number) => {
         MONGO_DATABASE_NAME,
         SESSION_SECRET 
     } = process.env;
+
+    let chosenPort = process.argv[2];
+
+    if (chosenPort) {
+        PORT = chosenPort;
+    }
 
     // Create database helper
     const data = new DataHelper(
