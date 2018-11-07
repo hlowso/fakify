@@ -397,6 +397,7 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         let { history } = this.props;
 
         if (!selectedSongId) {
+            this._stopSession();
             this._chart = undefined;
             return this.setState({ selectedSong: undefined });
         }
