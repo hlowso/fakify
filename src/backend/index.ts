@@ -83,12 +83,13 @@ const exitHandler = (data: DataHelper, options: any, exitCode: number) => {
 
     server.use("/api", apiRouter);
 
-    server.use(express.static(path.resolve(__dirname, "/build")));
-    server.use("/", (req, res) => {
-        return res.sendFile(path.resolve(__dirname, "/build"))
+    let pathToIndex = path.join(__dirname, "build", "index.html");
+
+    server.use(/\/.*/, (req, res) => {
+        return res.sendFile(pathToIndex);
     });
 
-    server.listen(PORT, () => console.log(`Precomp listening on port ${PORT}!`));
+    server.listen(PORT, () => console.log(`Fakify listening on port ${PORT}!`));
 
     /**
      * CLEANUP
