@@ -9,6 +9,8 @@ import { ChartsPrivateController } from "./controllers/api/ChartsPrivateControll
 
 import path from "path";
 
+require("dotenv").config();
+
 const exitHandler = (data: DataHelper, options: any, exitCode: number) => {
     data.close();
     if (options.exit) {

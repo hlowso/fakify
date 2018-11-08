@@ -2,6 +2,8 @@ import { DataHelper } from "../backend/DataHelper";
 import { stripBars } from "./migrations/stripBars";
 import { Migration } from "./migrations/MigrationBase";
 
+require("dotenv").config();
+
 (async () => {
     const { 
         MONGO_SERVER, 

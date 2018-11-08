@@ -1,5 +1,4 @@
 const path = require('path');
-const Dotenv = require('webpack-dotenv-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 module.exports = {
@@ -22,7 +21,6 @@ module.exports = {
     path: path.resolve(__dirname, '../../')
   },
   target: "node",
-  plugins: process.env.IS_HEROKU ? undefined : [ new Dotenv({ path: "./.env" }) ],
   node: {
     __dirname: false
   }
