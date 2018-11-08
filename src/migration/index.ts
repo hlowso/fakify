@@ -19,10 +19,8 @@ import { Migration } from "./migrations/MigrationBase";
 
     if (!MIGRATION) {
         throw new Error("UNDEFINED MIGRATION. Pass migration name as argument to 'npm run migration' to run a migration."); 
-        return;       
     } else if(!(MIGRATION in migrations)) {
         throw new Error(`INVALID MIGRATION: '${MIGRATION}'.`);
-        return;
     }
 
     let data = new DataHelper(MONGO_SERVER as string, MONGO_USER as string, MONGO_PASSWORD as string, MONGO_DATABASE_NAME as string);
