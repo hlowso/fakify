@@ -27,7 +27,10 @@ class MenuBar extends Component<IMenuBarProps, IMenuBarState> {
         return (
             <div id="menu-bar">
                 { !isMobile && <div style={{ height: 20, width: 28 }} /> }
-                <Search songTitles={this.props.songTitles} onSongTitleClick={this.props.onSongTitleClick} />
+                <Search 
+                    songTitles={this.props.songTitles} 
+                    onSongTitleClick={this.props.onSongTitleClick}
+                    isMobile={isMobile} />
                 <Button style={{ height: 34, padding: "3px 6px" }} onClick={openMIDISettingsModal} >
                     <Glyphicon glyph="cog"  />
                 </Button>

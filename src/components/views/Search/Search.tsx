@@ -4,6 +4,7 @@ import { ISongTitle } from "../../../shared/types";
 import "./Search.css";
 
 export interface ISearchProps {
+    isMobile: boolean;
     songTitles: { [songId: string]: string };
     onSongTitleClick: (songId?: string) => void;
 }
@@ -29,8 +30,18 @@ export class Search extends Component<ISearchProps, ISearchState> {
 
     public render() {
 
+        let { isMobile } = this.props;
         let { query } = this.state;
         let matchElems = this.renderMatchElements();
+        let matchElemsMinHeight = (
+            Array.isArray(matchElems) 
+                ? (
+                    isMobile
+                        ? Math.min(275, matchElems.length * this._matchHeight)
+                        : Math.min(400, matchElems.length * this._matchHeight)
+                )
+                : 0
+        );
 
         return (
             <div id="search" style={{ display: "flex", flexDirection: "column", width: "40%", minWidth: 250 }} >
@@ -53,7 +64,7 @@ export class Search extends Component<ISearchProps, ISearchState> {
                     </InputGroup.Button>
                     
                 </InputGroup>
-                <div className="matches" style={{ minHeight: Array.isArray(matchElems) ? Math.min(400, matchElems.length * this._matchHeight) : 0 }} >
+                <div className="matches" style={{ minHeight: matchElemsMinHeight }} >
                     {matchElems}
                 </div>
             </div>
