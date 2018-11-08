@@ -38,14 +38,16 @@
     "clean-native": "rimraf build-native",
     "build": "react-scripts-ts build",
     "build-native": "npm run clean-native && tsc -p src/native",
+    "build-app": "npm run build && npm run build-server",
     "test": "node_modules/jest/bin/jest.js",
     "eject": "react-scripts-ts eject",
     "build-server": "node_modules/webpack/bin/webpack.js --config src/backend/webpack.config.server.ts",
     "build-migrate": "node_modules/webpack/bin/webpack.js --config src/migration/webpack.config.migrate.ts",
     "migration": "npm run build-migrate && node migrate.js",
-    "deploy-static": "REACT_APP_DEPLOY_BUILD=DEV npm run build && netlify deploy --prod",
-    "deploy-api": "IS_HEROKU=true npm run build-server && git add . && git commit -m 'rebuilt server' && git push heroku master",
-    "deploy": "npm run deploy-api && npm run deploy-static"
+    "deploy-static-OLD": "REACT_APP_DEPLOY_BUILD=DEV npm run build && netlify deploy --prod",
+    "deploy-api-OLD": "IS_HEROKU=true npm run build-server && git add . && git commit -m 'rebuilt server' && git push heroku master",
+    "deploy-OLD": "npm run deploy-api && npm run deploy-static",
+    "deploy-test": "npm run build-app && rm -fr deploys && mkdir -p deploys/test && mv build server.js deploys/test && scp -r deploys/test 159.89.125.234:~/fakify/deploys/"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.1",

@@ -33,3 +33,5 @@ netlifyctl-debug.log
 
 server.js
 migrate.js
+
+deploys/
