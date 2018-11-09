@@ -1,12 +1,12 @@
 import * as Util from "../../../../Util";
 import { Chord } from "../../../domain/ChordClass";
 import { ChordName, Tempo, IMusicBar, IPart, IMusicIdx, IChordSegment, IStroke, IChordStretch, IChartBar } from "../../../../types";
+import { MAX_BPM } from "../../../../Constants";
 import Chart from "../../../Chart";
 
 const VEL_FACTOR = 0.6;
 const DURATION_SPREAD_ROOT = 3;
 const DURATION_SPREAD_FACTOR = Math.log2(DURATION_SPREAD_ROOT);
-const MAX_TEMPO = 210;
 const VOICING_TARGET = 60;
 const INITIAL_REFERRAL_TO_PREVIOUS_MUSIC_ODDS = 0.75;
 const NUDGE_WITHIN_RANGE_ODDS = 0.8;
@@ -260,7 +260,7 @@ function getVoicing(chordName: ChordName, previousVoicing: number[]) {
 }
 
 function maxPossibleDurationToDuration(max: number, tempo: Tempo) {
-    let durationSkewer = 0.5 * tempo[0] / MAX_TEMPO; 
+    let durationSkewer = 0.5 * tempo[0] / MAX_BPM; 
 
     // base must be a number between 0 and 2
     let base = Math.random() + (
@@ -268,7 +268,7 @@ function maxPossibleDurationToDuration(max: number, tempo: Tempo) {
             ? 0
             : 1
     );
-    return Math.ceil( max *  Math.pow(base, DURATION_SPREAD_FACTOR) / DURATION_SPREAD_ROOT );
+    return Math.ceil( max * Math.pow(base, DURATION_SPREAD_FACTOR) / DURATION_SPREAD_ROOT );
 }
 
 export default compPianoSwingV2;
