@@ -13,7 +13,7 @@
     "noUnusedParameters": false,
     "noImplicitReturns": false,
     "skipLibCheck": true,
-    "moduleResolution": "Node",
+    "moduleResolution": "node",
     "baseUrl": ".",
     "outDir": "build/dist",
     "lib": ["es6", "dom"],
@@ -37,8 +37,6 @@
     "src/migration",
     "server.js",
     "migrate.js",
-    "webpack.config.server.ts",
-    "webpack.config.migrate.ts",
     "**/*.test.ts",
     "App.js"
   ]

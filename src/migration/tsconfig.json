@@ -13,7 +13,7 @@
       "noUnusedParameters": false,
       "noImplicitReturns": false,
       "skipLibCheck": true,
-      "moduleResolution": "Node",
+      "moduleResolution": "node",
       "baseUrl": ".",
       "outDir": ".",
       "lib": ["es6", "dom"],
