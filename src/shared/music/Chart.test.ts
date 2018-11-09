@@ -7,7 +7,6 @@ import bars7_4WithCs from "../test-data/bars7_4WithCs";
 import barsByeByeBlackBird from "../test-data/barsByeByeBlackbird";
 import barsByeByeWithKeys from "../test-data/barsByeByeBlackbirdWithKeys";
 import barsInvalidDueToTooManyBeatsInOneBar from "../test-data/barsInvalid";
-import chordStretches251InBbMajor from "../test-data/chordStretches251InBbMajor";
 import { Feel, IChordStretch } from "../types";
 
 const chart251InBbMajor = new Chart(() => {}, _251_bars, "A#|Bb", [ 120, 4 ], Feel.Swing);
@@ -32,9 +31,9 @@ test("validBaseBars returns false when passed an array in which 1 bar has too ma
 	expect(Chart.validBaseBars(barsInvalidDueToTooManyBeatsInOneBar)).toBeFalsy();
 });
 
-test("chordStretches are generated properly", () => {
+test("the correct number of chord stretches are generated", () => {
 	let { chordStretches } = chart251InBbMajor;
-	expect(chordStretches).toEqual(chordStretches251InBbMajor);
+	expect((chordStretches as IChordStretch[]).length).toEqual(10);
 });
 
 test("chordStretches have all non zero integer durationInSubbeats values", () => {
