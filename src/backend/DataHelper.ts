@@ -23,7 +23,8 @@ export class DataHelper implements IDataHelper {
      */
 
     get connectionUrl() {
-        return `mongodb://${this._user}:${this._password}@${this._mongoServer}/${this._dbName}`;
+        let auth = (this._user && this._password) ? `${this._user}:${this._password}@` : "";
+        return `mongodb://${auth}${this._mongoServer}/${this._dbName}`;
     }
 
     public connectAsync = () => {
@@ -57,6 +58,18 @@ export class DataHelper implements IDataHelper {
 
     public countUsersAsync = (): Promise<number> => {
         return this._userColl.countDocuments();
+    }
+
+    public getUsersAsync = (): Promise<IUser[]> => {
+        return new Promise((resolve, reject) => {
+            this._userColl.find({}).toArray((err, users) => {
+                if (err !== null) {
+                    reject(err);
+                }
+
+                resolve(users as IUser[]);
+            });
+        });
     }
 
     public getUserByTokenAsync = (token: string): Promise<IUser> => {

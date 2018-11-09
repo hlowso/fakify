@@ -1,5 +1,7 @@
 import { DataHelper } from "../backend/DataHelper";
 import { stripBars } from "./migrations/stripBars";
+import readjustContexts from "./migrations/readjustBarsBaseChordRootsAndOriginalContexts";
+import backupLocally from "./migrations/backupLocally";
 import { Migration } from "./migrations/MigrationBase";
 
 require("dotenv").config();
@@ -16,7 +18,9 @@ require("dotenv").config();
 
     // Add migrations here...
     let migrations: { [name: string]: Migration } = {
-        stripBars
+        stripBars,
+        readjustContexts,
+        backupLocally
     };
 
     if (!MIGRATION) {

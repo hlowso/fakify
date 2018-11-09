@@ -11,6 +11,8 @@ interface IKeyCount {
     count: number;
     asMajorCount: number;
     asRelativeMajorCount: number;
+    asTonicFirstChord: "Major" | "Minor" | undefined;
+    asTonicLastChord: "Major" | "Minor" | undefined;
 };
 
 class Chart {
@@ -344,26 +346,78 @@ class Chart {
     }
 
     public static getMostCommonSuitableKey(bars: IChartBar[]) {
+        let barIdx = 0;
         let keyCounts = bars.reduce((keyCountsAcc, currBar) => {
-            for (let seg of currBar.chordSegments) {
+            for (let segIdx = 0; segIdx < currBar.chordSegments.length; segIdx ++) {
+                let seg = currBar.chordSegments[segIdx];
                 for (let key of Chord.getSuitableKeys(seg.chordName as ChordName)) {
                     let keyCountIdx = keyCountsAcc.findIndex(k => k.key === key);
                     let isMajor = (seg.chordName as ChordName)[0] === key;
                     let isMinor = (seg.chordName as ChordName)[0] === Domain.getRelativeMinor(key as NoteName | RelativeNoteName);
+                    let asTonicFirstChord = barIdx === 0 && segIdx === 0 ? (isMajor ? "Major" : (isMinor ? "Minor" : undefined)) : undefined as "Major" | "Minor" | undefined;;
+                    let asTonicLastChord = barIdx === bars.length - 1 && segIdx === currBar.chordSegments.length - 1 ? (isMajor ? "Major" : (isMinor ? "Minor" : undefined)) : undefined as "Major" | "Minor" | undefined;
 
                     if (keyCountIdx === -1) {
-                        keyCountsAcc.push({ key, count: 1, asMajorCount: isMajor ? 1 : 0, asRelativeMajorCount: isMinor ? 1 : 0 }) 
+                        keyCountsAcc.push({ 
+                            key, 
+                            count: 1, 
+                            asMajorCount: isMajor ? 1 : 0, 
+                            asRelativeMajorCount: isMinor ? 1 : 0,
+                            asTonicFirstChord,
+                            asTonicLastChord
+                        }) 
                     } else {
                         keyCountsAcc[keyCountIdx].count ++;
                         keyCountsAcc[keyCountIdx].asMajorCount += isMajor ? 1 : 0;
                         keyCountsAcc[keyCountIdx].asRelativeMajorCount += isMinor ? 1 : 0;
+                        if (asTonicFirstChord) keyCountsAcc[keyCountIdx].asTonicFirstChord = asTonicFirstChord;
+                        if (asTonicLastChord) keyCountsAcc[keyCountIdx].asTonicLastChord = asTonicLastChord;
                     }
                 }
             }
+
+            barIdx ++;
+
             return keyCountsAcc;
         }, [] as IKeyCount[]);
 
-        keyCounts.sort((a, b) => (b.count + Math.max(b.asMajorCount, b.asRelativeMajorCount)) - (a.count + Math.max(a.asMajorCount, a.asRelativeMajorCount)));
+        keyCounts.forEach(count => {
+            let asMajor = count.asMajorCount;
+            let asMinor = count.asRelativeMajorCount;
+
+            switch (count.asTonicFirstChord) {
+                default:
+                    break;
+
+                case "Major":
+                    count.asMajorCount += asMajor;
+                    break;
+                
+                case "Minor":
+                    count.asRelativeMajorCount += asMinor;
+                    break;
+            }
+
+            switch (count.asTonicLastChord) {
+                default:
+                    break;
+
+                case "Major":
+                    count.asMajorCount += asMajor;
+                    break;
+                
+                case "Minor":
+                    count.asRelativeMajorCount += asMinor;
+                    break;
+            }
+        });
+
+        keyCounts.sort((a, b) => { 
+            let bAsTonic = Math.max(b.asMajorCount, b.asRelativeMajorCount);
+            let aAsTonic = Math.max(a.asMajorCount, a.asRelativeMajorCount);
+            return ((b.count + bAsTonic) - (a.count + aAsTonic)) || bAsTonic - aAsTonic;
+        });
+
         return keyCounts[0];
     }
 
@@ -681,6 +735,14 @@ class Chart {
         this._bars.splice(idx, 1);
         this._onDirectBarsChange();
     }
+
+    public resetBarsBaseFromBars = () => {
+        this._onDirectBarsChange();
+    }
+
+    /**
+     * PRIVATE
+     */
 
     private _getExtendedBar = (idx: number) => {
         if (idx <= 0 || idx > this._bars.length) {
