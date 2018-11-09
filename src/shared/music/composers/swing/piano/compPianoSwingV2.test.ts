@@ -9,6 +9,7 @@ import barsJustForFun from "../../../../test-data/bars-just-for-fun";
 import bars7_4_full from "../../../../test-data/bars-7-4-full-bar";
 import barsByeBye from "../../../../test-data/barsByeByeBlackbird";
 import barsWitchcraft from "../../../../test-data/barsWitchcraft";
+import barsMusicAtWork from "../../../../test-data/barsMusicAtWork";
 import { compPianoSwingV2 } from "./compPianoSwingV2";
 import { Feel, IChordStretch, IMusicBar, IStroke } from "../../../../types";
 
@@ -21,6 +22,7 @@ const chart251Multi = new Chart(() => {}, _251_multichord_bars, "B|Cb", [ 120, 4
 const shortByeBye = new Chart(() => {}, barsByeBye, "F", [ 120, 4 ], Feel.Swing, 3, 17);
 const chartByeBye = new Chart(() => {}, barsByeBye, "F", [ 120, 4 ]);
 const chartWitchcraft = new Chart(() => {}, barsWitchcraft, "F", [ 120, 4 ]);
+const chartMusicAtWork = new Chart(() => {}, barsMusicAtWork, "E", [ 120, 4 ]);
 
 test("generates at least 1 voicing per chord stretch", () => {
 	let testRuns = 50;
@@ -28,8 +30,9 @@ test("generates at least 1 voicing per chord stretch", () => {
 	let successfulRuns = compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings(_251_chart, testRuns);
 	successfulRuns += compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings(chart4Chords, testRuns);
 	successfulRuns += compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings(chart7_4Full, testRuns);
+	successfulRuns += compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings(chartMusicAtWork, testRuns);
 
-	expect(successfulRuns).toBe(testRuns * 3);
+	expect(successfulRuns).toBe(testRuns * 4);
 });
 
 test("generates at least 1 voicing per chord stretch when range is shortened", () => {

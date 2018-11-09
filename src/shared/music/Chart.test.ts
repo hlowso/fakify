@@ -7,6 +7,7 @@ import bars7_4WithCs from "../test-data/bars7_4WithCs";
 import barsByeByeBlackBird from "../test-data/barsByeByeBlackbird";
 import barsByeByeWithKeys from "../test-data/barsByeByeBlackbirdWithKeys";
 import barsInvalidDueToTooManyBeatsInOneBar from "../test-data/barsInvalid";
+import barsMusicAtWork from "../test-data/barsMusicAtWork";
 import { Feel, IChordStretch } from "../types";
 
 const chart251InBbMajor = new Chart(() => {}, _251_bars, "A#|Bb", [ 120, 4 ], Feel.Swing);
@@ -14,6 +15,7 @@ const chart4Chords = new Chart(() => {}, _4_chord_bars, "F#|Gb", [ 120, 4 ], Fee
 const chart251Multi = new Chart(() => {}, _251_bars_multi, "A#|Bb", [ 120, 4 ], Feel.Swing);
 const chart251MultiShortened = new Chart(() => {}, _251_bars_multi, "A#|Bb", [ 120, 4 ], Feel.Swing, 3, 6);
 const chart7_4WithCs = new Chart(() => {}, bars7_4WithCs, "D#|Eb", [ 120, 4 ], Feel.Swing, 3, 3);
+const chartMusicAtWork = new Chart(() => {}, barsMusicAtWork, "E", [ 120, 4 ], Feel.Swing);
 
 test("valid tempo returns true when tempo is valid", () => {
 	expect(Chart.validTempo([120, 4])).toBe(true);
@@ -34,6 +36,11 @@ test("validBaseBars returns false when passed an array in which 1 bar has too ma
 test("the correct number of chord stretches are generated", () => {
 	let { chordStretches } = chart251InBbMajor;
 	expect((chordStretches as IChordStretch[]).length).toEqual(10);
+});
+
+test("the correct number of chord stretches are generated when chart has many chords in one bar", () => {
+	let { chordStretches } = chartMusicAtWork;
+	expect((chordStretches as IChordStretch[]).length).toEqual(4);
 });
 
 test("chordStretches have all non zero integer durationInSubbeats values", () => {

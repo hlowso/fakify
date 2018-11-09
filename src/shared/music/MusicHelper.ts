@@ -219,18 +219,19 @@ const _adjustBarsSwingFeel = (bars: IChartBar[]): IChartBar[] => {
         let startBarReached = false;
 
         for (
-                let barIdx = stretchEnd.barIdx; 
-                !startBarReached; 
-                barIdx = Util.mod(barIdx - 1, adjustedBars.length)
+            let barIdx = stretchEnd.barIdx; 
+            !startBarReached; 
+            barIdx = Util.mod(barIdx - 1, adjustedBars.length)
         ) {
             let { chordSegments } =  adjustedBars[barIdx];
             
             let segmentEndIdx = (
-                barIdx === stretchEnd.barIdx
-                    ? (barIdx === stretchStart.barIdx && stretchEnd.segmentIdx < stretchStart.segmentIdx) 
-                        ? chordSegments.length - 1
-                        : stretchEnd.segmentIdx - 1
-                    : chordSegments.length - 1
+                barIdx === stretchEnd.barIdx && !(
+                    stretchEnd.barIdx === stretchStart.barIdx && 
+                    stretchEnd.segmentIdx < stretchStart.segmentIdx && 
+                    stretchEnd.segmentIdx === 0 
+                ) ? stretchEnd.segmentIdx - 1
+                : chordSegments.length - 1
             );
             
             let segmentStartIdx = (
@@ -239,7 +240,16 @@ const _adjustBarsSwingFeel = (bars: IChartBar[]): IChartBar[] => {
                     : 0
             );
 
-            for (let segmentIdx = segmentEndIdx; segmentIdx >= segmentStartIdx; segmentIdx --) {
+            let segmentIdx = segmentEndIdx;
+
+            if (segmentIdx >= 0) {
+                while (segmentIdx !== segmentStartIdx) {
+                    let seg = chordSegments[segmentIdx];
+                    currentSubbeatSum += seg.durationInSubbeats as number;
+                    seg.subbeatsBeforeChange = currentSubbeatSum;
+                    segmentIdx = Util.mod(segmentIdx - 1, chordSegments.length);
+                }
+    
                 let segment = chordSegments[segmentIdx];
                 currentSubbeatSum += segment.durationInSubbeats as number;
                 segment.subbeatsBeforeChange = currentSubbeatSum;
