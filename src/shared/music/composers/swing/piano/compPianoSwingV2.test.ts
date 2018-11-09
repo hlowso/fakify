@@ -10,6 +10,7 @@ import bars7_4_full from "../../../../test-data/bars-7-4-full-bar";
 import barsByeBye from "../../../../test-data/barsByeByeBlackbird";
 import barsWitchcraft from "../../../../test-data/barsWitchcraft";
 import barsMusicAtWork from "../../../../test-data/barsMusicAtWork";
+import barsTakeFive from "../../../../test-data/barsTakeFive";
 import { compPianoSwingV2 } from "./compPianoSwingV2";
 import { Feel, IChordStretch, IMusicBar, IStroke } from "../../../../types";
 
@@ -23,6 +24,7 @@ const shortByeBye = new Chart(() => {}, barsByeBye, "F", [ 120, 4 ], Feel.Swing,
 const chartByeBye = new Chart(() => {}, barsByeBye, "F", [ 120, 4 ]);
 const chartWitchcraft = new Chart(() => {}, barsWitchcraft, "F", [ 120, 4 ]);
 const chartMusicAtWork = new Chart(() => {}, barsMusicAtWork, "E", [ 120, 4 ]);
+const chartTakeFive = new Chart(() => {}, barsTakeFive, "D#|Eb", [ 120, 4 ]);
 
 test("generates at least 1 voicing per chord stretch", () => {
 	let testRuns = 50;
@@ -31,8 +33,81 @@ test("generates at least 1 voicing per chord stretch", () => {
 	successfulRuns += compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings(chart4Chords, testRuns);
 	successfulRuns += compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings(chart7_4Full, testRuns);
 	successfulRuns += compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings(chartMusicAtWork, testRuns);
+	successfulRuns += compPianoSwingV2_Generates_At_Least_Minimum_Required_Voicings(chartTakeFive, testRuns);
 
-	expect(successfulRuns).toBe(testRuns * 4);
+	expect(successfulRuns).toBe(testRuns * 5);
+});
+
+test("generates voicings with correct required notes", () => {
+	let music: IMusicBar[] | undefined;
+	let successes = 0;
+	let testRuns = 50;
+
+	let checkBarAtSubbeatForEbCoverage = (bar: IMusicBar, subbeat: number) => {
+		let strokes = bar[subbeat];
+		if (strokes) {
+			let stroke = strokes[0];
+			let notes = stroke.notes.map(n => Util.mod(n, 12));
+			if (notes.indexOf(6) !== -1) {
+				return true;
+			}
+		}
+
+		return false
+	};
+
+	let checkBarAtSubbeatForBbCoverage = (bar: IMusicBar, subbeat: number) => {
+		let strokes = bar[subbeat];
+		if (strokes) {
+			let stroke = strokes[0];
+			let notes = stroke.notes.map(n => Util.mod(n, 12));
+			if (notes.indexOf(1) !== -1 && notes.indexOf(8) !== -1) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	testLoop: for (let i = 0; i < testRuns; i ++) {
+		music = compPianoSwingV2(chartTakeFive, music).music;
+		let prevBarCoveredEb = false;
+
+		for (let barIdx = 0; barIdx < 8; barIdx ++) {
+
+			let EbThirdFound = prevBarCoveredEb;
+			let BbThirdAndSeventhFound = false;
+
+			prevBarCoveredEb = false;
+
+			let j = 0;
+			while(j < 8) {
+				if (checkBarAtSubbeatForEbCoverage(music[barIdx], j)) {
+					EbThirdFound = true;
+				}
+				j ++;
+			}
+
+			while(j < 14) {
+				if (checkBarAtSubbeatForBbCoverage(music[barIdx], j)) {
+					BbThirdAndSeventhFound = true;
+				}
+				j ++;
+			}
+
+			if (!EbThirdFound || !BbThirdAndSeventhFound) {
+				continue testLoop;
+			}
+
+			if (checkBarAtSubbeatForEbCoverage(music[barIdx], 14)) {
+				prevBarCoveredEb = true;
+			}
+		}
+		
+		successes ++;
+	}
+
+	expect(successes).toEqual(testRuns);
 });
 
 test("generates at least 1 voicing per chord stretch when range is shortened", () => {

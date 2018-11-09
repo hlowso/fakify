@@ -8,14 +8,17 @@ import barsByeByeBlackBird from "../test-data/barsByeByeBlackbird";
 import barsByeByeWithKeys from "../test-data/barsByeByeBlackbirdWithKeys";
 import barsInvalidDueToTooManyBeatsInOneBar from "../test-data/barsInvalid";
 import barsMusicAtWork from "../test-data/barsMusicAtWork";
-import { Feel, IChordStretch } from "../types";
+import barsTakeFive from "../test-data/barsTakeFive";
+import { Feel, IChordStretch, ChordShape } from "../types";
+import { Chord } from "./domain/ChordClass";
 
-const chart251InBbMajor = new Chart(() => {}, _251_bars, "A#|Bb", [ 120, 4 ], Feel.Swing);
-const chart4Chords = new Chart(() => {}, _4_chord_bars, "F#|Gb", [ 120, 4 ], Feel.Swing);
-const chart251Multi = new Chart(() => {}, _251_bars_multi, "A#|Bb", [ 120, 4 ], Feel.Swing);
+const chart251InBbMajor = new Chart(() => {}, _251_bars, "A#|Bb", [ 120, 4 ]);
+const chart4Chords = new Chart(() => {}, _4_chord_bars, "F#|Gb", [ 120, 4 ]);
+const chart251Multi = new Chart(() => {}, _251_bars_multi, "A#|Bb", [ 120, 4 ]);
 const chart251MultiShortened = new Chart(() => {}, _251_bars_multi, "A#|Bb", [ 120, 4 ], Feel.Swing, 3, 6);
 const chart7_4WithCs = new Chart(() => {}, bars7_4WithCs, "D#|Eb", [ 120, 4 ], Feel.Swing, 3, 3);
-const chartMusicAtWork = new Chart(() => {}, barsMusicAtWork, "E", [ 120, 4 ], Feel.Swing);
+const chartMusicAtWork = new Chart(() => {}, barsMusicAtWork, "E", [ 120, 4 ]);
+const chartTakeFive = new Chart(() => {}, barsTakeFive, "D#|Eb", [ 120, 4 ]);
 
 test("valid tempo returns true when tempo is valid", () => {
 	expect(Chart.validTempo([120, 4])).toBe(true);
@@ -95,4 +98,9 @@ test("changing rangeEndIdx changes chord stretches correctly", () => {
 	chart7_4WithCs.rangeEndIdx = 8;
 	let { chordStretchesInRange } = (chart7_4WithCs as Chart);
 	expect((chordStretchesInRange as IChordStretch[])[0].durationInSubbeats).toBe(126);
+});
+
+test("segmentAtIdx returns the right segment", () => {
+	let seg = chartTakeFive.segmentAtIdx({ barIdx: 0, subbeatIdx: 9 });
+	expect(Chord.chordNamesAreEqual(seg.chordName, [ "A#|Bb", ChordShape.Min7 ])).toBeTruthy();
 });
