@@ -163,7 +163,7 @@ export class Search extends Component<ISearchProps, ISearchState> {
             }
         }
 
-        matchingTitles.sort((a, b) => (a.title < b.title) ? -1 : 1);
+        matchingTitles.sort((a, b) => (a.title.toLowerCase() < b.title.toLowerCase()) ? -1 : 1);
 
         return matchingTitles;
     }
