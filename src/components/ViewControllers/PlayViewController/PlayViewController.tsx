@@ -15,7 +15,6 @@ import "./PlayViewControllerMobile.css";
 import "./PlayViewController.css";
 import { ISong, NoteName, PlayMode, Tempo, IMusicIdx, IChartBar, ISoundActions, IStateHelper } from "../../../shared/types";
 import { Dashboard } from "../../views/Dashboard/Dashboard";
-import $ from "jquery";
 
 export interface IPlayVCProps {
     isMobile: boolean;
@@ -96,54 +95,6 @@ class PlayViewController extends Component<IPlayVCProps, IPlayVCState> {
         window.removeEventListener("click", this.onClickPlayButton, false);
 
         window.removeEventListener("blur", this._stopSession);
-    }
-
-    public componentDidUpdate() {
-        this._setScrollToPutCurrentBarInView();
-    }
-
-    private _setScrollToPutCurrentBarInView = () => {
-
-        let { sessionManager } = this.props;
-
-        if (!sessionManager || !sessionManager.inSession || !sessionManager.sessionIdx) {
-            return;
-        }
-
-        let { sessionIdx } = sessionManager;
-
-        let $chart = $("#chart-viewer") as any;
-        let $currBar: any;
-
-        $(".bar-container").each(function(barIdx) {
-            if (barIdx === sessionIdx.barIdx ) {
-                $currBar = $( this );
-            }
-        });
-
-        if (!$currBar || !$chart) {
-            return;
-        }
-
-        let currBarY = $currBar.offset().top;
-        let chartUpperLimit = $chart.offset().top + 150;
-        let chartLowerLimit = $chart.offset().top + $chart.height() - 150;
-
-        if (chartUpperLimit >= chartLowerLimit) {
-            return;
-        }
-
-        let chartScrollTop = $chart[0].scrollTop;
-        let chartScrollBottom = $chart[0].scrollHeight - $chart.height();
-        let distanceFromLimitToSweetSpot = (chartLowerLimit - chartUpperLimit) / 2;
-
-        if (currBarY < chartUpperLimit && chartScrollTop !== 0) {
-            $chart[0].scrollTop -= (chartUpperLimit - currBarY) + distanceFromLimitToSweetSpot;
-            this.forceUpdate();
-        } else if (currBarY > chartLowerLimit && chartScrollTop !== chartScrollBottom) {
-            $chart[0].scrollTop += (currBarY - chartLowerLimit) + distanceFromLimitToSweetSpot;
-            this.forceUpdate();
-        }
     }
 
     /**************

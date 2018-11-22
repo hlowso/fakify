@@ -41,13 +41,15 @@ export interface IChartViewerState {
     hoveredBarIdx?: number;
     lastInLineIndices?: number[];
     linesAreGrouped?: boolean;
+    barsResized?: boolean;
 }
 
 class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     constructor(props: IChartViewerProps) {
         super(props);
         this.state = {
-            linesAreGrouped: false
+            linesAreGrouped: false,
+            barsResized: false
         };
     }
 
@@ -642,15 +644,19 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                 JSON.stringify(chart.bars) !== JSON.stringify(prevProps.chart.bars) ||
                 isEditingBars !== prevProps.isEditingBars
             ) {
-                this._resetLineGroups();
+                return this._reformatChart();
             }
         }
 
         this._updateBarLines();
+
+        if (this._shouldUpdateScroll(prevProps)) {
+            this._setScrollToPutCurrentBarInView();
+        }
     }
 
-    private _resetLineGroups = () => {
-        this.setState({ linesAreGrouped: false, lastInLineIndices: undefined });
+    private _reformatChart = () => {
+        this.setState({ linesAreGrouped: false, lastInLineIndices: undefined, barsResized: false });
     }
 
     private _updateBarLines = () => {
@@ -741,6 +747,10 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
     }
 
     private _shrinkChordsIfNecessary = () => {
+        if (this.state.barsResized) {
+            return;
+        }
+
         let updateMade = false;
 
         $(".bar-container").each(function(barIdx) {
@@ -759,11 +769,79 @@ class ChartViewer extends Component<IChartViewerProps, IChartViewerState> {
                 $chords.css("font-size", `${currFontSize - 0.5}px`);
                 updateMade = true;
             }
+
         });
 
         if (updateMade) {
             this.forceUpdate();
+        } else {
+            this.setState({ barsResized: true });
         }
+    }
+
+    private _setScrollToPutCurrentBarInView = () => {
+
+        let { sessionIdx } = this.props;
+        let $chart = $("#chart-viewer") as any;
+        let $currBar: any;
+
+        $(".bar-container").each(function(barIdx) {
+            if (barIdx === (sessionIdx as IMusicIdx).barIdx) {
+                $currBar = $( this );
+                return false;
+            }
+            return;
+        });
+
+        if (!$currBar || !$chart) {
+            return;
+        }
+
+        let currBarY = $currBar.offset().top;
+        let chartUpperLimit = $chart.offset().top + 150;
+        let chartLowerLimit = $chart.offset().top + $chart.height() - 150;
+
+        if (chartUpperLimit >= chartLowerLimit) {
+            return;
+        }
+
+        let chartScrollTop = $chart[0].scrollTop;
+        let chartScrollBottom = $chart[0].scrollHeight - $chart.height();
+        let distanceFromLimitToSweetSpot = (chartLowerLimit - chartUpperLimit) / 2;
+
+        if (currBarY < chartUpperLimit && chartScrollTop !== 0) {
+            $chart[0].scrollTop -= (chartUpperLimit - currBarY) + distanceFromLimitToSweetSpot;
+            this.forceUpdate();
+        } else if (currBarY > chartLowerLimit && chartScrollTop !== chartScrollBottom) {
+            $chart[0].scrollTop += (currBarY - chartLowerLimit) + distanceFromLimitToSweetSpot;
+            this.forceUpdate();
+        }
+    }
+
+    private _shouldUpdateScroll = (prevProps: IChartViewerProps) => {
+        let { sessionIdx } = this.props;
+        let { lastInLineIndices } = this.state;
+
+        if (!prevProps) {
+            return true;
+        }
+
+        if (!sessionIdx || !Array.isArray(lastInLineIndices)) {
+            return false;
+        }
+
+        // Update the scroll if a chorus was just finished
+        if (prevProps.sessionIdx && prevProps.sessionIdx.barIdx > sessionIdx.barIdx) {
+            return true;
+        }
+
+        // Don't update the scroll if the current bar belongs to the
+        // same line as the previous bar
+        if (lastInLineIndices.indexOf(sessionIdx.barIdx - 1) === -1) {
+            return false;
+        }
+
+        return true;
     }
 };
 
