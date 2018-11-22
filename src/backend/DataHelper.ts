@@ -74,25 +74,33 @@ export class DataHelper implements IDataHelper {
 
     public getUserByTokenAsync = (token: string): Promise<IUser> => {
         return new Promise((resolve, reject) => {
-            this._userColl.findOne({ token }, (err, user) => {
-                if (err !== null) {
-                    reject(err);
-                }
-
-                resolve(user as IUser);
-            });
+            if (!token || typeof token !== "string") {
+                resolve();
+            } else {
+                this._userColl.findOne({ token }, (err, user) => {
+                    if (err !== null) {
+                        reject(err);
+                    }
+    
+                    resolve(user as IUser);
+                });
+            }
         });
     }
 
     public getUserByEmailAsync = (email: string): Promise<IUser> => {
         return new Promise((resolve, reject) => {
-            this._userColl.findOne({ email }, (err, user) => {
-                if (err !== null) {
-                    reject(err);
-                }
-
-                resolve(user as IUser);
-            });
+            if (!email || typeof email !== "string") {
+                resolve();
+            } else {
+                this._userColl.findOne({ email }, (err, user) => {
+                    if (err !== null) {
+                        reject(err);
+                    }
+    
+                    resolve(user as IUser);
+                });
+            }
         });
     }
 

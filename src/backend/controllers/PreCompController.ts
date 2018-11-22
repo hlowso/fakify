@@ -28,7 +28,7 @@ export class PreCompController {
 
             this._sessionToken = api.decryptSessionTokenEncryption(req.get("X-Session-Token"));
 
-            if (this._sessionToken) {
+            if (!!this._sessionToken && !!this._sessionToken.token) {
                 this._user = await this._api.data.getUserByTokenAsync(this._sessionToken.token);
             }
 
