@@ -56,7 +56,7 @@ class Authenticator extends Component<IAuthenticatorProps, IAuthenticatorState> 
         let userDto = await Api.authenticateAsync();
         let stateUpdate: IAuthenticatorState = { 
             authenticating: false,
-            user: !!userDto ? { email: userDto.email } : undefined 
+            user: !!userDto && !!userDto.email ? { email: userDto.email } : undefined 
         };
         
         this.setState(stateUpdate);
