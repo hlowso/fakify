@@ -59,7 +59,7 @@ export class Search extends Component<ISearchProps, ISearchState> {
                     </InputGroup.Button>
                     <InputGroup.Button>
                         <Button title="Browse" onClick={this._onBrowse} onBlur={this._onLeaveBrowse} >
-                            <Glyphicon glyph="align-justify" />
+                            <Glyphicon glyph="list" />
                         </Button>
                     </InputGroup.Button>
                     
