@@ -28,9 +28,8 @@
   },
   "scripts": {
     "start": "node server.js",
-    "start-server": "npm run build-server && node server.js",
+    "start-dev": "npm run build-app && node server.js",
     "start-test-server": "npm run build-server && node server.js --test",
-    "start-dev": "react-scripts-ts start",
     "start-native": "concurrently \"npm run build-native -- -w\" \"expo start\"",
     "start-android": "expo start --android",
     "start-ios": "expo start --ios",
