@@ -71,7 +71,7 @@
     "rimraf": "^2.6.2",
     "ts-jest": "^23.10.1",
     "wdio-jasmine-framework": "^0.3.4",
-    "webpack-cli": "^3.1.2"
+    "webpack-cli": "^3.3.12"
   },
   "jest": {
     "moduleFileExtensions": [
